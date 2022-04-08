@@ -7,27 +7,27 @@ license = "Insert License Here"
 modId = "probejs"
 version = "${version}"
 displayName = "ProbeJS"
-authors = "Me!"
+authors = "Prunoideae"
 description = '''
 Improving your KubeJS scripting experience by generating auto-completions of all kinds.
 '''
 #logoFile = ""
 
-[[dependencies.examplemod]]
+[[dependencies.probejs]]
 modId = "forge"
 mandatory = true
 versionRange = "[40,)"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.examplemod]]
+[[dependencies.probejs]]
 modId = "minecraft"
 mandatory = true
 versionRange = "[1.18.2,)"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.examplemod]]
+[[dependencies.probejs]]
 modId = "architectury"
 mandatory = true
 versionRange = "[4.1.39,)"
