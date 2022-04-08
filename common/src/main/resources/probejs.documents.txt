@@ -1,0 +1,10 @@
+docs/create.d.ts
+docs/minecraft.d.ts
+docs/integrateddynamics.d.ts
+docs/ars_nouveau.d.ts
+docs/artisanworktables.d.ts
+docs/botania.d.ts
+docs/botanypots.d.ts
+docs/cucumber.d.ts
+docs/dankstorage.d.ts
+docs/extendedcrafting.d.ts

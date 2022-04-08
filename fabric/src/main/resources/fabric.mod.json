@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "probejs",
+  "version": "${version}",
+  "name": "ProbeJS",
+  "description": "Improving your KubeJS scripting experience by generating auto-completions of all kinds.",
+  "authors": [
+    "Prunoideae"
+  ],
+  "contact": {
+    "homepage": "https://fabricmc.net/",
+    "sources": "https://github.com/Prunoideae/ProbeJS"
+  },
+  "license": "GPLv3",
+  "icon": "assets/probejs/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.probejs.fabric.ProbeJSFabric"
+    ]
+  },
+  "mixins": [
+    "probejs.mixins.json"
+  ],
+  "depends": {
+    "fabric": "*",
+    "minecraft": ">=1.18.2",
+    "architectury": ">=4.1.39"
+  }
+}
