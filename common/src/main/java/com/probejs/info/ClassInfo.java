@@ -162,6 +162,10 @@ public class ClassInfo {
         return parameters;
     }
 
+    public boolean isEnum() {
+        return clazzRaw.isEnum();
+    }
+
     public Class<?> getClazzRaw() {
         return clazzRaw;
     }
@@ -169,4 +173,5 @@ public class ClassInfo {
     public String getName() {
         return name;
     }
+
 }

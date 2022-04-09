@@ -3,6 +3,7 @@ package com.probejs.document.type;
 import com.google.common.collect.Sets;
 
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 public class TypeUnion implements IType {
@@ -20,7 +21,7 @@ public class TypeUnion implements IType {
     }
 
     @Override
-    public Set<String> getAssignableNames() {
-        return Sets.cartesianProduct(this.leftType.getAssignableNames(), this.rightType.getAssignableNames()).stream().map(l -> l.get(0) + " | " + l.get(1)).collect(Collectors.toSet());
+    public String getTransformedName(BiFunction<IType, String, String> transformer) {
+        return transformer.apply(this, leftType.getTransformedName(transformer) + " | " + rightType.getTransformedName(transformer));
     }
 }

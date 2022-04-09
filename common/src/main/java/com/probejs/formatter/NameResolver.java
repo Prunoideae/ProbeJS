@@ -54,6 +54,7 @@ public class NameResolver {
     public static final HashMap<Class<?>, Function<ITypeInfo, String>> specialTypeFormatters = new HashMap<>();
     public static final HashMap<Class<?>, Function<Object, String>> specialValueFormatters = new HashMap<>();
     public static final Set<String> keywords = new HashSet<>();
+    public static final Set<String> resolvedPrimitives = new HashSet<>();
 
     public static void putResolvedName(String className, String resolvedName) {
         putResolvedName(className, new ResolvedName(Arrays.stream(resolvedName.split("\\.")).toList()));
@@ -104,7 +105,7 @@ public class NameResolver {
     public static void resolveNames(Set<Class<?>> classes) {
         Set<ResolvedName> usedNames = new HashSet<>(resolvedNames.values());
         for (Class<?> clazz : classes) {
-            String remappedName = clazz.getPackageName() + "." + MethodInfo.RUNTIME.getMappedClass(clazz);
+            String remappedName = MethodInfo.RUNTIME.getMappedClass(clazz);
             ResolvedName resolved = new ResolvedName(Arrays.stream(remappedName.split("\\.")).toList());
             ResolvedName internal = new ResolvedName(List.of("Internal", resolved.getLastName()));
             if (usedNames.contains(internal))
@@ -124,31 +125,36 @@ public class NameResolver {
         return keywords.contains(kw) ? kw + "_" : kw;
     }
 
+    public static void putResolvedPrimitive(Class<?> clazz, String resolvedName) {
+        putResolvedName(clazz, resolvedName);
+        resolvedPrimitives.add(clazz.getName());
+    }
+
     public static void init() {
-        putResolvedName(Object.class, "object");
-        putResolvedName(String.class, "string");
-        putResolvedName(Character.class, "string");
-        putResolvedName(Character.TYPE, "string");
+        putResolvedPrimitive(Object.class, "object");
+        putResolvedPrimitive(String.class, "string");
+        putResolvedPrimitive(Character.class, "string");
+        putResolvedPrimitive(Character.TYPE, "string");
 
-        putResolvedName(Void.class, "void");
-        putResolvedName(Void.TYPE, "void");
+        putResolvedPrimitive(Void.class, "void");
+        putResolvedPrimitive(Void.TYPE, "void");
 
-        putResolvedName(Long.class, "number");
-        putResolvedName(Long.TYPE, "number");
-        putResolvedName(Integer.class, "number");
-        putResolvedName(Integer.TYPE, "number");
-        putResolvedName(Short.class, "number");
-        putResolvedName(Short.TYPE, "number");
-        putResolvedName(Byte.class, "number");
-        putResolvedName(Byte.TYPE, "number");
+        putResolvedPrimitive(Long.class, "number");
+        putResolvedPrimitive(Long.TYPE, "number");
+        putResolvedPrimitive(Integer.class, "number");
+        putResolvedPrimitive(Integer.TYPE, "number");
+        putResolvedPrimitive(Short.class, "number");
+        putResolvedPrimitive(Short.TYPE, "number");
+        putResolvedPrimitive(Byte.class, "number");
+        putResolvedPrimitive(Byte.TYPE, "number");
 
-        putResolvedName(Double.class, "number");
-        putResolvedName(Double.TYPE, "number");
-        putResolvedName(Float.class, "number");
-        putResolvedName(Float.TYPE, "number");
+        putResolvedPrimitive(Double.class, "number");
+        putResolvedPrimitive(Double.TYPE, "number");
+        putResolvedPrimitive(Float.class, "number");
+        putResolvedPrimitive(Float.TYPE, "number");
 
-        putResolvedName(Boolean.class, "boolean");
-        putResolvedName(Boolean.TYPE, "boolean");
+        putResolvedPrimitive(Boolean.class, "boolean");
+        putResolvedPrimitive(Boolean.TYPE, "boolean");
 
         Gson gson = new Gson();
 

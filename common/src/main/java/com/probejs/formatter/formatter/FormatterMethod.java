@@ -1,6 +1,5 @@
 package com.probejs.formatter.formatter;
 
-import com.google.common.collect.Sets;
 import com.probejs.document.DocumentComment;
 import com.probejs.document.DocumentMethod;
 import com.probejs.document.Manager;
@@ -16,9 +15,8 @@ import com.probejs.util.Pair;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class FormatterMethod extends DocumentedFormatter<DocumentMethod> implements IFormatter {
+public class FormatterMethod extends DocumentReceiver<DocumentMethod> implements IFormatter {
     private final MethodInfo methodInfo;
-    private boolean isInterface = false;
 
     private static String getCamelCase(String text) {
         return Character.toLowerCase(text.charAt(0)) + text.substring(1);
@@ -30,10 +28,6 @@ public class FormatterMethod extends DocumentedFormatter<DocumentMethod> impleme
 
     public MethodInfo getMethodInfo() {
         return methodInfo;
-    }
-
-    public void setInterface(boolean anInterface) {
-        isInterface = anInterface;
     }
 
     public String getBean() {
@@ -72,8 +66,8 @@ public class FormatterMethod extends DocumentedFormatter<DocumentMethod> impleme
         return new Pair<>(modifiers, returns);
     }
 
-    private static String formatTypeParameterized(ITypeInfo info) {
-        StringBuilder sb = new StringBuilder(new FormatterType(info).format(0, 0));
+    private static String formatTypeParameterized(ITypeInfo info, boolean useSpecial) {
+        StringBuilder sb = new StringBuilder(new FormatterType(info, useSpecial).format(0, 0));
         if (info instanceof TypeInfoClass clazz && !NameResolver.isTypeSpecial(clazz.getResolvedClass())) {
             if (clazz.getTypeVariables().size() != 0)
                 sb.append("<%s>".formatted(String.join(", ", Collections.nCopies(clazz.getTypeVariables().size(), "any"))));
@@ -82,60 +76,42 @@ public class FormatterMethod extends DocumentedFormatter<DocumentMethod> impleme
     }
 
     private String formatReturn() {
-        return formatTypeParameterized(methodInfo.getReturnType());
+        return formatTypeParameterized(methodInfo.getReturnType(), false);
     }
 
-    private String formatMethodBody(IType returnModifier) {
-        StringBuilder sb = new StringBuilder();
-        if (methodInfo.isStatic() && !isInterface)
-            sb.append("static ");
-        sb.append(methodInfo.getName());
-        if (methodInfo.getTypeVariables().size() != 0)
-            sb.append("<%s>".formatted(methodInfo.getTypeVariables().stream().map(ITypeInfo::getTypeName).collect(Collectors.joining(", "))));
-        sb.append("(%s)");
-        sb.append(": %s".formatted(returnModifier == null ? formatReturn() : returnModifier.getTypeName()));
+    private String formatParamUnderscore(ITypeInfo info) {
+        Class<?> resolvedClass = info.getResolvedClass();
+        //No assigned types, and not enum, use normal route.
+        if (Manager.typesAssignable.get(resolvedClass.getName()) == null && !resolvedClass.isEnum()) {
+            return formatTypeParameterized(info, true);
+        }
+
+        StringBuilder sb = new StringBuilder(new FormatterType(info, false, (typeInfo, rawString) -> {
+            if (typeInfo instanceof TypeInfoClass) {
+                Class<?> clazz = typeInfo.getResolvedClass();
+                if (!NameResolver.resolvedPrimitives.contains(clazz.getName()))
+                    return rawString + "_";
+            }
+            return rawString;
+        }).format(0, 0));
+        if (info instanceof TypeInfoClass clazz) {
+            if (clazz.getTypeVariables().size() != 0)
+                sb.append("<%s>".formatted(String.join(", ", Collections.nCopies(clazz.getTypeVariables().size(), "any"))));
+        }
         return sb.toString();
     }
 
-    private Set<String> formatParam(String name, Object type) {
-        Set<String> results = new HashSet<>();
-        String paramString = name + ": %s";
-        if (type instanceof IType docType) {
-            docType.getAssignableNames().stream().map(paramString::formatted).forEach(results::add);
-        } else if (type instanceof ITypeInfo origType) {
-            results.add(paramString.formatted(formatTypeParameterized(origType)));
-            if (origType instanceof TypeInfoClass clazz) {
-                List<IType> types = Manager.typesAssignable.getOrDefault(clazz.getTypeName(), new ArrayList<>());
-                for (IType t : types) {
-                    results.add(paramString.formatted(t.getTypeName()));
-                }
-            }
-        }
-        return results;
-    }
-
-    private List<String> formatMethods(Integer indent) {
-        List<String> methods = new ArrayList<>();
-
-        Pair<Map<String, IType>, IType> modifierPair = getModifiers();
-        Map<String, IType> modifiers = modifierPair.getFirst();
-        IType returnModifier = modifierPair.getSecond();
-
-        Map<String, String> renames = new HashMap<>();
-        if (document != null)
-            renames.putAll(CommentUtil.getRenames(document.getComment()));
-
-        List<MethodInfo.ParamInfo> params = methodInfo.getParams();
-        List<Set<String>> paramTypes = new ArrayList<>();
-        for (MethodInfo.ParamInfo param : params) {
-            String paramOriginal = param.getName();
-            String realName = renames.getOrDefault(paramOriginal, paramOriginal);
-            paramTypes.add(formatParam(NameResolver.getNameSafe(realName), modifiers.containsKey(paramOriginal) ? modifiers.get(paramOriginal) : param.getType()));
-        }
-
-        String methodBody = formatMethodBody(returnModifier);
-        Sets.cartesianProduct(paramTypes).forEach(p -> methods.add(" ".repeat(indent) + methodBody.formatted(String.join(", ", p))));
-        return methods;
+    private String formatParams(Map<String, IType> modifiers, Map<String, String> renames) {
+        return "(%s)".formatted(
+                methodInfo
+                        .getParams()
+                        .stream()
+                        .map(paramInfo -> "%s: %s".formatted(
+                                NameResolver.getNameSafe(renames.getOrDefault(paramInfo.getName(), paramInfo.getName())),
+                                modifiers.containsKey(paramInfo.getName())
+                                        ? modifiers.get(paramInfo.getName()).getTypeName()
+                                        : formatParamUnderscore(paramInfo.getType())))
+                        .collect(Collectors.joining(", ")));
     }
 
 
@@ -151,7 +127,24 @@ public class FormatterMethod extends DocumentedFormatter<DocumentMethod> impleme
                 formatted.addAll(comment.format(indent, stepIndent));
         }
 
-        formatted.addAll(formatMethods(indent));
+        Pair<Map<String, IType>, IType> modifierPair = getModifiers();
+        Map<String, IType> modifiers = modifierPair.getFirst();
+        IType returnModifier = modifierPair.getSecond();
+        Map<String, String> renames = new HashMap<>();
+        if (document != null)
+            renames.putAll(CommentUtil.getRenames(document.getComment()));
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(" ".repeat(indent));
+        if (methodInfo.isStatic())
+            sb.append("static ");
+        sb.append(methodInfo.getName());
+        if (methodInfo.getTypeVariables().size() != 0)
+            sb.append("<%s>".formatted(methodInfo.getTypeVariables().stream().map(ITypeInfo::getTypeName).collect(Collectors.joining(", "))));
+        sb.append(formatParams(modifiers, renames));
+        sb.append(": %s;".formatted(returnModifier != null ? returnModifier.getTypeName() : formatReturn()));
+
+        formatted.add(sb.toString());
         return formatted;
     }
 
@@ -178,8 +171,7 @@ public class FormatterMethod extends DocumentedFormatter<DocumentMethod> impleme
         if (methodName.startsWith("set")) {
             MethodInfo.ParamInfo info = methodInfo.getParams().get(0);
             String name = info.getName();
-            for (String paramString : formatParam(NameResolver.getNameSafe(name), paramModifiers.containsKey(name) ? paramModifiers.get(name) : info.getType()))
-                formatted.add(" ".repeat(indent) + "set %s(%s);".formatted(getBean(), paramString));
+            formatted.add(" ".repeat(indent) + "set %s%s;".formatted(getBean(), formatParams(paramModifiers, new HashMap<>())));
         }
         return formatted;
     }

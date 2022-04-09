@@ -95,7 +95,7 @@ public class TypingCompiler {
 
         for (Class<?> clazz : globalClasses) {
             FormatterClass formatter = new FormatterClass(ClassInfo.getOrCache(clazz));
-            Manager.classDocuments.getOrDefault(clazz.getName(), new ArrayList<>()).forEach(formatter::setDocument);
+            Manager.classDocuments.getOrDefault(clazz.getName(), new ArrayList<>()).forEach(formatter::addDocument);
 
             NameResolver.ResolvedName name = NameResolver.getResolvedName(clazz.getName());
             if (name.getNamespace().isEmpty()) {

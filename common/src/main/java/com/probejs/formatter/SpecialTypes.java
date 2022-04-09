@@ -10,6 +10,7 @@ import com.probejs.info.type.TypeInfoVariable;
 import dev.latvian.mods.kubejs.item.ingredient.IngredientJS;
 
 import java.util.*;
+import java.util.function.Function;
 
 public class SpecialTypes {
 
@@ -43,7 +44,7 @@ public class SpecialTypes {
             if (resolvedReturn instanceof TypeInfoVariable) {
                 resolvedReturn = variableMap.getOrDefault(resolvedReturn.getTypeName(), new TypeInfoClass(Object.class));
             }
-            return "(%s) => %s".formatted(String.join(", ", formattedParam), new FormatterType(resolvedReturn).format(0, 0));
+            return "((%s) => %s)".formatted(String.join(", ", formattedParam), new FormatterType(resolvedReturn).format(0, 0));
         }
     }
 
@@ -65,6 +66,5 @@ public class SpecialTypes {
 
     public static void init() {
         //Skipping classes that are not reasonably to be a functional interface
-        skippedSpecials.add(IngredientJS.class);
     }
 }

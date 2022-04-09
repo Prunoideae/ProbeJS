@@ -4,6 +4,8 @@ import com.google.common.collect.Sets;
 import com.probejs.document.parser.processor.IDocumentProvider;
 import com.probejs.document.type.IType;
 import com.probejs.document.type.Resolver;
+import com.probejs.document.type.TypeNamed;
+import com.probejs.formatter.NameResolver;
 import com.probejs.formatter.formatter.IFormatter;
 import com.probejs.info.MethodInfo;
 import com.probejs.util.StringUtil;
@@ -27,21 +29,22 @@ public class DocumentMethod extends DocumentProperty implements IDocumentProvide
         return sb.toString();
     }
 
-    private static Set<String> getParamSet(DocumentParam param) {
-        String paramBody = param.name + ": %s";
-        return param.type.getAssignableNames().stream().map(paramBody::formatted).collect(Collectors.toSet());
-    }
-
     @Override
     public List<String> format(Integer indent, Integer stepIndent) {
         List<String> formatted = new ArrayList<>();
         if (comment != null)
             formatted.addAll(comment.format(indent, stepIndent));
         String methodBody = getMethodBody();
-        List<Set<String>> paramSet = getParams().stream().map(DocumentMethod::getParamSet).collect(Collectors.toList());
-        for (List<String> paramsFormatted : Sets.cartesianProduct(paramSet)) {
-            formatted.add(" ".repeat(indent) + methodBody.formatted(String.join(", ", paramsFormatted)));
-        }
+        formatted.add(" ".repeat(indent) + methodBody.formatted(
+                getParams()
+                        .stream()
+                        .map(documentParam -> "%s: %s".formatted(documentParam.getName(), documentParam.getType().getTransformedName((t, s) -> {
+                            if (t instanceof TypeNamed n && NameResolver.resolvedNames.containsKey(n.getRawTypeName()) && !NameResolver.resolvedPrimitives.contains((n.getRawTypeName()))) {
+                                return s + "_";
+                            }
+                            return s;
+                        })))
+                        .collect(Collectors.joining(", "))));
         return formatted;
     }
 

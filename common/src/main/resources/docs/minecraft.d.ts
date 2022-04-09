@@ -1,26 +1,17 @@
 /**
 * @target dev.latvian.mods.kubejs.item.ItemStackJS
-* @assign string
-* @assign object
+* @assign `${string}:${string}`
+* @assign {item: string, count: number, nbt: object}
 */
 class ItemStackJS {
 }
 
 /**
  * @target dev.latvian.mods.kubejs.item.ingredient.IngredientJS
- * @assign string
- * @assign object
+ * @assign `#${string}`
  * @assign dev.latvian.mods.kubejs.item.ItemStackJS
  */
 class IngredientJS {
-
-}
-
-/**
- * @target net.minecraft.world.item.Tier
- * @assign string
- */
-class ItemTier{
 
 }
 

@@ -1,6 +1,7 @@
 package com.probejs.document.type;
 
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 public class TypeArray implements IType {
@@ -20,7 +21,7 @@ public class TypeArray implements IType {
     }
 
     @Override
-    public Set<String> getAssignableNames() {
-        return component.getAssignableNames().stream().map(s -> s + "[]").collect(Collectors.toSet());
+    public String getTransformedName(BiFunction<IType, String, String> transformer) {
+        return transformer.apply(this, component.getTransformedName(transformer) + "[]");
     }
 }

@@ -9,7 +9,7 @@ import com.probejs.info.FieldInfo;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FormatterField extends DocumentedFormatter<DocumentField> implements IFormatter {
+public class FormatterField extends DocumentReceiver<DocumentField> implements IFormatter {
     private final FieldInfo fieldInfo;
     private boolean isInterface = false;
 
