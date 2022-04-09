@@ -1,6 +1,7 @@
 package com.probejs.formatter;
 
 import com.google.gson.Gson;
+import com.probejs.info.MethodInfo;
 import com.probejs.info.type.ITypeInfo;
 
 import java.util.*;
@@ -103,7 +104,8 @@ public class NameResolver {
     public static void resolveNames(Set<Class<?>> classes) {
         Set<ResolvedName> usedNames = new HashSet<>(resolvedNames.values());
         for (Class<?> clazz : classes) {
-            ResolvedName resolved = new ResolvedName(Arrays.stream(clazz.getName().split("\\.")).toList());
+            String remappedName = clazz.getPackageName() + "." + MethodInfo.RUNTIME.getMappedClass(clazz);
+            ResolvedName resolved = new ResolvedName(Arrays.stream(remappedName.split("\\.")).toList());
             ResolvedName internal = new ResolvedName(List.of("Internal", resolved.getLastName()));
             if (usedNames.contains(internal))
                 putResolvedName(clazz.getName(), resolved);

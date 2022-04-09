@@ -25,8 +25,19 @@ public class MethodInfo {
     public static final Remapper RUNTIME = RemappingHelper.createModRemapper();
 
     private static String getRemappedOrDefault(Method method, Class<?> from) {
-        String s = RUNTIME.getMappedMethod(from, method);
-        return s.isEmpty() ? method.getName() : s;
+        String s = method.getName();
+        while (from != null && from != Object.class) {
+            s = RUNTIME.getMappedMethod(from, method);
+            if (!s.equals(method.getName()))
+                break;
+            for (Class<?> implemented : from.getInterfaces()) {
+                s = RUNTIME.getMappedMethod(implemented, method);
+                if (!s.equals(method.getName()))
+                    break;
+            }
+            from = from.getSuperclass();
+        }
+        return s;
     }
 
     public MethodInfo(Method method, Class<?> from) {
