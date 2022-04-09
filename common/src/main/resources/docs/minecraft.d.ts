@@ -17,6 +17,14 @@ class IngredientJS {
 }
 
 /**
+ * @target net.minecraft.world.item.Tier
+ * @assign string
+ */
+class ItemTier{
+
+}
+
+/**
 * @target dev.latvian.mods.kubejs.recipe.RecipeEventJS
 */
 class RecipeEventJS {

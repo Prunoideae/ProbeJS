@@ -1,7 +1,7 @@
 modLoader = "javafml"
 loaderVersion = "[40,)"
-#issueTrackerURL = ""
-license = "Insert License Here"
+issueTrackerURL = "https://github.com/Prunoideae/ProbeJS"
+license = "GPLv3"
 
 [[mods]]
 modId = "probejs"
@@ -11,7 +11,7 @@ authors = "Prunoideae"
 description = '''
 Improving your KubeJS scripting experience by generating auto-completions of all kinds.
 '''
-#logoFile = ""
+logoFile = "icon.png"
 
 [[dependencies.probejs]]
 modId = "forge"

@@ -8,11 +8,11 @@
     "Prunoideae"
   ],
   "contact": {
-    "homepage": "https://fabricmc.net/",
+    "homepage": "https://github.com/Prunoideae/ProbeJS",
     "sources": "https://github.com/Prunoideae/ProbeJS"
   },
   "license": "GPLv3",
-  "icon": "assets/probejs/icon.png",
+  "icon": "icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [
