@@ -33,3 +33,8 @@ mandatory = true
 versionRange = "[4.1.39,)"
 ordering = "AFTER"
 side = "BOTH"
+
+[[dependencies.probejs]]
+modId = "kubejs"
+mandatory = true
+versionRange = "[1802.5.1-build.331,)"

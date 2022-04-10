@@ -10,7 +10,26 @@ class ItemStackJS {
 /**
  * @target dev.latvian.mods.kubejs.item.ingredient.IngredientJS
  * @assign `#${string}`
- * @assign dev.latvian.mods.kubejs.item.ItemStackJS
+ * @assign Internal.ItemStackJS
+ * @assign Internal.FluidStackJS
+ * @assign "*"
+ * @assign `@${string}`
+ * @assign `%${string}`
+ * @assign `/${string}/`
+ * @assign net.minecraft.world.item.crafting.Ingredient
+ * @assign dev.latvian.mods.kubejs.item.ingredient.IngredientJS[]
+ * @assign {type: "forge:nbt", item: `${string}:${string}` | {item: string, count: number}, nbt: object}
+ * @assign {item: Internal.ItemStackJS_, count: number}
+ * @assign {fluid: Internal.FluidStackJS_}
+ * @assign {value: object}
+ * @assign {ingredient: object}
+ * Represents an Ingredient, which can match one or multiple ItemStacks.
+ * 
+ * Can be casted from several object, which has different usages.
+ * 
+ * If you want to specify nbt to check in ItemStack, use either Item.of() or {type: "forge:nbt"}.
+ * 
+ * Using {item: ItemStackJS} will NOT preserve NBT in any form.
  */
 class IngredientJS {
 
@@ -35,6 +54,14 @@ class RecipeEventJS {
      */
     getRecipes(): java.util.Map<java.lang.String, java.lang.Object>;
 
+    /**
+     * Remove recipe(s) by given recipe filter.
+     * 
+     * Please note that some of the recipes are not removable from KubeJS side.
+     * 
+     * An example is tipped arrows, because they do not have actual recipe registered in datapack.
+     */
+    remove(filter: dev.latvian.mods.kubejs.recipe.filter.RecipeFilter): int;
 
     /**
      * @hidden

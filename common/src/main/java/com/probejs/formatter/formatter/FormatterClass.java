@@ -13,6 +13,7 @@ import com.probejs.info.type.ITypeInfo;
 import com.probejs.info.type.InfoTypeResolver;
 import com.probejs.info.type.TypeInfoClass;
 import com.probejs.info.type.TypeInfoParameterized;
+import dev.latvian.mods.rhino.util.EnumTypeWrapper;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -60,18 +61,8 @@ public class FormatterClass extends DocumentReceiver<DocumentClass> implements I
         if (classInfo.isEnum()) {
             //TODO: add special processing for KubeJS - This is only a workaround
             Class<?> clazz = classInfo.getClazzRaw();
-            try {
-                Method values = clazz.getMethod("values");
-                values.setAccessible(true);
-                Object[] enumValues = (Object[]) values.invoke(null);
-                for (Object enumValue : enumValues) {
-                    //Use the name() here so won't be affected by overrides
-                    Method name = Enum.class.getMethod("name");
-                    assignableTypes.add(gson.toJson(name.invoke(enumValue).toString().toLowerCase(Locale.ROOT)));
-                }
-            } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-                e.printStackTrace();
-            }
+            EnumTypeWrapper<?> enumWrapper = EnumTypeWrapper.get(clazz);
+            enumWrapper.nameValues.keySet().stream().map(gson::toJson).forEach(assignableTypes::add);
         }
 
         // First line
@@ -170,6 +161,9 @@ public class FormatterClass extends DocumentReceiver<DocumentClass> implements I
         }
 
         assignableTypes.add(origName);
+        if (comment != null) {
+            formatted.addAll(comment.format(indent, stepIndent));
+        }
         formatted.add(" ".repeat(indent) + "type %s = %s;".formatted(underName, String.join(" | ", assignableTypes)));
         return formatted;
     }
