@@ -4,19 +4,15 @@ import com.google.gson.Gson;
 import com.probejs.ProbeConfig;
 import com.probejs.document.*;
 import com.probejs.document.comment.special.CommentHidden;
-import com.probejs.document.type.IType;
 import com.probejs.document.type.TypeNamed;
 import com.probejs.formatter.NameResolver;
 import com.probejs.info.ClassInfo;
-import com.probejs.info.MethodInfo;
 import com.probejs.info.type.ITypeInfo;
 import com.probejs.info.type.InfoTypeResolver;
 import com.probejs.info.type.TypeInfoClass;
 import com.probejs.info.type.TypeInfoParameterized;
 import dev.latvian.mods.rhino.util.EnumTypeWrapper;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.lang.reflect.TypeVariable;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -59,7 +55,6 @@ public class FormatterClass extends DocumentReceiver<DocumentClass> implements I
         })).collect(Collectors.toList());
 
         if (classInfo.isEnum()) {
-            //TODO: add special processing for KubeJS - This is only a workaround
             Class<?> clazz = classInfo.getClazzRaw();
             EnumTypeWrapper<?> enumWrapper = EnumTypeWrapper.get(clazz);
             enumWrapper.nameValues.keySet().stream().map(gson::toJson).forEach(assignableTypes::add);
@@ -143,6 +138,7 @@ public class FormatterClass extends DocumentReceiver<DocumentClass> implements I
             } else {
                 classInfo.getConstructorInfo().stream().map(FormatterConstructor::new).forEach(f -> formatted.addAll(f.format(indent + stepIndent, stepIndent)));
             }
+
         // additions
         fieldAdditions.forEach(fieldDoc -> formatted.addAll(fieldDoc.format(indent + stepIndent, stepIndent)));
         methodAdditions.forEach(methodDoc -> formatted.addAll(methodDoc.format(indent + stepIndent, stepIndent)));

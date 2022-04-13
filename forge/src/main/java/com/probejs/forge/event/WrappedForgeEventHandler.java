@@ -1,13 +1,10 @@
 package com.probejs.forge.event;
 
-import com.probejs.ProbeJS;
-import com.probejs.plugin.CapturedEvents;
+import com.probejs.plugin.CapturedClasses;
 import dev.latvian.mods.kubejs.forge.KubeJSForgeEventHandlerWrapper;
 import net.minecraftforge.eventbus.api.Event;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.Consumer;
 
 public record WrappedForgeEventHandler(
@@ -15,7 +12,7 @@ public record WrappedForgeEventHandler(
 
     @Override
     public void accept(Event event) {
-        CapturedEvents.capturedRawEvents.put(className, event.getClass());
+        CapturedClasses.capturedRawEvents.put(className, event.getClass());
         inner.accept(event);
     }
 

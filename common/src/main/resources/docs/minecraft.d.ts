@@ -1,4 +1,29 @@
 /**
+ * @target dev.latvian.mods.kubejs.recipe.ingredientaction.IngredientActionFilter
+ * @assign number
+ * @assign Internal.IngredientJS_
+ * @assign string
+ * @assign {item: Internal.IngredientJS_, index: number}
+ */
+class IngredientActionFilter {
+
+}
+
+/**
+ * @target dev.latvian.mods.kubejs.misc.EnchantmentBuilder
+ */
+class EnchantmentBuilder {
+    /**
+     * Set the callback when the enchanted item hits an entity.
+     * 
+     * WARN: This callback will ALWAYS be called TWICE, for both main hand and off hand.
+     * This is an annoying code logic from Vanilla Minecraft. There's no way KubeJS can
+     * change this.
+     */
+    doPostAttack(i: dev.latvian.mods.kubejs.misc.EnchantmentBuilder$PostFunction): dev.latvian.mods.kubejs.misc.EnchantmentBuilder;
+}
+
+/**
 * @target dev.latvian.mods.kubejs.item.ItemStackJS
 * @assign `${string}:${string}`
 * @assign {item: string, count: number, nbt: object}

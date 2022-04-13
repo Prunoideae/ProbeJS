@@ -1,9 +1,10 @@
 {
   "required": true,
   "compatibilityLevel": "JAVA_17",
-  "package": "com.probejs.fabric.mixins",
+  "package": "com.probejs.mixins",
   "mixins": [
-    "OnEventMixin"
+    "OnEventMixin",
+    "OnJavaMixin"
   ],
   "injectors": {
     "defaultRequire": 1

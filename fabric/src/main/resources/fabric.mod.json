@@ -20,7 +20,7 @@
     ]
   },
   "mixins": [
-    "probejs.mixins.json"
+    "probejs.common.mixins.json"
   ],
   "depends": {
     "fabric": "*",

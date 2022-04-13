@@ -1,7 +1,7 @@
-package com.probejs.fabric.mixins;
+package com.probejs.mixins;
 
 import com.probejs.ProbeConfig;
-import com.probejs.fabric.event.WrappedEventHandler;
+import com.probejs.event.WrappedEventHandler;
 import dev.latvian.mods.kubejs.event.EventsJS;
 import dev.latvian.mods.kubejs.event.IEventHandler;
 import org.spongepowered.asm.mixin.Mixin;
