@@ -1,4 +1,12 @@
 /**
+ * @target net.minecraft.resources.ResourceLocation
+ * @assign string
+ */
+class ResourceLocation {
+
+}
+
+/**
  * @target dev.latvian.mods.kubejs.recipe.ingredientaction.IngredientActionFilter
  * @assign number
  * @assign Internal.IngredientJS_

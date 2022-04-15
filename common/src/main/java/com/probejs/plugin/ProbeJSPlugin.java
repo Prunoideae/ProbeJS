@@ -15,7 +15,7 @@ public class ProbeJSPlugin extends KubeJSPlugin {
                 if (o instanceof NativeJavaObject njo) {
                     ProbeJS.LOGGER.info(o);
                     ProbeJS.LOGGER.info(njo.getClassName());
-                    Arrays.stream((njo).getIds()).map(Object::toString).forEach(ProbeJS.LOGGER::info);
+                    Arrays.stream(njo.getIds()).map(Object::toString).forEach(ProbeJS.LOGGER::info);
                 } else {
                     ProbeJS.LOGGER.info(o);
                 }
