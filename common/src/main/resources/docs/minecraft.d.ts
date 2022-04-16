@@ -11,7 +11,7 @@ class ResourceLocation {
  * @assign number
  * @assign Internal.IngredientJS_
  * @assign string
- * @assign {item: Internal.IngredientJS_, index: number}
+ * @assign {item: Internal.IngredientJS_, index?: number}
  */
 class IngredientActionFilter {
 
@@ -34,7 +34,6 @@ class EnchantmentBuilder {
 /**
 * @target dev.latvian.mods.kubejs.item.ItemStackJS
 * @assign `${string}:${string}`
-* @assign {item: string, count: number, nbt: object}
 */
 class ItemStackJS {
 
@@ -52,7 +51,7 @@ class ItemStackJS {
  * @assign net.minecraft.world.item.crafting.Ingredient
  * @assign dev.latvian.mods.kubejs.item.ingredient.IngredientJS[]
  * @assign {type: "forge:nbt", item: `${string}:${string}` | {item: string, count: number}, nbt: object}
- * @assign {item: Internal.ItemStackJS_, count: number}
+ * @assign {item: Internal.ItemStackJS_, count?: number}
  * @assign {fluid: Internal.FluidStackJS_}
  * @assign {value: object}
  * @assign {ingredient: object}
@@ -71,7 +70,7 @@ class IngredientJS {
 /**
  * @target dev.latvian.mods.kubejs.recipe.filter.RecipeFilter
  * @assign dev.latvian.mods.kubejs.recipe.filter.RecipeFilter[]
- * @assign {exact: boolean, not: Internal.RecipeFilter_, or: Internal.RecipeFilter_, id: string | `/${string}/`, type: string, group: string, mod: string, input: Internal.IngredientJS_, output: Internal.IngredientJS_}
+ * @assign {exact?: boolean, not?: Internal.RecipeFilter_, or?: Internal.RecipeFilter_, id?: string | `/${string}/`, type?: string, group?: string, mod?: string, input?: Internal.IngredientJS_, output?: Internal.IngredientJS_}
  */
 class RecipeFilter {
 

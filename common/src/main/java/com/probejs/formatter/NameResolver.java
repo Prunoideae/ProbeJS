@@ -131,7 +131,7 @@ public class NameResolver {
     }
 
     public static void init() {
-        putResolvedPrimitive(Object.class, "object");
+        putResolvedPrimitive(Object.class, "any");
         putResolvedPrimitive(String.class, "string");
         putResolvedPrimitive(Character.class, "string");
         putResolvedPrimitive(Character.TYPE, "string");

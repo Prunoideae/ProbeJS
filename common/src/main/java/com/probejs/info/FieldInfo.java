@@ -33,6 +33,10 @@ public class FieldInfo {
         return Modifier.isStatic(modifiers);
     }
 
+    public boolean isTransient() {
+        return Modifier.isTransient(modifiers);
+    }
+
     public boolean isFinal() {
         return Modifier.isFinal(modifiers);
     }

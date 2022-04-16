@@ -68,6 +68,7 @@ public class ClassInfo {
                 .map(FieldInfo::new)
                 .filter(f -> ClassResolver.acceptField(f.getName()))
                 .filter(f -> !f.shouldHide())
+                .filter(f -> !f.isTransient())
                 .collect(Collectors.toList());
 
         //Resolve types - rollback everything till Object
