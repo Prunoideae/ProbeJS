@@ -90,12 +90,18 @@ public class FormatterClass extends DocumentReceiver<DocumentClass> implements I
         formatted.add(" ".repeat(indent) + String.join(" ", firstLine));
 
         // Fields, methods
+        Set<List<String>> formattedMethods = new HashSet<>();
         methodFormatters.values().forEach(m -> m.stream().filter(mf -> ProbeConfig.INSTANCE.dumpMethod || (mf.getBean() == null || fieldFormatters.containsKey(mf.getBean()) || methodFormatters.containsKey(mf.getBean()))).forEach(mf -> {
             if (classInfo.isInterface() && mf.getMethodInfo().isStatic() && internal)
                 return;
-            formatted.addAll(mf.format(indent + stepIndent, stepIndent));
+            List<String> formattedMethod = mf.format(indent + stepIndent, stepIndent);
+            if (!formattedMethods.contains(formattedMethod)) {
+                formatted.addAll(formattedMethod);
+                formattedMethods.add(formattedMethod);
+            }
         }));
 
+        Set<List<String>> formattedFields = new HashSet<>();
         fieldFormatters.entrySet().stream().filter(e -> !methodFormatters.containsKey(e.getKey())).forEach(f -> {
             if (classInfo.isInterface() && f.getValue().getFieldInfo().isStatic() && internal)
                 return;
