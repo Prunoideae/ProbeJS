@@ -156,13 +156,12 @@ public class FormatterClass extends DocumentReceiver<DocumentClass> implements I
             origName += paramString;
         }
 
-        if (!assignableTypes.isEmpty()) {
-            assignableTypes.add(origName);
-            if (comment != null) {
-                formatted.addAll(comment.format(indent, stepIndent));
-            }
-            formatted.add(" ".repeat(indent) + "type %s = %s;".formatted(underName, String.join(" | ", assignableTypes)));
+        assignableTypes.add(origName);
+        if (comment != null) {
+            formatted.addAll(comment.format(indent, stepIndent));
         }
+        formatted.add(" ".repeat(indent) + "type %s = %s;".formatted(underName, String.join(" | ", assignableTypes)));
+
         return formatted;
     }
 

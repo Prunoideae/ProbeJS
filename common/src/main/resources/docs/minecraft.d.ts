@@ -9,7 +9,7 @@ class ResourceLocation {
 /**
  * @target dev.latvian.mods.kubejs.recipe.ingredientaction.IngredientActionFilter
  * @assign number
- * @assign Internal.IngredientJS_
+ * @assign dev.latvian.mods.kubejs.item.ingredient.IngredientJS
  * @assign string
  * @assign {item: Internal.IngredientJS_, index?: number}
  */
@@ -42,15 +42,15 @@ class ItemStackJS {
 /**
  * @target dev.latvian.mods.kubejs.item.ingredient.IngredientJS
  * @assign `#${string}`
- * @assign Internal.ItemStackJS
- * @assign Internal.FluidStackJS
+ * @assign dev.latvian.mods.kubejs.item.ItemStackJS
+ * @assign dev.latvian.mods.kubejs.fluid.FluidStackJS
  * @assign "*"
  * @assign `@${string}`
  * @assign `%${string}`
  * @assign `/${string}/`
  * @assign net.minecraft.world.item.crafting.Ingredient
  * @assign dev.latvian.mods.kubejs.item.ingredient.IngredientJS[]
- * @assign {type: "forge:nbt", item: `${string}:${string}` | {item: string, count: number}, nbt: object}
+ * @assign {type: "forge:nbt", item: `${string}:${string}` | {item: string, count?: number}, nbt: object}
  * @assign {item: Internal.ItemStackJS_, count?: number}
  * @assign {fluid: Internal.FluidStackJS_}
  * @assign {value: object}
