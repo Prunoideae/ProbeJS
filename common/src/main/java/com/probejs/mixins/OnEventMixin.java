@@ -13,7 +13,7 @@ public class OnEventMixin {
 
     @ModifyVariable(method = "listen", argsOnly = true, at = @At("HEAD"), remap = false)
     private IEventHandler listen(IEventHandler handler, String id) {
-        if (!(handler instanceof WrappedEventHandler) && !ProbeConfig.INSTANCE.disabled)
+        if (!(handler instanceof WrappedEventHandler) && !ProbeConfig.INSTANCE.mixinDisabled)
             return new WrappedEventHandler(id, handler);
         return handler;
     }

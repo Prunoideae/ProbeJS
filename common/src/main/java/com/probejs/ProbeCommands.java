@@ -75,8 +75,8 @@ public class ProbeCommands {
                                     return Command.SINGLE_SUCCESS;
                                 }))
                                 .then(Commands.literal("toggle_mixin").executes(context -> {
-                                    ProbeConfig.INSTANCE.disabled = !ProbeConfig.INSTANCE.disabled;
-                                    context.getSource().sendSuccess(new TextComponent("OnEvent mixin wrapper set to: %s".formatted(ProbeConfig.INSTANCE.disabled ? "disabled" : "enabled")), false);
+                                    ProbeConfig.INSTANCE.mixinDisabled = !ProbeConfig.INSTANCE.mixinDisabled;
+                                    context.getSource().sendSuccess(new TextComponent("OnEvent mixin wrapper set to: %s".formatted(ProbeConfig.INSTANCE.mixinDisabled ? "disabled" : "enabled")), false);
                                     ProbeConfig.INSTANCE.save();
                                     context.getSource().sendSuccess(new TextComponent("Changes will be applied next time you start the game."), false);
                                     return Command.SINGLE_SUCCESS;
