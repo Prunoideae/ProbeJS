@@ -2,7 +2,7 @@
  * @mod extendedcrafting
  */
 class RecipeHolder {
-    extendedcrafting: Document.ExtendedCraftingRecipes;
+    readonly extendedcrafting: Document.ExtendedCraftingRecipes;
 }
 
 /**

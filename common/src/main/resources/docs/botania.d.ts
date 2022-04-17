@@ -2,7 +2,7 @@
  * @mod botania
  */
 class RecipeHolder {
-    botania: Document.BotaniaRecipes;
+    readonly botania: Document.BotaniaRecipes;
 }
 
 /**

@@ -2,7 +2,7 @@
  * @mod botanypots
  */
 class RecipeHolder {
-    botanypots: Document.BotanyPotsRecipes;
+    readonly botanypots: Document.BotanyPotsRecipes;
 }
 
 /**

@@ -2,7 +2,7 @@
  * @mod cucumber
  */
 class RecipeHolder {
-    cucumber: Document.CucumberRecipes;
+    readonly cucumber: Document.CucumberRecipes;
 }
 
 /**

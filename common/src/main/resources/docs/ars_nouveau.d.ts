@@ -2,7 +2,7 @@
  * @mod ars_nouveau
  */
 class RecipeHolder {
-    ars_nouveau: Document.ArsNouveauRecipes;
+    readonly ars_nouveau: Document.ArsNouveauRecipes;
 }
 
 /**

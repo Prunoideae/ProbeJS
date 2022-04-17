@@ -2,7 +2,7 @@
  * @mod dankstorage
  */
  class RecipeHolder {
-    dankstorage: Document.DankStorageRecipes;
+    readonly dankstorage: Document.DankStorageRecipes;
 }
 
 /**

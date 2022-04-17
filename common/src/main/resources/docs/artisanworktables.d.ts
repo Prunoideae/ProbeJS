@@ -2,7 +2,7 @@
  * @mod artisanworktables
  */
  class RecipeHolder {
-    artisanworktables: Document.ArtisanWorktablesRecipes;
+    readonly artisanworktables: Document.ArtisanWorktablesRecipes;
 }
 
 /**

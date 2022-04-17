@@ -39,6 +39,8 @@ public class ProviderClass implements IStateHandler<String>, IDocumentProvider<D
         if (element.startsWith("class") && element.endsWith("{")) {
             String[] elements = element.split(" ");
             name = elements[1];
+            if (name.endsWith("{"))
+                name = name.substring(0, name.length() - 1);
         } else if (element.equals("}")) {
             stack.remove(this);
         }
