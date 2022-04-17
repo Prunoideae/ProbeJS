@@ -11,6 +11,10 @@ public class Resolver {
     public static IType resolveType(String type) {
         type = type.strip();
 
+        //TODO: Resolve object type
+        if (type.startsWith("{"))
+            return new TypeNamed(type);
+
         Pair<String, String> splitUnion = StringUtil.splitFirst(type, "<", ">", "|");
         if (splitUnion != null) {
             return new TypeUnion(resolveType(splitUnion.getFirst()), resolveType(splitUnion.getSecond()));

@@ -164,7 +164,8 @@ public class NameResolver {
                 Short.class, Short.TYPE, Byte.class, Byte.TYPE,
                 Double.class, Double.TYPE, Float.class, Float.TYPE,
                 Boolean.class, Boolean.TYPE);
-
+        putValueFormatter(SpecialTypes::formatMaps, Map.class);
+        
         addKeyword("function");
         addKeyword("debugger");
         addKeyword("in");

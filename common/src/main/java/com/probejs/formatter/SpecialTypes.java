@@ -1,5 +1,6 @@
 package com.probejs.formatter;
 
+import com.probejs.formatter.formatter.FormatterClass;
 import com.probejs.formatter.formatter.FormatterType;
 import com.probejs.info.ClassInfo;
 import com.probejs.info.MethodInfo;
@@ -62,6 +63,24 @@ public class SpecialTypes {
                 }
             }
         }
+    }
+
+    public static String formatMaps(Object obj) {
+        List<String> values = new ArrayList<>();
+        if (obj instanceof Map<?, ?> map) {
+            for (Map.Entry<?, ?> entry : map.entrySet()) {
+                Object key = entry.getKey();
+                Object value = entry.getValue();
+                String formattedKey = NameResolver.formatValue(key);
+                if (formattedKey == null)
+                    continue;
+                String formattedValue = NameResolver.formatValue(value);
+                if (formattedValue == null)
+                    formattedValue = FormatterClass.formatTypeParameterized(new TypeInfoClass(value.getClass()));
+                values.add("%s:%s".formatted(formattedKey, formattedValue));
+            }
+        }
+        return "{%s}".formatted(String.join(",", values));
     }
 
     public static void init() {
