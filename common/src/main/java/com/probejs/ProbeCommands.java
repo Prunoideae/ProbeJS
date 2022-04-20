@@ -31,7 +31,7 @@ public class ProbeCommands {
         dispatcher.register(
                 Commands.literal("probejs")
                         .then(Commands.literal("dump")
-                                .requires(source -> source.getServer().isSingleplayer() || source.hasPermission(2))
+                                .requires(source -> source.getServer().isSingleplayer())
                                 .executes(context -> {
                                     try {
                                         if (ProbeConfig.INSTANCE.autoExport)
@@ -53,7 +53,7 @@ public class ProbeCommands {
                                     return Command.SINGLE_SUCCESS;
                                 }))
                         .then(Commands.literal("clear_cache")
-                                .requires(source -> source.getServer().isSingleplayer() || source.hasPermission(2))
+                                .requires(source -> source.getServer().isSingleplayer())
                                 .executes(context -> {
                                     Path path = KubeJSPaths.EXPORTED.resolve("cachedEvents.json");
                                     if (Files.exists(path)) {
@@ -68,37 +68,47 @@ public class ProbeCommands {
                                     return Command.SINGLE_SUCCESS;
                                 }))
                         .then(Commands.literal("configure")
-                                .then(Commands.literal("toggle_bean").executes(context -> {
-                                    ProbeConfig.INSTANCE.dumpMethod = !ProbeConfig.INSTANCE.dumpMethod;
-                                    context.getSource().sendSuccess(new TextComponent("Keep method while beaning set to: %s".formatted(ProbeConfig.INSTANCE.dumpMethod)), false);
-                                    ProbeConfig.INSTANCE.save();
-                                    return Command.SINGLE_SUCCESS;
-                                }))
-                                .then(Commands.literal("toggle_mixin").executes(context -> {
-                                    ProbeConfig.INSTANCE.mixinDisabled = !ProbeConfig.INSTANCE.mixinDisabled;
-                                    context.getSource().sendSuccess(new TextComponent("OnEvent mixin wrapper set to: %s".formatted(ProbeConfig.INSTANCE.mixinDisabled ? "disabled" : "enabled")), false);
-                                    ProbeConfig.INSTANCE.save();
-                                    context.getSource().sendSuccess(new TextComponent("Changes will be applied next time you start the game."), false);
-                                    return Command.SINGLE_SUCCESS;
-                                }))
-                                .then(Commands.literal("toggle_snippet_order").executes(context -> {
-                                    ProbeConfig.INSTANCE.vanillaOrder = !ProbeConfig.INSTANCE.vanillaOrder;
-                                    context.getSource().sendSuccess(new TextComponent("In snippets, which will appear first: %s".formatted(ProbeConfig.INSTANCE.vanillaOrder ? "mod_id" : "member_type")), false);
-                                    ProbeConfig.INSTANCE.save();
-                                    return Command.SINGLE_SUCCESS;
-                                }))
-                                .then(Commands.literal("toggle_classname_snippets").executes(context -> {
-                                    ProbeConfig.INSTANCE.exportClassNames = !ProbeConfig.INSTANCE.exportClassNames;
-                                    context.getSource().sendSuccess(new TextComponent("Export class name as snippets set to: %s".formatted(ProbeConfig.INSTANCE.exportClassNames)), false);
-                                    ProbeConfig.INSTANCE.save();
-                                    return Command.SINGLE_SUCCESS;
-                                }))
-                                .then(Commands.literal("toggle_autoexport").executes(context -> {
-                                    ProbeConfig.INSTANCE.autoExport = !ProbeConfig.INSTANCE.autoExport;
-                                    context.getSource().sendSuccess(new TextComponent("Auto-export for KubeJS set to: %s".formatted(ProbeConfig.INSTANCE.autoExport)), false);
-                                    ProbeConfig.INSTANCE.save();
-                                    return Command.SINGLE_SUCCESS;
-                                }))
+                                .then(Commands.literal("toggle_bean")
+                                        .requires(source -> source.getServer().isSingleplayer())
+                                        .executes(context -> {
+                                            ProbeConfig.INSTANCE.dumpMethod = !ProbeConfig.INSTANCE.dumpMethod;
+                                            context.getSource().sendSuccess(new TextComponent("Keep method while beaning set to: %s".formatted(ProbeConfig.INSTANCE.dumpMethod)), false);
+                                            ProbeConfig.INSTANCE.save();
+                                            return Command.SINGLE_SUCCESS;
+                                        }))
+                                .then(Commands.literal("toggle_mixin")
+                                        .requires(source -> source.getServer().isSingleplayer())
+                                        .executes(context -> {
+                                            ProbeConfig.INSTANCE.mixinDisabled = !ProbeConfig.INSTANCE.mixinDisabled;
+                                            context.getSource().sendSuccess(new TextComponent("OnEvent mixin wrapper set to: %s".formatted(ProbeConfig.INSTANCE.mixinDisabled ? "disabled" : "enabled")), false);
+                                            ProbeConfig.INSTANCE.save();
+                                            context.getSource().sendSuccess(new TextComponent("Changes will be applied next time you start the game."), false);
+                                            return Command.SINGLE_SUCCESS;
+                                        }))
+                                .then(Commands.literal("toggle_snippet_order")
+                                        .requires(source -> source.getServer().isSingleplayer())
+                                        .executes(context -> {
+                                            ProbeConfig.INSTANCE.vanillaOrder = !ProbeConfig.INSTANCE.vanillaOrder;
+                                            context.getSource().sendSuccess(new TextComponent("In snippets, which will appear first: %s".formatted(ProbeConfig.INSTANCE.vanillaOrder ? "mod_id" : "member_type")), false);
+                                            ProbeConfig.INSTANCE.save();
+                                            return Command.SINGLE_SUCCESS;
+                                        }))
+                                .then(Commands.literal("toggle_classname_snippets")
+                                        .requires(source -> source.getServer().isSingleplayer())
+                                        .executes(context -> {
+                                            ProbeConfig.INSTANCE.exportClassNames = !ProbeConfig.INSTANCE.exportClassNames;
+                                            context.getSource().sendSuccess(new TextComponent("Export class name as snippets set to: %s".formatted(ProbeConfig.INSTANCE.exportClassNames)), false);
+                                            ProbeConfig.INSTANCE.save();
+                                            return Command.SINGLE_SUCCESS;
+                                        }))
+                                .then(Commands.literal("toggle_autoexport")
+                                        .requires(source -> source.getServer().isSingleplayer())
+                                        .executes(context -> {
+                                            ProbeConfig.INSTANCE.autoExport = !ProbeConfig.INSTANCE.autoExport;
+                                            context.getSource().sendSuccess(new TextComponent("Auto-export for KubeJS set to: %s".formatted(ProbeConfig.INSTANCE.autoExport)), false);
+                                            ProbeConfig.INSTANCE.save();
+                                            return Command.SINGLE_SUCCESS;
+                                        }))
                         )
                 //.then(Commands.literal("test")
                 //        .requires(source -> source.getServer().isSingleplayer() || source.hasPermission(2))

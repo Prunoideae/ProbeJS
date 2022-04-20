@@ -85,11 +85,11 @@ public class DocumentMethod extends DocumentProperty implements IDocumentProvide
         name = line.substring(0, nameIndex).strip();
         String paramsString = line.substring(nameIndex + 1, methodIndex);
         String remainedString = line.substring(methodIndex + 1).replace(":", "").strip();
-        params = StringUtil.splitLayer(paramsString, "<", ">", ",")
+        params = StringUtil.splitLayer(paramsString, "<{(", ")}>", ",")
                 .stream()
                 .map(String::strip)
                 .filter(s -> !s.isEmpty()).map(s -> {
-                    String[] nameType = s.split(":");
+                    String[] nameType = s.split(":", 2);
                     return new DocumentParam(nameType[0].strip(), Resolver.resolveType(nameType[1]));
                 })
                 .collect(Collectors.toList());

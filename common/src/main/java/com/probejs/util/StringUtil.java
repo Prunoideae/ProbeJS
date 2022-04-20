@@ -40,9 +40,9 @@ public class StringUtil {
 
         @Override
         public void trial(String element, List<IStateHandler<String>> stack) {
-            if (element.equals(push))
+            if (push.contains(element))
                 stack.add(new Mask(push, pop));
-            if (element.equals(pop))
+            if (pop.contains(element))
                 stack.remove(this);
         }
     }
@@ -61,7 +61,7 @@ public class StringUtil {
 
         @Override
         public void trial(String element, List<IStateHandler<String>> stack) {
-            if (element.equals(push))
+            if (push.contains(element))
                 stack.add(new Mask(push, pop));
             if (element.equals(split))
                 stack.remove(this);
