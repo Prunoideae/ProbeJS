@@ -217,21 +217,21 @@ public class TypingCompiler {
         Gson g = new Gson();
         Set<CapturedEvent> wildcards = new HashSet<>();
         for (Map.Entry<String, CapturedEvent> entry : cachedEvents.entrySet()) {
-            String name = entry.getKey();
+            String id = entry.getValue().getId();
             Class<?> event = entry.getValue().getCaptured();
             String sub = entry.getValue().getSub();
             if (entry.getValue().hasSub())
                 wildcards.add(entry.getValue());
-            writer.write("declare function onEvent(name: %s, handler: (event: %s) => void);\n".formatted(g.toJson(name + (sub == null ? "" : ("." + sub))), FormatterClass.formatTypeParameterized(new TypeInfoClass(event))));
+            writer.write("declare function onEvent(name: %s, handler: (event: %s) => void);\n".formatted(g.toJson(id + (sub == null ? "" : ("." + sub))), FormatterClass.formatTypeParameterized(new TypeInfoClass(event))));
         }
 
         Set<String> writtenWildcards = new HashSet<>();
         for (CapturedEvent wildcard : wildcards) {
-            String id = wildcard.getId();
+            String id = g.toJson(wildcard.getId());
             if (writtenWildcards.contains(id))
                 continue;
             writtenWildcards.add(id);
-            writer.write("declare function onEvent(name: `%s.${string}`, handler: (event: %s) => void);\n".formatted(g.toJson(id).substring(1, id.length() - 1), FormatterClass.formatTypeParameterized(new TypeInfoClass(wildcard.getCaptured()))));
+            writer.write("declare function onEvent(name: `%s.${string}`, handler: (event: %s) => void);\n".formatted(id.substring(1, id.length() - 1), FormatterClass.formatTypeParameterized(new TypeInfoClass(wildcard.getCaptured()))));
         }
 
         for (Map.Entry<String, Class<?>> entry : cachedForgeEvents.entrySet()) {

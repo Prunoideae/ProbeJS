@@ -70,7 +70,7 @@ class IngredientJS {
 /**
  * @target dev.latvian.mods.kubejs.recipe.filter.RecipeFilter
  * @assign dev.latvian.mods.kubejs.recipe.filter.RecipeFilter[]
- * @assign {exact?: boolean, not?: Internal.RecipeFilter_, or?: Internal.RecipeFilter_, id?: string | `/${string}/`, type?: string, group?: string, mod?: string, input?: Internal.IngredientJS_, output?: Internal.IngredientJS_}
+ * @assign {exact?: boolean, not?: Internal.RecipeFilter_, or?: Internal.RecipeFilter_[], id?: string | `/${string}/`, type?: string, group?: string, mod?: string, input?: Internal.IngredientJS_, output?: Internal.IngredientJS_}
  */
 class RecipeFilter {
 
