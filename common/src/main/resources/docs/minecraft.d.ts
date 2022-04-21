@@ -1,4 +1,20 @@
 /**
+ * @target net.minecraft.world.item.ItemStack
+ * @assign dev.latvian.mods.kubejs.item.ItemStackJS
+ */
+class ItemStack {
+
+}
+
+/**
+ * @target net.minecraft.world.entity.EntityType
+ * @assign string
+ */
+class EntityType {
+
+}
+
+/**
  * @target net.minecraft.resources.ResourceLocation
  * @assign string
  */
