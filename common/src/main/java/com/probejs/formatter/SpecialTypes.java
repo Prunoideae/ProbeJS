@@ -39,13 +39,13 @@ public class SpecialTypes {
                 if (resolvedType instanceof TypeInfoVariable) {
                     resolvedType = variableMap.getOrDefault(resolvedType.getTypeName(), new TypeInfoClass(Object.class));
                 }
-                formattedParam.add("%s: %s".formatted(param.getName(), new FormatterType(resolvedType).format(0, 0)));
+                formattedParam.add("%s: %s".formatted(param.getName(), new FormatterType(resolvedType, false).format(0, 0)));
             }
             ITypeInfo resolvedReturn = info.getReturnType();
             if (resolvedReturn instanceof TypeInfoVariable) {
                 resolvedReturn = variableMap.getOrDefault(resolvedReturn.getTypeName(), new TypeInfoClass(Object.class));
             }
-            return "((%s) => %s)".formatted(String.join(", ", formattedParam), new FormatterType(resolvedReturn).format(0, 0));
+            return "((%s) => %s)".formatted(String.join(", ", formattedParam), new FormatterType(resolvedReturn, false).format(0, 0));
         }
     }
 
