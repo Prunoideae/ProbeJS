@@ -94,6 +94,7 @@ class RecipeFilter {
 
 /**
 * @target dev.latvian.mods.kubejs.recipe.RecipeEventJS
+* Fired when you need to modify recipes.
 */
 class RecipeEventJS {
     /**

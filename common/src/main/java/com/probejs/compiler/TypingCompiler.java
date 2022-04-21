@@ -222,6 +222,15 @@ public class TypingCompiler {
             String sub = entry.getValue().getSub();
             if (entry.getValue().hasSub())
                 wildcards.add(entry.getValue());
+            List<DocumentClass> document = Manager.classDocuments.get(event.getName());
+            if (document != null) {
+                var comment = document.stream().map(DocumentClass::getComment).filter(Objects::nonNull).findFirst();
+                if (comment.isPresent()) {
+                    for (String s : comment.get().format(0, 4)) {
+                        writer.write(s + "\n");
+                    }
+                }
+            }
             writer.write("declare function onEvent(name: %s, handler: (event: %s) => void);\n".formatted(g.toJson(id + (sub == null ? "" : ("." + sub))), FormatterClass.formatTypeParameterized(new TypeInfoClass(event))));
         }
 

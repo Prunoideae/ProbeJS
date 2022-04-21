@@ -1,3 +1,4 @@
+docs/events.d.ts
 docs/create.d.ts
 docs/minecraft.d.ts
 docs/integrateddynamics.d.ts
