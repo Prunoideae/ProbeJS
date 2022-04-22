@@ -111,7 +111,7 @@ public class SnippetCompiler {
             NameResolver.ResolvedName resolvedName = entry.getValue();
             JsonObject classJson = new JsonObject();
             JsonArray prefix = new JsonArray();
-            prefix.add("!%s".formatted(resolvedName.getFullName()));
+            prefix.add("!%s".formatted(resolvedName.getFullName().replace("$", "\\$")));
             classJson.add("prefix", prefix);
             classJson.addProperty("body", className);
             resultJson.add(resolvedName.getFullName(), classJson);
