@@ -4,6 +4,7 @@ import com.google.gson.*;
 import com.probejs.ProbeJS;
 import com.probejs.ProbePaths;
 import com.probejs.document.DocumentClass;
+import com.probejs.document.DocumentComment;
 import com.probejs.document.Manager;
 import com.probejs.event.CapturedEvent;
 import com.probejs.formatter.ClassResolver;
@@ -212,8 +213,13 @@ public class TypingCompiler {
         cachedEvents.putAll(CapturedClasses.capturedEvents);
         cachedForgeEvents.putAll(CapturedClasses.capturedRawEvents);
         BufferedWriter writer = Files.newBufferedWriter(ProbePaths.GENERATED.resolve("events.d.ts"));
+        BufferedWriter writerDoc = Files.newBufferedWriter(ProbePaths.GENERATED.resolve("events.documented.d.ts"));
+
         writer.write("/// <reference path=\"./globals.d.ts\" />\n");
         writer.write("/// <reference path=\"./registries.d.ts\" />\n");
+        writerDoc.write("/// <reference path=\"./globals.d.ts\" />\n");
+        writerDoc.write("/// <reference path=\"./registries.d.ts\" />\n");
+
         Gson g = new Gson();
         Set<CapturedEvent> wildcards = new HashSet<>();
         for (Map.Entry<String, CapturedEvent> entry : cachedEvents.entrySet()) {
@@ -222,16 +228,20 @@ public class TypingCompiler {
             String sub = entry.getValue().getSub();
             if (entry.getValue().hasSub())
                 wildcards.add(entry.getValue());
-            List<DocumentClass> document = Manager.classDocuments.get(event.getName());
-            if (document != null) {
-                var comment = document.stream().map(DocumentClass::getComment).filter(Objects::nonNull).findFirst();
-                if (comment.isPresent()) {
-                    for (String s : comment.get().format(0, 4)) {
-                        writer.write(s + "\n");
-                    }
-                }
+            Optional<DocumentComment> document = Manager.classDocuments
+                    .getOrDefault(event.getName(), new ArrayList<>())
+                    .stream()
+                    .map(DocumentClass::getComment)
+                    .filter(Objects::nonNull)
+                    .findFirst();
+            String name = id + (sub == null ? "" : ("." + sub));
+            if (document.isPresent()) {
+                for (String s : document.get().format(0, 4))
+                    writerDoc.write(s + "\n");
+                writerDoc.write("declare function onEvent(name: %s, handler: (event: %s) => void);\n".formatted(g.toJson(name), FormatterClass.formatTypeParameterized(new TypeInfoClass(event))));
+                continue;
             }
-            writer.write("declare function onEvent(name: %s, handler: (event: %s) => void);\n".formatted(g.toJson(id + (sub == null ? "" : ("." + sub))), FormatterClass.formatTypeParameterized(new TypeInfoClass(event))));
+            writer.write("declare function onEvent(name: %s, handler: (event: %s) => void);\n".formatted(g.toJson(name), FormatterClass.formatTypeParameterized(new TypeInfoClass(event))));
         }
 
         Set<String> writtenWildcards = new HashSet<>();
@@ -240,6 +250,18 @@ public class TypingCompiler {
             if (writtenWildcards.contains(id))
                 continue;
             writtenWildcards.add(id);
+            Optional<DocumentComment> document = Manager.classDocuments
+                    .getOrDefault(wildcard.getCaptured().getName(), new ArrayList<>())
+                    .stream()
+                    .map(DocumentClass::getComment)
+                    .filter(Objects::nonNull)
+                    .findFirst();
+            if (document.isPresent()) {
+                for (String s : document.get().format(0, 4))
+                    writerDoc.write(s + "\n");
+                writerDoc.write("declare function onEvent(name: `%s.${string}`, handler: (event: %s) => void);\n".formatted(id.substring(1, id.length() - 1), FormatterClass.formatTypeParameterized(new TypeInfoClass(wildcard.getCaptured()))));
+                continue;
+            }
             writer.write("declare function onEvent(name: `%s.${string}`, handler: (event: %s) => void);\n".formatted(id.substring(1, id.length() - 1), FormatterClass.formatTypeParameterized(new TypeInfoClass(wildcard.getCaptured()))));
         }
 
@@ -250,6 +272,7 @@ public class TypingCompiler {
         }
         RegistryCompiler.compileEventRegistries(writer);
         writer.flush();
+        writerDoc.flush();
     }
 
     public static void compileConstants(DummyBindingEvent bindingEvent) throws IOException {
