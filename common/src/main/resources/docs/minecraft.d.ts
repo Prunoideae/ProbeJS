@@ -1,4 +1,13 @@
 /**
+ * @target net.minecraft.nbt.CompoundTag
+ * @assign string
+ * @assign {[string]: string | number | boolean | Internal.CompoundTag_}
+ */
+class CompoundTag {
+
+}
+
+/**
  * @target dev.latvian.mods.kubejs.text.Text
  * @assign string
  */
