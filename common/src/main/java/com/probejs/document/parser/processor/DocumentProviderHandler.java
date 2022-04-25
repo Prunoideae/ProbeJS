@@ -5,6 +5,7 @@ import com.probejs.document.DocumentMethod;
 import com.probejs.document.DocumentType;
 
 public class DocumentProviderHandler {
+    //TODO: Migrate to json style documents
 
     public static void init() {
         DocumentHandler.handlers.clear();
@@ -23,7 +24,7 @@ public class DocumentProviderHandler {
             d.addElement(comment);
             return comment;
         });
-        
+
         DocumentHandler.addSingleHandler(c -> c.strip().startsWith("type"), (s, d) -> d.addElement(new DocumentType(s)));
 
         ProviderClass.addMultiHandler(s -> s.strip().startsWith("/**"), (s, d) -> {

@@ -3,9 +3,15 @@ package com.probejs.formatter;
 import com.google.gson.Gson;
 import com.probejs.info.MethodInfo;
 import com.probejs.info.type.ITypeInfo;
+import net.minecraft.core.Registry;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.entity.ai.attributes.Attribute;
 
+import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class NameResolver {
@@ -53,6 +59,8 @@ public class NameResolver {
     public static final HashMap<String, ResolvedName> resolvedNames = new HashMap<>();
     public static final HashMap<Class<?>, Function<ITypeInfo, String>> specialTypeFormatters = new HashMap<>();
     public static final HashMap<Class<?>, Function<Object, String>> specialValueFormatters = new HashMap<>();
+    public static final HashMap<Class<?>, Supplier<List<String>>> specialClassAssigner = new HashMap<>();
+
     public static final Set<String> keywords = new HashSet<>();
     public static final Set<String> resolvedPrimitives = new HashSet<>();
 
@@ -130,6 +138,14 @@ public class NameResolver {
         resolvedPrimitives.add(clazz.getName());
     }
 
+    public static void putSpecialAssignments(Class<?> clazz, Supplier<List<String>> assigns) {
+        specialClassAssigner.put(clazz, assigns);
+    }
+
+    public static List<String> getClassAssignments(Class<?> clazz) {
+        return specialClassAssigner.getOrDefault(clazz, ArrayList::new).get();
+    }
+
     public static void init() {
         putResolvedPrimitive(Object.class, "any");
         putResolvedPrimitive(String.class, "string");
@@ -165,13 +181,29 @@ public class NameResolver {
                 Double.class, Double.TYPE, Float.class, Float.TYPE,
                 Boolean.class, Boolean.TYPE);
         putValueFormatter(SpecialTypes::formatMaps, Map.class);
-        
+
+        putSpecialAssignments(DamageSource.class, () -> {
+            List<String> result = new ArrayList<>();
+            try {
+                for (var field : DamageSource.class.getDeclaredFields()) {
+                    field.setAccessible(true);
+                    if (Modifier.isStatic(field.getModifiers()) && field.getType() == DamageSource.class) {
+                        result.add(((DamageSource) field.get(null)).getMsgId());
+                    }
+                }
+            } catch (Exception ignored) {
+            }
+            return result;
+        });
+
+        SpecialTypes.assignRegistry(Attribute.class, Registry.ATTRIBUTE_REGISTRY);
+        SpecialTypes.assignRegistry(MobEffect.class, Registry.MOB_EFFECT_REGISTRY);
+
         addKeyword("function");
         addKeyword("debugger");
         addKeyword("in");
         addKeyword("with");
         addKeyword("java");
 
-        SpecialTypes.init();
     }
 }

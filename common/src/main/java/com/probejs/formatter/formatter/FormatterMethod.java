@@ -80,12 +80,6 @@ public class FormatterMethod extends DocumentReceiver<DocumentMethod> implements
     }
 
     public static String formatParamUnderscore(ITypeInfo info) {
-        Class<?> resolvedClass = info.getResolvedClass();
-        //No assigned types, and not enum, use normal route.
-        if (Manager.typesAssignable.get(resolvedClass.getName()) == null && !resolvedClass.isEnum()) {
-            return formatTypeParameterized(info, true);
-        }
-
         StringBuilder sb = new StringBuilder(new FormatterType(info, false, (typeInfo, rawString) -> {
             if (typeInfo instanceof TypeInfoClass) {
                 Class<?> clazz = typeInfo.getResolvedClass();

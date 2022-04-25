@@ -1,5 +1,6 @@
 package com.probejs.formatter;
 
+import com.google.gson.Gson;
 import com.probejs.formatter.formatter.FormatterClass;
 import com.probejs.formatter.formatter.FormatterType;
 import com.probejs.info.ClassInfo;
@@ -8,10 +9,11 @@ import com.probejs.info.type.ITypeInfo;
 import com.probejs.info.type.TypeInfoClass;
 import com.probejs.info.type.TypeInfoParameterized;
 import com.probejs.info.type.TypeInfoVariable;
-import dev.latvian.mods.kubejs.item.ingredient.IngredientJS;
+import dev.latvian.mods.kubejs.KubeJSRegistries;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
 
 import java.util.*;
-import java.util.function.Function;
 
 public class SpecialTypes {
 
@@ -83,7 +85,16 @@ public class SpecialTypes {
         return "{%s}".formatted(String.join(",", values));
     }
 
-    public static void init() {
-        //Skipping classes that are not reasonably to be a functional interface
+    public static <T> void assignRegistry(Class<T> clazz, ResourceKey<Registry<T>> registry) {
+        NameResolver.putSpecialAssignments(clazz, () -> {
+            List<String> result = new ArrayList<>();
+            Gson g = new Gson();
+            KubeJSRegistries.genericRegistry(registry).getIds().forEach(r -> {
+                if (r.getNamespace().equals("minecraft"))
+                    result.add(g.toJson(r.getPath()));
+                result.add(g.toJson(r.toString()));
+            });
+            return result;
+        });
     }
 }

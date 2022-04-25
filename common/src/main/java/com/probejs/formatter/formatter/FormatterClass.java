@@ -54,6 +54,8 @@ public class FormatterClass extends DocumentReceiver<DocumentClass> implements I
             return s;
         })).collect(Collectors.toList());
 
+        assignableTypes.addAll(NameResolver.getClassAssignments(classInfo.getClazzRaw()));
+
         if (classInfo.isEnum()) {
             Class<?> clazz = classInfo.getClazzRaw();
             EnumTypeWrapper<?> enumWrapper = EnumTypeWrapper.get(clazz);
@@ -101,7 +103,6 @@ public class FormatterClass extends DocumentReceiver<DocumentClass> implements I
             }
         }));
 
-        Set<List<String>> formattedFields = new HashSet<>();
         fieldFormatters.entrySet().stream().filter(e -> !methodFormatters.containsKey(e.getKey())).forEach(f -> {
             if (classInfo.isInterface() && f.getValue().getFieldInfo().isStatic() && internal)
                 return;

@@ -149,7 +149,7 @@ class ItemTooltipEventJS {
 
     /**
      * @modify item internal.IngredientJS_
-     * @modify text net.minecraft.network.chat.Component | net.minecraft.network.chat.Component[]
+     * @modify text Internal.Component_ | Internal.Component_[]
      * 
      * Adds a line (or lines) to the end of tooltip.
      */

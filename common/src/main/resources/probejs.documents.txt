@@ -1,3 +1,5 @@
+docs/registry.d.ts
+docs/types.d.ts
 docs/events.d.ts
 docs/create.d.ts
 docs/minecraft.d.ts
