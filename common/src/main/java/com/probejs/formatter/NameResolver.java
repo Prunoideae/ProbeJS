@@ -7,6 +7,8 @@ import net.minecraft.core.Registry;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
 
 import java.lang.reflect.Modifier;
 import java.util.*;
@@ -198,6 +200,8 @@ public class NameResolver {
 
         SpecialTypes.assignRegistry(Attribute.class, Registry.ATTRIBUTE_REGISTRY);
         SpecialTypes.assignRegistry(MobEffect.class, Registry.MOB_EFFECT_REGISTRY);
+        SpecialTypes.assignRegistry(Block.class, Registry.BLOCK_REGISTRY);
+        SpecialTypes.assignRegistry(Item.class, Registry.ITEM_REGISTRY);
 
         addKeyword("function");
         addKeyword("debugger");
