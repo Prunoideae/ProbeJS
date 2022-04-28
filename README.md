@@ -17,7 +17,7 @@ Current progress of mod documents:
 - Integrated Dynamics (Completed)
 - ArsNouveau (Completed)
 - ArtisanWorktables (Completed)
-- Botania (Completed)
+- Botania (Builtin in KubeJS Botania)
 - Cucumber (Completed)
 - DankStorage (Completed)
 - ExtendedCrafting (Completed)
