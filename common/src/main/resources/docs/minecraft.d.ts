@@ -1,3 +1,16 @@
+/**
+ * @target dev.latvian.mods.kubejs.bindings.IngredientWrapper
+ */
+class IngredientWrapper {
+    /**
+     * @modify object Internal.IngredientJS_
+     */
+    static of(object: java.lang.Object): dev.latvian.mods.kubejs.item.ingredient.IngredientJS;
+    /**
+     * @modify object Internal.IngredientJS_
+     */
+    static of(object: java.lang.Object, count: int): dev.latvian.mods.kubejs.item.ingredient.IngredientJS;
+}
 
 /**
 * @target dev.latvian.mods.kubejs.recipe.RecipeEventJS

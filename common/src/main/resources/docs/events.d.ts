@@ -148,7 +148,7 @@ class LivingEntityDropsEventJS {
 class ItemTooltipEventJS {
 
     /**
-     * @modify item internal.IngredientJS_
+     * @modify item Internal.IngredientJS_
      * @modify text Internal.Component_ | Internal.Component_[]
      * 
      * Adds a line (or lines) to the end of tooltip.
@@ -156,7 +156,7 @@ class ItemTooltipEventJS {
     add(item: java.lang.Object, text: java.lang.Object): void;
 
     /**
-     * @modify item internal.IngredientJS_
+     * @modify item Internal.IngredientJS_
      * @modify handler (itemstack: Internal.ItemStackJS, advanced: boolean, lines: Internal.List<string>) => void
      * Adds a callback to the item, will be invoked when the tooltip is rendering.
      */

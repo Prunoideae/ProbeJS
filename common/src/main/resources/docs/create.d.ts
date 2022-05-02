@@ -13,12 +13,12 @@ class RecipeHolder {
 * @mod create
 * @mod kubejs_create
 */
-type ItemStackOrFluid = dev.latvian.mods.kubejs.item.ItemStackJS | dev.latvian.mods.kubejs.fluid.FluidStackJS;
+type ItemStackOrFluid = Internal.ItemStackJS_ | Internal.FluidStackJS_;
 /**
 * @mod create
 * @mod kubejs_create
 */
-type IngredientOrFluid = dev.latvian.mods.kubejs.item.ingredient.IngredientJS | dev.latvian.mods.kubejs.fluid.FluidStackJS;
+type IngredientOrFluid = Internal.IngredientJS_ | Internal.FluidStackJS_;
 
 /**
 * @mod create

@@ -4,11 +4,14 @@ import com.google.gson.Gson;
 import com.probejs.info.MethodInfo;
 import com.probejs.info.type.ITypeInfo;
 import net.minecraft.core.Registry;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.tags.Tag;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.material.Fluid;
 
 import java.lang.reflect.Modifier;
 import java.util.*;
@@ -202,6 +205,8 @@ public class NameResolver {
         SpecialTypes.assignRegistry(MobEffect.class, Registry.MOB_EFFECT_REGISTRY);
         SpecialTypes.assignRegistry(Block.class, Registry.BLOCK_REGISTRY);
         SpecialTypes.assignRegistry(Item.class, Registry.ITEM_REGISTRY);
+        SpecialTypes.assignRegistry(SoundEvent.class, Registry.SOUND_EVENT_REGISTRY);
+        SpecialTypes.assignRegistry(Fluid.class, Registry.FLUID_REGISTRY);
 
         addKeyword("function");
         addKeyword("debugger");

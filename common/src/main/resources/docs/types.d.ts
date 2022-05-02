@@ -7,7 +7,7 @@
  * @assign "" | "-" | "empty" | "minecraft:empty"
  * @assign `${string} ${number}`
  */
- class FluidStackJS {
+class FluidStackJS {
 
 }
 
@@ -99,7 +99,7 @@ class EnchantmentBuilder {
 
 /**
 * @target dev.latvian.mods.kubejs.item.ItemStackJS
-* @assign `${string}:${string}`
+* @assign net.minecraft.world.item.Item
 */
 class ItemStackJS {
 
