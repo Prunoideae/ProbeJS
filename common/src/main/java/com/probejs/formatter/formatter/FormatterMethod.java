@@ -6,6 +6,7 @@ import com.probejs.document.Manager;
 import com.probejs.document.comment.CommentUtil;
 import com.probejs.document.comment.special.CommentReturns;
 import com.probejs.document.type.IType;
+import com.probejs.document.type.TypeNamed;
 import com.probejs.formatter.NameResolver;
 import com.probejs.info.MethodInfo;
 import com.probejs.info.type.ITypeInfo;
@@ -103,8 +104,12 @@ public class FormatterMethod extends DocumentReceiver<DocumentMethod> implements
                         .map(paramInfo -> "%s: %s".formatted(
                                 NameResolver.getNameSafe(renames.getOrDefault(paramInfo.getName(), paramInfo.getName())),
                                 modifiers.containsKey(paramInfo.getName())
-                                        ? modifiers.get(paramInfo.getName()).getTypeName()
-                                        : formatParamUnderscore(paramInfo.getType())))
+                                        ? modifiers.get(paramInfo.getName()).getTransformedName((t, s) -> {
+                                    if (t instanceof TypeNamed n && NameResolver.resolvedNames.containsKey(n.getRawTypeName()) && !NameResolver.resolvedPrimitives.contains((n.getRawTypeName()))) {
+                                        return s + "_";
+                                    }
+                                    return s;
+                                }) : formatParamUnderscore(paramInfo.getType())))
                         .collect(Collectors.joining(", ")));
     }
 

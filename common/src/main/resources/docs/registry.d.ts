@@ -3,7 +3,7 @@
  */
 class BasicMobEffectBuilder {
     /**
-    * @modify attribute net.minecraft.world.entity.ai.attributes.Attribute_
+    * @modify attribute net.minecraft.world.entity.ai.attributes.Attribute
     */
     modifyAttribute(attribute: net.minecraft.resources.ResourceLocation, identifier: java.lang.String, d: double, operation: net.minecraft.world.entity.ai.attributes.AttributeModifier$Operation): dev.latvian.mods.kubejs.misc.MobEffectBuilder;
 }
@@ -13,7 +13,7 @@ class BasicMobEffectBuilder {
  */
 class MobEffectBuilder {
     /**
-    * @modify attribute net.minecraft.world.entity.ai.attributes.Attribute_
+    * @modify attribute net.minecraft.world.entity.ai.attributes.Attribute
     */
     modifyAttribute(attribute: net.minecraft.resources.ResourceLocation, identifier: java.lang.String, d: double, operation: net.minecraft.world.entity.ai.attributes.AttributeModifier$Operation): dev.latvian.mods.kubejs.misc.MobEffectBuilder;
 }
@@ -23,7 +23,7 @@ class MobEffectBuilder {
  */
 class ItemBuilder {
     /**
-     * @modify attribute net.minecraft.world.entity.ai.attributes.Attribute_
+     * @modify attribute net.minecraft.world.entity.ai.attributes.Attribute
      */
     modifyAttribute(attribute: net.minecraft.resources.ResourceLocation, identifier: java.lang.String, d: double, operation: net.minecraft.world.entity.ai.attributes.AttributeModifier$Operation): dev.latvian.mods.kubejs.item.ItemBuilder;
 }
@@ -33,7 +33,7 @@ class ItemBuilder {
  */
 class BasicItemBuilder {
     /**
-     * @modify attribute net.minecraft.world.entity.ai.attributes.Attribute_
+     * @modify attribute net.minecraft.world.entity.ai.attributes.Attribute
      */
     modifyAttribute(attribute: net.minecraft.resources.ResourceLocation, identifier: java.lang.String, d: double, operation: net.minecraft.world.entity.ai.attributes.AttributeModifier$Operation): dev.latvian.mods.kubejs.item.ItemBuilder;
 }
@@ -43,7 +43,7 @@ class BasicItemBuilder {
  */
 class SwordItemBuilder {
     /**
-     * @modify attribute net.minecraft.world.entity.ai.attributes.Attribute_
+     * @modify attribute net.minecraft.world.entity.ai.attributes.Attribute
      */
     modifyAttribute(attribute: net.minecraft.resources.ResourceLocation, identifier: java.lang.String, d: double, operation: net.minecraft.world.entity.ai.attributes.AttributeModifier$Operation): dev.latvian.mods.kubejs.item.ItemBuilder;
 }
@@ -53,7 +53,7 @@ class SwordItemBuilder {
  */
 class HoeItemBuilder {
     /**
-     * @modify attribute net.minecraft.world.entity.ai.attributes.Attribute_
+     * @modify attribute net.minecraft.world.entity.ai.attributes.Attribute
      */
     modifyAttribute(attribute: net.minecraft.resources.ResourceLocation, identifier: java.lang.String, d: double, operation: net.minecraft.world.entity.ai.attributes.AttributeModifier$Operation): dev.latvian.mods.kubejs.item.ItemBuilder;
 }
@@ -63,7 +63,7 @@ class HoeItemBuilder {
  */
 class PickaxeItemBuilder {
     /**
-     * @modify attribute net.minecraft.world.entity.ai.attributes.Attribute_
+     * @modify attribute net.minecraft.world.entity.ai.attributes.Attribute
      */
     modifyAttribute(attribute: net.minecraft.resources.ResourceLocation, identifier: java.lang.String, d: double, operation: net.minecraft.world.entity.ai.attributes.AttributeModifier$Operation): dev.latvian.mods.kubejs.item.ItemBuilder;
 }
@@ -73,7 +73,7 @@ class PickaxeItemBuilder {
  */
 class AxeItemBuilder {
     /**
-     * @modify attribute net.minecraft.world.entity.ai.attributes.Attribute_
+     * @modify attribute net.minecraft.world.entity.ai.attributes.Attribute
      */
     modifyAttribute(attribute: net.minecraft.resources.ResourceLocation, identifier: java.lang.String, d: double, operation: net.minecraft.world.entity.ai.attributes.AttributeModifier$Operation): dev.latvian.mods.kubejs.item.ItemBuilder;
 }
@@ -83,7 +83,7 @@ class AxeItemBuilder {
  */
 class ShovelItemBuilder {
     /**
-     * @modify attribute net.minecraft.world.entity.ai.attributes.Attribute_
+     * @modify attribute net.minecraft.world.entity.ai.attributes.Attribute
      */
     modifyAttribute(attribute: net.minecraft.resources.ResourceLocation, identifier: java.lang.String, d: double, operation: net.minecraft.world.entity.ai.attributes.AttributeModifier$Operation): dev.latvian.mods.kubejs.item.ItemBuilder;
 }
@@ -93,7 +93,7 @@ class ShovelItemBuilder {
  */
 class ArmorItemBuilder$Boots {
     /**
-     * @modify attribute net.minecraft.world.entity.ai.attributes.Attribute_
+     * @modify attribute net.minecraft.world.entity.ai.attributes.Attribute
      */
     modifyAttribute(attribute: net.minecraft.resources.ResourceLocation, identifier: java.lang.String, d: double, operation: net.minecraft.world.entity.ai.attributes.AttributeModifier$Operation): dev.latvian.mods.kubejs.item.ItemBuilder;
 }
@@ -103,7 +103,7 @@ class ArmorItemBuilder$Boots {
  */
 class ArmorItemBuilder$Chestplate {
     /**
-     * @modify attribute net.minecraft.world.entity.ai.attributes.Attribute_
+     * @modify attribute net.minecraft.world.entity.ai.attributes.Attribute
      */
     modifyAttribute(attribute: net.minecraft.resources.ResourceLocation, identifier: java.lang.String, d: double, operation: net.minecraft.world.entity.ai.attributes.AttributeModifier$Operation): dev.latvian.mods.kubejs.item.ItemBuilder;
 }
@@ -113,7 +113,7 @@ class ArmorItemBuilder$Chestplate {
  */
 class ArmorItemBuilder$Helmet {
     /**
-     * @modify attribute net.minecraft.world.entity.ai.attributes.Attribute_
+     * @modify attribute net.minecraft.world.entity.ai.attributes.Attribute
      */
     modifyAttribute(attribute: net.minecraft.resources.ResourceLocation, identifier: java.lang.String, d: double, operation: net.minecraft.world.entity.ai.attributes.AttributeModifier$Operation): dev.latvian.mods.kubejs.item.ItemBuilder;
 }
@@ -123,7 +123,7 @@ class ArmorItemBuilder$Helmet {
  */
 class ArmorItemBuilder$Leggings {
     /**
-     * @modify attribute net.minecraft.world.entity.ai.attributes.Attribute_
+     * @modify attribute net.minecraft.world.entity.ai.attributes.Attribute
      */
     modifyAttribute(attribute: net.minecraft.resources.ResourceLocation, identifier: java.lang.String, d: double, operation: net.minecraft.world.entity.ai.attributes.AttributeModifier$Operation): dev.latvian.mods.kubejs.item.ItemBuilder;
 }

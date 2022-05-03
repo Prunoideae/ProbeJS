@@ -3,11 +3,11 @@
  */
 class IngredientWrapper {
     /**
-     * @modify object Internal.IngredientJS_
+     * @modify object dev.latvian.mods.kubejs.item.ingredient.IngredientJS
      */
     static of(object: java.lang.Object): dev.latvian.mods.kubejs.item.ingredient.IngredientJS;
     /**
-     * @modify object Internal.IngredientJS_
+     * @modify object dev.latvian.mods.kubejs.item.ingredient.IngredientJS
      */
     static of(object: java.lang.Object, count: int): dev.latvian.mods.kubejs.item.ingredient.IngredientJS;
 }
