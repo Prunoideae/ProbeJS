@@ -3,9 +3,11 @@ package com.probejs.formatter;
 import com.google.gson.Gson;
 import com.probejs.info.MethodInfo;
 import com.probejs.info.type.ITypeInfo;
+import dev.latvian.mods.rhino.BaseFunction;
+import dev.latvian.mods.rhino.NativeJavaObject;
+import dev.latvian.mods.rhino.NativeObject;
 import net.minecraft.core.Registry;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.tags.Tag;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -115,18 +117,20 @@ public class NameResolver {
         return null;
     }
 
+    public static void resolveName(Class<?> clazz) {
+        String remappedName = MethodInfo.RUNTIME.getMappedClass(clazz);
+        ResolvedName resolved = new ResolvedName(Arrays.stream(remappedName.split("\\.")).toList());
+        ResolvedName internal = new ResolvedName(List.of("Internal", resolved.getLastName()));
+        if (resolvedNames.containsValue(internal))
+            putResolvedName(clazz.getName(), resolved);
+        else {
+            putResolvedName(clazz.getName(), internal);
+        }
+    }
+
     public static void resolveNames(Set<Class<?>> classes) {
-        Set<ResolvedName> usedNames = new HashSet<>(resolvedNames.values());
         for (Class<?> clazz : classes) {
-            String remappedName = MethodInfo.RUNTIME.getMappedClass(clazz);
-            ResolvedName resolved = new ResolvedName(Arrays.stream(remappedName.split("\\.")).toList());
-            ResolvedName internal = new ResolvedName(List.of("Internal", resolved.getLastName()));
-            if (usedNames.contains(internal))
-                putResolvedName(clazz.getName(), resolved);
-            else {
-                putResolvedName(clazz.getName(), internal);
-                usedNames.add(internal);
-            }
+            resolveName(clazz);
         }
     }
 
@@ -185,7 +189,12 @@ public class NameResolver {
                 Short.class, Short.TYPE, Byte.class, Byte.TYPE,
                 Double.class, Double.TYPE, Float.class, Float.TYPE,
                 Boolean.class, Boolean.TYPE);
-        putValueFormatter(SpecialTypes::formatMaps, Map.class);
+        putValueFormatter(SpecialTypes::formatMap, Map.class);
+        putValueFormatter(SpecialTypes::formatList, List.class);
+        putValueFormatter(SpecialTypes::formatScriptable, NativeObject.class);
+        putValueFormatter(SpecialTypes::formatFunction, BaseFunction.class);
+        putValueFormatter(SpecialTypes::formatNJO, NativeJavaObject.class);
+        //putValueFormatter(SpecialTypes::formatScriptable, Scriptable.class);
 
         putSpecialAssignments(DamageSource.class, () -> {
             List<String> result = new ArrayList<>();
