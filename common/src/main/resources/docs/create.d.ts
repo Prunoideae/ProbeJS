@@ -13,7 +13,8 @@ class RecipeHolder {
 * @mod create
 * @mod kubejs_create
 */
-type ItemStackOrFluid = Internal.ItemStackJS_ | Internal.FluidStackJS_;
+type ItemStackOrFluid = Internal.ItemStackJS_ | Internal.FluidStackJS_ | {fluidTag: Special.FluidTag, amount: number};
+
 /**
 * @mod create
 * @mod kubejs_create

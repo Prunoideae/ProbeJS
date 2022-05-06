@@ -107,16 +107,16 @@ class ItemStackJS {
 
 /**
  * @target dev.latvian.mods.kubejs.item.ingredient.IngredientJS
- * @assign `#${string}`
+ * @assign `#${Special.ItemTag}`
  * @assign dev.latvian.mods.kubejs.item.ItemStackJS
  * @assign dev.latvian.mods.kubejs.fluid.FluidStackJS
  * @assign "*"
- * @assign `@${string}`
+ * @assign `@${Special.Mod}`
  * @assign `%${string}`
  * @assign RegExp
  * @assign net.minecraft.world.item.crafting.Ingredient
  * @assign dev.latvian.mods.kubejs.item.ingredient.IngredientJS[]
- * @assign {type: "forge:nbt", item: `${string}:${string}` | {item: string, count?: number}, nbt: object}
+ * @assign {type: "forge:nbt", item: Internal.ItemStackJS_ | {item: Internal.Item_, count?: number}, nbt: object}
  * @assign {item: Internal.ItemStackJS_, count?: number}
  * @assign {fluid: Internal.FluidStackJS_}
  * @assign {value: object}
@@ -136,7 +136,7 @@ class IngredientJS {
 /**
  * @target dev.latvian.mods.kubejs.recipe.filter.RecipeFilter
  * @assign dev.latvian.mods.kubejs.recipe.filter.RecipeFilter[]
- * @assign {exact?: boolean, not?: Internal.RecipeFilter_, or?: Internal.RecipeFilter_[], id?: string | `/${string}/`, type?: string, group?: string, mod?: string, input?: Internal.IngredientJS_, output?: Internal.IngredientJS_}
+ * @assign {exact?: boolean, not?: Internal.RecipeFilter_, or?: Internal.RecipeFilter_[], id?: string | RegExp, type?: string, group?: string, mod?: string, input?: Internal.IngredientJS_, output?: Internal.IngredientJS_}
  */
 class RecipeFilter {
 

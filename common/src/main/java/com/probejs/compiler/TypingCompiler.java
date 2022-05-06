@@ -205,6 +205,7 @@ public class TypingCompiler {
 
         writer.write(String.join("\n", new FormatterNamespace("Document", Manager.classAdditions.values().stream().map(l -> l.get(0)).collect(Collectors.toList())).format(0, 4)) + "\n");
         writer.write(String.join("\n", new FormatterNamespace("Type", Manager.typeDocuments).format(0, 4)) + "\n");
+        writer.write(String.join("\n", new FormatterNamespace("Special", SpecialCompiler.compileSpecial()).format(0, 4)) + "\n");
         writer.write(String.join("\n", new FormatterRawTS(Manager.rawTSDoc).format(0, 4)) + "\n");
         writer.flush();
     }
