@@ -2,6 +2,7 @@ package com.probejs.info;
 
 import com.probejs.info.type.ITypeInfo;
 import com.probejs.info.type.InfoTypeResolver;
+import com.probejs.info.type.TypeInfoClass;
 import dev.latvian.mods.rhino.mod.util.RemappingHelper;
 import dev.latvian.mods.rhino.util.HideFromJS;
 import dev.latvian.mods.rhino.util.Remapper;
@@ -100,7 +101,13 @@ public class MethodInfo {
 
         public ParamInfo(Parameter parameter) {
             this.name = parameter.getName();
-            this.type = InfoTypeResolver.resolveType(parameter.getParameterizedType());
+            try {
+                this.type = InfoTypeResolver.resolveType(parameter.getParameterizedType());
+            } catch (Exception e) {
+                //#3, WTF???
+                e.printStackTrace();
+                this.type = new TypeInfoClass(Object.class);
+            }
         }
 
         public String getName() {
