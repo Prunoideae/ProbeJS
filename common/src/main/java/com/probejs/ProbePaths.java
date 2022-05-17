@@ -1,5 +1,6 @@
 package com.probejs;
 
+import dev.architectury.platform.Platform;
 import dev.latvian.mods.kubejs.KubeJSPaths;
 import dev.latvian.mods.kubejs.util.UtilsJS;
 
@@ -13,7 +14,7 @@ public class ProbePaths {
     public static Path DOCS = PROBE.resolve("docs");
     public static Path GENERATED = PROBE.resolve("generated");
     public static Path USER_DEFINED = PROBE.resolve("user");
-    public static Path SNIPPET = KubeJSPaths.DIRECTORY.resolve(".vscode");
+    public static Path SNIPPET = Platform.getGameFolder().resolve(".vscode");
 
     public static void init() {
         if (Files.notExists(PROBE, new LinkOption[0])) {
