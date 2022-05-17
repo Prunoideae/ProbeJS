@@ -41,11 +41,11 @@ class CreateRecipes {
     /**
      * Creates a recipe for Compacting.
      */
-    compacting(output: Type.ItemStackOrFluid, inputs: Type.IngredientOrFluid[]): dev.latvian.mods.kubejs.create.ProcessingRecipeJS;
+    compacting(output: Type.ItemStackOrFluid[], inputs: Type.IngredientOrFluid[]): dev.latvian.mods.kubejs.create.ProcessingRecipeJS;
     /**
      * Creates a recipe for Mixing.
      */
-    mixing(output: Type.ItemStackOrFluid, inputs: Type.IngredientOrFluid[]): dev.latvian.mods.kubejs.create.ProcessingRecipeJS;
+    mixing(output: Type.ItemStackOrFluid[], inputs: Type.IngredientOrFluid[]): dev.latvian.mods.kubejs.create.ProcessingRecipeJS;
     /**
      * Creates a recipe for Pressing.
      * 
