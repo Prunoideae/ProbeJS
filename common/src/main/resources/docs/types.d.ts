@@ -32,7 +32,10 @@ class FluidStackJS {
  * @assign RegExp
  */
 class BlockStatePredicate {
-
+    /**
+     * @modify o dev.latvian.mods.kubejs.block.state.BlockStatePredicate
+     */
+    static of(o: java.lang.Object): dev.latvian.mods.kubejs.block.state.BlockStatePredicate;
 }
 /**
  * @target net.minecraft.nbt.CompoundTag
