@@ -1,11 +1,22 @@
 /**
+ * @target dev.latvian.mods.kubejs.level.gen.filter.biome.BiomeFilter
+ * @assign net.minecraft.world.level.biome.Biome
+ * @assign RegExp
+ * @assign dev.latvian.mods.kubejs.level.gen.filter.biome.BiomeFilter[]
+ * @assign {or?: Internal.BiomeFilter_, not?: Internal.BiomeFilter_}
+ */
+class BiomeFilter {
+
+}
+
+/**
  * @target dev.latvian.mods.kubejs.fluid.FluidStackJS
  * @assign dev.architectury.fluid.FluidStack
  * @assign net.minecraft.world.level.material.Fluid
  * @assign com.google.gson.JsonObject
  * @assign {fluid: ResourceLocation_, amount?: number, nbt?: Internal.CompoundTag_}
  * @assign "" | "-" | "empty" | "minecraft:empty"
- * @assign `${string} ${number}`
+ * @assign `${Internal.Fluid_} ${number}`
  */
 class FluidStackJS {
 
@@ -13,11 +24,11 @@ class FluidStackJS {
 
 /**
  * @target dev.latvian.mods.kubejs.block.state.BlockStatePredicate
- * @assign string
  * @assign dev.latvian.mods.kubejs.block.state.BlockStatePredicate[]
- * @assign {or?: Internal.BlockStatePredicate_[], not?: Internal.BlockStatePredicate_}
+ * @assign {or?: Internal.BlockStatePredicate_, not?: Internal.BlockStatePredicate_}
  * @assign net.minecraft.world.level.block.Block
  * @assign net.minecraft.world.level.block.state.BlockState
+ * @assign `#${Special.BlockTag}`
  * @assign RegExp
  */
 class BlockStatePredicate {
@@ -76,7 +87,6 @@ class ResourceLocation {
  * @target dev.latvian.mods.kubejs.recipe.ingredientaction.IngredientActionFilter
  * @assign number
  * @assign dev.latvian.mods.kubejs.item.ingredient.IngredientJS
- * @assign string
  * @assign {item: Internal.IngredientJS_, index?: number}
  */
 class IngredientActionFilter {
@@ -136,7 +146,7 @@ class IngredientJS {
 /**
  * @target dev.latvian.mods.kubejs.recipe.filter.RecipeFilter
  * @assign dev.latvian.mods.kubejs.recipe.filter.RecipeFilter[]
- * @assign {exact?: boolean, not?: Internal.RecipeFilter_, or?: Internal.RecipeFilter_[], id?: string | RegExp, type?: string, group?: string, mod?: string, input?: Internal.IngredientJS_, output?: Internal.IngredientJS_}
+ * @assign {exact?: boolean, not?: Internal.RecipeFilter_, or?: Internal.RecipeFilter_[], id?: string | RegExp, type?: string, group?: string, mod?: `@${Special.Mod}`, input?: Internal.IngredientJS_, output?: Internal.IngredientJS_}
  */
 class RecipeFilter {
 
