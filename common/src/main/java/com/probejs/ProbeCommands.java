@@ -34,8 +34,6 @@ public class ProbeCommands {
                                 .requires(source -> source.getServer().isSingleplayer())
                                 .executes(context -> {
                                     try {
-                                        if (ProbeConfig.INSTANCE.autoExport)
-                                            export(context.getSource());
                                         SnippetCompiler.compile();
                                         DocumentProviderHandler.init();
                                         CommentHandler.init();
@@ -101,14 +99,6 @@ public class ProbeCommands {
                                             ProbeConfig.INSTANCE.save();
                                             return Command.SINGLE_SUCCESS;
                                         }))
-                                .then(Commands.literal("toggle_autoexport")
-                                        .requires(source -> source.getServer().isSingleplayer())
-                                        .executes(context -> {
-                                            ProbeConfig.INSTANCE.autoExport = !ProbeConfig.INSTANCE.autoExport;
-                                            context.getSource().sendSuccess(new TextComponent("Auto-export for KubeJS set to: %s".formatted(ProbeConfig.INSTANCE.autoExport)), false);
-                                            ProbeConfig.INSTANCE.save();
-                                            return Command.SINGLE_SUCCESS;
-                                        }))
                         )
                 //.then(Commands.literal("test")
                 //        .requires(source -> source.getServer().isSingleplayer() || source.hasPermission(2))
@@ -119,29 +109,4 @@ public class ProbeCommands {
         );
     }
 
-    private static void export(CommandSourceStack source) {
-        if (ServerSettings.dataExport != null) {
-            return;
-        }
-
-        ServerSettings.source = source;
-        ServerSettings.dataExport = new JsonObject();
-        source.sendSuccess(new TextComponent("Reloading server and exporting data..."), false);
-
-        MinecraftServer minecraftServer = source.getServer();
-        PackRepository packRepository = minecraftServer.getPackRepository();
-        WorldData worldData = minecraftServer.getWorldData();
-        Collection<String> collection = packRepository.getSelectedIds();
-        packRepository.reload();
-        Collection<String> collection2 = Lists.newArrayList(collection);
-        Collection<String> collection3 = worldData.getDataPackConfig().getDisabled();
-
-        for (String string : packRepository.getAvailableIds()) {
-            if (!collection3.contains(string) && !collection2.contains(string)) {
-                collection2.add(string);
-            }
-        }
-
-        ReloadCommand.reloadPacks(collection2, source);
-    }
 }

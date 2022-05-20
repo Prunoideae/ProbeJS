@@ -17,7 +17,6 @@ public class ProbeConfig {
     public boolean mixinDisabled = false;
     public boolean vanillaOrder = true;
     public boolean exportClassNames = false;
-    public boolean autoExport = true;
 
 
     private static <E> E fetchPropertyOrDefault(Object key, Map<?, ?> value, E defaultValue) {
@@ -34,7 +33,6 @@ public class ProbeConfig {
                 mixinDisabled = fetchPropertyOrDefault("disabled", obj, false);
                 vanillaOrder = fetchPropertyOrDefault("vanillaOrder", obj, true);
                 exportClassNames = fetchPropertyOrDefault("exportClassNames", obj, false);
-                autoExport = fetchPropertyOrDefault("autoExport", obj, true);
             } catch (IOException e) {
                 ProbeJS.LOGGER.warn("Cannot read config properties, falling back to defaults.");
             }

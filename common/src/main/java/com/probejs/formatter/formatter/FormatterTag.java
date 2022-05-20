@@ -29,4 +29,8 @@ public class FormatterTag implements IFormatter {
                         .map(g::toJson)
                         .collect(Collectors.joining(" | "))));
     }
+
+    public static List<String> getTagsFromRegistry(Registry<?> registry) {
+        return registry.getTagNames().map(TagKey::location).map(ResourceLocation::toString).collect(Collectors.toList());
+    }
 }
