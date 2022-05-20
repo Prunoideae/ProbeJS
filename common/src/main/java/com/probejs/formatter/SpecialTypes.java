@@ -1,7 +1,9 @@
 package com.probejs.formatter;
 
 import com.google.gson.Gson;
+import com.probejs.compiler.SpecialCompiler;
 import com.probejs.formatter.formatter.FormatterClass;
+import com.probejs.formatter.formatter.FormatterRegistry;
 import com.probejs.formatter.formatter.FormatterType;
 import com.probejs.info.ClassInfo;
 import com.probejs.info.MethodInfo;
@@ -158,15 +160,7 @@ public class SpecialTypes {
     }
 
     public static <T> void assignRegistry(Class<T> clazz, ResourceKey<Registry<T>> registry) {
-        NameResolver.putSpecialAssignments(clazz, () -> {
-            List<String> result = new ArrayList<>();
-            Gson g = new Gson();
-            KubeJSRegistries.genericRegistry(registry).getIds().forEach(r -> {
-                if (r.getNamespace().equals("minecraft"))
-                    result.add(g.toJson(r.getPath()));
-                result.add(g.toJson(r.toString()));
-            });
-            return result;
-        });
+        SpecialCompiler.specialCompilers.add(new FormatterRegistry<T>(registry, clazz));
+        NameResolver.putSpecialAssignments(clazz, () -> List.of("Special.%s".formatted(clazz.getSimpleName())));
     }
 }

@@ -156,7 +156,13 @@ public class NameResolver {
         return specialClassAssigner.getOrDefault(clazz, ArrayList::new).get();
     }
 
+    private static boolean initialized = false;
+
     public static void init() {
+        if (initialized)
+            return;
+        initialized = true;
+        
         putResolvedPrimitive(Object.class, "any");
         putResolvedPrimitive(String.class, "string");
         putResolvedPrimitive(Character.class, "string");

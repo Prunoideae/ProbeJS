@@ -16,7 +16,7 @@ class BiomeFilter {
  * @assign com.google.gson.JsonObject
  * @assign {fluid: ResourceLocation_, amount?: number, nbt?: Internal.CompoundTag_}
  * @assign "" | "-" | "empty" | "minecraft:empty"
- * @assign `${Internal.Fluid_} ${number}`
+ * @assign `${Special.Fluid} ${number}`
  */
 class FluidStackJS {
 
