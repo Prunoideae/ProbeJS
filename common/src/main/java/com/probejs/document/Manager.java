@@ -67,7 +67,7 @@ public class Manager {
                             }
                             ZipEntry docEntry = file.getEntry(subEntry);
                             if (docEntry != null) {
-                                ProbeJS.LOGGER.info("Loading document inside jar - %s".formatted(subEntry));
+                                ProbeJS.LOGGER.info("Loading raw document inside jar - %s".formatted(subEntry));
                                 InputStream docStream = file.getInputStream(docEntry);
                                 BufferedReader docReader = new BufferedReader(new InputStreamReader(new BufferedInputStream(docStream), StandardCharsets.UTF_8));
                                 docReader.lines().forEach(rawTSDoc::add);
@@ -92,6 +92,12 @@ public class Manager {
     }
 
     public static void init() {
+        classDocuments.clear();
+        classAdditions.clear();
+        typeDocuments.clear();
+        typesAssignable.clear();
+        rawTSDoc.clear();
+
         Document documentState = new Document();
         try {
             fromFiles(documentState);
@@ -99,13 +105,6 @@ public class Manager {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        classDocuments.clear();
-        classAdditions.clear();
-        typeDocuments.clear();
-        typesAssignable.clear();
-        rawTSDoc.clear();
-
 
         for (IDocument doc : documentState.getDocument().getDocuments()) {
             if (doc instanceof DocumentClass classDoc) {

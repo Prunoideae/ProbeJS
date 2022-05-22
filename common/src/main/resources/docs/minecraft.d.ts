@@ -1,4 +1,34 @@
 /**
+ * @target dev.latvian.mods.kubejs.player.PlayerJS
+ */
+class PlayerJS {
+    /**
+     * @modify arg0 TSDoc.Paintable
+     */
+    paint(arg0: net.minecraft.nbt.CompoundTag): void;
+}
+
+/**
+ * @target dev.latvian.mods.kubejs.player.ServerPlayerJS
+ */
+class ServerPlayerJS {
+    /**
+     * @modify arg0 TSDoc.Paintable
+     */
+    paint(arg0: net.minecraft.nbt.CompoundTag): void;
+}
+
+/**
+ * @target dev.latvian.mods.kubejs.player.ClientPlayerJS
+ */
+class ClientPlayerJS {
+    /**
+     * @modify arg0 TSDoc.Paintable
+     */
+    paint(arg0: net.minecraft.nbt.CompoundTag): void;
+}
+
+/**
  * @target dev.latvian.mods.kubejs.bindings.IngredientWrapper
  */
 class IngredientWrapper {

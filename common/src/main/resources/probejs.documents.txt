@@ -10,3 +10,4 @@ docs/botanypots.d.ts
 docs/cucumber.d.ts
 docs/dankstorage.d.ts
 docs/extendedcrafting.d.ts
+!docs/painter.d.ts
