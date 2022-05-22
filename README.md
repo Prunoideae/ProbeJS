@@ -30,7 +30,7 @@ For the detailed information about documents, please refer to the wiki page.
 1. Get VSCode.
 2. Install the mod.
 3. In game, use `/probejs dump` and wait for the typings to be generated.
-4. Open the `./minecraft/kubejs` in VSCode, you should see snippets and typing functioning.
+4. Open the `./minecraft` in VSCode, you should see snippets and typing functioning.
 5. Use `/probejs dump` in case of you want to refresh the generated typing. If VSCode is not responding to file changes,
    press F1 and execute `TypeScript: Restart TS server` to force a refresh in Code.
 
