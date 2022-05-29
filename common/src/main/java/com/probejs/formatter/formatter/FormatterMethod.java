@@ -77,7 +77,7 @@ public class FormatterMethod extends DocumentReceiver<DocumentMethod> implements
     }
 
     private String formatReturn() {
-        return formatTypeParameterized(methodInfo.getReturnType(), false);
+        return formatTypeParameterized(methodInfo.getReturnType(), NameResolver.specialTypeGuards.getOrDefault(methodInfo.getReturnType().getResolvedClass(), false));
     }
 
     public static String formatParamUnderscore(ITypeInfo info) {

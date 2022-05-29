@@ -3,6 +3,7 @@ package com.probejs.formatter;
 import com.google.gson.Gson;
 import com.probejs.info.MethodInfo;
 import com.probejs.info.type.ITypeInfo;
+import dev.latvian.mods.kubejs.util.ClassWrapper;
 import dev.latvian.mods.rhino.BaseFunction;
 import dev.latvian.mods.rhino.NativeJavaObject;
 import dev.latvian.mods.rhino.NativeObject;
@@ -67,6 +68,7 @@ public class NameResolver {
     public static final HashMap<String, ResolvedName> resolvedNames = new HashMap<>();
     public static final HashMap<Class<?>, Function<ITypeInfo, String>> specialTypeFormatters = new HashMap<>();
     public static final HashMap<Class<?>, Function<Object, String>> specialValueFormatters = new HashMap<>();
+    public static final HashMap<Class<?>, Boolean> specialTypeGuards = new HashMap<>();
     public static final HashMap<Class<?>, Supplier<List<String>>> specialClassAssigner = new HashMap<>();
 
     public static final Set<String> keywords = new HashSet<>();
@@ -97,6 +99,11 @@ public class NameResolver {
         specialTypeFormatters.put(className, formatter);
     }
 
+    public static void putTypeGuard(boolean isSafe, Class<?>... classes) {
+        for (Class<?> clazz : classes)
+            specialTypeGuards.put(clazz, isSafe);
+    }
+
     public static boolean isTypeSpecial(Class<?> clazz) {
         return specialTypeFormatters.containsKey(clazz);
     }
@@ -108,7 +115,7 @@ public class NameResolver {
 
     public static String formatValue(Object object) {
         if (object == null)
-            return null;
+            return "null";
         if (specialValueFormatters.containsKey(object.getClass()))
             return specialValueFormatters.get(object.getClass()).apply(object);
         for (Map.Entry<Class<?>, Function<Object, String>> entry : specialValueFormatters.entrySet()) {
@@ -162,7 +169,7 @@ public class NameResolver {
         if (initialized)
             return;
         initialized = true;
-        
+
         putResolvedPrimitive(Object.class, "any");
         putResolvedPrimitive(String.class, "string");
         putResolvedPrimitive(Character.class, "string");
@@ -224,6 +231,10 @@ public class NameResolver {
         SpecialTypes.assignRegistry(SoundEvent.class, Registry.SOUND_EVENT_REGISTRY);
         SpecialTypes.assignRegistry(Fluid.class, Registry.FLUID_REGISTRY);
         SpecialTypes.assignRegistry(Biome.class, Registry.BIOME_REGISTRY);
+
+        putTypeFormatter(Class.class, SpecialTypes::formatClassLike);
+        putTypeFormatter(ClassWrapper.class, SpecialTypes::formatClassLike);
+        putTypeGuard(true, Class.class, ClassWrapper.class);
 
         addKeyword("function");
         addKeyword("debugger");

@@ -1,6 +1,5 @@
 package com.probejs.formatter;
 
-import com.google.gson.Gson;
 import com.probejs.compiler.SpecialCompiler;
 import com.probejs.formatter.formatter.FormatterClass;
 import com.probejs.formatter.formatter.FormatterRegistry;
@@ -11,11 +10,10 @@ import com.probejs.info.type.ITypeInfo;
 import com.probejs.info.type.TypeInfoClass;
 import com.probejs.info.type.TypeInfoParameterized;
 import com.probejs.info.type.TypeInfoVariable;
-import dev.latvian.mods.kubejs.KubeJSRegistries;
+import dev.latvian.mods.kubejs.util.ClassWrapper;
 import dev.latvian.mods.rhino.BaseFunction;
 import dev.latvian.mods.rhino.NativeJavaObject;
 import dev.latvian.mods.rhino.NativeObject;
-import dev.latvian.mods.rhino.Scriptable;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 
@@ -100,6 +98,18 @@ public class SpecialTypes {
             }
         }
         return "{%s}".formatted(String.join(",", values));
+    }
+
+    public static String formatClassLike(ITypeInfo obj) {
+        ITypeInfo inner = null;
+        if (obj instanceof TypeInfoParameterized cls) {
+            inner = cls.getParamTypes().get(0);
+        } else if (obj instanceof TypeInfoClass cls) {
+            inner = cls;
+        }
+        if (inner == null)
+            return "any";
+        return "typeof %s".formatted(new FormatterType(inner.getBaseType(), false).format(0, 0));
     }
 
     public static String formatList(Object obj) {
