@@ -3,6 +3,8 @@ package com.probejs.formatter;
 import com.google.gson.Gson;
 import com.probejs.info.MethodInfo;
 import com.probejs.info.type.ITypeInfo;
+import dev.latvian.mods.kubejs.block.MaterialJS;
+import dev.latvian.mods.kubejs.block.MaterialListJS;
 import dev.latvian.mods.kubejs.util.ClassWrapper;
 import dev.latvian.mods.rhino.BaseFunction;
 import dev.latvian.mods.rhino.NativeJavaObject;
@@ -216,13 +218,15 @@ public class NameResolver {
                 for (var field : DamageSource.class.getDeclaredFields()) {
                     field.setAccessible(true);
                     if (Modifier.isStatic(field.getModifiers()) && field.getType() == DamageSource.class) {
-                        result.add(((DamageSource) field.get(null)).getMsgId());
+                        result.add(gson.toJson(((DamageSource) field.get(null)).getMsgId()));
                     }
                 }
             } catch (Exception ignored) {
             }
             return result;
         });
+
+        putSpecialAssignments(MaterialJS.class, () -> MaterialListJS.INSTANCE.map.keySet().stream().map(gson::toJson).collect(Collectors.toList()));
 
         SpecialTypes.assignRegistry(Attribute.class, Registry.ATTRIBUTE_REGISTRY);
         SpecialTypes.assignRegistry(MobEffect.class, Registry.MOB_EFFECT_REGISTRY);
