@@ -108,7 +108,7 @@ public class SnippetCompiler {
                     else
                         prefixes.add("@%s.tags.%s".formatted(type, mod));
                     modMembersJson.add("prefix", prefixes);
-                    modMembersJson.addProperty("body", "\"#%s:${1|%s|}\"".formatted(mod, String.join(",", modMembers)));
+                    modMembersJson.addProperty("body", "\"%s:${1|%s|}\"".formatted(mod, String.join(",", modMembers)));
                     resultJson.add("%s_tag_%s".formatted(type, mod), modMembersJson);
                 });
             }
