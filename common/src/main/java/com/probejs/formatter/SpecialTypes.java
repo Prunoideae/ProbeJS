@@ -10,7 +10,6 @@ import com.probejs.info.type.ITypeInfo;
 import com.probejs.info.type.TypeInfoClass;
 import com.probejs.info.type.TypeInfoParameterized;
 import com.probejs.info.type.TypeInfoVariable;
-import dev.latvian.mods.kubejs.util.ClassWrapper;
 import dev.latvian.mods.rhino.BaseFunction;
 import dev.latvian.mods.rhino.NativeJavaObject;
 import dev.latvian.mods.rhino.NativeObject;

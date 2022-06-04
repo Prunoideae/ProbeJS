@@ -43,7 +43,7 @@ public class FormatterField extends DocumentReceiver<DocumentField> implements I
         } else if (fieldInfo.isStatic() && NameResolver.formatValue(fieldInfo.getStaticValue()) != null)
             elements.add(NameResolver.formatValue(fieldInfo.getStaticValue()));
         else
-            elements.add(new FormatterType(fieldInfo.getType()).format(0, 0));
+            elements.add(new FormatterType(fieldInfo.getType(), NameResolver.specialTypeGuards.getOrDefault(fieldInfo.getType().getResolvedClass(), true)).format(0, 0));
 
         formatted.add(" ".repeat(indent) + String.join(" ", elements) + ";");
         return formatted;
