@@ -1,7 +1,10 @@
 package com.probejs.info.type;
 
 import java.lang.reflect.Type;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class InfoTypeResolver {
@@ -17,6 +20,19 @@ public class InfoTypeResolver {
         if (TypeInfoParameterized.test(type))
             return new TypeInfoParameterized(type);
         return null;
+    }
+
+    public static ITypeInfo getContainedTypeOrSelf(ITypeInfo typeInfo) {
+        if (typeInfo instanceof TypeInfoParameterized paramType) {
+            ITypeInfo baseType = paramType.getBaseType();
+            if (baseType.assignableFrom(resolveType(Collection.class)) && paramType.getParamTypes().size() > 0) {
+                return paramType.getParamTypes().get(0);
+            }
+            if (baseType.assignableFrom(resolveType(Map.class)) && paramType.getParamTypes().size() > 1) {
+                return paramType.getParamTypes().get(1);
+            }
+        }
+        return typeInfo;
     }
 
     /**
