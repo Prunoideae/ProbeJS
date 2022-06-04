@@ -10,9 +10,7 @@ import com.probejs.info.type.ITypeInfo;
 import com.probejs.info.type.TypeInfoClass;
 import com.probejs.info.type.TypeInfoParameterized;
 import com.probejs.info.type.TypeInfoVariable;
-import dev.latvian.mods.rhino.BaseFunction;
-import dev.latvian.mods.rhino.NativeJavaObject;
-import dev.latvian.mods.rhino.NativeObject;
+import dev.latvian.mods.rhino.*;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 
@@ -126,7 +124,15 @@ public class SpecialTypes {
 
     public static String formatScriptable(Object obj) {
         List<String> values = new ArrayList<>();
-        if (obj instanceof NativeObject scriptable) {
+        if (obj instanceof ScriptableObject scriptable) {
+            Scriptable pt = scriptable.getPrototype();
+            if (pt.get("constructor", pt) instanceof BaseFunction fun) {
+                //Resolves Object since they're not typed
+                if (!fun.getFunctionName().isEmpty() && !fun.getFunctionName().equals("Object")) {
+                    return fun.getFunctionName();
+                }
+            }
+
             for (Object id : scriptable.getIds()) {
                 String formattedKey = NameResolver.formatValue(id);
                 Object value;
