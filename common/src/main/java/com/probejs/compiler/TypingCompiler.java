@@ -158,7 +158,7 @@ public class TypingCompiler {
         Set<Class<?>> touchableClasses = new HashSet<>(bindingEvent.getClassDumpMap().values());
         touchableClasses.addAll(cachedClasses);
         touchableClasses.addAll(typeMap.values().stream().map(recipeTypeJS -> recipeTypeJS.factory.get().getClass()).collect(Collectors.toList()));
-        touchableClasses.addAll(bindingEvent.getConstantDumpMap().values().stream().map(Object::getClass).collect(Collectors.toList()));
+        bindingEvent.getConstantDumpMap().values().stream().map(DummyBindingEvent::getConstantClassRecursive).forEach(touchableClasses::addAll);
         touchableClasses.addAll(CapturedClasses.capturedEvents.values().stream().map(CapturedEvent::getCaptured).collect(Collectors.toList()));
         touchableClasses.addAll(CapturedClasses.capturedRawEvents.values());
         touchableClasses.addAll(CapturedClasses.capturedJavaClasses);

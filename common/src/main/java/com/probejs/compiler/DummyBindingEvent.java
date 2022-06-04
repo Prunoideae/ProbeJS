@@ -3,8 +3,10 @@ package com.probejs.compiler;
 import dev.latvian.mods.kubejs.script.BindingsEvent;
 import dev.latvian.mods.kubejs.script.ScriptManager;
 import dev.latvian.mods.rhino.BaseFunction;
+import dev.latvian.mods.rhino.Scriptable;
+import dev.latvian.mods.rhino.ScriptableObject;
 
-import java.util.HashMap;
+import java.util.*;
 
 public class DummyBindingEvent extends BindingsEvent {
     private final HashMap<String, Object> constantDumpMap = new HashMap<>();
@@ -36,5 +38,25 @@ public class DummyBindingEvent extends BindingsEvent {
 
     public HashMap<String, Object> getConstantDumpMap() {
         return constantDumpMap;
+    }
+
+    public static Set<Class<?>> getConstantClassRecursive(Object constantDump) {
+        Set<Class<?>> result = new HashSet<>();
+        if (constantDump == null)
+            return result;
+        if (constantDump instanceof ScriptableObject scriptable) {
+            Arrays.stream(scriptable.getIds())
+                    .map(scriptable::get)
+                    .map(DummyBindingEvent::getConstantClassRecursive)
+                    .forEach(result::addAll);
+        } else if (constantDump instanceof Map<?, ?> map) {
+            map.keySet().stream().map(DummyBindingEvent::getConstantClassRecursive).forEach(result::addAll);
+            map.values().stream().map(DummyBindingEvent::getConstantClassRecursive).forEach(result::addAll);
+        } else if (constantDump instanceof Collection<?> collection) {
+            collection.stream().map(DummyBindingEvent::getConstantClassRecursive).forEach(result::addAll);
+        } else {
+            result.add(constantDump.getClass());
+        }
+        return result;
     }
 }
