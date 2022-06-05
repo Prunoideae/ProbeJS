@@ -46,44 +46,33 @@ public class Manager {
 
     public static void fromFiles(Document document) throws IOException {
         for (Mod mod : Platform.getMods()) {
-            Path filePath = mod.getFilePath();
-            if (Files.isRegularFile(filePath) && (filePath.getFileName().toString().endsWith(".jar") || filePath.getFileName().toString().endsWith(".zip"))) {
-                ZipFile file = new ZipFile(filePath.toFile());
-                ZipEntry entry = file.getEntry("probejs.documents.txt");
-                if (entry != null) {
-                    ProbeJS.LOGGER.info("Found documents list from %s".formatted(mod.getName()));
-                    InputStream stream = file.getInputStream(entry);
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(new BufferedInputStream(stream), StandardCharsets.UTF_8));
-                    List<String> list = reader.lines().collect(Collectors.toList());
-                    for (String subEntry : list) {
-                        if (subEntry.startsWith("!")) {
-                            subEntry = subEntry.substring(1);
-                            int i = subEntry.indexOf(" ");
-                            if (i != -1) {
-                                if (!Platform.isModLoaded(subEntry.substring(0, i))) {
-                                    continue;
-                                }
-                                subEntry = subEntry.substring(i + 1);
+            Optional<Path> docsList = mod.findResource("probejs.documents.txt");
+            if (docsList.isPresent()) {
+                ProbeJS.LOGGER.info("Found documents list from %s".formatted(mod.getName()));
+                for (String subEntry : Files.lines(docsList.get()).collect(Collectors.toList())) {
+                    if (subEntry.startsWith("!")) {
+                        subEntry = subEntry.substring(1);
+                        int i = subEntry.indexOf(" ");
+                        if (i != -1) {
+                            if (!Platform.isModLoaded(subEntry.substring(0, i))) {
+                                continue;
                             }
-                            ZipEntry docEntry = file.getEntry(subEntry);
-                            if (docEntry != null) {
-                                ProbeJS.LOGGER.info("Loading raw document inside jar - %s".formatted(subEntry));
-                                InputStream docStream = file.getInputStream(docEntry);
-                                BufferedReader docReader = new BufferedReader(new InputStreamReader(new BufferedInputStream(docStream), StandardCharsets.UTF_8));
-                                docReader.lines().forEach(rawTSDoc::add);
-                            } else {
-                                ProbeJS.LOGGER.warn("Document from file is not found - %s".formatted(subEntry));
-                            }
+                            subEntry = subEntry.substring(i + 1);
+                        }
+                        Optional<Path> docEntry = mod.findResource(subEntry);
+                        if (docEntry.isPresent()) {
+                            ProbeJS.LOGGER.info("Loading raw document inside jar - %s".formatted(subEntry));
+                            Files.lines(docEntry.get()).forEach(rawTSDoc::add);
                         } else {
-                            ZipEntry docEntry = file.getEntry(subEntry);
-                            if (docEntry != null) {
-                                ProbeJS.LOGGER.info("Loading document inside jar - %s".formatted(subEntry));
-                                InputStream docStream = file.getInputStream(docEntry);
-                                BufferedReader docReader = new BufferedReader(new InputStreamReader(new BufferedInputStream(docStream), StandardCharsets.UTF_8));
-                                docReader.lines().forEach(document::step);
-                            } else {
-                                ProbeJS.LOGGER.warn("Document from file is not found - %s".formatted(subEntry));
-                            }
+                            ProbeJS.LOGGER.warn("Document from file is not found - %s".formatted(subEntry));
+                        }
+                    } else {
+                        Optional<Path> docEntry = mod.findResource(subEntry);
+                        if (docEntry.isPresent()) {
+                            ProbeJS.LOGGER.info("Loading document inside jar - %s".formatted(subEntry));
+                            Files.lines(docEntry.get()).forEach(document::step);
+                        } else {
+                            ProbeJS.LOGGER.warn("Document from file is not found - %s".formatted(subEntry));
                         }
                     }
                 }
