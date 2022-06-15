@@ -97,10 +97,12 @@ public class MethodInfo {
 
     public static class ParamInfo {
         private final String name;
+        private boolean isVararg;
         private ITypeInfo type;
 
         public ParamInfo(Parameter parameter) {
             this.name = parameter.getName();
+            this.isVararg = parameter.isVarArgs();
             try {
                 this.type = InfoTypeResolver.resolveType(parameter.getParameterizedType());
             } catch (Exception e) {
@@ -116,6 +118,10 @@ public class MethodInfo {
 
         public ITypeInfo getType() {
             return type;
+        }
+
+        public boolean isVararg() {
+            return isVararg;
         }
 
         public void setTypeInfo(ITypeInfo type) {

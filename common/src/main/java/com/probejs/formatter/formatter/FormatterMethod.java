@@ -6,10 +6,12 @@ import com.probejs.document.Manager;
 import com.probejs.document.comment.CommentUtil;
 import com.probejs.document.comment.special.CommentReturns;
 import com.probejs.document.type.IType;
+import com.probejs.document.type.TypeArray;
 import com.probejs.document.type.TypeNamed;
 import com.probejs.formatter.NameResolver;
 import com.probejs.info.MethodInfo;
 import com.probejs.info.type.ITypeInfo;
+import com.probejs.info.type.TypeInfoArray;
 import com.probejs.info.type.TypeInfoClass;
 import com.probejs.util.Pair;
 
@@ -96,20 +98,26 @@ public class FormatterMethod extends DocumentReceiver<DocumentMethod> implements
         return sb.toString();
     }
 
+    private static String formatParamDoc(Map<String, IType> modifiers, MethodInfo.ParamInfo paramInfo) {
+        IType type = modifiers.get(paramInfo.getName());
+        return type.getTransformedName((t, s) -> {
+            if (t instanceof TypeNamed n && NameResolver.resolvedNames.containsKey(n.getRawTypeName()) && !NameResolver.resolvedPrimitives.contains((n.getRawTypeName()))) {
+                return s + "_";
+            }
+            return s;
+        });
+    }
+
     private String formatParams(Map<String, IType> modifiers, Map<String, String> renames) {
         return "(%s)".formatted(
                 methodInfo
                         .getParams()
                         .stream()
                         .map(paramInfo -> "%s: %s".formatted(
-                                NameResolver.getNameSafe(renames.getOrDefault(paramInfo.getName(), paramInfo.getName())),
+                                (paramInfo.isVararg() ? "... " : "") + NameResolver.getNameSafe(renames.getOrDefault(paramInfo.getName(), paramInfo.getName())),
                                 modifiers.containsKey(paramInfo.getName())
-                                        ? modifiers.get(paramInfo.getName()).getTransformedName((t, s) -> {
-                                    if (t instanceof TypeNamed n && NameResolver.resolvedNames.containsKey(n.getRawTypeName()) && !NameResolver.resolvedPrimitives.contains((n.getRawTypeName()))) {
-                                        return s + "_";
-                                    }
-                                    return s;
-                                }) : formatParamUnderscore(paramInfo.getType())))
+                                        ? formatParamDoc(modifiers, paramInfo)
+                                        : formatParamUnderscore(paramInfo.getType())))
                         .collect(Collectors.joining(", ")));
     }
 
