@@ -13,6 +13,7 @@ import dev.latvian.mods.kubejs.KubeJSPaths;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -69,8 +70,8 @@ public class ProbeCommands {
                                 .then(Commands.literal("toggle_mixin")
                                         .requires(source -> source.getServer().isSingleplayer())
                                         .executes(context -> {
-                                            ProbeConfig.INSTANCE.mixinDisabled = !ProbeConfig.INSTANCE.mixinDisabled;
-                                            context.getSource().sendSuccess(Component.literal("OnEvent mixin wrapper set to: %s".formatted(ProbeConfig.INSTANCE.mixinDisabled ? "disabled" : "enabled")), false);
+                                            ProbeConfig.INSTANCE.aggressiveProbing = !ProbeConfig.INSTANCE.aggressiveProbing;
+                                            context.getSource().sendSuccess(Component.literal("OnEvent mixin wrapper set to: %s".formatted(ProbeConfig.INSTANCE.aggressiveProbing ? "disabled" : "enabled")), false);
                                             ProbeConfig.INSTANCE.save();
                                             context.getSource().sendSuccess(Component.literal("Changes will be applied next time you start the game."), false);
                                             return Command.SINGLE_SUCCESS;
@@ -101,4 +102,12 @@ public class ProbeCommands {
         );
     }
 
+    public static void alertAggressiveDump(ServerPlayer player) {
+        player.sendSystemMessage(Component.literal(
+                """
+                        ProbeJS is working at aggressive dump mode! This may cause overhead in certain cases. If you're \
+                        in debug/developing stage, you can ignore it, otherwise, use /probejs configure toggle_mixin to \
+                        disable the aggressive info."""
+        ));
+    }
 }

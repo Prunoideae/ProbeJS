@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class OnJavaMixin {
     @Inject(method = "loadJavaClass", at = @At("RETURN"), remap = false)
     public void loadJavaClass(Scriptable njc, Object[] ex, CallbackInfoReturnable<NativeJavaClass> cir) {
-        if (!ProbeConfig.INSTANCE.mixinDisabled)
+        if (!ProbeConfig.INSTANCE.aggressiveProbing)
             CapturedClasses.capturedJavaClasses.add(cir.getReturnValue().getClassObject());
     }
 }

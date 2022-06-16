@@ -15,7 +15,7 @@ public class OnForgeEventMixin {
 
     @Inject(method = "onPlatformEvent", at = @At("HEAD"), remap = false)
     private static void onPlatformEvent(BindingsEvent event, Object[] objects, CallbackInfoReturnable<Object> callback) {
-        if (objects.length >= 2 && objects[0] instanceof CharSequence && !ProbeConfig.INSTANCE.mixinDisabled) {
+        if (objects.length >= 2 && objects[0] instanceof CharSequence && !ProbeConfig.INSTANCE.aggressiveProbing) {
             try {
                 Class<?> forName = Class.forName(objects[0].toString());
                 CapturedClasses.capturedRawEvents.put(objects[0].toString(), forName);
