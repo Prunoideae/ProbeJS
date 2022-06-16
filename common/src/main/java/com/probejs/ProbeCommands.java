@@ -1,7 +1,5 @@
 package com.probejs;
 
-import com.google.common.collect.Lists;
-import com.google.gson.JsonObject;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.probejs.compiler.SnippetCompiler;
@@ -12,18 +10,12 @@ import com.probejs.document.parser.processor.DocumentProviderHandler;
 import com.probejs.formatter.ClassResolver;
 import com.probejs.formatter.NameResolver;
 import dev.latvian.mods.kubejs.KubeJSPaths;
-import dev.latvian.mods.kubejs.server.ServerSettings;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.commands.ReloadCommand;
-import net.minecraft.server.packs.repository.PackRepository;
-import net.minecraft.world.level.storage.WorldData;
+import net.minecraft.network.chat.Component;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collection;
 
 public class ProbeCommands {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
@@ -45,9 +37,9 @@ public class ProbeCommands {
                                             SnippetCompiler.compileClassNames();
                                     } catch (Exception e) {
                                         e.printStackTrace();
-                                        context.getSource().sendSuccess(new TextComponent("Uncaught exception happened in wrapper, please report to the Github issue with complete latest.log."), false);
+                                        context.getSource().sendSuccess(Component.literal("Uncaught exception happened in wrapper, please report to the Github issue with complete latest.log."), false);
                                     }
-                                    context.getSource().sendSuccess(new TextComponent("ProbeJS typing generation finished."), false);
+                                    context.getSource().sendSuccess(Component.literal("ProbeJS typing generation finished."), false);
                                     return Command.SINGLE_SUCCESS;
                                 }))
                         .then(Commands.literal("clear_cache")
@@ -56,12 +48,12 @@ public class ProbeCommands {
                                     Path path = KubeJSPaths.EXPORTED.resolve("cachedEvents.json");
                                     if (Files.exists(path)) {
                                         if (path.toFile().delete()) {
-                                            context.getSource().sendSuccess(new TextComponent("Cache files removed."), false);
+                                            context.getSource().sendSuccess(Component.literal("Cache files removed."), false);
                                         } else {
-                                            context.getSource().sendSuccess(new TextComponent("Failed to remove cache files."), false);
+                                            context.getSource().sendSuccess(Component.literal("Failed to remove cache files."), false);
                                         }
                                     } else {
-                                        context.getSource().sendSuccess(new TextComponent("No cached files to be cleared."), false);
+                                        context.getSource().sendSuccess(Component.literal("No cached files to be cleared."), false);
                                     }
                                     return Command.SINGLE_SUCCESS;
                                 }))
@@ -70,7 +62,7 @@ public class ProbeCommands {
                                         .requires(source -> source.getServer().isSingleplayer())
                                         .executes(context -> {
                                             ProbeConfig.INSTANCE.dumpMethod = !ProbeConfig.INSTANCE.dumpMethod;
-                                            context.getSource().sendSuccess(new TextComponent("Keep method while beaning set to: %s".formatted(ProbeConfig.INSTANCE.dumpMethod)), false);
+                                            context.getSource().sendSuccess(Component.literal("Keep method while beaning set to: %s".formatted(ProbeConfig.INSTANCE.dumpMethod)), false);
                                             ProbeConfig.INSTANCE.save();
                                             return Command.SINGLE_SUCCESS;
                                         }))
@@ -78,16 +70,16 @@ public class ProbeCommands {
                                         .requires(source -> source.getServer().isSingleplayer())
                                         .executes(context -> {
                                             ProbeConfig.INSTANCE.mixinDisabled = !ProbeConfig.INSTANCE.mixinDisabled;
-                                            context.getSource().sendSuccess(new TextComponent("OnEvent mixin wrapper set to: %s".formatted(ProbeConfig.INSTANCE.mixinDisabled ? "disabled" : "enabled")), false);
+                                            context.getSource().sendSuccess(Component.literal("OnEvent mixin wrapper set to: %s".formatted(ProbeConfig.INSTANCE.mixinDisabled ? "disabled" : "enabled")), false);
                                             ProbeConfig.INSTANCE.save();
-                                            context.getSource().sendSuccess(new TextComponent("Changes will be applied next time you start the game."), false);
+                                            context.getSource().sendSuccess(Component.literal("Changes will be applied next time you start the game."), false);
                                             return Command.SINGLE_SUCCESS;
                                         }))
                                 .then(Commands.literal("toggle_snippet_order")
                                         .requires(source -> source.getServer().isSingleplayer())
                                         .executes(context -> {
                                             ProbeConfig.INSTANCE.vanillaOrder = !ProbeConfig.INSTANCE.vanillaOrder;
-                                            context.getSource().sendSuccess(new TextComponent("In snippets, which will appear first: %s".formatted(ProbeConfig.INSTANCE.vanillaOrder ? "mod_id" : "member_type")), false);
+                                            context.getSource().sendSuccess(Component.literal("In snippets, which will appear first: %s".formatted(ProbeConfig.INSTANCE.vanillaOrder ? "mod_id" : "member_type")), false);
                                             ProbeConfig.INSTANCE.save();
                                             return Command.SINGLE_SUCCESS;
                                         }))
@@ -95,7 +87,7 @@ public class ProbeCommands {
                                         .requires(source -> source.getServer().isSingleplayer())
                                         .executes(context -> {
                                             ProbeConfig.INSTANCE.exportClassNames = !ProbeConfig.INSTANCE.exportClassNames;
-                                            context.getSource().sendSuccess(new TextComponent("Export class name as snippets set to: %s".formatted(ProbeConfig.INSTANCE.exportClassNames)), false);
+                                            context.getSource().sendSuccess(Component.literal("Export class name as snippets set to: %s".formatted(ProbeConfig.INSTANCE.exportClassNames)), false);
                                             ProbeConfig.INSTANCE.save();
                                             return Command.SINGLE_SUCCESS;
                                         }))
