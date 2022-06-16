@@ -1,8 +1,8 @@
 package com.probejs.compiler;
 
 import com.google.gson.*;
-import com.probejs.ProbeJS;
 import com.probejs.ProbePaths;
+import com.probejs.ProbeJS;
 import com.probejs.document.DocumentClass;
 import com.probejs.document.DocumentComment;
 import com.probejs.document.Manager;

@@ -3,7 +3,6 @@
   "compatibilityLevel": "JAVA_17",
   "package": "com.probejs.forge.mixin",
   "mixins": [
-    "OnForgeEventMixin"
   ],
   "injectors": {
     "defaultRequire": 1
