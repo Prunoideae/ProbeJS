@@ -1,7 +1,5 @@
 package com.probejs;
 
-import com.google.common.collect.Lists;
-import com.google.gson.JsonObject;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.probejs.compiler.SnippetCompiler;
@@ -12,18 +10,12 @@ import com.probejs.document.parser.processor.DocumentProviderHandler;
 import com.probejs.formatter.ClassResolver;
 import com.probejs.formatter.NameResolver;
 import dev.latvian.mods.kubejs.KubeJSPaths;
-import dev.latvian.mods.kubejs.server.ServerSettings;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.commands.ReloadCommand;
-import net.minecraft.server.packs.repository.PackRepository;
-import net.minecraft.world.level.storage.WorldData;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collection;
 
 public class ProbeCommands {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
@@ -77,8 +69,8 @@ public class ProbeCommands {
                                 .then(Commands.literal("toggle_mixin")
                                         .requires(source -> source.getServer().isSingleplayer())
                                         .executes(context -> {
-                                            ProbeConfig.INSTANCE.mixinDisabled = !ProbeConfig.INSTANCE.mixinDisabled;
-                                            context.getSource().sendSuccess(new TextComponent("OnEvent mixin wrapper set to: %s".formatted(ProbeConfig.INSTANCE.mixinDisabled ? "disabled" : "enabled")), false);
+                                            ProbeConfig.INSTANCE.aggressiveProbing = !ProbeConfig.INSTANCE.aggressiveProbing;
+                                            context.getSource().sendSuccess(new TextComponent("OnEvent mixin wrapper set to: %s".formatted(ProbeConfig.INSTANCE.aggressiveProbing ? "disabled" : "enabled")), false);
                                             ProbeConfig.INSTANCE.save();
                                             context.getSource().sendSuccess(new TextComponent("Changes will be applied next time you start the game."), false);
                                             return Command.SINGLE_SUCCESS;
