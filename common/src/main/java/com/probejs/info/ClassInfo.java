@@ -61,6 +61,7 @@ public class ClassInfo {
         parameters = Arrays.stream(clazzRaw.getTypeParameters()).map(InfoTypeResolver::resolveType).collect(Collectors.toList());
         methodInfo = Arrays.stream(clazzRaw.getMethods())
                 .filter(m -> !m.isSynthetic())
+                .filter(m -> m.getDeclaringClass() == clazz)
                 .map(m -> new MethodInfo(m, clazz))
                 .filter(m -> ClassResolver.acceptMethod(m.getName()))
                 .filter(m -> !m.shouldHide())
@@ -71,63 +72,6 @@ public class ClassInfo {
                 .filter(f -> !f.shouldHide())
                 .filter(f -> !f.isTransient())
                 .collect(Collectors.toList());
-
-        //Resolve types - rollback everything till Object
-        applySuperGenerics(methodInfo, fieldInfo);
-    }
-
-    private void applySuperGenerics(List<MethodInfo> methodsToMutate, List<FieldInfo> fieldsToMutate) {
-        if (superClass != null) {
-            //Apply current level changes
-            ITypeInfo typeInfo = InfoTypeResolver.resolveType(clazzRaw.getGenericSuperclass());
-            Map<String, ITypeInfo> internalGenericMap = resolveTypeOverrides(typeInfo);
-            applyGenerics(internalGenericMap, methodsToMutate, fieldsToMutate);
-            Arrays.stream(clazzRaw.getGenericInterfaces()).map(InfoTypeResolver::resolveType).map(ClassInfo::resolveTypeOverrides).forEach(m -> applyGenerics(m, methodsToMutate, fieldsToMutate));
-            //Step to next level
-            superClass.applySuperGenerics(methodsToMutate, fieldsToMutate);
-            //Rewind
-            applyGenerics(internalGenericMap, methodsToMutate, fieldsToMutate);
-            Arrays.stream(clazzRaw.getGenericInterfaces()).map(InfoTypeResolver::resolveType).map(ClassInfo::resolveTypeOverrides).forEach(m -> applyGenerics(m, methodsToMutate, fieldsToMutate));
-        }
-        applyInterfaceGenerics(methodsToMutate, fieldsToMutate);
-    }
-
-    private void applyInterfaceGenerics(List<MethodInfo> methodsToMutate, List<FieldInfo> fieldsToMutate) {
-        //Apply current level changes
-        Arrays.stream(clazzRaw.getGenericInterfaces())
-                .map(InfoTypeResolver::resolveType)
-                .map(ClassInfo::resolveTypeOverrides)
-                .forEach(m -> applyGenerics(m, methodsToMutate, fieldsToMutate));
-        //Step to next level
-        interfaces.forEach(i -> i.applyInterfaceGenerics(methodsToMutate, fieldsToMutate));
-        //Rewind
-        Arrays.stream(clazzRaw.getGenericInterfaces())
-                .map(InfoTypeResolver::resolveType)
-                .map(ClassInfo::resolveTypeOverrides)
-                .forEach(m -> applyGenerics(m, methodsToMutate, fieldsToMutate));
-    }
-
-    private static void applyGenerics(Map<String, ITypeInfo> internalGenericMap, List<MethodInfo> methodInfo, List<FieldInfo> fieldInfo) {
-        for (MethodInfo method : methodInfo) {
-            Map<String, ITypeInfo> maskedNames = new HashMap<>();
-            method.getTypeVariables()
-                    .stream()
-                    .filter(i -> i instanceof TypeInfoVariable)
-                    .map(i -> (TypeInfoVariable) i)
-                    .forEach(v -> {
-                        maskedNames.put(v.getTypeName(), v);
-                        v.setUnderscored(true);
-                    });
-
-            method.setReturnType(InfoTypeResolver.mutateTypeMap(method.getReturnType(), maskedNames));
-            method.getParams().forEach(p -> p.setTypeInfo(InfoTypeResolver.mutateTypeMap(p.getType(), maskedNames)));
-
-            method.setReturnType(InfoTypeResolver.mutateTypeMap(method.getReturnType(), internalGenericMap));
-            method.getParams().forEach(p -> p.setTypeInfo(InfoTypeResolver.mutateTypeMap(p.getType(), internalGenericMap)));
-        }
-        for (FieldInfo field : fieldInfo) {
-            field.setTypeInfo(InfoTypeResolver.mutateTypeMap(field.getType(), internalGenericMap));
-        }
     }
 
 
