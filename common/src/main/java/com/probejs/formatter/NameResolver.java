@@ -18,6 +18,7 @@ import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
@@ -239,6 +240,7 @@ public class NameResolver {
         SpecialTypes.assignRegistry(Fluid.class, Registry.FLUID_REGISTRY);
         SpecialTypes.assignRegistry(Biome.class, Registry.BIOME_REGISTRY);
         SpecialTypes.assignRegistry(RecipeSerializer.class, ((ResourceKey<Registry<RecipeSerializer>>) ((Object) Registry.RECIPE_SERIALIZER_REGISTRY)));
+        SpecialTypes.assignRegistry(Enchantment.class, Registry.ENCHANTMENT_REGISTRY);
 
         putTypeFormatter(Class.class, SpecialTypes::formatClassLike);
         putTypeFormatter(ClassWrapper.class, SpecialTypes::formatClassLike);
