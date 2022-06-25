@@ -71,7 +71,7 @@ public class NameResolver {
         }
     }
 
-    public static final HashMap<String, ResolvedName> resolvedNames = new HashMap<>();
+    public static final HashMap<String, List<ResolvedName>> resolvedNames = new HashMap<>();
     public static final HashMap<Class<?>, Function<ITypeInfo, String>> specialTypeFormatters = new HashMap<>();
     public static final HashMap<Class<?>, Function<Object, String>> specialValueFormatters = new HashMap<>();
     public static final HashMap<Class<?>, Boolean> specialTypeGuards = new HashMap<>();
@@ -84,9 +84,9 @@ public class NameResolver {
         putResolvedName(className, new ResolvedName(Arrays.stream(resolvedName.split("\\.")).toList()));
     }
 
+    //Put a resolved name to the class.
     public static void putResolvedName(String className, ResolvedName resolvedName) {
-        if (!resolvedNames.containsKey(className))
-            resolvedNames.put(className, resolvedName);
+        resolvedNames.computeIfAbsent(className, s -> new ArrayList<>()).add(resolvedName);
     }
 
     public static void putResolvedName(Class<?> className, ResolvedName resolvedName) {
@@ -98,7 +98,11 @@ public class NameResolver {
     }
 
     public static ResolvedName getResolvedName(String className) {
-        return resolvedNames.getOrDefault(className, ResolvedName.UNRESOLVED);
+        List<ResolvedName> names = resolvedNames.get(className);
+        if (names == null || names.size() == 0)
+            return ResolvedName.UNRESOLVED;
+
+        return names.get(0);
     }
 
     public static void putTypeFormatter(Class<?> className, Function<ITypeInfo, String> formatter) {
@@ -131,11 +135,19 @@ public class NameResolver {
         return null;
     }
 
+    public static boolean findResolvedName(ResolvedName name) {
+        return resolvedNames.values().stream().anyMatch(names -> names.contains(name));
+    }
+
+    //Resolves a name.
+    //Will skip if the name is already resolved.
     public static void resolveName(Class<?> clazz) {
+        if (resolvedNames.containsKey(clazz.getName()))
+            return;
         String remappedName = MethodInfo.RUNTIME.getMappedClass(clazz);
         ResolvedName resolved = new ResolvedName(Arrays.stream(remappedName.split("\\.")).toList());
         ResolvedName internal = new ResolvedName(List.of("Internal", resolved.getLastName()));
-        if (resolvedNames.containsValue(internal))
+        if (findResolvedName(internal))
             putResolvedName(clazz.getName(), resolved);
         else {
             putResolvedName(clazz.getName(), internal);

@@ -1,12 +1,6 @@
 package com.probejs.document.type;
 
-import com.probejs.document.Manager;
 import com.probejs.formatter.NameResolver;
-import com.probejs.info.type.TypeInfoClass;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
 
 public class TypeNamed implements IType {
     private final String typeName;
@@ -21,7 +15,7 @@ public class TypeNamed implements IType {
 
     @Override
     public String getTypeName() {
-        NameResolver.ResolvedName resolved = NameResolver.resolvedNames.get(typeName);
+        NameResolver.ResolvedName resolved = NameResolver.getResolvedName(typeName);
         if (resolved == null)
             return typeName;
         return resolved.getFullName();
