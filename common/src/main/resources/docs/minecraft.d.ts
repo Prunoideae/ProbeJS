@@ -1,4 +1,14 @@
 /**
+ * @target dev.latvian.mods.kubejs.item.FoodBuilder
+ */
+class FoodBuilder {
+    /**
+     * @modify mobEffectId Special.MobEffect
+     */
+    effect(mobEffectId: net.minecraft.resources.ResourceLocation, duration: int, amplifier: int, probability: float): dev.latvian.mods.kubejs.item.FoodBuilder;
+}
+
+/**
  * @target dev.latvian.mods.kubejs.player.PlayerJS
  */
 class PlayerJS {

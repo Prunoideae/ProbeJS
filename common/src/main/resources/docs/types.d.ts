@@ -154,3 +154,10 @@ class IngredientJS {
 class RecipeFilter {
 
 }
+
+/**
+ * @target java.util.Map
+ * @assign {[key in K]: V}
+ */
+class Map {
+}
