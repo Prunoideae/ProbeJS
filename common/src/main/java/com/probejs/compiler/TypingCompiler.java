@@ -299,6 +299,20 @@ public class TypingCompiler {
         writer.flush();
     }
 
+    public static void compileAdditionalTypeNames() throws IOException {
+        BufferedWriter writer = Files.newBufferedWriter(ProbePaths.GENERATED.resolve("names.d.ts"));
+        writer.write("/// <reference path=\"./globals.d.ts\" />\n");
+        for (Map.Entry<String, List<NameResolver.ResolvedName>> entry : NameResolver.resolvedNames.entrySet()) {
+            String className = entry.getKey();
+            List<NameResolver.ResolvedName> exportedNames = entry.getValue();
+            if (exportedNames.size() > 1) {
+                for (int i = 1; i < exportedNames.size(); i++)
+                    writer.write("const %s: typeof %s\n".formatted(exportedNames.get(i).getLastName(), exportedNames.get(0).getLastName()));
+            }
+        }
+        writer.flush();
+    }
+
     public static void compileJSConfig() throws IOException {
         BufferedWriter writer = Files.newBufferedWriter(KubeJSPaths.DIRECTORY.resolve("jsconfig.json"));
         writer.write("""
@@ -337,6 +351,7 @@ public class TypingCompiler {
         compileEvents(cachedEvents, cachedForgeEvents);
         compileConstants(bindingEvent);
         compileJava(globalClasses);
+        compileAdditionalTypeNames();
         compileJSConfig();
         cachedJavaClasses.addAll(CapturedClasses.capturedJavaClasses);
         writeCachedEvents("cachedEvents.json", cachedEvents);
