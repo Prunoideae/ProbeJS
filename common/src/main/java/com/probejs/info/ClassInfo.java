@@ -67,6 +67,7 @@ public class ClassInfo {
                 .filter(m -> !m.shouldHide())
                 .collect(Collectors.toList());
         fieldInfo = Arrays.stream(clazzRaw.getFields())
+                .filter(f -> f.getDeclaringClass() == clazz)
                 .map(FieldInfo::new)
                 .filter(f -> ClassResolver.acceptField(f.getName()))
                 .filter(f -> !f.shouldHide())

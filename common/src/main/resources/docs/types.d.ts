@@ -71,14 +71,6 @@ class ItemStack {
 }
 
 /**
- * @target net.minecraft.world.entity.EntityType
- * @assign string
- */
-class EntityType {
-
-}
-
-/**
  * @target net.minecraft.resources.ResourceLocation
  * @assign string
  */

@@ -16,7 +16,7 @@ public class TypeNamed implements IType {
     @Override
     public String getTypeName() {
         NameResolver.ResolvedName resolved = NameResolver.getResolvedName(typeName);
-        if (resolved == null)
+        if (resolved.equals(NameResolver.ResolvedName.UNRESOLVED))
             return typeName;
         return resolved.getFullName();
     }
