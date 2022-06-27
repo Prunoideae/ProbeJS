@@ -10,11 +10,13 @@ import dev.latvian.mods.kubejs.util.ClassWrapper;
 import dev.latvian.mods.rhino.BaseFunction;
 import dev.latvian.mods.rhino.NativeJavaObject;
 import dev.latvian.mods.rhino.NativeObject;
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -97,6 +99,7 @@ public class NameResolver {
         putResolvedName(className, new ResolvedName(Arrays.stream(resolvedName.split("\\.")).toList()));
     }
 
+    @MethodsReturnNonnullByDefault
     public static ResolvedName getResolvedName(String className) {
         List<ResolvedName> names = resolvedNames.get(className);
         if (names == null || names.size() == 0)
@@ -183,6 +186,7 @@ public class NameResolver {
 
     private static boolean initialized = false;
 
+    @SuppressWarnings("unchecked")
     public static void init() {
         if (initialized)
             return;
@@ -253,7 +257,7 @@ public class NameResolver {
         SpecialTypes.assignRegistry(Biome.class, Registry.BIOME_REGISTRY);
         SpecialTypes.assignRegistry(RecipeSerializer.class, ((ResourceKey<Registry<RecipeSerializer>>) ((Object) Registry.RECIPE_SERIALIZER_REGISTRY)));
         SpecialTypes.assignRegistry(Enchantment.class, Registry.ENCHANTMENT_REGISTRY);
-
+        SpecialTypes.assignRegistry((Class<EntityType<?>>) ((Class<?>) EntityType.class), Registry.ENTITY_TYPE_REGISTRY);
         putTypeFormatter(Class.class, SpecialTypes::formatClassLike);
         putTypeFormatter(ClassWrapper.class, SpecialTypes::formatClassLike);
         putTypeGuard(true, Class.class, ClassWrapper.class);
