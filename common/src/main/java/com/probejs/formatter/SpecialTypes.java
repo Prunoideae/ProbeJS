@@ -175,7 +175,7 @@ public class SpecialTypes {
     }
 
     public static <T> void assignRegistry(Class<T> clazz, ResourceKey<Registry<T>> registry) {
-        SpecialCompiler.specialCompilers.add(new FormatterRegistry<T>(registry, clazz));
+        SpecialCompiler.specialCompilers.add(new FormatterRegistry<>(registry, clazz));
         NameResolver.putSpecialAssignments(clazz, () -> List.of("Special.%s".formatted(clazz.getSimpleName())));
     }
 }

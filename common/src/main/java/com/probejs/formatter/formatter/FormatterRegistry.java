@@ -1,12 +1,15 @@
 package com.probejs.formatter.formatter;
 
 import com.google.gson.Gson;
+import com.probejs.info.MethodInfo;
 import dev.latvian.mods.kubejs.KubeJSRegistries;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class FormatterRegistry<T> implements IFormatter {
     private final ResourceKey<Registry<T>> registry;
@@ -26,6 +29,7 @@ public class FormatterRegistry<T> implements IFormatter {
                 items.add(g.toJson(rl.getPath()));
             items.add(g.toJson(rl.toString()));
         });
-        return List.of("%stype %s = %s;".formatted(" ".repeat(indent), clazz.getSimpleName(), String.join(" | ", items)));
+        List<String> remappedName = Arrays.stream(MethodInfo.RUNTIME.getMappedClass(clazz).split("\\.")).collect(Collectors.toList());
+        return List.of("%stype %s = %s;".formatted(" ".repeat(indent), remappedName.get(remappedName.size() - 1), String.join(" | ", items)));
     }
 }
