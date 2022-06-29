@@ -107,7 +107,8 @@ public class SpecialTypes {
         }
         if (inner == null)
             return "any";
-        return "typeof %s".formatted(new FormatterType(inner.getBaseType(), false).format(0, 0));
+
+        return "%s%s".formatted(inner.getResolvedClass().isInterface() ? "" : "typeof ", new FormatterType(inner.getBaseType(), false).format(0, 0));
     }
 
     public static String formatList(Object obj) {
