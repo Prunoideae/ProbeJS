@@ -5,7 +5,6 @@ import com.probejs.formatter.ClassResolver;
 import com.probejs.info.type.ITypeInfo;
 import com.probejs.info.type.InfoTypeResolver;
 import com.probejs.info.type.TypeInfoParameterized;
-import com.probejs.info.type.TypeInfoVariable;
 
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
