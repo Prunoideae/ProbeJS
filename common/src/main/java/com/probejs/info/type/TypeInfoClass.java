@@ -1,5 +1,7 @@
 package com.probejs.info.type;
 
+import com.probejs.info.MethodInfo;
+
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
@@ -32,7 +34,7 @@ public class TypeInfoClass implements ITypeInfo {
 
     @Override
     public String getTypeName() {
-        return type.getName();
+        return MethodInfo.RUNTIME.getMappedClass(type);
     }
 
     @Override

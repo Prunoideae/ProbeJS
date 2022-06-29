@@ -47,7 +47,7 @@ public class FormatterClass extends DocumentReceiver<DocumentClass> implements I
             formatted.addAll(comment.format(indent, stepIndent));
         }
 
-        List<String> assignableTypes = Manager.typesAssignable.getOrDefault(classInfo.getClazzRaw().getName(), new ArrayList<>()).stream().map(t -> t.getTransformedName((i, s) -> {
+        List<String> assignableTypes = Manager.typesAssignable.getOrDefault(classInfo.getName(), new ArrayList<>()).stream().map(t -> t.getTransformedName((i, s) -> {
             if (i instanceof TypeNamed n && NameResolver.resolvedNames.containsKey(n.getRawTypeName()) && !NameResolver.resolvedPrimitives.contains((n.getRawTypeName()))) {
                 return s + "_";
             }

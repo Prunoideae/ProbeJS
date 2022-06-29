@@ -51,7 +51,7 @@ public class ClassInfo {
 
     private ClassInfo(Class<?> clazz) {
         clazzRaw = clazz;
-        name = clazzRaw.getName();
+        name = MethodInfo.RUNTIME.getMappedClass(clazzRaw);
         modifiers = clazzRaw.getModifiers();
         isInterface = clazzRaw.isInterface();
         constructorInfo = Arrays.stream(clazzRaw.getConstructors()).map(ConstructorInfo::new).collect(Collectors.toList());

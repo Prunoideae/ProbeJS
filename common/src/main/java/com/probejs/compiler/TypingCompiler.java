@@ -27,6 +27,7 @@ import dev.latvian.mods.kubejs.util.KubeJSPlugins;
 import net.minecraft.resources.ResourceLocation;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -176,10 +177,11 @@ public class TypingCompiler {
         Map<String, List<IFormatter>> namespaced = new HashMap<>();
 
         for (Class<?> clazz : globalClasses) {
-            FormatterClass formatter = new FormatterClass(ClassInfo.getOrCache(clazz));
+            ClassInfo info = ClassInfo.getOrCache(clazz);
+            FormatterClass formatter = new FormatterClass(info);
             Manager.classDocuments.getOrDefault(clazz.getName(), new ArrayList<>()).forEach(formatter::addDocument);
 
-            NameResolver.ResolvedName name = NameResolver.getResolvedName(clazz.getName());
+            NameResolver.ResolvedName name = NameResolver.getResolvedName(info.getName());
             if (name.getNamespace().isEmpty()) {
                 writer.write(String.join("\n", formatter.format(0, 4)) + "\n");
                 if (clazz.isInterface())
@@ -292,14 +294,18 @@ public class TypingCompiler {
         BufferedWriter writer = Files.newBufferedWriter(ProbePaths.GENERATED.resolve("java.d.ts"));
         writer.write("/// <reference path=\"./globals.d.ts\" />\n");
         for (Class<?> c : globalClasses) {
+            ClassInfo info = ClassInfo.getOrCache(c);
             if (ServerScriptManager.instance.scriptManager.isClassAllowed(c.getName())) {
-                writer.write("declare function java(name: \"%s\"): typeof %s;\n".formatted(c.getName(), FormatterClass.formatTypeParameterized(new TypeInfoClass(c))));
+                writer.write("declare function java(name: \"%s\"): typeof %s;\n".formatted(info.getName(), FormatterClass.formatTypeParameterized(new TypeInfoClass(c))));
             }
         }
         writer.flush();
     }
 
     public static void compileAdditionalTypeNames() throws IOException {
+        Path path = ProbePaths.GENERATED.resolve("names.d.ts");
+        if (Files.exists(path))
+            return;
         BufferedWriter writer = Files.newBufferedWriter(ProbePaths.GENERATED.resolve("names.d.ts"));
         writer.write("/// <reference path=\"./globals.d.ts\" />\n");
         for (Map.Entry<String, List<NameResolver.ResolvedName>> entry : NameResolver.resolvedNames.entrySet()) {
