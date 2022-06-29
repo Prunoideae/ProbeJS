@@ -92,7 +92,8 @@ public class NameResolver {
     }
 
     public static void putResolvedName(Class<?> className, ResolvedName resolvedName) {
-        putResolvedName(className.getName(), resolvedName);
+        String remappedName = MethodInfo.RUNTIME.getMappedClass(className);
+        putResolvedName(remappedName, resolvedName);
     }
 
     public static void putResolvedName(Class<?> className, String resolvedName) {
@@ -145,15 +146,15 @@ public class NameResolver {
     //Resolves a name.
     //Will skip if the name is already resolved.
     public static void resolveName(Class<?> clazz) {
-        if (resolvedNames.containsKey(clazz.getName()))
-            return;
         String remappedName = MethodInfo.RUNTIME.getMappedClass(clazz);
+        if (resolvedNames.containsKey(remappedName))
+            return;
         ResolvedName resolved = new ResolvedName(Arrays.stream(remappedName.split("\\.")).toList());
         ResolvedName internal = new ResolvedName(List.of("Internal", resolved.getLastName()));
         if (findResolvedName(internal))
-            putResolvedName(clazz.getName(), resolved);
+            putResolvedName(remappedName, resolved);
         else {
-            putResolvedName(clazz.getName(), internal);
+            putResolvedName(remappedName, internal);
         }
     }
 

@@ -73,7 +73,8 @@ public class SpecialTypes {
     private static String formatValueOrType(Object obj) {
         String formattedValue = NameResolver.formatValue(obj);
         if (formattedValue == null) {
-            if (!NameResolver.resolvedNames.containsKey(obj.getClass().getName()) && !obj.getClass().getName().contains("$Lambda$")) {
+            String remappedName = MethodInfo.RUNTIME.getMappedClass(obj.getClass());
+            if (!NameResolver.resolvedNames.containsKey(remappedName) && !remappedName.contains("$Lambda$")) {
                 NameResolver.resolveName(obj.getClass());
             }
             formattedValue = FormatterClass.formatTypeParameterized(new TypeInfoClass(obj.getClass()));
@@ -176,6 +177,7 @@ public class SpecialTypes {
 
     public static <T> void assignRegistry(Class<T> clazz, ResourceKey<Registry<T>> registry) {
         SpecialCompiler.specialCompilers.add(new FormatterRegistry<>(registry, clazz));
-        NameResolver.putSpecialAssignments(clazz, () -> List.of("Special.%s".formatted(clazz.getSimpleName())));
+        List<String> remappedName = Arrays.stream(MethodInfo.RUNTIME.getMappedClass(clazz).split("\\.")).collect(Collectors.toList());
+        NameResolver.putSpecialAssignments(clazz, () -> List.of("Special.%s".formatted(remappedName.get(remappedName.size() - 1))));
     }
 }
