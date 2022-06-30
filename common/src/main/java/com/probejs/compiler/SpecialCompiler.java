@@ -1,5 +1,6 @@
 package com.probejs.compiler;
 
+import com.probejs.formatter.formatter.FormatterIngredient;
 import com.probejs.formatter.formatter.FormatterMod;
 import com.probejs.formatter.formatter.FormatterTag;
 import com.probejs.formatter.formatter.IFormatter;
@@ -18,6 +19,7 @@ public class SpecialCompiler {
         formatters.add(new FormatterTag("BlockTag", Registry.BLOCK));
         formatters.add(new FormatterTag("EntityTypeTag", Registry.ENTITY_TYPE));
         formatters.add(new FormatterMod());
+        formatters.add(new FormatterIngredient());
         formatters.addAll(specialCompilers);
         return formatters;
     }

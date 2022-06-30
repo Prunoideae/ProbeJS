@@ -56,7 +56,6 @@ class Text {
 
 /**
  * @target net.minecraft.network.chat.Component
- * @assign dev.latvian.mods.kubejs.text.Text
  */
 class Component {
 
@@ -121,7 +120,7 @@ class ItemStackJS {
  * @assign RegExp
  * @assign net.minecraft.world.item.crafting.Ingredient
  * @assign dev.latvian.mods.kubejs.item.ingredient.IngredientJS[]
- * @assign {type: "forge:nbt", item: Internal.ItemStackJS_ | {item: Internal.Item_, count?: number}, nbt: object}
+ * @assign {type: Special.Ingredient}
  * @assign {item: Internal.ItemStackJS_, count?: number}
  * @assign {fluid: Internal.FluidStackJS_}
  * @assign {value: object}
