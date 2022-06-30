@@ -1,6 +1,8 @@
 package com.probejs.info;
 
 
+import com.google.common.collect.ImmutableList;
+import com.probejs.ProbeJS;
 import com.probejs.formatter.ClassResolver;
 import com.probejs.info.type.ITypeInfo;
 import com.probejs.info.type.InfoTypeResolver;
@@ -8,10 +10,7 @@ import com.probejs.info.type.TypeInfoParameterized;
 import com.probejs.info.type.TypeInfoVariable;
 
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ClassInfo {
@@ -55,24 +54,45 @@ public class ClassInfo {
         name = MethodInfo.RUNTIME.getMappedClass(clazzRaw);
         modifiers = clazzRaw.getModifiers();
         isInterface = clazzRaw.isInterface();
-        constructorInfo = Arrays.stream(clazzRaw.getConstructors()).map(ConstructorInfo::new).collect(Collectors.toList());
         superClass = clazzRaw.getSuperclass() == Object.class || clazzRaw.getSuperclass() == null ? null : getOrCache(clazzRaw.getSuperclass());
         interfaces = Arrays.stream(clazzRaw.getInterfaces()).map(ClassInfo::getOrCache).collect(Collectors.toList());
         parameters = Arrays.stream(clazzRaw.getTypeParameters()).map(InfoTypeResolver::resolveType).collect(Collectors.toList());
-        methodInfo = Arrays.stream(clazzRaw.getMethods())
-                .filter(m -> !m.isSynthetic())
-                .filter(m -> m.getDeclaringClass() == clazz)
-                .map(m -> new MethodInfo(m, clazz))
-                .filter(m -> ClassResolver.acceptMethod(m.getName()))
-                .filter(m -> !m.shouldHide())
-                .collect(Collectors.toList());
-        fieldInfo = Arrays.stream(clazzRaw.getFields())
-                .filter(f -> f.getDeclaringClass() == clazz)
-                .map(FieldInfo::new)
-                .filter(f -> ClassResolver.acceptField(f.getName()))
-                .filter(f -> !f.shouldHide())
-                .filter(f -> !f.isTransient())
-                .collect(Collectors.toList());
+
+        List<ConstructorInfo> conInfo = new ArrayList<>();
+        try {
+            conInfo = Arrays.stream(clazzRaw.getConstructors()).map(ConstructorInfo::new).collect(Collectors.toList());
+        } catch (Error | Exception e) {
+            ProbeJS.LOGGER.warn("Unable to access constructors of class %s".formatted(name));
+        }
+        constructorInfo = conInfo;
+
+        List<MethodInfo> metInfo = new ArrayList<>();
+        try {
+            metInfo = Arrays.stream(clazzRaw.getMethods())
+                    .filter(m -> !m.isSynthetic())
+                    .filter(m -> m.getDeclaringClass() == clazz)
+                    .map(m -> new MethodInfo(m, clazz))
+                    .filter(m -> ClassResolver.acceptMethod(m.getName()))
+                    .filter(m -> !m.shouldHide())
+                    .collect(Collectors.toList());
+        } catch (Error | Exception e) {
+            ProbeJS.LOGGER.warn("Unable to access methods of class %s".formatted(name));
+        }
+        methodInfo = metInfo;
+
+        List<FieldInfo> fldInfo = new ArrayList<>();
+        try {
+            fldInfo = Arrays.stream(clazzRaw.getFields())
+                    .filter(f -> f.getDeclaringClass() == clazz)
+                    .map(FieldInfo::new)
+                    .filter(f -> ClassResolver.acceptField(f.getName()))
+                    .filter(f -> !f.shouldHide())
+                    .filter(f -> !f.isTransient())
+                    .collect(Collectors.toList());
+        } catch (Error | Exception e) {
+            ProbeJS.LOGGER.warn("Unable to access fields of class %s".formatted(name));
+        }
+        fieldInfo = fldInfo;
     }
 
 
