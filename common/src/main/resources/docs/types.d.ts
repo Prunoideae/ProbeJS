@@ -25,7 +25,7 @@ class FluidStackJS {
 /**
  * @target dev.latvian.mods.kubejs.block.state.BlockStatePredicate
  * @assign dev.latvian.mods.kubejs.block.state.BlockStatePredicate[]
- * @assign {or?: Internal.BlockStatePredicate_, not?: Internal.BlockStatePredicate_}
+ * @assign {or?: BlockStatePredicate_, not?: BlockStatePredicate_}
  * @assign net.minecraft.world.level.block.Block
  * @assign net.minecraft.world.level.block.state.BlockState
  * @assign `#${Special.BlockTag}`

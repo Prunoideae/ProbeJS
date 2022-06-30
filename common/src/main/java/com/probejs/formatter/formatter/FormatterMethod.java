@@ -85,7 +85,7 @@ public class FormatterMethod extends DocumentReceiver<DocumentMethod> implements
     public static String formatParamUnderscore(ITypeInfo info) {
         StringBuilder sb = new StringBuilder(new FormatterType(info, false, (typeInfo, rawString) -> {
             if (typeInfo instanceof TypeInfoClass classInfo) {
-                if (!NameResolver.resolvedPrimitives.contains(classInfo.getTypeName()))
+                if (!NameResolver.resolvedPrimitives.contains(classInfo.getTypeName()) && !rawString.equals("any"))
                     return rawString + "_";
             }
             return rawString;

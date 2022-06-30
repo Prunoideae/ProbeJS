@@ -37,24 +37,12 @@ public class ClassInfo {
     private final ClassInfo superClass;
     private final List<ClassInfo> interfaces;
 
-    private static Map<String, ITypeInfo> resolveTypeOverrides(ITypeInfo typeInfo) {
-        Map<String, ITypeInfo> caughtTypes = new HashMap<>();
-        if (typeInfo instanceof TypeInfoParameterized parType) {
-            List<ITypeInfo> rawClassNames = Arrays.stream(parType.getResolvedClass().getTypeParameters()).map(InfoTypeResolver::resolveType).collect(Collectors.toList());
-            List<ITypeInfo> parTypeNames = parType.getParamTypes();
-            for (int i = 0; i < parTypeNames.size(); i++) {
-                caughtTypes.put(rawClassNames.get(i).getTypeName(), parTypeNames.get(i));
-            }
-        }
-        return caughtTypes;
-    }
-
     private ClassInfo(Class<?> clazz) {
         clazzRaw = clazz;
         name = MethodInfo.RUNTIME.getMappedClass(clazzRaw);
         modifiers = clazzRaw.getModifiers();
         isInterface = clazzRaw.isInterface();
-        superClass = clazzRaw.getSuperclass() == Object.class || clazzRaw.getSuperclass() == null ? null : getOrCache(clazzRaw.getSuperclass());
+        superClass = (clazzRaw.getSuperclass() == Object.class || clazzRaw.getSuperclass() == null) ? null : getOrCache(clazzRaw.getSuperclass());
         interfaces = Arrays.stream(clazzRaw.getInterfaces()).map(ClassInfo::getOrCache).collect(Collectors.toList());
         parameters = Arrays.stream(clazzRaw.getTypeParameters()).map(InfoTypeResolver::resolveType).collect(Collectors.toList());
 
