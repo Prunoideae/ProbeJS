@@ -401,3 +401,13 @@ class BlockRightClickEventJS {
 class ItemRightClickEventJS {
 
 }
+
+/**
+ * @target dev.latvian.mods.kubejs.player.PlayerEventJS
+ */
+class PlayerEventJS {
+    /**
+     * @returns dev.latvian.mods.kubejs.player.PlayerJS<net.minecraft.world.entity.player.Player>
+     */
+    getPlayer(): dev.latvian.mods.kubejs.player.PlayerJS;
+}
