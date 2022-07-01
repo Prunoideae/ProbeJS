@@ -4,7 +4,8 @@
   "package": "com.probejs.mixins",
   "mixins": [
     "OnEventMixin",
-    "OnJavaMixin"
+    "OnJavaMixin",
+    "RecipeManagerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

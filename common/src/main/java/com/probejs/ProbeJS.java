@@ -12,6 +12,5 @@ public class ProbeJS {
 
     public static void init() {
         CommandRegistrationEvent.EVENT.register((dispatcher, selection) -> ProbeCommands.register(dispatcher));
-        LifecycleEvent.SERVER_STARTED.register(FormatterRecipeId::onServerLoaded);
     }
 }
