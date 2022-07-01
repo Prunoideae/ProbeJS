@@ -1,9 +1,6 @@
 package com.probejs.compiler;
 
-import com.probejs.formatter.formatter.FormatterIngredient;
-import com.probejs.formatter.formatter.FormatterMod;
-import com.probejs.formatter.formatter.FormatterTag;
-import com.probejs.formatter.formatter.IFormatter;
+import com.probejs.formatter.formatter.*;
 import net.minecraft.core.Registry;
 
 import java.util.ArrayList;
@@ -20,6 +17,7 @@ public class SpecialCompiler {
         formatters.add(new FormatterTag("EntityTypeTag", Registry.ENTITY_TYPE));
         formatters.add(new FormatterMod());
         formatters.add(new FormatterIngredient());
+        formatters.add(new FormatterRecipeId());
         formatters.addAll(specialCompilers);
         return formatters;
     }
