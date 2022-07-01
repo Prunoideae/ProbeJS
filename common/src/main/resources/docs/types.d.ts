@@ -102,11 +102,24 @@ class EnchantmentBuilder {
 }
 
 /**
+ * @target net.minecraft.world.item.Item
+ */
+class Item {
+    /**
+     * @returns Special.Item
+     */
+    getId(): java.lang.String;
+}
+
+/**
 * @target dev.latvian.mods.kubejs.item.ItemStackJS
 * @assign net.minecraft.world.item.Item
 */
 class ItemStackJS {
-
+    /**
+     * @returns Special.Item
+     */
+    getId(): java.lang.String;
 }
 
 /**
