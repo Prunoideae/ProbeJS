@@ -12,7 +12,8 @@ public class CapturedEvent {
     private final String sub;
     @Nonnull
     private final String id;
-    public CapturedEvent(@Nonnull Class<? extends EventJS> captured, String id, @Nullable String sub) {
+
+    public CapturedEvent(@Nonnull Class<? extends EventJS> captured, @Nonnull String id, @Nullable String sub) {
         this.captured = captured;
         this.sub = sub;
         this.id = id;

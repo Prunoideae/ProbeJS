@@ -60,7 +60,7 @@ public class MethodInfo {
     }
 
     public boolean isStatic() {
-        return Modifier.isStatic(modifiers);
+        return Modifier.isStatic(modifiers) && !from.isInterface();
     }
 
     public boolean isAbstract() {
