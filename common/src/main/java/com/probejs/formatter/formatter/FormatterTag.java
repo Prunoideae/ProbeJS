@@ -1,6 +1,6 @@
 package com.probejs.formatter.formatter;
 
-import com.google.gson.Gson;
+import com.probejs.ProbeJS;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -19,14 +19,13 @@ public class FormatterTag implements IFormatter {
 
     @Override
     public List<String> format(Integer indent, Integer stepIndent) {
-        Gson g = new Gson();
         return List.of("%stype %s = %s;".formatted(
                 " ".repeat(indent),
                 this.name,
                 this.registry.getTagNames()
                         .map(TagKey::location)
                         .map(ResourceLocation::toString)
-                        .map(g::toJson)
+                        .map(ProbeJS.GSON::toJson)
                         .collect(Collectors.joining(" | "))));
     }
 

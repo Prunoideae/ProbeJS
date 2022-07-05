@@ -1,12 +1,10 @@
 package com.probejs.info;
 
 
-import com.google.common.collect.ImmutableList;
 import com.probejs.ProbeJS;
 import com.probejs.formatter.ClassResolver;
 import com.probejs.info.type.ITypeInfo;
 import com.probejs.info.type.InfoTypeResolver;
-import com.probejs.info.type.TypeInfoParameterized;
 
 import java.lang.reflect.Modifier;
 import java.util.*;

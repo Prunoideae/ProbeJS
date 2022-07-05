@@ -1,6 +1,5 @@
 package com.probejs;
 
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dev.latvian.mods.kubejs.KubeJSPaths;
 
@@ -28,7 +27,7 @@ public class ProbeConfig {
         Path cfg = KubeJSPaths.CONFIG.resolve("probejs.json");
         if (Files.exists(cfg)) {
             try {
-                Map<?, ?> obj = new Gson().fromJson(Files.newBufferedReader(cfg), Map.class);
+                Map<?, ?> obj = ProbeJS.GSON.fromJson(Files.newBufferedReader(cfg), Map.class);
                 dumpMethod = fetchPropertyOrDefault("dumpMethod", obj, true);
                 aggressiveProbing = fetchPropertyOrDefault("disabled", obj, false);
                 vanillaOrder = fetchPropertyOrDefault("vanillaOrder", obj, true);

@@ -1,14 +1,12 @@
 package com.probejs.compiler;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-
 import com.probejs.ProbeConfig;
+import com.probejs.ProbeJS;
 import com.probejs.ProbePaths;
 import com.probejs.formatter.NameResolver;
 import com.probejs.formatter.formatter.FormatterTag;
-import dev.latvian.mods.kubejs.KubeJSPaths;
 import dev.latvian.mods.kubejs.KubeJSRegistries;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
@@ -16,7 +14,6 @@ import net.minecraft.resources.ResourceLocation;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -120,10 +117,9 @@ public class SnippetCompiler {
 
     public static void compile() throws IOException {
         Path codeFile = ProbePaths.SNIPPET.resolve("probe.code-snippets");
-        Gson gson = new Gson();
         KubeDump kubeDump = KubeDump.fetch();
         BufferedWriter writer = Files.newBufferedWriter(codeFile);
-        writer.write(gson.toJson(kubeDump.toSnippet()));
+        writer.write(ProbeJS.GSON.toJson(kubeDump.toSnippet()));
         writer.flush();
     }
 
@@ -143,9 +139,8 @@ public class SnippetCompiler {
         }
 
         Path codeFile = ProbePaths.SNIPPET.resolve("classNames.code-snippets");
-        Gson gson = new Gson();
         BufferedWriter writer = Files.newBufferedWriter(codeFile);
-        gson.toJson(resultJson, writer);
+        ProbeJS.GSON.toJson(resultJson, writer);
         writer.flush();
     }
 }
