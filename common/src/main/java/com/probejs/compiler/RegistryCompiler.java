@@ -1,6 +1,6 @@
 package com.probejs.compiler;
 
-import com.google.gson.Gson;
+import com.probejs.ProbeJS;
 import com.probejs.ProbePaths;
 import com.probejs.formatter.formatter.FormatterClass;
 import com.probejs.formatter.formatter.FormatterNamespace;
@@ -24,14 +24,13 @@ public class RegistryCompiler {
     }
 
     public static void compileEventRegistries(BufferedWriter writer) throws IOException {
-        Gson stringG = new Gson();
         for (var types : RegistryObjectBuilderTypes.MAP.values()) {
             String fullName = types.registryKey.location().getNamespace() + "." + types.registryKey.location().getPath().replace('/', '.') + ".registry";
             String registryName = FormatterRegistry.getFormattedRegistryName(types);
-            writer.write("declare function onEvent(name: %s, handler: (event: Registry.%s) => void);\n".formatted(stringG.toJson(fullName), registryName));
+            writer.write("declare function onEvent(name: %s, handler: (event: Registry.%s) => void);\n".formatted(ProbeJS.GSON.toJson(fullName), registryName));
             if (types.registryKey.location().getNamespace().equals("minecraft")) {
                 String shortName = types.registryKey.location().getPath().replace('/', '.') + ".registry";
-                writer.write("declare function onEvent(name: %s, handler: (event: Registry.%s) => void);\n".formatted(stringG.toJson(shortName), registryName));
+                writer.write("declare function onEvent(name: %s, handler: (event: Registry.%s) => void);\n".formatted(ProbeJS.GSON.toJson(shortName), registryName));
             }
         }
     }
@@ -61,10 +60,9 @@ public class RegistryCompiler {
         public List<String> format(Integer indent, Integer stepIndent) {
             List<String> formatted = new ArrayList<>();
             int stepped = indent + stepIndent;
-            Gson stringG = new Gson();
             formatted.add(" ".repeat(indent) + "class %s extends %s {".formatted(name, FormatterClass.formatTypeParameterized(new TypeInfoClass(RegistryObjectBuilderTypes.RegistryEventJS.class))));
             for (RegistryObjectBuilderTypes.BuilderType<?> builder : types.types.values()) {
-                formatted.add(" ".repeat(stepped) + "create(id: string, type: %s): %s;".formatted(stringG.toJson(builder.type()), FormatterClass.formatTypeParameterized(new TypeInfoClass(builder.builderClass()))));
+                formatted.add(" ".repeat(stepped) + "create(id: string, type: %s): %s;".formatted(ProbeJS.GSON.toJson(builder.type()), FormatterClass.formatTypeParameterized(new TypeInfoClass(builder.builderClass()))));
             }
             if (types.getDefaultType() != null) {
                 formatted.add(" ".repeat(stepped) + "create(id: string): %s;".formatted(FormatterClass.formatTypeParameterized(new TypeInfoClass(types.getDefaultType().builderClass()))));

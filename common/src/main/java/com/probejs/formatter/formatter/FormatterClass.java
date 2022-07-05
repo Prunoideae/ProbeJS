@@ -1,7 +1,7 @@
 package com.probejs.formatter.formatter;
 
-import com.google.gson.Gson;
 import com.probejs.ProbeConfig;
+import com.probejs.ProbeJS;
 import com.probejs.document.*;
 import com.probejs.document.comment.special.CommentHidden;
 import com.probejs.document.type.TypeNamed;
@@ -38,7 +38,6 @@ public class FormatterClass extends DocumentReceiver<DocumentClass> implements I
 
     @Override
     public List<String> format(Integer indent, Integer stepIndent) {
-        Gson gson = new Gson();
         List<String> formatted = new ArrayList<>();
         DocumentComment comment = document == null ? null : document.getComment();
         if (comment != null) {
@@ -59,7 +58,7 @@ public class FormatterClass extends DocumentReceiver<DocumentClass> implements I
         if (classInfo.isEnum()) {
             Class<?> clazz = classInfo.getClazzRaw();
             EnumTypeWrapper<?> enumWrapper = EnumTypeWrapper.get(clazz);
-            enumWrapper.nameValues.keySet().stream().map(gson::toJson).forEach(assignableTypes::add);
+            enumWrapper.nameValues.keySet().stream().map(ProbeJS.GSON::toJson).forEach(assignableTypes::add);
         }
 
         // First line

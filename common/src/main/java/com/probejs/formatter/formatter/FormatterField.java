@@ -1,5 +1,6 @@
 package com.probejs.formatter.formatter;
 
+import com.probejs.ProbeJS;
 import com.probejs.document.DocumentComment;
 import com.probejs.document.DocumentField;
 import com.probejs.document.comment.special.CommentHidden;
@@ -36,7 +37,11 @@ public class FormatterField extends DocumentReceiver<DocumentField> implements I
             elements.add("static");
         if (fieldInfo.isFinal())
             elements.add("readonly");
-        elements.add(fieldInfo.getName());
+        String fieldName = fieldInfo.getName();
+        if (!fieldName.matches("^[\\\\w.]+$")) {
+            fieldName = ProbeJS.GSON.toJson(fieldName);
+        }
+        elements.add(fieldName);
         elements.add(":");
 
         if (document != null) {

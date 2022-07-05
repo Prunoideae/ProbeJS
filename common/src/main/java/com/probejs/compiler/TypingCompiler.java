@@ -1,8 +1,8 @@
 package com.probejs.compiler;
 
 import com.google.gson.*;
-import com.probejs.ProbePaths;
 import com.probejs.ProbeJS;
+import com.probejs.ProbePaths;
 import com.probejs.document.DocumentClass;
 import com.probejs.document.DocumentComment;
 import com.probejs.document.Manager;
@@ -27,7 +27,6 @@ import dev.latvian.mods.kubejs.util.KubeJSPlugins;
 import net.minecraft.resources.ResourceLocation;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -41,7 +40,7 @@ public class TypingCompiler {
         Path cachedClassesPath = KubeJSPaths.EXPORTED.resolve(fileName);
         if (Files.exists(cachedClassesPath)) {
             try {
-                List<?> cachedList = new Gson().fromJson(Files.newBufferedReader(cachedClassesPath), List.class);
+                List<?> cachedList = ProbeJS.GSON.fromJson(Files.newBufferedReader(cachedClassesPath), List.class);
                 cachedList.forEach((c) -> {
                     try {
                         Class<?> clazz = Class.forName((String) c);
@@ -63,7 +62,7 @@ public class TypingCompiler {
         for (Class<?> clazz : javaClasses) {
             outJson.add(clazz.getName());
         }
-        new Gson().toJson(outJson, cacheWriter);
+        ProbeJS.GSON.toJson(outJson, cacheWriter);
         cacheWriter.flush();
     }
 
@@ -72,7 +71,7 @@ public class TypingCompiler {
         Path cachedEventPath = KubeJSPaths.EXPORTED.resolve(fileName);
         if (Files.exists(cachedEventPath)) {
             try {
-                JsonObject cachedMap = new Gson().fromJson(Files.newBufferedReader(cachedEventPath), JsonObject.class);
+                JsonObject cachedMap = ProbeJS.GSON.fromJson(Files.newBufferedReader(cachedEventPath), JsonObject.class);
                 for (Map.Entry<String, JsonElement> entry : cachedMap.entrySet()) {
                     String key = entry.getKey();
                     JsonElement value = entry.getValue();
@@ -105,7 +104,7 @@ public class TypingCompiler {
         Path cachedEventPath = KubeJSPaths.EXPORTED.resolve(fileName);
         if (Files.exists(cachedEventPath)) {
             try {
-                Map<?, ?> cachedMap = new Gson().fromJson(Files.newBufferedReader(cachedEventPath), Map.class);
+                Map<?, ?> cachedMap = ProbeJS.GSON.fromJson(Files.newBufferedReader(cachedEventPath), Map.class);
                 cachedMap.forEach((k, v) -> {
                     if (k instanceof String && v instanceof String) {
                         try {
@@ -137,8 +136,7 @@ public class TypingCompiler {
                 captured.addProperty("sub", eventClass.getSub());
             outJson.add(eventName, captured);
         }
-        Gson gson = new Gson();
-        gson.toJson(outJson, cacheWriter);
+        ProbeJS.GSON.toJson(outJson, cacheWriter);
         cacheWriter.flush();
     }
 
@@ -150,8 +148,7 @@ public class TypingCompiler {
             Class<?> eventClass = entry.getValue();
             outJson.addProperty(eventName, eventClass.getName());
         }
-        Gson gson = new Gson();
-        gson.toJson(outJson, cacheWriter);
+        ProbeJS.GSON.toJson(outJson, cacheWriter);
         cacheWriter.flush();
     }
 
@@ -223,7 +220,6 @@ public class TypingCompiler {
         writerDoc.write("/// <reference path=\"./globals.d.ts\" />\n");
         writerDoc.write("/// <reference path=\"./registries.d.ts\" />\n");
 
-        Gson g = new Gson();
         Set<CapturedEvent> wildcards = new HashSet<>();
         for (Map.Entry<String, CapturedEvent> entry : cachedEvents.entrySet()) {
             String id = entry.getValue().getId();
@@ -241,15 +237,15 @@ public class TypingCompiler {
             if (document.isPresent()) {
                 for (String s : document.get().format(0, 4))
                     writerDoc.write(s + "\n");
-                writerDoc.write("declare function onEvent(name: %s, handler: (event: %s) => void);\n".formatted(g.toJson(name), FormatterClass.formatTypeParameterized(new TypeInfoClass(event))));
+                writerDoc.write("declare function onEvent(name: %s, handler: (event: %s) => void);\n".formatted(ProbeJS.GSON.toJson(name), FormatterClass.formatTypeParameterized(new TypeInfoClass(event))));
                 continue;
             }
-            writer.write("declare function onEvent(name: %s, handler: (event: %s) => void);\n".formatted(g.toJson(name), FormatterClass.formatTypeParameterized(new TypeInfoClass(event))));
+            writer.write("declare function onEvent(name: %s, handler: (event: %s) => void);\n".formatted(ProbeJS.GSON.toJson(name), FormatterClass.formatTypeParameterized(new TypeInfoClass(event))));
         }
 
         Set<String> writtenWildcards = new HashSet<>();
         for (CapturedEvent wildcard : wildcards) {
-            String id = g.toJson(wildcard.getId());
+            String id = ProbeJS.GSON.toJson(wildcard.getId());
             if (writtenWildcards.contains(id))
                 continue;
             writtenWildcards.add(id);
@@ -271,7 +267,7 @@ public class TypingCompiler {
         for (Map.Entry<String, Class<?>> entry : cachedForgeEvents.entrySet()) {
             String name = entry.getKey();
             Class<?> event = entry.getValue();
-            writer.write("declare function onForgeEvent(name: %s, handler: (event: %s) => void);\n".formatted(g.toJson(name), FormatterClass.formatTypeParameterized(new TypeInfoClass(event))));
+            writer.write("declare function onForgeEvent(name: %s, handler: (event: %s) => void);\n".formatted(ProbeJS.GSON.toJson(name), FormatterClass.formatTypeParameterized(new TypeInfoClass(event))));
         }
         RegistryCompiler.compileEventRegistries(writer);
         writer.flush();
@@ -309,7 +305,6 @@ public class TypingCompiler {
         BufferedWriter writer = Files.newBufferedWriter(ProbePaths.GENERATED.resolve("names.d.ts"));
         writer.write("/// <reference path=\"./globals.d.ts\" />\n");
         for (Map.Entry<String, List<NameResolver.ResolvedName>> entry : NameResolver.resolvedNames.entrySet()) {
-            String className = entry.getKey();
             List<NameResolver.ResolvedName> exportedNames = entry.getValue();
             if (exportedNames.size() > 1) {
                 for (int i = 1; i < exportedNames.size(); i++)

@@ -1,6 +1,6 @@
 package com.probejs.formatter;
 
-import com.google.gson.Gson;
+import com.probejs.ProbeJS;
 import com.probejs.info.MethodInfo;
 import com.probejs.info.type.ITypeInfo;
 import dev.latvian.mods.kubejs.block.MaterialJS;
@@ -218,9 +218,8 @@ public class NameResolver {
         putResolvedPrimitive(Boolean.class, "boolean");
         putResolvedPrimitive(Boolean.TYPE, "boolean");
 
-        Gson gson = new Gson();
 
-        putValueFormatter(gson::toJson,
+        putValueFormatter(ProbeJS.GSON::toJson,
                 String.class, Character.class, Character.TYPE,
                 Long.class, Long.TYPE, Integer.class, Integer.TYPE,
                 Short.class, Short.TYPE, Byte.class, Byte.TYPE,
@@ -239,7 +238,7 @@ public class NameResolver {
                 for (var field : DamageSource.class.getDeclaredFields()) {
                     field.setAccessible(true);
                     if (Modifier.isStatic(field.getModifiers()) && field.getType() == DamageSource.class) {
-                        result.add(gson.toJson(((DamageSource) field.get(null)).getMsgId()));
+                        result.add(ProbeJS.GSON.toJson(((DamageSource) field.get(null)).getMsgId()));
                     }
                 }
             } catch (Exception ignored) {
@@ -247,7 +246,7 @@ public class NameResolver {
             return result;
         });
 
-        putSpecialAssignments(MaterialJS.class, () -> MaterialListJS.INSTANCE.map.keySet().stream().map(gson::toJson).collect(Collectors.toList()));
+        putSpecialAssignments(MaterialJS.class, () -> MaterialListJS.INSTANCE.map.keySet().stream().map(ProbeJS.GSON::toJson).collect(Collectors.toList()));
 
         SpecialTypes.assignRegistry(Attribute.class, Registry.ATTRIBUTE_REGISTRY);
         SpecialTypes.assignRegistry(MobEffect.class, Registry.MOB_EFFECT_REGISTRY);
@@ -269,6 +268,7 @@ public class NameResolver {
         addKeyword("in");
         addKeyword("with");
         addKeyword("java");
-
+        addKeyword("var");
+        addKeyword("const");
     }
 }
