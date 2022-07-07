@@ -48,6 +48,14 @@ allprojects {
                 includeGroup "curse.maven"
             }
         }
+
+        maven {
+            url "https://modmaven.dev/"
+            content {
+                includeGroup "mekanism"
+                includeGroup "mezz.jei"
+            }
+        }
     }
 
     tasks.withType(JavaCompile) {

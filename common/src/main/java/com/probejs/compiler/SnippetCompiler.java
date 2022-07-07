@@ -6,7 +6,7 @@ import com.probejs.ProbeConfig;
 import com.probejs.ProbeJS;
 import com.probejs.ProbePaths;
 import com.probejs.formatter.NameResolver;
-import com.probejs.formatter.formatter.FormatterTag;
+import com.probejs.formatter.formatter.special.FormatterTag;
 import dev.latvian.mods.kubejs.KubeJSRegistries;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;

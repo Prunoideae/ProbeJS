@@ -18,7 +18,7 @@ public class TypeNamed implements IType {
         NameResolver.ResolvedName resolved = NameResolver.getResolvedName(typeName);
         if (resolved.equals(NameResolver.ResolvedName.UNRESOLVED))
             return typeName;
-        return resolved.getFullName();
+        return resolved.getFullName() + (!NameResolver.resolvedPrimitives.contains(typeName) ? "_" : "");
     }
 
 }

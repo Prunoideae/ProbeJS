@@ -106,7 +106,7 @@ class EnchantmentBuilder {
  */
 class Item {
     /**
-     * @returns Special.Item
+     * @returns Special.Item & "${string}:${string}"
      */
     getId(): java.lang.String;
 }
@@ -117,7 +117,7 @@ class Item {
 */
 class ItemStackJS {
     /**
-     * @returns Special.Item
+     * @returns Special.Item & "${string}:${string}"
      */
     getId(): java.lang.String;
 }

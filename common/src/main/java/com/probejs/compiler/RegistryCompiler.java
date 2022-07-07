@@ -2,7 +2,7 @@ package com.probejs.compiler;
 
 import com.probejs.ProbeJS;
 import com.probejs.ProbePaths;
-import com.probejs.formatter.formatter.FormatterClass;
+import com.probejs.formatter.formatter.clazz.FormatterClass;
 import com.probejs.formatter.formatter.FormatterNamespace;
 import com.probejs.formatter.formatter.IFormatter;
 import com.probejs.info.type.TypeInfoClass;

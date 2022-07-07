@@ -1,6 +1,7 @@
-package com.probejs.formatter.formatter;
+package com.probejs.formatter.formatter.special;
 
 import com.probejs.ProbeJS;
+import com.probejs.formatter.formatter.IFormatter;
 import com.probejs.util.PlatformSpecial;
 import net.minecraft.resources.ResourceLocation;
 

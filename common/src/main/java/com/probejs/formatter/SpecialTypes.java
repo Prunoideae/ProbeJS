@@ -1,9 +1,9 @@
 package com.probejs.formatter;
 
 import com.probejs.compiler.SpecialCompiler;
-import com.probejs.formatter.formatter.FormatterClass;
-import com.probejs.formatter.formatter.FormatterRegistry;
-import com.probejs.formatter.formatter.FormatterType;
+import com.probejs.formatter.formatter.clazz.FormatterClass;
+import com.probejs.formatter.formatter.special.FormatterRegistry;
+import com.probejs.formatter.formatter.clazz.FormatterType;
 import com.probejs.info.ClassInfo;
 import com.probejs.info.MethodInfo;
 import com.probejs.info.type.ITypeInfo;

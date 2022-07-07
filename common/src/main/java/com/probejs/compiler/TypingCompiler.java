@@ -10,7 +10,7 @@ import com.probejs.event.CapturedEvent;
 import com.probejs.formatter.ClassResolver;
 import com.probejs.formatter.NameResolver;
 import com.probejs.formatter.SpecialTypes;
-import com.probejs.formatter.formatter.FormatterClass;
+import com.probejs.formatter.formatter.clazz.FormatterClass;
 import com.probejs.formatter.formatter.FormatterNamespace;
 import com.probejs.formatter.formatter.FormatterRawTS;
 import com.probejs.formatter.formatter.IFormatter;

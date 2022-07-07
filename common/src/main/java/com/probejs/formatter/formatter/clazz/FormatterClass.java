@@ -1,11 +1,13 @@
-package com.probejs.formatter.formatter;
+package com.probejs.formatter.formatter.clazz;
 
 import com.probejs.ProbeConfig;
 import com.probejs.ProbeJS;
 import com.probejs.document.*;
 import com.probejs.document.comment.special.CommentHidden;
+import com.probejs.document.type.IType;
 import com.probejs.document.type.TypeNamed;
 import com.probejs.formatter.NameResolver;
+import com.probejs.formatter.formatter.*;
 import com.probejs.info.ClassInfo;
 import com.probejs.info.type.ITypeInfo;
 import com.probejs.info.type.InfoTypeResolver;
@@ -46,12 +48,11 @@ public class FormatterClass extends DocumentReceiver<DocumentClass> implements I
             formatted.addAll(comment.format(indent, stepIndent));
         }
 
-        List<String> assignableTypes = Manager.typesAssignable.getOrDefault(classInfo.getName(), new ArrayList<>()).stream().map(t -> t.getTransformedName((i, s) -> {
-            if (i instanceof TypeNamed n && NameResolver.resolvedNames.containsKey(n.getRawTypeName()) && !NameResolver.resolvedPrimitives.contains((n.getRawTypeName()))) {
-                return s + "_";
-            }
-            return s;
-        })).collect(Collectors.toList());
+        List<String> assignableTypes = Manager.typesAssignable
+                .getOrDefault(classInfo.getName(), new ArrayList<>())
+                .stream()
+                .map(IType::getTypeName)
+                .collect(Collectors.toList());
 
         assignableTypes.addAll(NameResolver.getClassAssignments(classInfo.getClazzRaw()));
 

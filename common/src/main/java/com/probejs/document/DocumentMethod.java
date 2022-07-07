@@ -38,12 +38,7 @@ public class DocumentMethod extends DocumentProperty implements IDocumentProvide
         formatted.add(" ".repeat(indent) + methodBody.formatted(
                 getParams()
                         .stream()
-                        .map(documentParam -> "%s: %s".formatted(documentParam.getName(), documentParam.getType().getTransformedName((t, s) -> {
-                            if (t instanceof TypeNamed n && NameResolver.resolvedNames.containsKey(n.getRawTypeName()) && !NameResolver.resolvedPrimitives.contains((n.getRawTypeName()))) {
-                                return s + "_";
-                            }
-                            return s;
-                        })))
+                        .map(documentParam -> "%s: %s".formatted(documentParam.getName(), documentParam.getType().getTypeName()))
                         .collect(Collectors.joining(", "))));
         return formatted;
     }

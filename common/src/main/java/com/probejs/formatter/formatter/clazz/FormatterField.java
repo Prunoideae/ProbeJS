@@ -1,10 +1,12 @@
-package com.probejs.formatter.formatter;
+package com.probejs.formatter.formatter.clazz;
 
 import com.probejs.ProbeJS;
 import com.probejs.document.DocumentComment;
 import com.probejs.document.DocumentField;
 import com.probejs.document.comment.special.CommentHidden;
 import com.probejs.formatter.NameResolver;
+import com.probejs.formatter.formatter.DocumentReceiver;
+import com.probejs.formatter.formatter.IFormatter;
 import com.probejs.info.FieldInfo;
 import com.probejs.info.type.InfoTypeResolver;
 

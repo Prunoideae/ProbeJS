@@ -11,4 +11,6 @@ docs/cucumber.d.ts
 docs/dankstorage.d.ts
 docs/extendedcrafting.d.ts
 docs/multiblocked.d.ts
+docs/mekanism.d.ts
+docs/immersiveengineering.d.ts
 !docs/painter.d.ts

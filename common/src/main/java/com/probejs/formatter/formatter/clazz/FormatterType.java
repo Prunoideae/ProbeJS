@@ -1,10 +1,9 @@
-package com.probejs.formatter.formatter;
+package com.probejs.formatter.formatter.clazz;
 
 import com.probejs.formatter.NameResolver;
 import com.probejs.info.type.*;
 
 import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class FormatterType {

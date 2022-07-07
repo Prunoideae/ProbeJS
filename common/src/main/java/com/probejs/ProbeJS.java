@@ -1,9 +1,7 @@
 package com.probejs;
 
 import com.google.gson.Gson;
-import com.probejs.formatter.formatter.FormatterRecipeId;
 import dev.architectury.event.events.common.CommandRegistrationEvent;
-import dev.architectury.event.events.common.LifecycleEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
