@@ -248,16 +248,7 @@ public class NameResolver {
 
         putSpecialAssignments(MaterialJS.class, () -> MaterialListJS.INSTANCE.map.keySet().stream().map(ProbeJS.GSON::toJson).collect(Collectors.toList()));
 
-        SpecialTypes.assignRegistry(Attribute.class, Registry.ATTRIBUTE_REGISTRY);
-        SpecialTypes.assignRegistry(MobEffect.class, Registry.MOB_EFFECT_REGISTRY);
-        SpecialTypes.assignRegistry(Block.class, Registry.BLOCK_REGISTRY);
-        SpecialTypes.assignRegistry(Item.class, Registry.ITEM_REGISTRY);
-        SpecialTypes.assignRegistry(SoundEvent.class, Registry.SOUND_EVENT_REGISTRY);
-        SpecialTypes.assignRegistry(Fluid.class, Registry.FLUID_REGISTRY);
-        SpecialTypes.assignRegistry(Biome.class, Registry.BIOME_REGISTRY);
-        SpecialTypes.assignRegistry(RecipeSerializer.class, ((ResourceKey<Registry<RecipeSerializer>>) ((Object) Registry.RECIPE_SERIALIZER_REGISTRY)));
-        SpecialTypes.assignRegistry(Enchantment.class, Registry.ENCHANTMENT_REGISTRY);
-        SpecialTypes.assignRegistry((Class<EntityType<?>>) ((Class<?>) EntityType.class), Registry.ENTITY_TYPE_REGISTRY);
+        SpecialTypes.assignRegistries();
         putTypeFormatter(Class.class, SpecialTypes::formatClassLike);
         putTypeFormatter(ClassWrapper.class, SpecialTypes::formatClassLike);
         putTypeGuard(true, Class.class, ClassWrapper.class);

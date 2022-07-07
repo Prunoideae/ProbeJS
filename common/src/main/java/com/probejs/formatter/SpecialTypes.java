@@ -1,19 +1,22 @@
 package com.probejs.formatter;
 
+import com.google.common.reflect.TypeResolver;
+import com.mojang.serialization.Codec;
+import com.probejs.ProbeJS;
 import com.probejs.compiler.SpecialCompiler;
 import com.probejs.formatter.formatter.clazz.FormatterClass;
 import com.probejs.formatter.formatter.special.FormatterRegistry;
 import com.probejs.formatter.formatter.clazz.FormatterType;
 import com.probejs.info.ClassInfo;
 import com.probejs.info.MethodInfo;
-import com.probejs.info.type.ITypeInfo;
-import com.probejs.info.type.TypeInfoClass;
-import com.probejs.info.type.TypeInfoParameterized;
-import com.probejs.info.type.TypeInfoVariable;
+import com.probejs.info.type.*;
 import dev.latvian.mods.rhino.*;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 
+import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -180,5 +183,28 @@ public class SpecialTypes {
         SpecialCompiler.specialCompilers.add(new FormatterRegistry<>(registry, clazz));
         List<String> remappedName = Arrays.stream(MethodInfo.RUNTIME.getMappedClass(clazz).split("\\.")).collect(Collectors.toList());
         NameResolver.putSpecialAssignments(clazz, () -> List.of("Special.%s".formatted(remappedName.get(remappedName.size() - 1))));
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> void assignRegistries() {
+        for (var field : Registry.class.getFields()) {
+            if (field.getType() == ResourceKey.class && Modifier.isStatic(field.getModifiers())) {
+                try {
+                    ResourceKey<Registry<T>> key = (ResourceKey<Registry<T>>) field.get(null);
+                    var type = field.getGenericType();
+                    var type1 = ((ParameterizedType) type).getActualTypeArguments()[0];
+                    var type2 = ((ParameterizedType) type1).getActualTypeArguments()[0];
+                    ITypeInfo typeInfo = InfoTypeResolver.resolveType(type2);
+                    if (typeInfo == null)
+                        continue;
+                    Class<T> clazz = (Class<T>) typeInfo.getResolvedClass();
+                    if (clazz == ResourceLocation.class || clazz == ResourceKey.class || clazz == Codec.class)
+                        continue;
+                    assignRegistry(clazz, key);
+                } catch (IllegalAccessException | IllegalArgumentException e) {
+                    ProbeJS.LOGGER.error("Can not touch field: %s of %s".formatted(field.getName(), field.getDeclaringClass()));
+                }
+            }
+        }
     }
 }
