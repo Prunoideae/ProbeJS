@@ -48,7 +48,7 @@ class ImmersiveEngineeringRecipes {
     coke_oven(output: dev.latvian.mods.kubejs.item.ItemStackJS, input: dev.latvian.mods.kubejs.item.ingredient.IngredientJS): dev.latvian.mods.kubejs.immersiveengineering.recipe.CokeOvenRecipeJS;
 
     garden_clothe(output: dev.latvian.mods.kubejs.item.ItemStackJS[], input: dev.latvian.mods.kubejs.item.ingredient.IngredientJS, soil: dev.latvian.mods.kubejs.item.ItemStackJS): dev.latvian.mods.kubejs.immersiveengineering.recipe.ClocheRecipeJS
-    garden_clothe(output: dev.latvian.mods.kubejs.item.ItemStackJS[], input: dev.latvian.mods.kubejs.item.ingredient.IngredientJS, soil: dev.latvian.mods.kubejs.item.ItemStackJS,): dev.latvian.mods.kubejs.immersiveengineering.recipe.ClocheRecipeJS
+    garden_clothe(output: dev.latvian.mods.kubejs.item.ItemStackJS[], input: dev.latvian.mods.kubejs.item.ingredient.IngredientJS, soil: dev.latvian.mods.kubejs.item.ItemStackJS, render:Type.CropRender): dev.latvian.mods.kubejs.immersiveengineering.recipe.ClocheRecipeJS
 
     fertilizer(input: dev.latvian.mods.kubejs.item.ingredient.IngredientJS): dev.latvian.mods.kubejs.immersiveengineering.recipe.ClocheFertilizerRecipeJS;
 

@@ -1,3 +1,5 @@
+type SelfOrArray<T> = T | T[]
+
 /**
  * @target dev.latvian.mods.kubejs.level.gen.filter.biome.BiomeFilter
  * @assign net.minecraft.world.level.biome.Biome

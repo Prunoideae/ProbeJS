@@ -21,6 +21,9 @@ Current progress of mod documents:
 - Cucumber (Completed)
 - DankStorage (Completed)
 - ExtendedCrafting (Completed)
+- Mekanism (Completed)
+- Immersive Engineering (Completed)
+- Thermal Expansion (Completed)
 - Others (Please PR)
 
 For the detailed information about documents, please refer to the wiki page.
