@@ -141,7 +141,7 @@ class IngredientJS {
 /**
  * @target dev.latvian.mods.kubejs.recipe.filter.RecipeFilter
  * @assign dev.latvian.mods.kubejs.recipe.filter.RecipeFilter[]
- * @assign {exact?: boolean, not?: Internal.RecipeFilter_, or?: Internal.RecipeFilter_[], id?: Special.RecipeId | RegExp, type?: Special.RecipeSerializer, group?: string, mod?: `@${Special.Mod}`, input?: Internal.IngredientJS_, output?: Internal.IngredientJS_}
+ * @assign {exact?: boolean, not?: Internal.RecipeFilter_, or?: Internal.RecipeFilter_[], id?: Special.RecipeId | RegExp, type?: Special.RecipeSerializer, group?: string, mod?: Special.Mod, input?: Internal.IngredientJS_, output?: Internal.IngredientJS_}
  */
 class RecipeFilter {
 
