@@ -94,7 +94,7 @@ class EnchantmentBuilder {
  */
 class Item {
     /**
-     * @returns Special.Item & "${string}:${string}"
+     * @returns Special.Item & `${string}:${string}`
      */
     getId(): java.lang.String;
 }

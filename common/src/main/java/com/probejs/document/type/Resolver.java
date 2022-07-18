@@ -1,26 +1,26 @@
 package com.probejs.document.type;
 
+import com.google.gson.JsonSyntaxException;
+import com.probejs.ProbeJS;
 import com.probejs.info.type.*;
 import com.probejs.util.Pair;
 import com.probejs.util.StringUtil;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Resolver {
     public static IType resolveType(String type) {
         type = type.strip();
 
-        //TODO: Resolve object type
-        if (type.startsWith("{"))
-            return new TypeNamed(type);
-
-        Pair<String, String> splitUnion = StringUtil.splitFirst(type, "<", ">", "|");
+        Pair<String, String> splitUnion = StringUtil.splitFirst(type, "<{", "}>", "|");
         if (splitUnion != null) {
             return new TypeUnion(resolveType(splitUnion.getFirst()), resolveType(splitUnion.getSecond()));
         }
 
-        Pair<String, String> splitIntersection = StringUtil.splitFirst(type, "<", ">", "&");
+        Pair<String, String> splitIntersection = StringUtil.splitFirst(type, "<{", "}>", "&");
         if (splitIntersection != null) {
             return new TypeIntersection(resolveType(splitIntersection.getFirst()), resolveType(splitIntersection.getSecond()));
         }
@@ -29,11 +29,34 @@ public class Resolver {
             return new TypeArray(resolveType(type.substring(0, type.length() - 2)));
         }
 
+        if (type.startsWith("{")) {
+            Map<String, IType> membersMap = new HashMap<>();
+            ProbeJS.LOGGER.info(type);
+            List<String> members = StringUtil.splitLayer(type.substring(1, type.length() - 1), "<{", "}>", ",");
+            for (String member : members) {
+                Pair<String, String> pair = StringUtil.splitFirst(member, "[", "]", ":");
+                if (pair == null) {
+                    ProbeJS.LOGGER.warn("Failed to parse member: %s".formatted(member));
+                    continue;
+                }
+                String memberName = pair.getFirst().strip();
+                IType memberType = resolveType(pair.getSecond().strip());
+                if (memberName.startsWith("\""))
+                    try {
+                        memberName = ProbeJS.GSON.fromJson(memberName, String.class);
+                    } catch (JsonSyntaxException e) {
+                        ProbeJS.LOGGER.error(e.getMessage());
+                    }
+                membersMap.put(memberName, memberType);
+            }
+            return new TypeObject(membersMap);
+        }
+
         if (type.endsWith(">")) {
             int indexLeft = type.indexOf("<");
             String rawType = type.substring(0, indexLeft);
             String typeParams = type.substring(indexLeft + 1, type.length() - 1);
-            List<String> params = StringUtil.splitLayer(typeParams, "<", ">", ",");
+            List<String> params = StringUtil.splitLayer(typeParams, "<{", "}>", ",");
             return new TypeParameterized(resolveType(rawType), params.stream().map(Resolver::resolveType).collect(Collectors.toList()));
         }
         return new TypeNamed(type);

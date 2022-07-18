@@ -29,8 +29,4 @@ public class TypeParameterized implements IType {
         return "%s<%s>".formatted(rawType.getTypeName(), paramTypes.stream().map(IType::getTypeName).collect(Collectors.joining(", ")));
     }
 
-    @Override
-    public String getTransformedName(BiFunction<IType, String, String> transformer) {
-        return transformer.apply(this, "%s<%s>".formatted(rawType.getTransformedName(transformer), paramTypes.stream().map(t -> t.getTransformedName(transformer)).collect(Collectors.joining(", "))));
-    }
 }

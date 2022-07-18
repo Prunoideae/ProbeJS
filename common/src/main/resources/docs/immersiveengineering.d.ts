@@ -25,18 +25,6 @@ type CropRender = { type: Type.CropRenderType, block: Special.Block } | Special.
  * @mod immersiveengineering
  * @mod kubejs_immersive_engineering
  */
-type StripStack = dev.latvian.mods.kubejs.item.ItemStackJS;
-
-/**
- * @mod immersiveengineering
- * @mod kubejs_immersive_engineering
- */
-type SawStack = { stripping: boolean, output: Type.StripStack}
-
-/**
- * @mod immersiveengineering
- * @mod kubejs_immersive_engineering
- */
 class ImmersiveEngineeringRecipes {
 
     alloy(output: dev.latvian.mods.kubejs.item.ItemStackJS, input1: dev.latvian.mods.kubejs.item.ingredient.IngredientJS, input2: dev.latvian.mods.kubejs.item.ingredient.IngredientJS): dev.latvian.mods.kubejs.immersiveengineering.recipe.AlloyRecipeJS;
@@ -48,7 +36,7 @@ class ImmersiveEngineeringRecipes {
     coke_oven(output: dev.latvian.mods.kubejs.item.ItemStackJS, input: dev.latvian.mods.kubejs.item.ingredient.IngredientJS): dev.latvian.mods.kubejs.immersiveengineering.recipe.CokeOvenRecipeJS;
 
     garden_clothe(output: dev.latvian.mods.kubejs.item.ItemStackJS[], input: dev.latvian.mods.kubejs.item.ingredient.IngredientJS, soil: dev.latvian.mods.kubejs.item.ItemStackJS): dev.latvian.mods.kubejs.immersiveengineering.recipe.ClocheRecipeJS
-    garden_clothe(output: dev.latvian.mods.kubejs.item.ItemStackJS[], input: dev.latvian.mods.kubejs.item.ingredient.IngredientJS, soil: dev.latvian.mods.kubejs.item.ItemStackJS, render:Type.CropRender): dev.latvian.mods.kubejs.immersiveengineering.recipe.ClocheRecipeJS
+    garden_clothe(output: dev.latvian.mods.kubejs.item.ItemStackJS[], input: dev.latvian.mods.kubejs.item.ingredient.IngredientJS, soil: dev.latvian.mods.kubejs.item.ItemStackJS, render: Type.CropRender): dev.latvian.mods.kubejs.immersiveengineering.recipe.ClocheRecipeJS
 
     fertilizer(input: dev.latvian.mods.kubejs.item.ingredient.IngredientJS): dev.latvian.mods.kubejs.immersiveengineering.recipe.ClocheFertilizerRecipeJS;
 
@@ -62,7 +50,7 @@ class ImmersiveEngineeringRecipes {
     crusher(output: dev.latvian.mods.kubejs.item.ItemStackJS, input: dev.latvian.mods.kubejs.item.ingredient.IngredientJS, secondaries: dev.latvian.mods.kubejs.item.ItemStackJS[]): dev.latvian.mods.kubejs.immersiveengineering.recipe.CrusherRecipeJS;
 
     sawmill(output: dev.latvian.mods.kubejs.item.ItemStackJS, input: dev.latvian.mods.kubejs.item.ingredient.IngredientJS): dev.latvian.mods.kubejs.immersiveengineering.recipe.SawmillRecipeJS;
-    sawmill(output: dev.latvian.mods.kubejs.item.ItemStackJS, input: dev.latvian.mods.kubejs.item.ingredient.IngredientJS, secondaries: Type.SawStack[]): dev.latvian.mods.kubejs.immersiveengineering.recipe.SawmillRecipeJS;
-    sawmill(output: dev.latvian.mods.kubejs.item.ItemStackJS, input: dev.latvian.mods.kubejs.item.ingredient.IngredientJS, secondaries: Type.SawStack[], stripped: dev.latvian.mods.kubejs.item.ItemStackJS): dev.latvian.mods.kubejs.immersiveengineering.recipe.SawmillRecipeJS;
+    sawmill(output: dev.latvian.mods.kubejs.item.ItemStackJS, input: dev.latvian.mods.kubejs.item.ingredient.IngredientJS, secondaries: { stripping: boolean, output: dev.latvian.mods.kubejs.item.ItemStackJS }[]): dev.latvian.mods.kubejs.immersiveengineering.recipe.SawmillRecipeJS;
+    sawmill(output: dev.latvian.mods.kubejs.item.ItemStackJS, input: dev.latvian.mods.kubejs.item.ingredient.IngredientJS, secondaries: { stripping: boolean, output: dev.latvian.mods.kubejs.item.ItemStackJS }[], stripped: dev.latvian.mods.kubejs.item.ItemStackJS): dev.latvian.mods.kubejs.immersiveengineering.recipe.SawmillRecipeJS;
 
 }

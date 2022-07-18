@@ -59,9 +59,11 @@ public class SpecialTypes {
 
     public static void processFunctionalInterfaces(Set<Class<?>> globalClasses) {
         for (Class<?> clazz : globalClasses) {
-            if (clazz.isInterface() && clazz.getAnnotation(FunctionalInterface.class) != null && !skippedSpecials.contains(clazz)) {
+            if (clazz.isInterface() && !skippedSpecials.contains(clazz)) {
                 //Functional interfaces has one and only one abstract method
                 ClassInfo info = ClassInfo.getOrCache(clazz);
+                if (info.getMethodInfo().stream().filter(MethodInfo::isAbstract).count() != 1)
+                    continue;
                 for (MethodInfo method : info.getMethodInfo()) {
                     if (method.isAbstract()) {
                         FormatterLambda formatter = new FormatterLambda(method);

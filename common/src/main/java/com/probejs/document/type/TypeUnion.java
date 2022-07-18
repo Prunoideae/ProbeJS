@@ -20,8 +20,4 @@ public class TypeUnion implements IType {
         return leftType.getTypeName() + " | " + rightType.getTypeName();
     }
 
-    @Override
-    public String getTransformedName(BiFunction<IType, String, String> transformer) {
-        return transformer.apply(this, leftType.getTransformedName(transformer) + " | " + rightType.getTransformedName(transformer));
-    }
 }

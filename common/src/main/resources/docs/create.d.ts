@@ -59,7 +59,7 @@ class CreateRecipes {
      * 
      * Deploying is available as an Assembly step.
      */
-    deploying(output: dev.latvian.mods.kubejs.item.ItemStackJS, input: dev.latvian.mods.kubejs.item.ingredient.IngredientJS): dev.latvian.mods.kubejs.create.ProcessingRecipeJS;
+    deploying(output: dev.latvian.mods.kubejs.item.ItemStackJS, input: dev.latvian.mods.kubejs.item.ingredient.IngredientJS[]): dev.latvian.mods.kubejs.create.ItemApplicationRecipeJS;
     /**
      * Creates a recipe for Cutting.
      * 
@@ -94,9 +94,13 @@ class CreateRecipes {
      * Creates a recipe for Mechanical Crafting.
      */
     mechanical_crafting(output: dev.latvian.mods.kubejs.item.ItemStackJS, pattern: string[], items: java.util.Map<string, dev.latvian.mods.kubejs.item.ingredient.IngredientJS>): dev.latvian.mods.kubejs.create.ProcessingRecipeJS;
-
     /**
      * Creates a recipe for Emptying.
      */
     emptying(output: Type.ItemStackOrFluid[], input: dev.latvian.mods.kubejs.item.ingredient.IngredientJS): dev.latvian.mods.kubejs.create.ProcessingRecipeJS;
+    /**
+     * Creates a recipe for Emptying.
+     */
+    item_application(output: dev.latvian.mods.kubejs.item.ItemStackJS[], input: dev.latvian.mods.kubejs.item.ingredient.IngredientJS[]): dev.latvian.mods.kubejs.create.ItemApplicationRecipeJS;
+
 }
