@@ -5,9 +5,9 @@ import com.probejs.ProbeJS;
 import com.probejs.document.*;
 import com.probejs.document.comment.special.CommentHidden;
 import com.probejs.document.type.IType;
-import com.probejs.document.type.TypeNamed;
 import com.probejs.formatter.NameResolver;
-import com.probejs.formatter.formatter.*;
+import com.probejs.formatter.formatter.DocumentReceiver;
+import com.probejs.formatter.formatter.IFormatter;
 import com.probejs.info.ClassInfo;
 import com.probejs.info.type.ITypeInfo;
 import com.probejs.info.type.InfoTypeResolver;
@@ -80,11 +80,13 @@ public class FormatterClass extends DocumentReceiver<DocumentClass> implements I
         if (classInfo.getClazzRaw().getTypeParameters().length != 0) {
             firstLine.add("<%s>".formatted(Arrays.stream(classInfo.getClazzRaw().getTypeParameters()).map(TypeVariable::getName).collect(Collectors.joining(", "))));
         }
-        if (classInfo.getSuperClass() != null) {
+        if (NameResolver.specialExtension.containsKey(classInfo.getClazzRaw())) {
+            firstLine.add("extends");
+            firstLine.add(NameResolver.specialExtension.get(classInfo.getClazzRaw()).stream().map(IType::getTypeName).collect(Collectors.joining(", ")));
+        } else if (classInfo.getSuperClass() != null) {
             firstLine.add("extends");
             firstLine.add(formatTypeParameterized(InfoTypeResolver.resolveType(classInfo.getClazzRaw().getGenericSuperclass())));
-        }
-        if (!classInfo.getInterfaces().isEmpty()) {
+        } else if (!classInfo.getInterfaces().isEmpty()) {
             firstLine.add(classInfo.isInterface() ? "extends" : "implements");
             firstLine.add("%s".formatted(Arrays.stream(classInfo.getClazzRaw().getGenericInterfaces()).map(InfoTypeResolver::resolveType).map(FormatterClass::formatTypeParameterized).collect(Collectors.joining(", "))));
         }

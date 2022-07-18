@@ -1,6 +1,9 @@
 package com.probejs.formatter;
 
 import com.probejs.ProbeJS;
+import com.probejs.document.type.IType;
+import com.probejs.document.type.TypeNamed;
+import com.probejs.document.type.TypeParameterized;
 import com.probejs.info.MethodInfo;
 import com.probejs.info.type.ITypeInfo;
 import dev.latvian.mods.kubejs.block.MaterialJS;
@@ -62,6 +65,7 @@ public class NameResolver {
     }
 
     public static final HashMap<String, List<ResolvedName>> resolvedNames = new HashMap<>();
+    public static final HashMap<Class<?>, List<IType>> specialExtension = new HashMap<>();
     public static final HashMap<Class<?>, Function<ITypeInfo, String>> specialTypeFormatters = new HashMap<>();
     public static final HashMap<Class<?>, Function<Object, String>> specialValueFormatters = new HashMap<>();
     public static final HashMap<Class<?>, Boolean> specialTypeGuards = new HashMap<>();
@@ -173,6 +177,14 @@ public class NameResolver {
         return specialClassAssigner.getOrDefault(clazz, ArrayList::new).get();
     }
 
+    public static void putSpecialExtension(Class<?> clazz, String base) {
+        putSpecialExtension(clazz, new TypeNamed(base));
+    }
+
+    public static void putSpecialExtension(Class<?> clazz, IType type) {
+        specialExtension.computeIfAbsent(clazz, c -> new ArrayList<>()).add(type);
+    }
+
     private static boolean initialized = false;
 
     @SuppressWarnings("unchecked")
@@ -241,6 +253,10 @@ public class NameResolver {
         putTypeFormatter(ClassWrapper.class, SpecialTypes::formatClassLike);
         putTypeGuard(true, Class.class, ClassWrapper.class);
         putTypeGuard(false, IngredientJS.class);
+
+        putSpecialExtension(List.class, new TypeParameterized(new TypeNamed("TSDoc.JSArray"), List.of(new TypeNamed("E"))));
+        putSpecialExtension(List.class, new TypeParameterized(new TypeNamed(Collection.class.getName()), List.of(new TypeNamed("E"))));
+        putSpecialExtension(Map.class, new TypeParameterized(new TypeNamed("TSDoc.JSMap"), List.of(new TypeNamed("K"), new TypeNamed("V"))));
 
         addKeyword("function");
         addKeyword("debugger");
