@@ -70,7 +70,7 @@ public class NameResolver {
     public static final HashMap<Class<?>, Function<Object, String>> specialValueFormatters = new HashMap<>();
     public static final HashMap<Class<?>, Boolean> specialTypeGuards = new HashMap<>();
     public static final HashMap<Class<?>, Supplier<List<String>>> specialClassAssigner = new HashMap<>();
-
+    public static final List<String> nameResolveSpecials = new ArrayList<>();
     public static final Set<String> keywords = new HashSet<>();
     public static final Set<String> resolvedPrimitives = new HashSet<>();
 
@@ -150,7 +150,7 @@ public class NameResolver {
         }
     }
 
-    public static void resolveNames(Set<Class<?>> classes) {
+    public static void resolveNames(List<Class<?>> classes) {
         for (Class<?> clazz : classes) {
             resolveName(clazz);
         }
@@ -183,6 +183,33 @@ public class NameResolver {
 
     public static void putSpecialExtension(Class<?> clazz, IType type) {
         specialExtension.computeIfAbsent(clazz, c -> new ArrayList<>()).add(type);
+    }
+
+    public static void addPrioritizedPackage(String prior) {
+        //Add a point to the end to prevent overlapping of package names
+        //For example, net.minecraft and net.minecraftforge
+        nameResolveSpecials.add(prior + ".");
+    }
+
+    public static List<Class<?>> priorSortClasses(Set<Class<?>> classes) {
+        Map<Integer, List<Class<?>>> partMap = new HashMap<>();
+        for (Class<?> clazz : classes) {
+            int index = -1;
+            String remappedName = MethodInfo.RUNTIME.getMappedClass(clazz);
+            for (int i = 0; i < nameResolveSpecials.size(); i++) {
+                if (remappedName.startsWith(nameResolveSpecials.get(i)))
+                    index = i;
+            }
+            partMap.computeIfAbsent(index, i -> new ArrayList<>()).add(clazz);
+        }
+        List<Class<?>> result = new ArrayList<>();
+        for (int i = 0; i < nameResolveSpecials.size(); i++) {
+            if (partMap.containsKey(i))
+                result.addAll(partMap.get(i));
+        }
+        if (partMap.containsKey(-1))
+            result.addAll(partMap.get(-1));
+        return result;
     }
 
     private static boolean initialized = false;
@@ -265,5 +292,10 @@ public class NameResolver {
         addKeyword("java");
         addKeyword("var");
         addKeyword("const");
+
+        addPrioritizedPackage("java");
+        addPrioritizedPackage("net.minecraft");
+        addPrioritizedPackage("net.minecraftforge");
+        addPrioritizedPackage("dev.latvian.mods");
     }
 }

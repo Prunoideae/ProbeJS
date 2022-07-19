@@ -168,7 +168,7 @@ public class TypingCompiler {
     public static void compileGlobal(DummyBindingEvent bindingEvent, Set<Class<?>> globalClasses) throws IOException {
 
         bindingEvent.getClassDumpMap().forEach((s, c) -> NameResolver.putResolvedName(c, s));
-        NameResolver.resolveNames(globalClasses);
+        NameResolver.resolveNames(NameResolver.priorSortClasses(globalClasses));
 
         BufferedWriter writer = Files.newBufferedWriter(ProbePaths.GENERATED.resolve("globals.d.ts"));
         Map<String, List<IFormatter>> namespaced = new HashMap<>();

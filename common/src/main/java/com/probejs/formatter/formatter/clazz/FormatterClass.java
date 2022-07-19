@@ -45,7 +45,15 @@ public class FormatterClass extends DocumentReceiver<DocumentClass> implements I
         if (comment != null) {
             if (comment.getSpecialComment(CommentHidden.class) != null)
                 return formatted;
-            formatted.addAll(comment.format(indent, stepIndent));
+            List<String> formattedText = comment.format(indent, stepIndent);
+            formattedText.add(formattedText.size() - 1, "%s* @javaClass %s".formatted(" ".repeat(indent), classInfo.getClazzRaw().getName()));
+            formatted.addAll(formattedText);
+        } else {
+            List<String> formattedText = new ArrayList<>();
+            formattedText.add("%s/**".formatted(" ".repeat(indent)));
+            formattedText.add("%s* @javaClass %s".formatted(" ".repeat(indent), classInfo.getClazzRaw().getName()));
+            formattedText.add("%s*/".formatted(" ".repeat(indent)));
+            formatted.addAll(formattedText);
         }
 
         List<String> assignableTypes = Manager.typesAssignable
