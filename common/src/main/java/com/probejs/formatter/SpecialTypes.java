@@ -135,8 +135,9 @@ public class SpecialTypes {
             Scriptable pt = scriptable.getPrototype();
             if (pt.get("constructor", pt) instanceof BaseFunction fun) {
                 //Resolves Object since they're not typed
-                if (!fun.getFunctionName().isEmpty() && !fun.getFunctionName().equals("Object")) {
-                    return fun.getFunctionName();
+                String funName = fun.getFunctionName();
+                if (!funName.isEmpty() && !funName.equals("Object")) {
+                    return funName;
                 }
             }
 

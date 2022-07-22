@@ -281,9 +281,9 @@ public class NameResolver {
         putTypeGuard(true, Class.class, ClassWrapper.class);
         putTypeGuard(false, IngredientJS.class);
 
-        putSpecialExtension(List.class, new TypeParameterized(new TypeNamed("TSDoc.JSArray"), List.of(new TypeNamed("E"))));
-        putSpecialExtension(List.class, new TypeParameterized(new TypeNamed(Collection.class.getName()), List.of(new TypeNamed("E"))));
-        putSpecialExtension(Map.class, new TypeParameterized(new TypeNamed("TSDoc.JSMap"), List.of(new TypeNamed("K"), new TypeNamed("V"))));
+        putSpecialExtension(List.class, new TypeParameterized(new TypeNamed("Array"), List.of(new TypeNamed("E"))));
+        putSpecialExtension(AbstractList.class, new TypeParameterized(new TypeNamed("Array"), List.of(new TypeNamed("E"))));
+        putSpecialExtension(AbstractMap.class, new TypeParameterized(new TypeNamed("TSDoc.JSMap"), List.of(new TypeNamed("K"), new TypeNamed("V"))));
 
         addKeyword("function");
         addKeyword("debugger");

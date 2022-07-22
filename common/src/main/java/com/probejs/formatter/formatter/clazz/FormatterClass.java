@@ -13,6 +13,10 @@ import com.probejs.info.type.ITypeInfo;
 import com.probejs.info.type.InfoTypeResolver;
 import com.probejs.info.type.TypeInfoClass;
 import com.probejs.info.type.TypeInfoParameterized;
+import dev.latvian.mods.kubejs.client.ClientEventJS;
+import dev.latvian.mods.kubejs.event.EventJS;
+import dev.latvian.mods.kubejs.event.StartupEventJS;
+import dev.latvian.mods.kubejs.server.ServerEventJS;
 import dev.latvian.mods.rhino.util.EnumTypeWrapper;
 
 import java.lang.reflect.TypeVariable;
@@ -38,6 +42,12 @@ public class FormatterClass extends DocumentReceiver<DocumentClass> implements I
         this.internal = internal;
     }
 
+    private List<String> fetchAdditionalComments(Integer indent) {
+        List<String> comments = new ArrayList<>();
+        comments.add("%s* @javaClass %s".formatted(" ".repeat(indent), classInfo.getClazzRaw().getName()));
+        return comments;
+    }
+
     @Override
     public List<String> format(Integer indent, Integer stepIndent) {
         List<String> formatted = new ArrayList<>();
@@ -46,12 +56,12 @@ public class FormatterClass extends DocumentReceiver<DocumentClass> implements I
             if (comment.getSpecialComment(CommentHidden.class) != null)
                 return formatted;
             List<String> formattedText = comment.format(indent, stepIndent);
-            formattedText.add(formattedText.size() - 1, "%s* @javaClass %s".formatted(" ".repeat(indent), classInfo.getClazzRaw().getName()));
+            formattedText.addAll(formattedText.size() - 1, fetchAdditionalComments(indent));
             formatted.addAll(formattedText);
         } else {
             List<String> formattedText = new ArrayList<>();
             formattedText.add("%s/**".formatted(" ".repeat(indent)));
-            formattedText.add("%s* @javaClass %s".formatted(" ".repeat(indent), classInfo.getClazzRaw().getName()));
+            formattedText.addAll(fetchAdditionalComments(indent));
             formattedText.add("%s*/".formatted(" ".repeat(indent)));
             formatted.addAll(formattedText);
         }
@@ -91,10 +101,12 @@ public class FormatterClass extends DocumentReceiver<DocumentClass> implements I
         if (NameResolver.specialExtension.containsKey(classInfo.getClazzRaw())) {
             firstLine.add("extends");
             firstLine.add(NameResolver.specialExtension.get(classInfo.getClazzRaw()).stream().map(IType::getTypeName).collect(Collectors.joining(", ")));
-        } else if (classInfo.getSuperClass() != null) {
+        }
+        if (classInfo.getSuperClass() != null) {
             firstLine.add("extends");
             firstLine.add(formatTypeParameterized(InfoTypeResolver.resolveType(classInfo.getClazzRaw().getGenericSuperclass())));
-        } else if (!classInfo.getInterfaces().isEmpty()) {
+        }
+        if (!classInfo.getInterfaces().isEmpty()) {
             firstLine.add(classInfo.isInterface() ? "extends" : "implements");
             firstLine.add("%s".formatted(Arrays.stream(classInfo.getClazzRaw().getGenericInterfaces()).map(InfoTypeResolver::resolveType).map(FormatterClass::formatTypeParameterized).collect(Collectors.joining(", "))));
         }

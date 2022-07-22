@@ -16,6 +16,9 @@ import net.minecraft.network.chat.TextComponent;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.concurrent.TimeUnit;
 
 public class ProbeCommands {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
@@ -25,6 +28,7 @@ public class ProbeCommands {
                         .then(Commands.literal("dump")
                                 .requires(source -> source.getServer().isSingleplayer())
                                 .executes(context -> {
+                                    Instant start = Instant.now();
                                     try {
                                         SnippetCompiler.compile();
                                         DocumentProviderHandler.init();
@@ -39,7 +43,10 @@ public class ProbeCommands {
                                         e.printStackTrace();
                                         context.getSource().sendSuccess(new TextComponent("Uncaught exception happened in wrapper, please report to the Github issue with complete latest.log."), false);
                                     }
-                                    context.getSource().sendSuccess(new TextComponent("ProbeJS typing generation finished."), false);
+                                    Instant end = Instant.now();
+                                    Duration duration = Duration.between(start, end);
+                                    long sub = TimeUnit.MILLISECONDS.convert(duration.getNano(), TimeUnit.NANOSECONDS);
+                                    context.getSource().sendSuccess(new TextComponent("ProbeJS typing generation finished in %s.%ss.".formatted(duration.getSeconds(), sub)), false);
                                     return Command.SINGLE_SUCCESS;
                                 }))
                         .then(Commands.literal("clear_cache")
@@ -69,8 +76,8 @@ public class ProbeCommands {
                                 .then(Commands.literal("toggle_mixin")
                                         .requires(source -> source.getServer().isSingleplayer())
                                         .executes(context -> {
-                                            ProbeConfig.INSTANCE.aggressiveProbing = !ProbeConfig.INSTANCE.aggressiveProbing;
-                                            context.getSource().sendSuccess(new TextComponent("OnEvent mixin wrapper set to: %s".formatted(ProbeConfig.INSTANCE.aggressiveProbing ? "disabled" : "enabled")), false);
+                                            ProbeConfig.INSTANCE.noAggressiveProbing = !ProbeConfig.INSTANCE.noAggressiveProbing;
+                                            context.getSource().sendSuccess(new TextComponent("OnEvent mixin wrapper set to: %s".formatted(ProbeConfig.INSTANCE.noAggressiveProbing ? "disabled" : "enabled")), false);
                                             ProbeConfig.INSTANCE.save();
                                             context.getSource().sendSuccess(new TextComponent("Changes will be applied next time you start the game."), false);
                                             return Command.SINGLE_SUCCESS;

@@ -13,7 +13,7 @@ public class ProbeConfig {
     public static ProbeConfig INSTANCE = new ProbeConfig();
     private static final Path CONFIG = KubeJSPaths.CONFIG.resolve("probejs.json");
     public boolean dumpMethod = true;
-    public boolean aggressiveProbing = false;
+    public boolean noAggressiveProbing = false;
     public boolean vanillaOrder = true;
     public boolean exportClassNames = false;
 
@@ -29,7 +29,7 @@ public class ProbeConfig {
             try {
                 Map<?, ?> obj = ProbeJS.GSON.fromJson(Files.newBufferedReader(cfg), Map.class);
                 dumpMethod = fetchPropertyOrDefault("dumpMethod", obj, true);
-                aggressiveProbing = fetchPropertyOrDefault("disabled", obj, false);
+                noAggressiveProbing = fetchPropertyOrDefault("disabled", obj, false);
                 vanillaOrder = fetchPropertyOrDefault("vanillaOrder", obj, true);
                 exportClassNames = fetchPropertyOrDefault("exportClassNames", obj, false);
             } catch (IOException e) {

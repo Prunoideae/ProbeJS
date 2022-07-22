@@ -76,21 +76,9 @@ public class TypingCompiler {
                     String key = entry.getKey();
                     JsonElement value = entry.getValue();
                     if (value.isJsonObject()) {
-                        var obj = value.getAsJsonObject();
-                        if (obj.has("class") && obj.has("id")) {
-                            try {
-                                Class<?> clazz = Class.forName(obj.get("class").getAsString());
-                                if (EventJS.class.isAssignableFrom(clazz)) {
-                                    cachedEvents.put(key, new CapturedEvent((Class<? extends EventJS>) clazz, obj.get("id").getAsString(), obj.has("sub") ? obj.get("sub").getAsString() : null));
-                                    continue;
-                                }
-                            } catch (ClassNotFoundException e) {
-                                ProbeJS.LOGGER.warn("Class %s was in the cache, but disappeared in packages now.".formatted(obj.get("class").getAsString()));
-                                continue;
-                            }
-                        }
+                        CapturedEvent.fromJson(value.getAsJsonObject())
+                                .ifPresent(event -> cachedEvents.put(key, event));
                     }
-                    ProbeJS.LOGGER.warn("Dropping unknown/unsupported entry: %s, this may caused by a change in cache format, please regenerate the dump".formatted(entry.getKey()));
                 }
             } catch (JsonSyntaxException | JsonIOException e) {
                 ProbeJS.LOGGER.warn("Cannot read malformed cache, ignoring.");
@@ -129,12 +117,7 @@ public class TypingCompiler {
         for (Map.Entry<String, CapturedEvent> entry : events.entrySet()) {
             String eventName = entry.getKey();
             CapturedEvent eventClass = entry.getValue();
-            var captured = new JsonObject();
-            captured.addProperty("class", eventClass.getCaptured().getName());
-            captured.addProperty("id", eventClass.getId());
-            if (eventClass.hasSub())
-                captured.addProperty("sub", eventClass.getSub());
-            outJson.add(eventName, captured);
+            outJson.add(eventName, eventClass.toJson());
         }
         ProbeJS.GSON.toJson(outJson, cacheWriter);
         cacheWriter.flush();
@@ -209,6 +192,20 @@ public class TypingCompiler {
         writer.flush();
     }
 
+    private static List<String> getAdditionalEventComments(CapturedEvent event) {
+        List<String> comments = new ArrayList<>();
+        //TODO: find a way to properly check for sides.
+
+        if (!event.getScriptTypes().isEmpty()) {
+            comments.add("* ");
+            comments.add("* The event fires on: %s.".formatted(event.getFormattedTypeString()));
+        }
+
+        comments.add("* ");
+        comments.add("* The event is %scancellable.".formatted(event.isCancellable() ? "" : "**not** "));
+        return comments;
+    }
+
     public static void compileEvents(Map<String, CapturedEvent> cachedEvents, Map<String, Class<?>> cachedForgeEvents) throws IOException {
         cachedEvents.putAll(CapturedClasses.capturedEvents);
         cachedForgeEvents.putAll(CapturedClasses.capturedRawEvents);
@@ -222,11 +219,12 @@ public class TypingCompiler {
 
         Set<CapturedEvent> wildcards = new HashSet<>();
         for (Map.Entry<String, CapturedEvent> entry : cachedEvents.entrySet()) {
-            String id = entry.getValue().getId();
-            Class<?> event = entry.getValue().getCaptured();
-            String sub = entry.getValue().getSub();
-            if (entry.getValue().hasSub())
-                wildcards.add(entry.getValue());
+            CapturedEvent capturedEvent = entry.getValue();
+            String id = capturedEvent.getId();
+            Class<?> event = capturedEvent.getCaptured();
+            String sub = capturedEvent.getSub();
+            if (capturedEvent.hasSub())
+                wildcards.add(capturedEvent);
             Optional<DocumentComment> document = Manager.classDocuments
                     .getOrDefault(event.getName(), new ArrayList<>())
                     .stream()
@@ -235,11 +233,19 @@ public class TypingCompiler {
                     .findFirst();
             String name = id + (sub == null ? "" : ("." + sub));
             if (document.isPresent()) {
-                for (String s : document.get().format(0, 4))
+                List<String> docStrings = document.get().format(0, 4);
+                docStrings.addAll(docStrings.size() - 1, getAdditionalEventComments(capturedEvent));
+                for (String s : docStrings)
                     writerDoc.write(s + "\n");
                 writerDoc.write("declare function onEvent(name: %s, handler: (event: %s) => void);\n".formatted(ProbeJS.GSON.toJson(name), FormatterClass.formatTypeParameterized(new TypeInfoClass(event))));
                 continue;
             }
+            List<String> docStrings = new ArrayList<>();
+            docStrings.add("/**");
+            docStrings.addAll(getAdditionalEventComments(capturedEvent));
+            docStrings.add("*/");
+            for (String s : docStrings)
+                writer.write(s + "\n");
             writer.write("declare function onEvent(name: %s, handler: (event: %s) => void);\n".formatted(ProbeJS.GSON.toJson(name), FormatterClass.formatTypeParameterized(new TypeInfoClass(event))));
         }
 
@@ -286,15 +292,25 @@ public class TypingCompiler {
         writer.flush();
     }
 
+    private static String formatJavaType(ClassInfo c) {
+        if (c.isInterface()) {
+            return "declare function java(name: \"%s\"): TSDoc.JavaInterface<%s>;\n".formatted(c.getName(), FormatterClass.formatTypeParameterized(new TypeInfoClass(c.getClazzRaw())));
+        } else {
+            return "declare function java(name: \"%s\"): TSDoc.JavaClass<typeof %s>;\n".formatted(c.getName(), FormatterClass.formatTypeParameterized(new TypeInfoClass(c.getClazzRaw())));
+        }
+    }
+
     public static void compileJava(Set<Class<?>> globalClasses) throws IOException {
         BufferedWriter writer = Files.newBufferedWriter(ProbePaths.GENERATED.resolve("java.d.ts"));
         writer.write("/// <reference path=\"./globals.d.ts\" />\n");
         for (Class<?> c : globalClasses) {
             ClassInfo info = ClassInfo.getOrCache(c);
             if (ServerScriptManager.instance.scriptManager.isClassAllowed(c.getName())) {
-                writer.write("declare function java(name: \"%s\"): typeof %s;\n".formatted(info.getName(), FormatterClass.formatTypeParameterized(new TypeInfoClass(c))));
+                writer.write(formatJavaType(info));
             }
         }
+        writer.write("/**\n* This name is not present in current ProbeJS's dump, if the class exists, dump after this java() is called to fetch typing.\n*/\n");
+        writer.write("declare function java(name: string): never;\n");
         writer.flush();
     }
 
@@ -320,7 +336,8 @@ public class TypingCompiler {
                 {
                     "compilerOptions": {
                         "lib": ["ES5", "ES2015"],
-                        "typeRoots": ["./probe/generated", "./probe/user"]
+                        "typeRoots": ["./probe/generated", "./probe/user"],
+                        "target": "ES2015"
                     }
                 }""");
         writer.flush();

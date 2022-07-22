@@ -15,7 +15,7 @@ public class ProbeJSForge {
     public ProbeJSForge() {
         // Submit our event bus to let architectury register our content on the right time
         EventBuses.registerModEventBus(ProbeJS.MOD_ID, FMLJavaModLoadingContext.get().getModEventBus());
-        if (!ProbeConfig.INSTANCE.aggressiveProbing) {
+        if (!ProbeConfig.INSTANCE.noAggressiveProbing) {
             ProbeJS.LOGGER.info("Listening to EVERY forge event since aggressive probing is active.");
             MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, true, Event.class, ProbeJSForgeEventListener::onEvent);
         }
