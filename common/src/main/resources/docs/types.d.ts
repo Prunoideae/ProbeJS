@@ -153,3 +153,10 @@ class RecipeFilter {
  */
 class Map {
 }
+
+/**
+ * @target java.util.AbstractList
+ */
+class AbstractList{
+    [Symbol.iterator](): IterableIterator<E>;
+}

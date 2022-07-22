@@ -98,17 +98,24 @@ public class FormatterClass extends DocumentReceiver<DocumentClass> implements I
         if (classInfo.getClazzRaw().getTypeParameters().length != 0) {
             firstLine.add("<%s>".formatted(Arrays.stream(classInfo.getClazzRaw().getTypeParameters()).map(TypeVariable::getName).collect(Collectors.joining(", "))));
         }
-        if (NameResolver.specialExtension.containsKey(classInfo.getClazzRaw())) {
-            firstLine.add("extends");
-            firstLine.add(NameResolver.specialExtension.get(classInfo.getClazzRaw()).stream().map(IType::getTypeName).collect(Collectors.joining(", ")));
-        }
         if (classInfo.getSuperClass() != null) {
             firstLine.add("extends");
             firstLine.add(formatTypeParameterized(InfoTypeResolver.resolveType(classInfo.getClazzRaw().getGenericSuperclass())));
+
+            if (NameResolver.specialExtension.containsKey(classInfo.getClazzRaw())) {
+                String extensions = NameResolver.specialExtension.get(classInfo.getClazzRaw()).stream().map(IType::getTypeName).collect(Collectors.joining(", "));
+                if (!extensions.isEmpty())
+                    firstLine.add("," + extensions);
+            }
         }
         if (!classInfo.getInterfaces().isEmpty()) {
             firstLine.add(classInfo.isInterface() ? "extends" : "implements");
             firstLine.add("%s".formatted(Arrays.stream(classInfo.getClazzRaw().getGenericInterfaces()).map(InfoTypeResolver::resolveType).map(FormatterClass::formatTypeParameterized).collect(Collectors.joining(", "))));
+            if (NameResolver.specialExtension.containsKey(classInfo.getClazzRaw())) {
+                String extensions = NameResolver.specialExtension.get(classInfo.getClazzRaw()).stream().map(IType::getTypeName).collect(Collectors.joining(", "));
+                if (!extensions.isEmpty() && classInfo.isInterface())
+                    firstLine.add("," + extensions);
+            }
         }
         firstLine.add("{");
         formatted.add(" ".repeat(indent) + String.join(" ", firstLine));
