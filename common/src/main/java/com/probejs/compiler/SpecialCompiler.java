@@ -1,10 +1,7 @@
 package com.probejs.compiler;
 
 import com.probejs.formatter.formatter.*;
-import com.probejs.formatter.formatter.special.FormatterIngredient;
-import com.probejs.formatter.formatter.special.FormatterMod;
-import com.probejs.formatter.formatter.special.FormatterRecipeId;
-import com.probejs.formatter.formatter.special.FormatterTag;
+import com.probejs.formatter.formatter.special.*;
 import com.probejs.util.PlatformSpecial;
 import net.minecraft.core.Registry;
 
@@ -24,6 +21,8 @@ public class SpecialCompiler {
         formatters.add(new FormatterMod());
         formatters.add(new FormatterIngredient());
         formatters.add(new FormatterRecipeId());
+        formatters.add(new FormatterLang());
+        formatters.add(new FormatterTexture());
         formatters.addAll(PlatformSpecial.INSTANCE.get().getPlatformFormatters());
         formatters.addAll(specialCompilers);
         return formatters;

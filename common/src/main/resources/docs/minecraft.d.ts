@@ -1,4 +1,43 @@
 /**
+ * @target dev.latvian.mods.kubejs.bindings.ComponentWrapper
+ */
+class ComponentWrapper {
+    /**
+     * @modify key Special.LangKey
+     */
+    static translate(key: java.lang.String): net.minecraft.network.chat.MutableComponent;
+    /**
+     * @modify key Special.LangKey
+     */
+    static translate(key: java.lang.String, objects: java.lang.Object[]): net.minecraft.network.chat.MutableComponent;
+}
+
+/**
+ * @target dev.latvian.mods.kubejs.level.BlockContainerJS
+ */
+class BlockContainerJS {
+    /**
+     * @returns Special.Block & `${string}:${string}`
+     */
+    getId(): java.lang.String;
+
+    /**
+     * @modify id Special.Block
+     */
+    set(id: net.minecraft.resources.ResourceLocation): void;
+
+    /**
+     * @modify id Special.Block
+     */
+    set(id: net.minecraft.resources.ResourceLocation, properties: java.util.Map<java.lang.Object, java.lang.Object>): void;
+
+    /**
+     * @modify id Special.Block
+     */
+    set(id: net.minecraft.resources.ResourceLocation, properties: java.util.Map<java.lang.Object, java.lang.Object>, flags: int): void;
+}
+
+/**
  * @target dev.latvian.mods.kubejs.item.FoodBuilder
  */
 class FoodBuilder {
@@ -57,6 +96,11 @@ class IngredientWrapper {
 * Fired when you need to modify recipes.
 */
 class RecipeEventJS {
+    /**
+     * @modify o {type: Special.RecipeType}
+     */
+    custom(o: java.lang.Object): dev.latvian.mods.kubejs.recipe.RecipeJS;
+
     /**
      * Holds all the recipes collected from documents.
      * @returns Document.RecipeHolder

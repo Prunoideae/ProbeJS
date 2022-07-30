@@ -105,7 +105,7 @@ class Item {
 */
 class ItemStackJS {
     /**
-     * @returns Special.Item & "${string}:${string}"
+     * @returns Special.Item & `${string}:${string}`
      */
     getId(): java.lang.String;
 }

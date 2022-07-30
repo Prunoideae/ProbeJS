@@ -78,7 +78,7 @@ public class Resolver {
             }
             return typeEquals(((TypeParameterized) docType).getRawType(), parameterized.getBaseType());
         }
-        if (docType instanceof TypeNamed && (param instanceof TypeInfoVariable || param instanceof TypeInfoClass))
+        if (docType instanceof TypeNamed && (param instanceof TypeInfoVariable || param instanceof TypeInfoClass || param instanceof TypeInfoWildcard))
             return ((TypeNamed) docType).getRawTypeName().equals(param.getTypeName());
 
         return false;

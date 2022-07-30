@@ -26,7 +26,8 @@ public class ProbeCommands {
         dispatcher.register(
                 Commands.literal("probejs")
                         .then(Commands.literal("dump")
-                                .requires(source -> source.getServer().isSingleplayer())
+                                //SINGLE PLAYER IS NEEDED
+                                .requires(source -> source.getServer().isSingleplayer() && source.hasPermission(2))
                                 .executes(context -> {
                                     Instant start = Instant.now();
                                     try {
@@ -73,11 +74,11 @@ public class ProbeCommands {
                                             ProbeConfig.INSTANCE.save();
                                             return Command.SINGLE_SUCCESS;
                                         }))
-                                .then(Commands.literal("toggle_mixin")
+                                .then(Commands.literal("toggle_aggressive")
                                         .requires(source -> source.getServer().isSingleplayer())
                                         .executes(context -> {
                                             ProbeConfig.INSTANCE.noAggressiveProbing = !ProbeConfig.INSTANCE.noAggressiveProbing;
-                                            context.getSource().sendSuccess(new TextComponent("OnEvent mixin wrapper set to: %s".formatted(ProbeConfig.INSTANCE.noAggressiveProbing ? "disabled" : "enabled")), false);
+                                            context.getSource().sendSuccess(new TextComponent("Aggressive mode is now: %s".formatted(ProbeConfig.INSTANCE.noAggressiveProbing ? "disabled" : "enabled")), false);
                                             ProbeConfig.INSTANCE.save();
                                             context.getSource().sendSuccess(new TextComponent("Changes will be applied next time you start the game."), false);
                                             return Command.SINGLE_SUCCESS;

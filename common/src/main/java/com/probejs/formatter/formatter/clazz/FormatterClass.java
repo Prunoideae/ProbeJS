@@ -13,10 +13,6 @@ import com.probejs.info.type.ITypeInfo;
 import com.probejs.info.type.InfoTypeResolver;
 import com.probejs.info.type.TypeInfoClass;
 import com.probejs.info.type.TypeInfoParameterized;
-import dev.latvian.mods.kubejs.client.ClientEventJS;
-import dev.latvian.mods.kubejs.event.EventJS;
-import dev.latvian.mods.kubejs.event.StartupEventJS;
-import dev.latvian.mods.kubejs.server.ServerEventJS;
 import dev.latvian.mods.rhino.util.EnumTypeWrapper;
 
 import java.lang.reflect.TypeVariable;
