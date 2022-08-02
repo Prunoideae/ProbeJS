@@ -31,21 +31,21 @@ class CreateRecipes {
      * 
      * Specifying chances on outputs will make them output with chance.
      */
-    crushing(outputs: dev.latvian.mods.kubejs.item.ItemStackJS[], input: dev.latvian.mods.kubejs.item.ingredient.IngredientJS): dev.latvian.mods.kubejs.create.ProcessingRecipeJS;
+    crushing(outputs: Type.SelfOrArray<dev.latvian.mods.kubejs.item.ItemStackJS>, input: dev.latvian.mods.kubejs.item.ingredient.IngredientJS): dev.latvian.mods.kubejs.create.ProcessingRecipeJS;
     /**
      * Creates a recipe for Millstone.
      * 
      * Specifying chances on outputs will make them output with chance.
      */
-    milling(outputs: dev.latvian.mods.kubejs.item.ItemStackJS[], input: dev.latvian.mods.kubejs.item.ingredient.IngredientJS): dev.latvian.mods.kubejs.create.ProcessingRecipeJS;
+    milling(outputs: Type.SelfOrArray<dev.latvian.mods.kubejs.item.ItemStackJS>, input: dev.latvian.mods.kubejs.item.ingredient.IngredientJS): dev.latvian.mods.kubejs.create.ProcessingRecipeJS;
     /**
      * Creates a recipe for Compacting.
      */
-    compacting(output: Type.ItemStackOrFluid[], inputs: Type.IngredientOrFluid[]): dev.latvian.mods.kubejs.create.ProcessingRecipeJS;
+    compacting(output: Type.SelfOrArray<Type.ItemStackOrFluid>, inputs: Type.SelfOrArray<Type.IngredientOrFluid>): dev.latvian.mods.kubejs.create.ProcessingRecipeJS;
     /**
      * Creates a recipe for Mixing.
      */
-    mixing(output: Type.ItemStackOrFluid[], inputs: Type.IngredientOrFluid[]): dev.latvian.mods.kubejs.create.ProcessingRecipeJS;
+    mixing(output: Type.SelfOrArray<Type.ItemStackOrFluid>, inputs: Type.SelfOrArray<Type.IngredientOrFluid>): dev.latvian.mods.kubejs.create.ProcessingRecipeJS;
     /**
      * Creates a recipe for Pressing.
      * 
@@ -65,7 +65,7 @@ class CreateRecipes {
      * 
      * Cutting is available as an Assembly step.
      */
-    cutting(output: dev.latvian.mods.kubejs.item.ItemStackJS, input: dev.latvian.mods.kubejs.item.ingredient.IngredientJS): dev.latvian.mods.kubejs.create.ProcessingRecipeJS;
+    cutting(output: Type.SelfOrArray<dev.latvian.mods.kubejs.item.ItemStackJS>, input: dev.latvian.mods.kubejs.item.ingredient.IngredientJS): dev.latvian.mods.kubejs.create.ProcessingRecipeJS;
     /**
      * Creates a recipe for Filling.
      * 
@@ -81,11 +81,11 @@ class CreateRecipes {
     /**
      * Creates a recipe for Splashing.
      */
-    splashing(output: dev.latvian.mods.kubejs.item.ItemStackJS[], input: dev.latvian.mods.kubejs.item.ingredient.IngredientJS): dev.latvian.mods.kubejs.create.ProcessingRecipeJS;
+    splashing(output: Type.SelfOrArray<dev.latvian.mods.kubejs.item.ItemStackJS>, input: dev.latvian.mods.kubejs.item.ingredient.IngredientJS): dev.latvian.mods.kubejs.create.ProcessingRecipeJS;
     /**
      * Creates a recipe for Haunting.
      */
-    haunting(output: dev.latvian.mods.kubejs.item.ItemStackJS[], input: dev.latvian.mods.kubejs.item.ingredient.IngredientJS): dev.latvian.mods.kubejs.create.ProcessingRecipeJS;
+    haunting(output: Type.SelfOrArray<dev.latvian.mods.kubejs.item.ItemStackJS>, input: dev.latvian.mods.kubejs.item.ingredient.IngredientJS): dev.latvian.mods.kubejs.create.ProcessingRecipeJS;
     /**
      * Creates a recipe for Sandpaper Polishing.
      */
@@ -101,6 +101,6 @@ class CreateRecipes {
     /**
      * Creates a recipe for Emptying.
      */
-    item_application(output: dev.latvian.mods.kubejs.item.ItemStackJS[], input: dev.latvian.mods.kubejs.item.ingredient.IngredientJS[]): dev.latvian.mods.kubejs.create.ItemApplicationRecipeJS;
+    item_application(output: Type.SelfOrArray<dev.latvian.mods.kubejs.item.ItemStackJS>, input: dev.latvian.mods.kubejs.item.ingredient.IngredientJS[]): dev.latvian.mods.kubejs.create.ItemApplicationRecipeJS;
 
 }

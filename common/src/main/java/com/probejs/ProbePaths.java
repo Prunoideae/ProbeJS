@@ -15,6 +15,7 @@ public class ProbePaths {
     public static Path GENERATED = PROBE.resolve("generated");
     public static Path USER_DEFINED = PROBE.resolve("user");
     public static Path SNIPPET = Platform.getGameFolder().resolve(".vscode");
+    public static Path SCHEMA = KubeJSPaths.DIRECTORY.resolve("assets/kubejs/lang");
 
     public static void init() {
         if (Files.notExists(PROBE, new LinkOption[0])) {
@@ -31,6 +32,9 @@ public class ProbePaths {
         }
         if (Files.notExists(SNIPPET, new LinkOption[0])) {
             UtilsJS.tryIO(() -> Files.createDirectories(SNIPPET));
+        }
+        if (Files.notExists(SCHEMA, new LinkOption[0])) {
+            UtilsJS.tryIO(() -> Files.createDirectories(SCHEMA));
         }
     }
 

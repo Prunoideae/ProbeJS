@@ -17,7 +17,7 @@ public class FormatterLang implements IFormatter {
                     clientLanguage.storage
                             .keySet()
                             .stream()
-                            .filter(s -> !s.startsWith("_"))
+                            .filter(s -> !(s.startsWith("_") || s.startsWith("$")))
                             .map(ProbeJS.GSON::toJson)
                             .collect(Collectors.joining(" | "))
             ));

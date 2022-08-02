@@ -2,6 +2,7 @@ package com.probejs;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
+import com.probejs.compiler.SchemaCompiler;
 import com.probejs.compiler.SnippetCompiler;
 import com.probejs.compiler.TypingCompiler;
 import com.probejs.document.Manager;
@@ -32,6 +33,7 @@ public class ProbeCommands {
                                     Instant start = Instant.now();
                                     try {
                                         SnippetCompiler.compile();
+                                        SchemaCompiler.compile();
                                         DocumentProviderHandler.init();
                                         CommentHandler.init();
                                         Manager.init();
