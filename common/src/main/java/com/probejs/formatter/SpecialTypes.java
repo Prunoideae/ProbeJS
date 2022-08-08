@@ -1,16 +1,18 @@
 package com.probejs.formatter;
 
-import com.google.common.reflect.TypeResolver;
 import com.mojang.serialization.Codec;
 import com.probejs.ProbeJS;
 import com.probejs.compiler.SpecialCompiler;
 import com.probejs.formatter.formatter.clazz.FormatterClass;
-import com.probejs.formatter.formatter.special.FormatterRegistry;
 import com.probejs.formatter.formatter.clazz.FormatterType;
+import com.probejs.formatter.formatter.special.FormatterRegistry;
 import com.probejs.info.ClassInfo;
 import com.probejs.info.MethodInfo;
 import com.probejs.info.type.*;
-import dev.latvian.mods.rhino.*;
+import dev.latvian.mods.rhino.BaseFunction;
+import dev.latvian.mods.rhino.NativeJavaObject;
+import dev.latvian.mods.rhino.Scriptable;
+import dev.latvian.mods.rhino.ScriptableObject;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;

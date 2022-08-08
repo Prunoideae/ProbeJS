@@ -47,8 +47,16 @@ public class RegistryCompiler {
         RegistryObjectBuilderTypes<?> types;
         String name;
 
+        private static String getCapitalized(String s) {
+            return s.substring(0, 1).toUpperCase() + s.substring(1);
+        }
+
         private static String getFormattedRegistryName(RegistryObjectBuilderTypes<?> types) {
-            return Arrays.stream(types.registryKey.location().getPath().split("/")).map(str -> str.substring(0, 1).toUpperCase() + str.substring(1)).collect(Collectors.joining(""));
+            return Arrays.stream(types.registryKey.location().getPath().split("/"))
+                    .map(str -> Arrays.stream(str.split("_"))
+                            .map(FormatterRegistry::getCapitalized)
+                            .collect(Collectors.joining("")))
+                    .collect(Collectors.joining(""));
         }
 
         private FormatterRegistry(RegistryObjectBuilderTypes<?> types) {

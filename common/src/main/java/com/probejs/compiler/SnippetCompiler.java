@@ -116,7 +116,7 @@ public class SnippetCompiler {
     }
 
     public static void compile() throws IOException {
-        Path codeFile = ProbePaths.SNIPPET.resolve("probe.code-snippets");
+        Path codeFile = ProbePaths.WORKSPACE_SETTINGS.resolve("probe.code-snippets");
         KubeDump kubeDump = KubeDump.fetch();
         BufferedWriter writer = Files.newBufferedWriter(codeFile);
         writer.write(ProbeJS.GSON.toJson(kubeDump.toSnippet()));
@@ -138,7 +138,7 @@ public class SnippetCompiler {
             }
         }
 
-        Path codeFile = ProbePaths.SNIPPET.resolve("classNames.code-snippets");
+        Path codeFile = ProbePaths.WORKSPACE_SETTINGS.resolve("classNames.code-snippets");
         BufferedWriter writer = Files.newBufferedWriter(codeFile);
         ProbeJS.GSON.toJson(resultJson, writer);
         writer.flush();

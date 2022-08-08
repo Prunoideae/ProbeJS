@@ -1,6 +1,7 @@
 package com.probejs.compiler;
 
 import com.google.gson.*;
+import com.google.gson.stream.JsonWriter;
 import com.probejs.ProbeJS;
 import com.probejs.ProbePaths;
 import com.probejs.document.DocumentClass;
@@ -27,6 +28,7 @@ import dev.latvian.mods.kubejs.util.KubeJSPlugins;
 import net.minecraft.resources.ResourceLocation;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -330,17 +332,47 @@ public class TypingCompiler {
         writer.flush();
     }
 
+    private static void writeMergedConfig(Path path, String config) throws IOException {
+        JsonObject updates = ProbeJS.GSON.fromJson(config, JsonObject.class);
+        JsonObject original = Files.exists(path) ? ProbeJS.GSON.fromJson(Files.newBufferedReader(path), JsonObject.class) : new JsonObject();
+        updates.entrySet().forEach((entry) -> original.add(entry.getKey(), entry.getValue()));
+        JsonWriter jsonWriter = ProbeJS.GSON_WRITER.newJsonWriter(Files.newBufferedWriter(path));
+        jsonWriter.setIndent("    ");
+        ProbeJS.GSON_WRITER.toJson(original, JsonObject.class, jsonWriter);
+        jsonWriter.flush();
+    }
+
     public static void compileJSConfig() throws IOException {
-        BufferedWriter writer = Files.newBufferedWriter(KubeJSPaths.DIRECTORY.resolve("jsconfig.json"));
-        writer.write("""
-                {
-                    "compilerOptions": {
-                        "lib": ["ES5", "ES2015"],
-                        "typeRoots": ["./probe/generated", "./probe/user"],
-                        "target": "ES2015"
-                    }
-                }""");
-        writer.flush();
+        TypingCompiler.writeMergedConfig(
+                KubeJSPaths.DIRECTORY.resolve("jsconfig.json"),
+                """
+                        {
+                            "compilerOptions": {
+                                "lib": ["ES5", "ES2015"],
+                                "typeRoots": ["./probe/generated", "./probe/user"],
+                                "target": "ES2015"
+                            }
+                        }"""
+        );
+    }
+
+    public static void compileVSCodeConfig() throws IOException {
+        TypingCompiler.writeMergedConfig(
+                ProbePaths.WORKSPACE_SETTINGS.resolve("settings.json"),
+                """
+                        {
+                            "json.schemas": [
+                                {
+                                    "fileMatch": [
+                                        "/lang/*.json"
+                                    ],
+                                    "url": "./.vscode/schema.json"
+                                }
+                            ]
+                        }
+                        """
+        );
+
     }
 
     public static void compile() throws IOException {
@@ -371,6 +403,7 @@ public class TypingCompiler {
         compileJava(globalClasses);
         compileAdditionalTypeNames();
         compileJSConfig();
+        compileVSCodeConfig();
         cachedJavaClasses.addAll(CapturedClasses.capturedJavaClasses);
         writeCachedEvents("cachedEvents.json", cachedEvents);
         writeCachedForgeEvents("cachedForgedEvents.json", cachedForgeEvents);

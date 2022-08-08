@@ -5,6 +5,7 @@ import com.probejs.ProbeJS;
 import com.probejs.ProbePaths;
 import net.minecraft.client.resources.language.ClientLanguage;
 import net.minecraft.locale.Language;
+import net.minecraft.world.item.BundleItem;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -17,12 +18,16 @@ public class SchemaCompiler {
         JsonObject properties = new JsonObject();
         if (Language.getInstance() instanceof ClientLanguage clientLanguage) {
             clientLanguage.storage
-                    .keySet()
-                    .stream().filter(s -> !(s.startsWith("_") || s.startsWith("$")))
-                    .forEach(key -> {
+                    .entrySet()
+                    .stream().filter(e -> {
+                        var s = e.getKey();
+                        return !(s.startsWith("_") || s.startsWith("$"));
+                    })
+                    .forEach(entry -> {
                         JsonObject typeString = new JsonObject();
                         typeString.addProperty("type", "string");
-                        properties.add(key, typeString);
+                        typeString.addProperty("description", entry.getValue());
+                        properties.add(entry.getKey(), typeString);
                     });
         }
         JsonObject schema = new JsonObject();
@@ -32,7 +37,7 @@ public class SchemaCompiler {
     }
 
     public static void compile() throws IOException {
-        Path schemaFile = ProbePaths.SCHEMA.resolve("schema.json");
+        Path schemaFile = ProbePaths.WORKSPACE_SETTINGS.resolve("schema.json");
         BufferedWriter writer = Files.newBufferedWriter(schemaFile);
         writer.write(ProbeJS.GSON.toJson(SchemaCompiler.toSchema()));
         writer.flush();
