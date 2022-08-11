@@ -266,10 +266,10 @@ public class TypingCompiler {
             if (document.isPresent()) {
                 for (String s : document.get().format(0, 4))
                     writerDoc.write(s + "\n");
-                writerDoc.write("declare function onEvent(name: `%s.${string}`, handler: (event: %s) => void);\n".formatted(id.substring(1, id.length() - 1), FormatterClass.formatTypeParameterized(new TypeInfoClass(wildcard.getCaptured()))));
+                writerDoc.write("declare function onEvent(name: `%s`, handler: (event: %s) => void);\n".formatted(id.substring(1, id.length() - 1), FormatterClass.formatTypeParameterized(new TypeInfoClass(wildcard.getCaptured()))));
                 continue;
             }
-            writer.write("declare function onEvent(name: `%s.${string}`, handler: (event: %s) => void);\n".formatted(id.substring(1, id.length() - 1), FormatterClass.formatTypeParameterized(new TypeInfoClass(wildcard.getCaptured()))));
+            writer.write("declare function onEvent(name: `%s`, handler: (event: %s) => void);\n".formatted(id.substring(1, id.length() - 1), FormatterClass.formatTypeParameterized(new TypeInfoClass(wildcard.getCaptured()))));
         }
 
         for (Map.Entry<String, Class<?>> entry : cachedForgeEvents.entrySet()) {
