@@ -79,7 +79,7 @@ public class FormatterMethod extends DocumentReceiver<DocumentMethod> implements
 
     private String formatReturn() {
         var returnType = methodInfo.getReturnType();
-        if (returnType instanceof TypeInfoClass clsInfo && clsInfo.getResolvedClass() == methodInfo.getFrom().getClazzRaw()) {
+        if (returnType instanceof TypeInfoClass clsInfo && clsInfo.getResolvedClass() == methodInfo.getFrom().getClazzRaw() && !methodInfo.isStatic()) {
             return "this";
         }
         return formatTypeParameterized(methodInfo.getReturnType(), NameResolver.specialTypeGuards.getOrDefault(methodInfo.getReturnType().getResolvedClass(), false));

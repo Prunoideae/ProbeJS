@@ -46,7 +46,7 @@ public class MethodInfo {
     public MethodInfo(Method method, Class<?> from) {
         Map<Type, Type> typeGenericMap = new HashMap<>();
         if (method.getDeclaringClass() != from) {
-            rewindGenerics(method, from).forEach((key, value) -> typeGenericMap.put(value, key));
+            typeGenericMap.putAll(rewindGenerics(method, from));
         }
         this.name = getRemappedOrDefault(method, method.getDeclaringClass());
         this.shouldHide = method.getAnnotation(HideFromJS.class) != null;
@@ -178,15 +178,18 @@ public class MethodInfo {
                     Type[] remappedTypes = parameterizedType.getActualTypeArguments();
                     Type[] originalTypes = paramClass.getTypeParameters();
                     for (int i = 0; i < remappedTypes.length; i++)
-                        currentMap.put(remappedTypes[i], originalTypes[i]);
+                        currentMap.put(originalTypes[i], remappedTypes[i]);
                 }
 
                 Map<Type, Type> parentMap = rewindGenerics(method, unwrapGenerics(parentType));
-                for (Type key : currentMap.keySet()) {
-                    if (parentMap.containsKey(currentMap.get(key)))
-                        currentMap.put(key, parentMap.get(currentMap.get(key)));
+                Map<Type, Type> mutMap = new HashMap<>();
+                for (Type key : parentMap.keySet()) {
+                    if (currentMap.containsKey(parentMap.get(key)))
+                        mutMap.put(key, currentMap.get(parentMap.get(key)));
+                    else
+                        mutMap.put(key, parentMap.get(key));
                 }
-
+                currentMap = mutMap;
             } else if (parentType != null) {
                 currentMap = rewindGenerics(method, unwrapGenerics(parentType));
             }
@@ -199,5 +202,4 @@ public class MethodInfo {
         }
         return currentMap;
     }
-
 }
