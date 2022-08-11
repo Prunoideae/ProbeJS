@@ -2,6 +2,7 @@ package com.probejs.info.type;
 
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.util.function.Function;
 
 public class TypeInfoVariable implements ITypeInfo {
     public static boolean test(Type type) {
@@ -11,7 +12,7 @@ public class TypeInfoVariable implements ITypeInfo {
     private final TypeVariable<?> type;
     private boolean underscored = false;
 
-    public TypeInfoVariable(Type type) {
+    public TypeInfoVariable(Type type, Function<Type, Type> typeTransformer) {
         this.type = (TypeVariable<?>) type;
     }
 

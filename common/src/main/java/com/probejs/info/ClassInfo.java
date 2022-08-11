@@ -55,7 +55,7 @@ public class ClassInfo {
         try {
             metInfo = Arrays.stream(clazzRaw.getMethods())
                     .filter(m -> !m.isSynthetic())
-                    .filter(m -> m.getDeclaringClass() == clazz)
+                    .filter(m -> m.getDeclaringClass() == clazz || m.isDefault())
                     .map(m -> new MethodInfo(m, clazz))
                     .filter(m -> ClassResolver.acceptMethod(m.getName()))
                     .filter(m -> !m.shouldHide())

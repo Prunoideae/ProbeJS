@@ -3,6 +3,7 @@ package com.probejs.info.type;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.function.Function;
 
 public class TypeInfoArray implements ITypeInfo {
     public static boolean test1(Type type) {
@@ -19,12 +20,12 @@ public class TypeInfoArray implements ITypeInfo {
 
     private ITypeInfo type;
 
-    public TypeInfoArray(Type type) {
+    public TypeInfoArray(Type type, Function<Type, Type> typeTransformer) {
         if (test1(type))
-            this.type = InfoTypeResolver.resolveType(((GenericArrayType) type).getGenericComponentType());
+            this.type = InfoTypeResolver.resolveType(((GenericArrayType) type).getGenericComponentType(), typeTransformer);
         if (test2(type)) {
             assert type instanceof Class<?>;
-            this.type = InfoTypeResolver.resolveType(((Class<?>) type).getComponentType());
+            this.type = InfoTypeResolver.resolveType(((Class<?>) type).getComponentType(), typeTransformer);
         }
     }
 

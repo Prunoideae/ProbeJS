@@ -10,15 +10,18 @@ import com.probejs.document.comment.CommentHandler;
 import com.probejs.document.parser.processor.DocumentProviderHandler;
 import com.probejs.formatter.ClassResolver;
 import com.probejs.formatter.NameResolver;
+import com.probejs.info.MethodInfo;
 import dev.latvian.mods.kubejs.KubeJSPaths;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.server.level.ServerLevel;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 public class ProbeCommands {
@@ -99,12 +102,17 @@ public class ProbeCommands {
                                             return Command.SINGLE_SUCCESS;
                                         }))
                         )
-                //.then(Commands.literal("test")
-                //        .requires(source -> source.getServer().isSingleplayer() || source.hasPermission(2))
-                //       .executes(context -> {
-                //          RegistryCompiler.getBuilderTypes();
-                //         return Command.SINGLE_SUCCESS;
-                //    }))
+                        .then(Commands.literal("test")
+                                .requires(source -> false)
+                                .executes(context -> {
+                                    Arrays.stream(ServerLevel.class.getMethods())
+                                            .map(method -> new MethodInfo(method, ServerLevel.class))
+                                            .forEach(method -> {
+                                                ProbeJS.LOGGER.info(method.getName());
+                                                ProbeJS.LOGGER.info(method.isDefaultMethod());
+                                            });
+                                    return Command.SINGLE_SUCCESS;
+                                }))
         );
     }
 

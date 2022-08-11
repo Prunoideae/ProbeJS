@@ -4,6 +4,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class TypeInfoParameterized implements ITypeInfo {
@@ -14,10 +15,10 @@ public class TypeInfoParameterized implements ITypeInfo {
     private ITypeInfo rawType;
     private List<ITypeInfo> paramTypes;
 
-    public TypeInfoParameterized(Type type) {
+    public TypeInfoParameterized(Type type, Function<Type, Type> typeTransformer) {
         if (type instanceof ParameterizedType parType) {
-            rawType = InfoTypeResolver.resolveType(parType.getRawType());
-            paramTypes = Arrays.stream(parType.getActualTypeArguments()).map(InfoTypeResolver::resolveType).collect(Collectors.toList());
+            rawType = InfoTypeResolver.resolveType(parType.getRawType(), typeTransformer);
+            paramTypes = Arrays.stream(parType.getActualTypeArguments()).map(param -> InfoTypeResolver.resolveType(param, typeTransformer)).collect(Collectors.toList());
         }
     }
 

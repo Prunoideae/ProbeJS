@@ -5,6 +5,7 @@ import com.probejs.info.MethodInfo;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class TypeInfoClass implements ITypeInfo {
@@ -14,11 +15,11 @@ public class TypeInfoClass implements ITypeInfo {
 
     private final Class<?> type;
 
-    public TypeInfoClass(Type type) {
+    public TypeInfoClass(Type type, Function<Type, Type> typeTransformer) {
         this.type = (Class<?>) type;
     }
 
-    private TypeInfoClass(Class<?> type) {
+    public TypeInfoClass(Class<?> type) {
         this.type = type;
     }
 

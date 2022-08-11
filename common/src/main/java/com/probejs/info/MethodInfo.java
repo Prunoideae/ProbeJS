@@ -7,17 +7,19 @@ import dev.latvian.mods.rhino.mod.util.RemappingHelper;
 import dev.latvian.mods.rhino.util.HideFromJS;
 import dev.latvian.mods.rhino.util.Remapper;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.Parameter;
+import java.lang.reflect.*;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class MethodInfo {
 
+
     private final String name;
     private final boolean shouldHide;
+    private final boolean defaultMethod;
     private final int modifiers;
     private final Class<?> from;
     private ITypeInfo returnType;
@@ -42,13 +44,21 @@ public class MethodInfo {
     }
 
     public MethodInfo(Method method, Class<?> from) {
-        this.name = getRemappedOrDefault(method, from);
+        Map<Type, Type> typeGenericMap = new HashMap<>();
+        if (method.getDeclaringClass() != from) {
+            rewindGenerics(method, from).forEach((key, value) -> typeGenericMap.put(value, key));
+        }
+        this.name = getRemappedOrDefault(method, method.getDeclaringClass());
         this.shouldHide = method.getAnnotation(HideFromJS.class) != null;
         this.from = from;
         this.modifiers = method.getModifiers();
-        this.returnType = InfoTypeResolver.resolveType(method.getGenericReturnType());
-        this.params = Arrays.stream(method.getParameters()).map(ParamInfo::new).collect(Collectors.toList());
+        this.returnType = InfoTypeResolver.resolveType(
+                method.getGenericReturnType(),
+                type -> typeGenericMap.getOrDefault(type, type)
+        );
+        this.params = Arrays.stream(method.getParameters()).map(param -> new ParamInfo(param, typeGenericMap)).collect(Collectors.toList());
         this.typeVariables = Arrays.stream(method.getTypeParameters()).map(InfoTypeResolver::resolveType).collect(Collectors.toList());
+        this.defaultMethod = method.isDefault();
     }
 
     public String getName() {
@@ -65,6 +75,10 @@ public class MethodInfo {
 
     public boolean isAbstract() {
         return Modifier.isAbstract(modifiers);
+    }
+
+    public boolean isDefaultMethod() {
+        return defaultMethod;
     }
 
     public ITypeInfo getReturnType() {
@@ -97,14 +111,18 @@ public class MethodInfo {
 
     public static class ParamInfo {
         private final String name;
-        private boolean isVararg;
+        private final boolean isVararg;
         private ITypeInfo type;
 
         public ParamInfo(Parameter parameter) {
+            this(parameter, new HashMap<>());
+        }
+
+        public ParamInfo(Parameter parameter, Map<Type, Type> typeMap) {
             this.name = parameter.getName();
             this.isVararg = parameter.isVarArgs();
             try {
-                this.type = InfoTypeResolver.resolveType(parameter.getParameterizedType());
+                this.type = InfoTypeResolver.resolveType(parameter.getParameterizedType(), t -> typeMap.getOrDefault(t, t));
             } catch (Exception e) {
                 //#3, WTF???
                 e.printStackTrace();
@@ -128,4 +146,58 @@ public class MethodInfo {
             this.type = type;
         }
     }
+
+    private static Class<?> unwrapGenerics(Type type) {
+        if (type instanceof Class<?>)
+            return (Class<?>) type;
+        else if (type instanceof ParameterizedType parameterizedType)
+            return unwrapGenerics(parameterizedType.getRawType());
+        return null;
+    }
+
+    private static boolean testTypeAssignable(Type type1, Type type2) {
+        Class<?> clazz1 = unwrapGenerics(type1);
+        Class<?> clazz2 = unwrapGenerics(type2);
+        return clazz1 != null && clazz2 != null && clazz1.isAssignableFrom(clazz2);
+    }
+
+    private static Map<Type, Type> rewindGenerics(Method method, Class<?> currentClass) {
+        Class<?> targetClass = method.getDeclaringClass();
+        Map<Type, Type> currentMap = new HashMap<>();
+
+        if (targetClass != currentClass) {
+            Type parentType = testTypeAssignable(targetClass, currentClass.getGenericSuperclass()) ?
+                    currentClass.getGenericSuperclass() :
+                    Arrays.stream(currentClass.getGenericInterfaces())
+                            .filter(i -> testTypeAssignable(targetClass, i))
+                            .findFirst()
+                            .orElse(null);
+            if (parentType instanceof ParameterizedType parameterizedType) {
+                Class<?> paramClass = unwrapGenerics(parameterizedType);
+                if (paramClass != null) {
+                    Type[] remappedTypes = parameterizedType.getActualTypeArguments();
+                    Type[] originalTypes = paramClass.getTypeParameters();
+                    for (int i = 0; i < remappedTypes.length; i++)
+                        currentMap.put(remappedTypes[i], originalTypes[i]);
+                }
+
+                Map<Type, Type> parentMap = rewindGenerics(method, unwrapGenerics(parentType));
+                for (Type key : currentMap.keySet()) {
+                    if (parentMap.containsKey(currentMap.get(key)))
+                        currentMap.put(key, parentMap.get(currentMap.get(key)));
+                }
+
+            } else if (parentType != null) {
+                currentMap = rewindGenerics(method, unwrapGenerics(parentType));
+            }
+
+        } else {
+            //Only get up to what this method wants.
+            for (TypeVariable<? extends Class<?>> type : currentClass.getTypeParameters()) {
+                currentMap.put(type, type);
+            }
+        }
+        return currentMap;
+    }
+
 }

@@ -111,7 +111,7 @@ public class FormatterMethod extends DocumentReceiver<DocumentMethod> implements
                         .getParams()
                         .stream()
                         .map(paramInfo -> "%s: %s".formatted(
-                                (paramInfo.isVararg() ? "... " : "") + NameResolver.getNameSafe(renames.getOrDefault(paramInfo.getName(), paramInfo.getName())),
+                                (paramInfo.isVararg() ? "..." : "") + NameResolver.getNameSafe(renames.getOrDefault(paramInfo.getName(), paramInfo.getName())),
                                 modifiers.containsKey(paramInfo.getName())
                                         ? formatParamDoc(modifiers, paramInfo)
                                         : formatParamUnderscore(paramInfo.getType())))

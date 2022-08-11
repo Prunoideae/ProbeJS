@@ -2,6 +2,7 @@ package com.probejs.info.type;
 
 import java.lang.reflect.Type;
 import java.lang.reflect.WildcardType;
+import java.util.function.Function;
 
 public class TypeInfoWildcard implements ITypeInfo {
 
@@ -12,20 +13,20 @@ public class TypeInfoWildcard implements ITypeInfo {
 
     private final ITypeInfo type;
 
-    public TypeInfoWildcard(Type type) {
+    public TypeInfoWildcard(Type type, Function<Type, Type> typeTransformer) {
         if (type instanceof WildcardType wild) {
             Type[] upper = wild.getUpperBounds();
             Type[] lower = wild.getLowerBounds();
             if (upper[0] != Object.class) {
-                this.type = InfoTypeResolver.resolveType(upper[0]);
+                this.type = InfoTypeResolver.resolveType(upper[0], typeTransformer);
                 return;
             }
             if (lower.length != 0) {
-                this.type = InfoTypeResolver.resolveType(lower[0]);
+                this.type = InfoTypeResolver.resolveType(lower[0], typeTransformer);
                 return;
             }
         }
-        this.type = new TypeInfoClass(Object.class);
+        this.type = new TypeInfoClass(Object.class, typeTransformer);
     }
 
     private TypeInfoWildcard(ITypeInfo inner) {
