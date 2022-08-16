@@ -5,7 +5,6 @@ import com.probejs.document.DocumentMethod;
 import com.probejs.document.comment.CommentUtil;
 import com.probejs.document.comment.special.CommentReturns;
 import com.probejs.document.type.IType;
-import com.probejs.document.type.TypeNamed;
 import com.probejs.formatter.NameResolver;
 import com.probejs.formatter.formatter.DocumentReceiver;
 import com.probejs.formatter.formatter.IFormatter;

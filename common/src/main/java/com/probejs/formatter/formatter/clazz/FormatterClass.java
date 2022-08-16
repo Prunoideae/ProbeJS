@@ -161,15 +161,14 @@ public class FormatterClass extends DocumentReceiver<DocumentClass> implements I
         }
 
         // constructors
-        if (!classInfo.isInterface())
+        if (!classInfo.isInterface()) {
             if (internal) {
                 formatted.add(" ".repeat(indent + stepIndent) + "/**");
-                formatted.add(" ".repeat(indent + stepIndent) + "* Internal constructor, this means that it's not valid and you will get an error if you use it.");
+                formatted.add(" ".repeat(indent + stepIndent) + "* Internal constructor, this means that it's not valid unless you use `java()`.");
                 formatted.add(" ".repeat(indent + stepIndent) + "*/");
-                formatted.add(" ".repeat(indent + stepIndent) + "protected constructor();");
-            } else {
-                classInfo.getConstructorInfo().stream().map(FormatterConstructor::new).forEach(f -> formatted.addAll(f.format(indent + stepIndent, stepIndent)));
             }
+            classInfo.getConstructorInfo().stream().map(FormatterConstructor::new).forEach(f -> formatted.addAll(f.format(indent + stepIndent, stepIndent)));
+        }
 
         // additions
         fieldAdditions.forEach(fieldDoc -> formatted.addAll(fieldDoc.format(indent + stepIndent, stepIndent)));
