@@ -157,7 +157,7 @@ class ItemTooltipEventJS {
 
     /**
      * @modify item dev.latvian.mods.kubejs.item.ingredient.IngredientJS
-     * @modify handler (itemstack: Internal.ItemStackJS, advanced: boolean, lines: Internal.List<string>) => void
+     * @modify handler (itemstack: Internal.ItemStackJS, advanced: boolean, lines: Internal.List<Internal.Component>) => void
      * Adds a callback to the item, will be invoked when the tooltip is rendering.
      */
     addAdvanced(item: java.lang.Object, handler: dev.latvian.mods.kubejs.item.ItemTooltipEventJS$StaticTooltipHandlerFromJS): void;
