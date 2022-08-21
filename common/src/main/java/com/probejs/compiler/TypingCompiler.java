@@ -403,6 +403,7 @@ public class TypingCompiler {
         compileConstants(bindingEvent);
         compileJava(globalClasses);
         compileAdditionalTypeNames();
+        RawCompiler.compileRaw();
         compileJSConfig();
         compileVSCodeConfig();
         cachedJavaClasses.addAll(CapturedClasses.capturedJavaClasses);
