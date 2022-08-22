@@ -17,6 +17,7 @@ public class ProbeConfig {
     public boolean vanillaOrder = true;
     public boolean exportClassNames = false;
 
+    public boolean allowObfuscated = false;
 
     private static <E> E fetchPropertyOrDefault(Object key, Map<?, ?> value, E defaultValue) {
         Object v = value.get(key);
@@ -32,6 +33,7 @@ public class ProbeConfig {
                 noAggressiveProbing = fetchPropertyOrDefault("disabled", obj, false);
                 vanillaOrder = fetchPropertyOrDefault("vanillaOrder", obj, true);
                 exportClassNames = fetchPropertyOrDefault("exportClassNames", obj, false);
+                allowObfuscated = fetchPropertyOrDefault("allowObfuscated", obj, false);
             } catch (IOException e) {
                 ProbeJS.LOGGER.warn("Cannot read config properties, falling back to defaults.");
             }

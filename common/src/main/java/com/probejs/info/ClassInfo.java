@@ -1,6 +1,7 @@
 package com.probejs.info;
 
 
+import com.probejs.ProbeConfig;
 import com.probejs.ProbeJS;
 import com.probejs.formatter.ClassResolver;
 import com.probejs.info.type.ITypeInfo;
@@ -57,7 +58,7 @@ public class ClassInfo {
                     .filter(m -> !m.isSynthetic())
                     .filter(m -> m.getDeclaringClass() == clazz || m.isDefault())
                     .map(m -> new MethodInfo(m, clazz))
-                    .filter(m -> ClassResolver.acceptMethod(m.getName()))
+                    .filter(m -> (ClassResolver.acceptMethod(m.getName()) || ProbeConfig.INSTANCE.allowObfuscated))
                     .filter(m -> !m.shouldHide())
                     .collect(Collectors.toList());
         } catch (Error | Exception e) {
