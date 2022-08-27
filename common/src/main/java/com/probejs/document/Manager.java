@@ -49,7 +49,7 @@ public class Manager {
             Optional<Path> docsList = mod.findResource("probejs.documents.txt");
             if (docsList.isPresent()) {
                 ProbeJS.LOGGER.info("Found documents list from %s".formatted(mod.getName()));
-                for (String subEntry : Files.lines(docsList.get()).collect(Collectors.toList())) {
+                for (String subEntry : Files.lines(docsList.get()).toList()) {
                     if (subEntry.startsWith("!")) {
                         subEntry = subEntry.substring(1);
                         int i = subEntry.indexOf(" ");
