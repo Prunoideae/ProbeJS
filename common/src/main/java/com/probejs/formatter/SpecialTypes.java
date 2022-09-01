@@ -62,10 +62,22 @@ public class SpecialTypes {
         }
     }
 
+    private static boolean isFunctionalInterface(Class<?> clazz) {
+        if (clazz.isAnnotationPresent(FunctionalInterface.class)) {
+            return true;
+        }
+        for (Class<?> superInterface : clazz.getInterfaces()) {
+            if (isFunctionalInterface(superInterface))
+                return true;
+        }
+        return false;
+    }
+
     public static void processFunctionalInterfaces(Set<Class<?>> globalClasses) {
         for (Class<?> clazz : globalClasses) {
-            if (clazz.isInterface() && !skippedSpecials.contains(clazz) && clazz.isAnnotationPresent(FunctionalInterface.class)) {
-                //Functional interfaces has one and only one abstract method
+            //For some very random reason, people think that anything extending a FunctionInterface is also a FunctionalInterface
+            if (clazz.isInterface() && !skippedSpecials.contains(clazz) && isFunctionalInterface(clazz)) {
+                //...But a FunctionalInterfaces must only have one and only one abstract method
                 ClassInfo info = ClassInfo.getOrCache(clazz);
                 if (info.getMethodInfo().stream().filter(MethodInfo::isAbstract).count() != 1)
                     continue;
