@@ -25,7 +25,7 @@ public class MethodInfo {
     private ITypeInfo returnType;
     private List<ParamInfo> params;
     private List<ITypeInfo> typeVariables;
-    public static final Remapper RUNTIME = RemappingHelper.createModRemapper();
+    public static final Remapper RUNTIME = RemappingHelper.getMinecraftRemapper();
 
     private static String getRemappedOrDefault(Method method, Class<?> from) {
         String s = method.getName();
@@ -40,7 +40,7 @@ public class MethodInfo {
             }
             from = from.getSuperclass();
         }
-        return s;
+        return s.isEmpty() ? method.getName() : s;
     }
 
     public MethodInfo(Method method, Class<?> from) {

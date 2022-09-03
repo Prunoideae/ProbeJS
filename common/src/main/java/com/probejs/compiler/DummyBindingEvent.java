@@ -14,7 +14,7 @@ public class DummyBindingEvent extends BindingsEvent {
     private final HashMap<String, BaseFunction> functionDump = new HashMap<>();
 
     public DummyBindingEvent(ScriptManager manager) {
-        super(manager, null, null);
+        super(manager, null);
     }
 
     @Override

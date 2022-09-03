@@ -26,6 +26,6 @@
     "fabric": "*",
     "minecraft": ">=1.18.2",
     "architectury": ">=4.1.39",
-    "kubejs": ">=1802.5.4-build.476"
+    "kubejs": ">=1802.5.5-build.545"
   }
 }

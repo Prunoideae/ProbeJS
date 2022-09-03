@@ -2,6 +2,7 @@ package com.probejs.mixins;
 
 import com.probejs.ProbeConfig;
 import com.probejs.plugin.CapturedClasses;
+import dev.latvian.mods.kubejs.script.BindingsEvent;
 import dev.latvian.mods.kubejs.script.ScriptManager;
 import dev.latvian.mods.rhino.NativeJavaClass;
 import dev.latvian.mods.rhino.Scriptable;
@@ -13,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(ScriptManager.class)
 public class OnJavaMixin {
     @Inject(method = "loadJavaClass", at = @At("RETURN"), remap = false)
-    public void loadJavaClass(Scriptable njc, Object[] ex, CallbackInfoReturnable<NativeJavaClass> cir) {
+    public void loadJavaClass(BindingsEvent event, Object[] args, CallbackInfoReturnable<NativeJavaClass> cir) {
         if (!ProbeConfig.INSTANCE.noAggressiveProbing)
             CapturedClasses.capturedJavaClasses.add(cir.getReturnValue().getClassObject());
     }

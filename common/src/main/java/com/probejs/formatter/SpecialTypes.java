@@ -55,10 +55,7 @@ public class SpecialTypes {
             if (resolvedReturn instanceof TypeInfoVariable) {
                 resolvedReturn = variableMap.getOrDefault(resolvedReturn.getTypeName(), new TypeInfoClass(Object.class));
             }
-            //Use special to support most of the special wrappers in the callback.
-            //Only problem is that it might be problematic when actually applying the methods...
-            //But for most of the time, FunctionalInterface is meant to be passed into Java.
-            return "((%s) => %s)".formatted(String.join(", ", formattedParam), new FormatterType(resolvedReturn, true).format(0, 0));
+            return "((%s) => %s)".formatted(String.join(", ", formattedParam), new FormatterType(resolvedReturn, false).format(0, 0));
         }
     }
 

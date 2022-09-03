@@ -10,8 +10,11 @@ import com.probejs.document.comment.CommentHandler;
 import com.probejs.document.parser.processor.DocumentProviderHandler;
 import com.probejs.formatter.ClassResolver;
 import com.probejs.formatter.NameResolver;
+import com.probejs.info.ClassInfo;
 import com.probejs.info.MethodInfo;
+import com.probejs.jdoc.document.DocumentClass;
 import dev.latvian.mods.kubejs.KubeJSPaths;
+import dev.latvian.mods.kubejs.item.ingredient.IngredientJS;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.TextComponent;
@@ -105,12 +108,8 @@ public class ProbeCommands {
                         .then(Commands.literal("test")
                                 .requires(source -> false)
                                 .executes(context -> {
-                                    Arrays.stream(ServerLevel.class.getMethods())
-                                            .map(method -> new MethodInfo(method, ServerLevel.class))
-                                            .forEach(method -> {
-                                                ProbeJS.LOGGER.info(method.getName());
-                                                ProbeJS.LOGGER.info(method.isDefaultMethod());
-                                            });
+                                    DocumentClass document = DocumentClass.fromJava(ClassInfo.getOrCache(IngredientJS.class));
+                                    ProbeJS.LOGGER.info(document.serialize().toString());
                                     return Command.SINGLE_SUCCESS;
                                 }))
         );

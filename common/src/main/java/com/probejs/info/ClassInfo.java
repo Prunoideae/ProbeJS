@@ -71,7 +71,7 @@ public class ClassInfo {
             fldInfo = Arrays.stream(clazzRaw.getFields())
                     .filter(f -> f.getDeclaringClass() == clazz)
                     .map(FieldInfo::new)
-                    .filter(f -> ClassResolver.acceptField(f.getName()))
+                    .filter(f -> ClassResolver.acceptField(f.getName()) || ProbeConfig.INSTANCE.allowObfuscated)
                     .filter(f -> !f.shouldHide())
                     .filter(f -> !f.isTransient())
                     .collect(Collectors.toList());
@@ -125,6 +125,14 @@ public class ClassInfo {
 
     public String getName() {
         return name;
+    }
+
+    public ITypeInfo getSuperClassType() {
+        return InfoTypeResolver.resolveType(clazzRaw.getGenericSuperclass());
+    }
+
+    public List<ITypeInfo> getInterfaceTypes() {
+        return Arrays.stream(clazzRaw.getGenericInterfaces()).map(InfoTypeResolver::resolveType).collect(Collectors.toList());
     }
 
 }
