@@ -3,7 +3,6 @@ package com.probejs.jdoc;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.probejs.info.ClassInfo;
 import com.probejs.info.type.*;
 import com.probejs.jdoc.document.AbstractDocument;
 import com.probejs.jdoc.document.DocumentClass;
@@ -11,7 +10,7 @@ import com.probejs.jdoc.document.DocumentField;
 import com.probejs.jdoc.document.DocumentMethod;
 import com.probejs.jdoc.property.*;
 
-import java.lang.reflect.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.function.Supplier;
 
@@ -31,7 +30,6 @@ public class Serde {
         AbstractProperty.PROPERTY_TYPE_REGISTRY.put(PropertyHide.class, "property:hide");
         AbstractProperty.PROPERTY_TYPE_REGISTRY.put(PropertyMod.class, "property:mod");
         AbstractProperty.PROPERTY_TYPE_REGISTRY.put(PropertyModify.class, "property:modify");
-        AbstractProperty.PROPERTY_TYPE_REGISTRY.put(PropertyRename.class, "property:rename");
         AbstractProperty.PROPERTY_TYPE_REGISTRY.put(PropertyReturns.class, "property:returns");
         AbstractProperty.PROPERTY_TYPE_REGISTRY.put(PropertyParam.class, "property:param");
 
@@ -42,10 +40,10 @@ public class Serde {
 
     }
 
-    public static AbstractDocument deserializeDocument(JsonObject obj) {
+    public static AbstractDocument<?> deserializeDocument(JsonObject obj) {
         String type = obj.get("type").getAsString();
         try {
-            AbstractDocument doc = AbstractDocument.DOCUMENT_TYPE_REGISTRY.inverse().get(type).getDeclaredConstructor().newInstance();
+            AbstractDocument<?> doc = AbstractDocument.DOCUMENT_TYPE_REGISTRY.inverse().get(type).getDeclaredConstructor().newInstance();
             doc.deserialize(obj);
             return doc;
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
@@ -68,13 +66,13 @@ public class Serde {
         return null;
     }
 
-    private static PropertyType constructType(Supplier<PropertyType> builder, ITypeInfo type) {
-        PropertyType property = builder.get();
+    private static PropertyType<?> constructType(Supplier<PropertyType<?>> builder, ITypeInfo type) {
+        PropertyType<?> property = builder.get();
         property.deserializeFromType(type);
         return property;
     }
 
-    public static PropertyType deserializeFromJavaType(ITypeInfo type) {
+    public static PropertyType<?> deserializeFromJavaType(ITypeInfo type) {
         if (type instanceof TypeInfoClass) {
             return constructType(PropertyType.Clazz::new, type);
         }
@@ -93,21 +91,36 @@ public class Serde {
         return null;
     }
 
-    public static JsonArray serializeCollection(Iterable<? extends ISerde> serdes) {
+
+    public static void serializeCollection(JsonObject object, String key, Iterable<? extends ISerde> serdes) {
+        serializeCollection(object, key, serdes, false);
+    }
+
+    public static void serializeCollection(JsonObject object, String key, Iterable<? extends ISerde> serdes, boolean skipIfEmpty) {
+        if (serdes == null)
+            return;
         JsonArray result = new JsonArray();
         serdes.forEach(serde -> result.add(serde.serialize()));
-        return result;
+        if (result.isEmpty() && skipIfEmpty)
+            return;
+        object.add(key, result);
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends AbstractDocument> void deserializeDocuments(Collection<T> serdes, JsonElement jsonArray) {
+    public static <T extends AbstractDocument<T>> void deserializeDocuments(Collection<T> serdes, JsonElement jsonArray) {
+        if (jsonArray == null)
+            return;
         for (JsonElement element : jsonArray.getAsJsonArray()) {
-            serdes.add((T) deserializeDocument(element.getAsJsonObject()));
+            T document = (T) deserializeDocument(element.getAsJsonObject());
+            if (document != null && document.allModsLoaded())
+                serdes.add(document);
         }
     }
 
     @SuppressWarnings("unchecked")
     public static <T extends AbstractProperty> void deserializeProperties(Collection<T> serdes, JsonElement jsonArray) {
+        if (jsonArray == null)
+            return;
         for (JsonElement element : jsonArray.getAsJsonArray()) {
             serdes.add((T) deserializeProperty(element.getAsJsonObject()));
         }

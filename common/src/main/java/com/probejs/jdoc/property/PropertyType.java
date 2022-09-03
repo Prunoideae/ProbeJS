@@ -8,17 +8,20 @@ import com.probejs.jdoc.Serde;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
-public abstract class PropertyType extends AbstractProperty {
+public abstract class PropertyType<T extends PropertyType<T>> extends AbstractProperty {
 
     public abstract String getTypeName();
 
-    public abstract boolean deserializeFromType(ITypeInfo type);
+    public abstract void deserializeFromType(ITypeInfo type);
 
     public abstract boolean equalsToJavaType(ITypeInfo type);
 
-    public static abstract class Named extends PropertyType {
+    public abstract boolean typeEquals(T type);
+
+    public static abstract class Named extends PropertyType<Named> {
         protected String name;
 
         @Override
@@ -40,6 +43,16 @@ public abstract class PropertyType extends AbstractProperty {
         @Override
         public String getTypeName() {
             return getName();
+        }
+
+        @Override
+        public boolean typeEquals(Named type) {
+            return name.equals(type.name);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(name);
         }
     }
 
@@ -74,12 +87,10 @@ public abstract class PropertyType extends AbstractProperty {
         }
 
         @Override
-        public boolean deserializeFromType(ITypeInfo type) {
+        public void deserializeFromType(ITypeInfo type) {
             if (type instanceof TypeInfoClass clazz) {
                 name = clazz.getTypeName();
-                return true;
             }
-            return false;
         }
     }
 
@@ -90,12 +101,10 @@ public abstract class PropertyType extends AbstractProperty {
         }
 
         @Override
-        public boolean deserializeFromType(ITypeInfo type) {
+        public void deserializeFromType(ITypeInfo type) {
             if (type instanceof TypeInfoVariable variable) {
                 name = variable.getTypeName();
-                return true;
             }
-            return false;
         }
 
     }
@@ -107,19 +116,18 @@ public abstract class PropertyType extends AbstractProperty {
         }
 
         @Override
-        public boolean deserializeFromType(ITypeInfo type) {
-            return false;
+        public void deserializeFromType(ITypeInfo type) {
         }
     }
 
-    public static class Parameterized extends PropertyType {
-        protected List<PropertyType> params = new ArrayList<>();
-        protected PropertyType base;
+    public static class Parameterized extends PropertyType<Parameterized> {
+        protected List<PropertyType<?>> params = new ArrayList<>();
+        protected PropertyType<?> base;
 
         @Override
         public JsonObject serialize() {
             JsonObject object = super.serialize();
-            object.add("params", Serde.serializeCollection(params));
+            Serde.serializeCollection(object,"params", params);
             object.add("base", base.serialize());
             return object;
         }
@@ -127,14 +135,14 @@ public abstract class PropertyType extends AbstractProperty {
         @Override
         public void deserialize(JsonObject object) {
             Serde.deserializeProperties(params, object.get("params"));
-            base = (PropertyType) Serde.deserializeProperty(object.get("base").getAsJsonObject());
+            base = (PropertyType<?>) Serde.deserializeProperty(object.get("base").getAsJsonObject());
         }
 
-        public List<PropertyType> getParams() {
+        public List<PropertyType<?>> getParams() {
             return params;
         }
 
-        public PropertyType getBase() {
+        public PropertyType<?> getBase() {
             return base;
         }
 
@@ -144,13 +152,11 @@ public abstract class PropertyType extends AbstractProperty {
         }
 
         @Override
-        public boolean deserializeFromType(ITypeInfo type) {
+        public void deserializeFromType(ITypeInfo type) {
             if (type instanceof TypeInfoParameterized paramType) {
                 base = Serde.deserializeFromJavaType(paramType.getBaseType());
                 paramType.getParamTypes().forEach(t -> params.add(Serde.deserializeFromJavaType(t)));
-                return true;
             }
-            return false;
         }
 
         @Override
@@ -170,10 +176,20 @@ public abstract class PropertyType extends AbstractProperty {
             }
             return false;
         }
+
+        @Override
+        public boolean typeEquals(Parameterized type) {
+            return base.equals(type.base) && params.equals(type.params);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(params, base);
+        }
     }
 
-    public static abstract class Joint extends PropertyType {
-        protected List<PropertyType> types = new ArrayList<>();
+    public static abstract class Joint extends PropertyType<Joint> {
+        protected List<PropertyType<?>> types = new ArrayList<>();
 
         @Override
         public void deserialize(JsonObject object) {
@@ -183,7 +199,7 @@ public abstract class PropertyType extends AbstractProperty {
         @Override
         public JsonObject serialize() {
             JsonObject object = super.serialize();
-            object.add("types", Serde.serializeCollection(types));
+            Serde.serializeCollection(object, "types", types);
             return object;
         }
 
@@ -200,8 +216,17 @@ public abstract class PropertyType extends AbstractProperty {
         }
 
         @Override
-        public boolean deserializeFromType(ITypeInfo type) {
-            return false;
+        public void deserializeFromType(ITypeInfo type) {
+        }
+
+        @Override
+        public boolean typeEquals(Joint type) {
+            return types.equals(type.types);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(types);
         }
     }
 
@@ -219,8 +244,8 @@ public abstract class PropertyType extends AbstractProperty {
         }
     }
 
-    public static class Array extends PropertyType {
-        private PropertyType component;
+    public static class Array extends PropertyType<Array> {
+        private PropertyType<?> component;
 
         @Override
         public String getTypeName() {
@@ -236,22 +261,37 @@ public abstract class PropertyType extends AbstractProperty {
 
         @Override
         public void deserialize(JsonObject object) {
-            component = (PropertyType) Serde.deserializeProperty(object.get("component").getAsJsonObject());
+            component = (PropertyType<?>) Serde.deserializeProperty(object.get("component").getAsJsonObject());
         }
 
         @Override
-        public boolean deserializeFromType(ITypeInfo type) {
+        public void deserializeFromType(ITypeInfo type) {
             if (type instanceof TypeInfoArray array) {
                 component = Serde.deserializeFromJavaType(array.getBaseType());
-                return true;
             }
-            return false;
         }
 
         @Override
         public boolean equalsToJavaType(ITypeInfo type) {
             return (type instanceof TypeInfoArray array && component.equalsToJavaType(array.getBaseType()));
         }
+
+        @Override
+        public boolean typeEquals(Array type) {
+            return component.equals(type.component);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(component);
+        }
     }
 
+    @Override
+    @SuppressWarnings("unchecked")
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        return this.getClass() == obj.getClass() && this.typeEquals((T) obj);
+    }
 }

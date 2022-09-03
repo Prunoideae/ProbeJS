@@ -22,12 +22,25 @@ import java.util.stream.Collectors;
  * <p>
  * You must ensure that the parameter-less constructor <b>does not</b> depend
  * on any other stateful objects. As this document might be constructed at any time.
+ * <p>
+ * The document can be (partially) overwritten by another document. Which is especially
+ * used in the user docs.
+ * <p>
+ * Despite the auto-generated docs will always be overwritten by
+ * user docs, there's no guarantee for a doc to load first or second.
  */
 public abstract class AbstractDocument<T extends AbstractDocument<T>> implements ISerde {
     public static final BiMap<Class<? extends AbstractDocument<?>>, String> DOCUMENT_TYPE_REGISTRY = HashBiMap.create();
 
     protected List<AbstractProperty> properties = new ArrayList<>();
 
+    /**
+     * Merges other document into this document.
+     * <p>
+     * Returns a new document without modifying either document, however, subfields might be shallow-copy.
+     * @param other the other document
+     * @return a merged new document
+     */
     public abstract T merge(T other);
 
     public abstract T copy();
@@ -64,8 +77,8 @@ public abstract class AbstractDocument<T extends AbstractDocument<T>> implements
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends AbstractProperty> List<T> findPropertiesOf(Class<T> property) {
-        return this.properties.stream().filter(prop -> property.isAssignableFrom(prop.getClass())).map(prop -> (T) prop).collect(Collectors.toList());
+    public <E extends AbstractProperty> List<E> findPropertiesOf(Class<E> property) {
+        return this.properties.stream().filter(prop -> property.isAssignableFrom(prop.getClass())).map(prop -> (E) prop).collect(Collectors.toList());
     }
 
     public boolean allModsLoaded() {

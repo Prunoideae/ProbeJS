@@ -5,11 +5,13 @@ import com.probejs.info.FieldInfo;
 import com.probejs.jdoc.Serde;
 import com.probejs.jdoc.property.PropertyType;
 
+import java.util.Objects;
+
 public class DocumentField extends AbstractDocument<DocumentField> {
     private String name;
     private boolean isStatic;
     private boolean isFinal;
-    private PropertyType type;
+    private PropertyType<?> type;
 
     @Override
     public JsonObject serialize() {
@@ -27,7 +29,7 @@ public class DocumentField extends AbstractDocument<DocumentField> {
         name = object.get("name").getAsString();
         isStatic = object.get("static").getAsBoolean();
         isFinal = object.get("final").getAsBoolean();
-        type = (PropertyType) Serde.deserializeProperty(object.get("fieldType").getAsJsonObject());
+        type = (PropertyType<?>) Serde.deserializeProperty(object.get("fieldType").getAsJsonObject());
     }
 
     public boolean matchField(FieldInfo info) {
@@ -62,5 +64,18 @@ public class DocumentField extends AbstractDocument<DocumentField> {
         document.type = type;
         document.properties.addAll(properties);
         return document;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DocumentField that = (DocumentField) o;
+        return Objects.equals(name, that.name) && Objects.equals(type, that.type);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, type);
     }
 }

@@ -1,5 +1,6 @@
 package com.probejs;
 
+import com.google.gson.JsonObject;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.probejs.compiler.SchemaCompiler;
@@ -12,6 +13,7 @@ import com.probejs.formatter.ClassResolver;
 import com.probejs.formatter.NameResolver;
 import com.probejs.info.ClassInfo;
 import com.probejs.info.MethodInfo;
+import com.probejs.jdoc.Serde;
 import com.probejs.jdoc.document.DocumentClass;
 import dev.latvian.mods.kubejs.KubeJSPaths;
 import dev.latvian.mods.kubejs.item.ingredient.IngredientJS;
@@ -106,10 +108,17 @@ public class ProbeCommands {
                                         }))
                         )
                         .then(Commands.literal("test")
-                                .requires(source -> false)
+                                .requires(source -> true)
                                 .executes(context -> {
-                                    DocumentClass document = DocumentClass.fromJava(ClassInfo.getOrCache(IngredientJS.class));
-                                    ProbeJS.LOGGER.info(document.serialize().toString());
+                                    try {
+                                        DocumentClass document = DocumentClass.fromJava(ClassInfo.getOrCache(IngredientJS.class));
+                                        String serialized = ProbeJS.GSON.toJson(document.serialize());
+                                        ProbeJS.LOGGER.info(document.serialize().toString());
+                                        DocumentClass clazz = (DocumentClass) Serde.deserializeDocument(ProbeJS.GSON.fromJson(serialized, JsonObject.class));
+                                        ProbeJS.LOGGER.info(clazz.getMethods().equals(document.getMethods()));
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
                                     return Command.SINGLE_SUCCESS;
                                 }))
         );

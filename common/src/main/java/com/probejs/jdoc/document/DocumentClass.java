@@ -5,34 +5,32 @@ import com.probejs.info.ClassInfo;
 import com.probejs.jdoc.Serde;
 import com.probejs.jdoc.property.PropertyType;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
+/**
+ * The Document of a class.
+ */
 public class DocumentClass extends AbstractDocument<DocumentClass> {
     protected String name;
-    protected List<PropertyType> generics;
-    protected PropertyType parent;
-    protected List<PropertyType> interfaces;
-    protected List<DocumentField> fields = new ArrayList<>();
-    protected List<DocumentMethod> methods = new ArrayList<>();
+    protected List<PropertyType<?>> generics = new ArrayList<>();
+    protected PropertyType<?> parent;
+    protected Set<PropertyType<?>> interfaces = new HashSet<>();
+    protected Set<DocumentField> fields = new HashSet<>();
+    protected Set<DocumentMethod> methods = new HashSet<>();
 
-    protected boolean isAbstract;
-    protected boolean isInterface;
-
+    protected boolean isAbstract = false;
+    protected boolean isInterface = false;
 
     @Override
     public JsonObject serialize() {
         JsonObject object = super.serialize();
         object.addProperty("className", name);
-        object.addProperty("interface", isInterface);
-        object.addProperty("abstract", isAbstract);
-
         if (parent != null)
             object.add("parent", parent.serialize());
-        object.add("fields", Serde.serializeCollection(fields));
-        object.add("methods", Serde.serializeCollection(methods));
-        object.add("variables", Serde.serializeCollection(generics));
-        object.add("interfaces", Serde.serializeCollection(interfaces));
+        Serde.serializeCollection(object, "fields", fields);
+        Serde.serializeCollection(object, "methods", methods);
+        Serde.serializeCollection(object, "variables", generics, true);
+        Serde.serializeCollection(object, "interfaces", interfaces, true);
         return object;
     }
 
@@ -40,10 +38,8 @@ public class DocumentClass extends AbstractDocument<DocumentClass> {
     public void deserialize(JsonObject object) {
         super.deserialize(object);
         name = object.get("className").getAsString();
-        isInterface = object.get("interface").getAsBoolean();
-        isAbstract = object.get("abstract").getAsBoolean();
         if (object.has("parent"))
-            parent = (PropertyType) Serde.deserializeProperty(object.get("parent").getAsJsonObject());
+            parent = (PropertyType<?>) Serde.deserializeProperty(object.get("parent").getAsJsonObject());
         Serde.deserializeDocuments(this.fields, object.get("fields"));
         Serde.deserializeDocuments(this.methods, object.get("methods"));
         Serde.deserializeProperties(this.generics, object.get("variables"));
@@ -57,6 +53,7 @@ public class DocumentClass extends AbstractDocument<DocumentClass> {
         document.isInterface = info.isInterface();
         document.parent = info.getSuperClass() != null ? Serde.deserializeFromJavaType(info.getSuperClassType()) : null;
         document.interfaces.addAll(info.getInterfaceTypes().stream().map(Serde::deserializeFromJavaType).toList());
+        document.generics.addAll(info.getParameters().stream().map(Serde::deserializeFromJavaType).toList());
         info.getFieldInfo().stream().map(DocumentField::fromJava).forEach(document.fields::add);
         info.getMethodInfo().stream().map(DocumentMethod::fromJava).forEach(document.methods::add);
         return document;
@@ -65,7 +62,11 @@ public class DocumentClass extends AbstractDocument<DocumentClass> {
     @Override
     public DocumentClass merge(DocumentClass other) {
         DocumentClass document = copy();
-
+        document.parent = other.parent;
+        document.interfaces.addAll(other.interfaces);
+        document.methods.addAll(other.methods);
+        document.fields.addAll(other.fields);
+        document.properties = other.properties;
         return document;
     }
 
@@ -74,9 +75,41 @@ public class DocumentClass extends AbstractDocument<DocumentClass> {
         DocumentClass document = new DocumentClass();
         document.name = name;
         document.parent = parent;
+        document.isInterface = isInterface;
+        document.isAbstract = isAbstract;
+        document.interfaces.addAll(interfaces);
         document.properties.addAll(properties);
         document.methods.addAll(methods);
         document.fields.addAll(fields);
         return document;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DocumentClass that = (DocumentClass) o;
+        return Objects.equals(name, that.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
+    }
+
+    public Set<DocumentMethod> getMethods() {
+        return methods;
+    }
+
+    public Set<DocumentField> getFields() {
+        return fields;
+    }
+
+    public Set<PropertyType<?>> getInterfaces() {
+        return interfaces;
+    }
+
+    public List<PropertyType<?>> getGenerics() {
+        return generics;
     }
 }
