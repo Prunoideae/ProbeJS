@@ -17,21 +17,21 @@ import java.util.function.Supplier;
 public class Serde {
     public static void init() {
         //Types
-        AbstractProperty.PROPERTY_TYPE_REGISTRY.put(PropertyType.Array.class, "type:array");
-        AbstractProperty.PROPERTY_TYPE_REGISTRY.put(PropertyType.Clazz.class, "type:class");
-        AbstractProperty.PROPERTY_TYPE_REGISTRY.put(PropertyType.Parameterized.class, "type:parameterized");
-        AbstractProperty.PROPERTY_TYPE_REGISTRY.put(PropertyType.Variable.class, "type:variable");
-        AbstractProperty.PROPERTY_TYPE_REGISTRY.put(PropertyType.Primitive.class, "type:primitive");
-        AbstractProperty.PROPERTY_TYPE_REGISTRY.put(PropertyType.Intersection.class, "type:intersection");
-        AbstractProperty.PROPERTY_TYPE_REGISTRY.put(PropertyType.Union.class, "type:union");
+        AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyType.Array.class, "type:array");
+        AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyType.Clazz.class, "type:class");
+        AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyType.Parameterized.class, "type:parameterized");
+        AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyType.Variable.class, "type:variable");
+        AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyType.Primitive.class, "type:primitive");
+        AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyType.Intersection.class, "type:intersection");
+        AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyType.Union.class, "type:union");
 
         //Properties
-        AbstractProperty.PROPERTY_TYPE_REGISTRY.put(PropertyComment.class, "property:comment");
-        AbstractProperty.PROPERTY_TYPE_REGISTRY.put(PropertyHide.class, "property:hide");
-        AbstractProperty.PROPERTY_TYPE_REGISTRY.put(PropertyMod.class, "property:mod");
-        AbstractProperty.PROPERTY_TYPE_REGISTRY.put(PropertyModify.class, "property:modify");
-        AbstractProperty.PROPERTY_TYPE_REGISTRY.put(PropertyReturns.class, "property:returns");
-        AbstractProperty.PROPERTY_TYPE_REGISTRY.put(PropertyParam.class, "property:param");
+        AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyComment.class, "property:comment");
+        AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyHide.class, "property:hide");
+        AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyMod.class, "property:mod");
+        AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyModify.class, "property:modify");
+        AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyReturns.class, "property:returns");
+        AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyParam.class, "property:param");
 
         //Documents
         AbstractDocument.DOCUMENT_TYPE_REGISTRY.put(DocumentClass.class, "document:class");
@@ -53,14 +53,14 @@ public class Serde {
         return null;
     }
 
-    public static AbstractProperty deserializeProperty(JsonObject obj) {
+    public static AbstractProperty<?> deserializeProperty(JsonObject obj) {
         String type = obj.get("type").getAsString();
         try {
-            AbstractProperty property = AbstractProperty.PROPERTY_TYPE_REGISTRY.inverse().get(type).getDeclaredConstructor().newInstance();
+            AbstractProperty<?> property = (AbstractProperty<?>) AbstractProperty.DOCUMENT_TYPE_REGISTRY.inverse().get(type).getDeclaredConstructor().newInstance();
             property.deserialize(obj);
             return property;
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
-                 NoSuchMethodException e) {
+        } catch (InstantiationException | IllegalAccessException
+                 | InvocationTargetException | NoSuchMethodException e) {
             e.printStackTrace();
         }
         return null;

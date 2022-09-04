@@ -1,6 +1,7 @@
 package com.probejs.info;
 
 
+import com.probejs.formatter.SpecialTypes;
 import com.probejs.info.type.ITypeInfo;
 import com.probejs.info.type.InfoTypeResolver;
 import com.probejs.util.Util;
@@ -13,6 +14,7 @@ public class FieldInfo {
     private final String name;
     private final int modifiers;
     private final boolean shouldHide;
+    private boolean nonnull;
     private final Object value;
     private ITypeInfo info;
 
@@ -27,6 +29,7 @@ public class FieldInfo {
         shouldHide = field.getAnnotation(HideFromJS.class) != null;
         info = InfoTypeResolver.resolveType(field.getGenericType());
         value = Util.tryOrDefault(() -> isStatic() ? field.get(null) : null, null);
+        nonnull = SpecialTypes.isNotNullable(field);
     }
 
     public boolean isStatic() {
@@ -59,5 +62,13 @@ public class FieldInfo {
 
     public void setTypeInfo(ITypeInfo info) {
         this.info = info;
+    }
+
+    public boolean isNonnull() {
+        return nonnull;
+    }
+
+    public void setNonnull(boolean nonnull) {
+        this.nonnull = nonnull;
     }
 }

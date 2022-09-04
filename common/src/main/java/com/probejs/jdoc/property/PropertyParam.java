@@ -6,9 +6,18 @@ import com.probejs.jdoc.Serde;
 
 import java.util.Objects;
 
-public class PropertyParam extends AbstractProperty {
+public class PropertyParam extends AbstractProperty<PropertyParam> {
     private String name;
     private PropertyType<?> type;
+
+    public PropertyParam(String name, PropertyType<?> type) {
+        this.name = name;
+        this.type = type;
+    }
+
+    public PropertyParam() {
+
+    }
 
     @Override
     public JsonObject serialize() {
@@ -49,6 +58,15 @@ public class PropertyParam extends AbstractProperty {
         PropertyParam param = new PropertyParam();
         param.name = info.getName();
         param.type = Serde.deserializeFromJavaType(info.getType());
+        if (info.isNonnull()) {
+            param.type = PropertyType.wrapNonNull(param.type);
+        }
         return param;
+
+    }
+
+    @Override
+    public PropertyParam copy() {
+        return new PropertyParam(name, type);
     }
 }

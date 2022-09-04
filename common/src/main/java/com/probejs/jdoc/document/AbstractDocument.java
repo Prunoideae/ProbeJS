@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 public abstract class AbstractDocument<T extends AbstractDocument<T>> implements ISerde {
     public static final BiMap<Class<? extends AbstractDocument<?>>, String> DOCUMENT_TYPE_REGISTRY = HashBiMap.create();
 
-    protected List<AbstractProperty> properties = new ArrayList<>();
+    protected List<AbstractProperty<?>> properties = new ArrayList<>();
 
     /**
      * Merges other document into this document.
@@ -49,7 +49,7 @@ public abstract class AbstractDocument<T extends AbstractDocument<T>> implements
         JsonObject obj = new JsonObject();
         obj.addProperty("type", DOCUMENT_TYPE_REGISTRY.get(this.getClass()));
         JsonArray jsonProperties = new JsonArray();
-        for (AbstractProperty property : properties) {
+        for (AbstractProperty<?> property : properties) {
             jsonProperties.add(property.serialize());
         }
         obj.add("properties", jsonProperties);
@@ -59,25 +59,25 @@ public abstract class AbstractDocument<T extends AbstractDocument<T>> implements
     public void deserialize(JsonObject object) {
         JsonArray propertiesJson = object.get("properties").getAsJsonArray();
         for (JsonElement element : propertiesJson) {
-            AbstractProperty property = Serde.deserializeProperty(element.getAsJsonObject());
+            AbstractProperty<?> property = Serde.deserializeProperty(element.getAsJsonObject());
             this.properties.add(property);
         }
     }
 
-    public Optional<AbstractProperty> findProperty(Class<? extends AbstractProperty> property) {
+    public Optional<AbstractProperty<?>> findProperty(Class<? extends AbstractProperty<?>> property) {
         return this.properties.stream().filter(p -> p.getClass() == property).findFirst();
     }
 
-    public boolean hasProperty(Class<? extends AbstractProperty> property) {
+    public boolean hasProperty(Class<? extends AbstractProperty<?>> property) {
         return findProperty(property).isPresent();
     }
 
-    public List<AbstractProperty> findProperties(Predicate<AbstractProperty> predicate) {
+    public List<AbstractProperty<?>> findProperties(Predicate<AbstractProperty<?>> predicate) {
         return this.properties.stream().filter(predicate).collect(Collectors.toList());
     }
 
     @SuppressWarnings("unchecked")
-    public <E extends AbstractProperty> List<E> findPropertiesOf(Class<E> property) {
+    public <E extends AbstractProperty<?>> List<E> findPropertiesOf(Class<E> property) {
         return this.properties.stream().filter(prop -> property.isAssignableFrom(prop.getClass())).map(prop -> (E) prop).collect(Collectors.toList());
     }
 

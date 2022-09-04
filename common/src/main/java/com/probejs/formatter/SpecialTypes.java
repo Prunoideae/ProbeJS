@@ -9,6 +9,7 @@ import com.probejs.formatter.formatter.special.FormatterRegistry;
 import com.probejs.info.ClassInfo;
 import com.probejs.info.MethodInfo;
 import com.probejs.info.type.*;
+import dev.latvian.mods.kubejs.NonnullByDefault;
 import dev.latvian.mods.rhino.BaseFunction;
 import dev.latvian.mods.rhino.NativeJavaObject;
 import dev.latvian.mods.rhino.Scriptable;
@@ -16,7 +17,10 @@ import dev.latvian.mods.rhino.ScriptableObject;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.util.*;
@@ -68,6 +72,10 @@ public class SpecialTypes {
                 return true;
         }
         return false;
+    }
+
+    public static boolean isNotNullable(AnnotatedElement element) {
+        return element.isAnnotationPresent(NotNull.class) || element.isAnnotationPresent(Nonnull.class);
     }
 
     public static void processFunctionalInterfaces(Set<Class<?>> globalClasses) {

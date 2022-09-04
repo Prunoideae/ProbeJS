@@ -7,8 +7,11 @@ import com.google.gson.JsonObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PropertyComment extends AbstractProperty {
+public class PropertyComment extends AbstractProperty<PropertyComment> {
     private final List<String> lines = new ArrayList<>();
+
+    public PropertyComment() {
+    }
 
     @Override
     public JsonObject serialize() {
@@ -32,5 +35,12 @@ public class PropertyComment extends AbstractProperty {
 
     public List<String> formatLines(int indent) {
         return new ArrayList<>();
+    }
+
+    @Override
+    public PropertyComment copy() {
+        PropertyComment comment = new PropertyComment();
+        comment.lines.addAll(lines);
+        return comment;
     }
 }

@@ -1,9 +1,7 @@
 package com.probejs.jdoc.property;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import com.google.gson.JsonObject;
-import com.probejs.jdoc.ISerde;
+import com.probejs.jdoc.document.AbstractDocument;
 
 /**
  * Represents a property.
@@ -11,13 +9,11 @@ import com.probejs.jdoc.ISerde;
  * You must ensure that the parameter-less constructor <b>does not</b> depend
  * on any other stateful objects. As this property might be constructed at any time.
  */
-public abstract class AbstractProperty implements ISerde {
-    public static final BiMap<Class<? extends AbstractProperty>, String> PROPERTY_TYPE_REGISTRY = HashBiMap.create();
+public abstract class AbstractProperty<T extends AbstractDocument<T>> extends AbstractDocument<T> {
 
-    public JsonObject serialize() {
-        JsonObject obj = new JsonObject();
-        obj.addProperty("type", PROPERTY_TYPE_REGISTRY.get(this.getClass()));
-        return obj;
+    @Override
+    public T merge(T other) {
+        return other.copy();
     }
 
     public abstract void deserialize(JsonObject object);

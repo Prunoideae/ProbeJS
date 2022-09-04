@@ -3,9 +3,16 @@ package com.probejs.jdoc.property;
 import com.google.gson.JsonObject;
 import dev.architectury.platform.Platform;
 
-public class PropertyMod extends AbstractProperty {
+public class PropertyMod extends AbstractProperty<PropertyMod> {
 
     private String mod;
+
+    public PropertyMod() {
+    }
+
+    public PropertyMod(String mod) {
+        this.mod = mod;
+    }
 
     @Override
     public JsonObject serialize() {
@@ -21,5 +28,10 @@ public class PropertyMod extends AbstractProperty {
 
     public boolean isModLoaded() {
         return Platform.isModLoaded(mod);
+    }
+
+    @Override
+    public PropertyMod copy() {
+        return new PropertyMod(mod);
     }
 }

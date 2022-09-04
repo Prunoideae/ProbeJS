@@ -40,6 +40,8 @@ public class DocumentMethod extends AbstractDocument<DocumentMethod> {
         DocumentMethod document = new DocumentMethod();
         document.name = info.getName();
         document.returns = Serde.deserializeFromJavaType(info.getReturnType());
+        if (info.isNonnull())
+            document.returns = PropertyType.wrapNonNull(document.returns);
         document.isStatic = info.isStatic();
         info.getParams().stream()
                 .map(PropertyParam::fromJava)

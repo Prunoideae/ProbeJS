@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.probejs.formatter.NameResolver;
 import com.probejs.info.type.*;
 import com.probejs.jdoc.Serde;
+import com.probejs.jdoc.document.AbstractDocument;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -11,7 +12,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public abstract class PropertyType<T extends PropertyType<T>> extends AbstractProperty {
+public abstract class PropertyType<T extends PropertyType<T>> extends AbstractProperty<T> {
+
+    public static PropertyType<?> wrapNonNull(PropertyType<?> inner) {
+        return new Parameterized(new Primitive("NonNullable"), List.of(inner));
+    }
 
     public abstract String getTypeName();
 
@@ -21,8 +26,15 @@ public abstract class PropertyType<T extends PropertyType<T>> extends AbstractPr
 
     public abstract boolean typeEquals(T type);
 
-    public static abstract class Named extends PropertyType<Named> {
+    public static abstract class Named<T extends Named<T>> extends PropertyType<T> {
         protected String name;
+
+        public Named(String name) {
+            this.name = name;
+        }
+
+        public Named() {
+        }
 
         @Override
         public JsonObject serialize() {
@@ -46,7 +58,7 @@ public abstract class PropertyType<T extends PropertyType<T>> extends AbstractPr
         }
 
         @Override
-        public boolean typeEquals(Named type) {
+        public boolean typeEquals(T type) {
             return name.equals(type.name);
         }
 
@@ -56,7 +68,13 @@ public abstract class PropertyType<T extends PropertyType<T>> extends AbstractPr
         }
     }
 
-    public static class Clazz extends Named {
+    public static class Clazz extends Named<Clazz> {
+        public Clazz(String name) {
+            super(name);
+        }
+
+        public Clazz() {
+        }
 
         public String getClassName() {
             return name;
@@ -92,9 +110,21 @@ public abstract class PropertyType<T extends PropertyType<T>> extends AbstractPr
                 name = clazz.getTypeName();
             }
         }
+
+        @Override
+        public Clazz copy() {
+            return new Clazz(name);
+        }
     }
 
-    public static class Variable extends Named {
+    public static class Variable extends Named<Variable> {
+        public Variable(String name) {
+            super(name);
+        }
+
+        public Variable() {
+        }
+
         @Override
         public boolean equalsToJavaType(ITypeInfo type) {
             return type instanceof TypeInfoVariable variable && variable.getTypeName().equals(getName());
@@ -107,9 +137,20 @@ public abstract class PropertyType<T extends PropertyType<T>> extends AbstractPr
             }
         }
 
+        @Override
+        public Variable copy() {
+            return new Variable(name);
+        }
     }
 
-    public static class Primitive extends Named {
+    public static class Primitive extends Named<Primitive> {
+        public Primitive(String name) {
+            super(name);
+        }
+
+        public Primitive() {
+        }
+
         @Override
         public boolean equalsToJavaType(ITypeInfo type) {
             return false;
@@ -118,16 +159,29 @@ public abstract class PropertyType<T extends PropertyType<T>> extends AbstractPr
         @Override
         public void deserializeFromType(ITypeInfo type) {
         }
+
+        @Override
+        public Primitive copy() {
+            return new Primitive(name);
+        }
     }
 
     public static class Parameterized extends PropertyType<Parameterized> {
         protected List<PropertyType<?>> params = new ArrayList<>();
         protected PropertyType<?> base;
 
+        public Parameterized(PropertyType<?> base, List<PropertyType<?>> params) {
+            this.base = base;
+            this.params = params;
+        }
+
+        public Parameterized() {
+        }
+
         @Override
         public JsonObject serialize() {
             JsonObject object = super.serialize();
-            Serde.serializeCollection(object,"params", params);
+            Serde.serializeCollection(object, "params", params);
             object.add("base", base.serialize());
             return object;
         }
@@ -186,10 +240,22 @@ public abstract class PropertyType<T extends PropertyType<T>> extends AbstractPr
         public int hashCode() {
             return Objects.hash(params, base);
         }
+
+        @Override
+        public Parameterized copy() {
+            return new Parameterized(base, params);
+        }
     }
 
-    public static abstract class Joint extends PropertyType<Joint> {
+    public static abstract class Joint<T extends Joint<T>> extends PropertyType<T> {
         protected List<PropertyType<?>> types = new ArrayList<>();
+
+        public Joint() {
+        }
+
+        public Joint(List<PropertyType<?>> types) {
+            this.types = types;
+        }
 
         @Override
         public void deserialize(JsonObject object) {
@@ -230,22 +296,54 @@ public abstract class PropertyType<T extends PropertyType<T>> extends AbstractPr
         }
     }
 
-    public static class Intersection extends Joint {
+    public static class Intersection extends Joint<Intersection> {
+        public Intersection() {
+        }
+
+        public Intersection(List<PropertyType<?>> types) {
+            super(types);
+        }
+
         @Override
         public String getDelimiter() {
             return "&";
         }
+
+        @Override
+        public Intersection copy() {
+            return new Intersection(types);
+        }
     }
 
-    public static class Union extends Joint {
+    public static class Union extends Joint<Union> {
+        public Union() {
+        }
+
+        public Union(List<PropertyType<?>> types) {
+            super(types);
+        }
+
         @Override
         public String getDelimiter() {
             return "|";
+        }
+
+        @Override
+        public Union copy() {
+            return new Union(types);
         }
     }
 
     public static class Array extends PropertyType<Array> {
         private PropertyType<?> component;
+
+        public Array(PropertyType<?> component) {
+            this.component = component;
+        }
+
+        public Array() {
+
+        }
 
         @Override
         public String getTypeName() {
@@ -284,6 +382,11 @@ public abstract class PropertyType<T extends PropertyType<T>> extends AbstractPr
         @Override
         public int hashCode() {
             return Objects.hash(component);
+        }
+
+        @Override
+        public Array copy() {
+            return new Array(component);
         }
     }
 
