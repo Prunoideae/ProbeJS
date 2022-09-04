@@ -4,10 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.probejs.info.type.*;
-import com.probejs.jdoc.document.AbstractDocument;
-import com.probejs.jdoc.document.DocumentClass;
-import com.probejs.jdoc.document.DocumentField;
-import com.probejs.jdoc.document.DocumentMethod;
+import com.probejs.jdoc.document.*;
 import com.probejs.jdoc.property.*;
 
 import java.lang.reflect.InvocationTargetException;
@@ -21,7 +18,7 @@ public class Serde {
         AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyType.Clazz.class, "type:class");
         AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyType.Parameterized.class, "type:parameterized");
         AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyType.Variable.class, "type:variable");
-        AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyType.Primitive.class, "type:primitive");
+        AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyType.Native.class, "type:primitive");
         AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyType.Intersection.class, "type:intersection");
         AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyType.Union.class, "type:union");
 
@@ -37,6 +34,7 @@ public class Serde {
         AbstractDocument.DOCUMENT_TYPE_REGISTRY.put(DocumentClass.class, "document:class");
         AbstractDocument.DOCUMENT_TYPE_REGISTRY.put(DocumentMethod.class, "document:method");
         AbstractDocument.DOCUMENT_TYPE_REGISTRY.put(DocumentField.class, "document:field");
+        AbstractDocument.DOCUMENT_TYPE_REGISTRY.put(DocumentConstructor.class, "document:constructor");
 
     }
 
@@ -68,7 +66,7 @@ public class Serde {
 
     private static PropertyType<?> constructType(Supplier<PropertyType<?>> builder, ITypeInfo type) {
         PropertyType<?> property = builder.get();
-        property.deserializeFromType(type);
+        property.fromJava(type);
         return property;
     }
 
@@ -107,22 +105,13 @@ public class Serde {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends AbstractDocument<T>> void deserializeDocuments(Collection<T> serdes, JsonElement jsonArray) {
-        if (jsonArray == null)
+    public static <T extends AbstractDocument<?>> void deserializeDocuments(Collection<T> serdes, JsonElement jsonArray) {
+        if (jsonArray == null || serdes == null)
             return;
         for (JsonElement element : jsonArray.getAsJsonArray()) {
             T document = (T) deserializeDocument(element.getAsJsonObject());
-            if (document != null && document.allModsLoaded())
+            if (document != null && document.fulfillsConditions())
                 serdes.add(document);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <T extends AbstractProperty> void deserializeProperties(Collection<T> serdes, JsonElement jsonArray) {
-        if (jsonArray == null)
-            return;
-        for (JsonElement element : jsonArray.getAsJsonArray()) {
-            serdes.add((T) deserializeProperty(element.getAsJsonObject()));
         }
     }
 }

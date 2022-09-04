@@ -32,7 +32,7 @@ public class DocumentMethod extends AbstractDocument<DocumentMethod> {
         super.deserialize(object);
         name = object.get("name").getAsString();
         isStatic = object.get("static").getAsBoolean();
-        Serde.deserializeProperties(params, object.get("params"));
+        Serde.deserializeDocuments(params, object.get("params"));
         returns = (PropertyType<?>) Serde.deserializeProperty(object.get("returns").getAsJsonObject());
     }
 
@@ -47,11 +47,6 @@ public class DocumentMethod extends AbstractDocument<DocumentMethod> {
                 .map(PropertyParam::fromJava)
                 .forEach(document.params::add);
         return document;
-    }
-
-    @Override
-    public DocumentMethod merge(DocumentMethod other) {
-        return other.copy();
     }
 
     @Override

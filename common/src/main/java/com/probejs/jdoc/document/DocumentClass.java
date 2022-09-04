@@ -3,9 +3,11 @@ package com.probejs.jdoc.document;
 import com.google.gson.JsonObject;
 import com.probejs.info.ClassInfo;
 import com.probejs.jdoc.Serde;
+import com.probejs.jdoc.property.PropertyComment;
 import com.probejs.jdoc.property.PropertyType;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * The Document of a class.
@@ -17,6 +19,7 @@ public class DocumentClass extends AbstractDocument<DocumentClass> {
     protected Set<PropertyType<?>> interfaces = new HashSet<>();
     protected Set<DocumentField> fields = new HashSet<>();
     protected Set<DocumentMethod> methods = new HashSet<>();
+    protected Set<DocumentConstructor> constructors = new HashSet<>();
 
     protected boolean isAbstract = false;
     protected boolean isInterface = false;
@@ -31,6 +34,7 @@ public class DocumentClass extends AbstractDocument<DocumentClass> {
         Serde.serializeCollection(object, "methods", methods);
         Serde.serializeCollection(object, "variables", generics, true);
         Serde.serializeCollection(object, "interfaces", interfaces, true);
+        Serde.serializeCollection(object, "constructors", constructors);
         return object;
     }
 
@@ -42,8 +46,10 @@ public class DocumentClass extends AbstractDocument<DocumentClass> {
             parent = (PropertyType<?>) Serde.deserializeProperty(object.get("parent").getAsJsonObject());
         Serde.deserializeDocuments(this.fields, object.get("fields"));
         Serde.deserializeDocuments(this.methods, object.get("methods"));
-        Serde.deserializeProperties(this.generics, object.get("variables"));
-        Serde.deserializeProperties(this.interfaces, object.get("interfaces"));
+        Serde.deserializeDocuments(this.constructors, object.get("constructors"));
+        Serde.deserializeDocuments(this.generics, object.get("variables"));
+        Serde.deserializeDocuments(this.interfaces, object.get("interfaces"));
+
     }
 
     public static DocumentClass fromJava(ClassInfo info) {
@@ -61,12 +67,15 @@ public class DocumentClass extends AbstractDocument<DocumentClass> {
 
     @Override
     public DocumentClass merge(DocumentClass other) {
+        //Overwrites everything basing on current document
         DocumentClass document = copy();
         document.parent = other.parent;
         document.interfaces.addAll(other.interfaces);
         document.methods.addAll(other.methods);
         document.fields.addAll(other.fields);
-        document.properties = other.properties;
+        //Retains all comments
+        document.properties = properties.stream().filter(prop -> prop instanceof PropertyComment).collect(Collectors.toCollection(ArrayList::new));
+        document.properties.addAll(other.properties);
         return document;
     }
 

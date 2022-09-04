@@ -43,4 +43,12 @@ public class PropertyComment extends AbstractProperty<PropertyComment> {
         comment.lines.addAll(lines);
         return comment;
     }
+
+    @Override
+    public PropertyComment merge(PropertyComment other) {
+        PropertyComment comment = copy();
+        comment.lines.add("");
+        comment.lines.addAll(other.lines);
+        return comment;
+    }
 }

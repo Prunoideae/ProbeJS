@@ -1,9 +1,10 @@
 package com.probejs.jdoc.property;
 
 import com.google.gson.JsonObject;
+import com.probejs.jdoc.IConditional;
 import dev.architectury.platform.Platform;
 
-public class PropertyMod extends AbstractProperty<PropertyMod> {
+public class PropertyMod extends AbstractProperty<PropertyMod> implements IConditional {
 
     private String mod;
 
@@ -26,7 +27,7 @@ public class PropertyMod extends AbstractProperty<PropertyMod> {
         mod = object.get("mod").getAsString();
     }
 
-    public boolean isModLoaded() {
+    public boolean test() {
         return Platform.isModLoaded(mod);
     }
 

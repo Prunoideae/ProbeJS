@@ -4,23 +4,20 @@ import com.google.gson.JsonObject;
 import com.probejs.formatter.NameResolver;
 import com.probejs.info.type.*;
 import com.probejs.jdoc.Serde;
-import com.probejs.jdoc.document.AbstractDocument;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public abstract class PropertyType<T extends PropertyType<T>> extends AbstractProperty<T> {
 
     public static PropertyType<?> wrapNonNull(PropertyType<?> inner) {
-        return new Parameterized(new Primitive("NonNullable"), List.of(inner));
+        return new Parameterized(new Native("NonNullable"), List.of(inner));
     }
 
     public abstract String getTypeName();
 
-    public abstract void deserializeFromType(ITypeInfo type);
+    public abstract void fromJava(ITypeInfo type);
 
     public abstract boolean equalsToJavaType(ITypeInfo type);
 
@@ -105,7 +102,7 @@ public abstract class PropertyType<T extends PropertyType<T>> extends AbstractPr
         }
 
         @Override
-        public void deserializeFromType(ITypeInfo type) {
+        public void fromJava(ITypeInfo type) {
             if (type instanceof TypeInfoClass clazz) {
                 name = clazz.getTypeName();
             }
@@ -131,7 +128,7 @@ public abstract class PropertyType<T extends PropertyType<T>> extends AbstractPr
         }
 
         @Override
-        public void deserializeFromType(ITypeInfo type) {
+        public void fromJava(ITypeInfo type) {
             if (type instanceof TypeInfoVariable variable) {
                 name = variable.getTypeName();
             }
@@ -143,12 +140,12 @@ public abstract class PropertyType<T extends PropertyType<T>> extends AbstractPr
         }
     }
 
-    public static class Primitive extends Named<Primitive> {
-        public Primitive(String name) {
+    public static class Native extends Named<Native> {
+        public Native(String name) {
             super(name);
         }
 
-        public Primitive() {
+        public Native() {
         }
 
         @Override
@@ -157,12 +154,12 @@ public abstract class PropertyType<T extends PropertyType<T>> extends AbstractPr
         }
 
         @Override
-        public void deserializeFromType(ITypeInfo type) {
+        public void fromJava(ITypeInfo type) {
         }
 
         @Override
-        public Primitive copy() {
-            return new Primitive(name);
+        public Native copy() {
+            return new Native(name);
         }
     }
 
@@ -188,7 +185,7 @@ public abstract class PropertyType<T extends PropertyType<T>> extends AbstractPr
 
         @Override
         public void deserialize(JsonObject object) {
-            Serde.deserializeProperties(params, object.get("params"));
+            Serde.deserializeDocuments(params, object.get("params"));
             base = (PropertyType<?>) Serde.deserializeProperty(object.get("base").getAsJsonObject());
         }
 
@@ -206,7 +203,7 @@ public abstract class PropertyType<T extends PropertyType<T>> extends AbstractPr
         }
 
         @Override
-        public void deserializeFromType(ITypeInfo type) {
+        public void fromJava(ITypeInfo type) {
             if (type instanceof TypeInfoParameterized paramType) {
                 base = Serde.deserializeFromJavaType(paramType.getBaseType());
                 paramType.getParamTypes().forEach(t -> params.add(Serde.deserializeFromJavaType(t)));
@@ -259,7 +256,7 @@ public abstract class PropertyType<T extends PropertyType<T>> extends AbstractPr
 
         @Override
         public void deserialize(JsonObject object) {
-            Serde.deserializeProperties(types, object.get("types"));
+            Serde.deserializeDocuments(types, object.get("types"));
         }
 
         @Override
@@ -273,7 +270,9 @@ public abstract class PropertyType<T extends PropertyType<T>> extends AbstractPr
 
         @Override
         public String getTypeName() {
-            return types.stream().map(PropertyType::getTypeName).map("(%s)"::formatted).collect(Collectors.joining(getDelimiter()));
+            return types.stream()
+                    .map(prop -> ((prop instanceof PropertyType.Joint<?>) ? "(%s)" : "%s").formatted(prop.getTypeName())).map("(%s)"::formatted)
+                    .collect(Collectors.joining(getDelimiter()));
         }
 
         @Override
@@ -282,17 +281,21 @@ public abstract class PropertyType<T extends PropertyType<T>> extends AbstractPr
         }
 
         @Override
-        public void deserializeFromType(ITypeInfo type) {
+        public void fromJava(ITypeInfo type) {
         }
 
         @Override
-        public boolean typeEquals(Joint type) {
+        public boolean typeEquals(T type) {
             return types.equals(type.types);
         }
 
         @Override
         public int hashCode() {
             return Objects.hash(types);
+        }
+
+        public List<PropertyType<?>> getTypes() {
+            return types;
         }
     }
 
@@ -363,7 +366,7 @@ public abstract class PropertyType<T extends PropertyType<T>> extends AbstractPr
         }
 
         @Override
-        public void deserializeFromType(ITypeInfo type) {
+        public void fromJava(ITypeInfo type) {
             if (type instanceof TypeInfoArray array) {
                 component = Serde.deserializeFromJavaType(array.getBaseType());
             }
@@ -387,6 +390,73 @@ public abstract class PropertyType<T extends PropertyType<T>> extends AbstractPr
         @Override
         public Array copy() {
             return new Array(component);
+        }
+
+        public PropertyType<?> getComponent() {
+            return component;
+        }
+    }
+
+    public static class JSObject extends PropertyType<JSObject> {
+        private final Map<Object, PropertyType<?>> keyValues = new HashMap<>();
+
+        public JSObject() {
+
+        }
+
+        public JSObject(Map<Object, PropertyType<?>> keyValues) {
+            this.keyValues.putAll(keyValues);
+        }
+
+
+        @Override
+        public JSObject copy() {
+            return new JSObject(keyValues);
+        }
+
+        @Override
+        public JsonObject serialize() {
+            JsonObject serialize = super.serialize();
+            return serialize;
+        }
+
+        @Override
+        public void deserialize(JsonObject object) {
+
+        }
+
+        @Override
+        public String getTypeName() {
+            return null;
+        }
+
+        @Override
+        public void fromJava(ITypeInfo type) {
+
+        }
+
+        @Override
+        public boolean equalsToJavaType(ITypeInfo type) {
+            return false;
+        }
+
+        @Override
+        public boolean typeEquals(JSObject type) {
+            return keyValues.equals(type.keyValues);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            if (!super.equals(o)) return false;
+            JSObject jsObject = (JSObject) o;
+            return Objects.equals(keyValues, jsObject.keyValues);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(keyValues);
         }
     }
 

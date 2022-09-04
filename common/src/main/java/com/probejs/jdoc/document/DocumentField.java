@@ -32,15 +32,6 @@ public class DocumentField extends AbstractDocument<DocumentField> {
         type = (PropertyType<?>) Serde.deserializeProperty(object.get("fieldType").getAsJsonObject());
     }
 
-    public boolean matchField(FieldInfo info) {
-        if (!name.equals(info.getName())) {
-            return false;
-        }
-        if (info.isFinal() != isFinal || info.isStatic() != isStatic)
-            return false;
-        return type.equalsToJavaType(info.getType());
-    }
-
     public static DocumentField fromJava(FieldInfo info) {
         DocumentField document = new DocumentField();
         document.name = info.getName();
@@ -48,11 +39,6 @@ public class DocumentField extends AbstractDocument<DocumentField> {
         document.isStatic = info.isStatic();
         document.type = Serde.deserializeFromJavaType(info.getType());
         return document;
-    }
-
-    @Override
-    public DocumentField merge(DocumentField other) {
-        return other.copy();
     }
 
     @Override
