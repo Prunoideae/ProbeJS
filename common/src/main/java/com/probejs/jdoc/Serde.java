@@ -9,6 +9,8 @@ import com.probejs.jdoc.property.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class Serde {
@@ -36,6 +38,14 @@ public class Serde {
         AbstractDocument.DOCUMENT_TYPE_REGISTRY.put(DocumentField.class, "document:field");
         AbstractDocument.DOCUMENT_TYPE_REGISTRY.put(DocumentConstructor.class, "document:constructor");
 
+        //Values
+        AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyValue.NumberValue.class, "value:number");
+        AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyValue.BooleanValue.class, "value:boolean");
+        AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyValue.StringValue.class, "value:string");
+        AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyValue.CharacterValue.class, "value:character");
+        AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyValue.FallbackValue.class, "value:fallback");
+        AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyValue.MapValue.class, "value:map");
+        AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyValue.ListValue.class, "value:list");
     }
 
     public static AbstractDocument<?> deserializeDocument(JsonObject obj) {
@@ -113,5 +123,19 @@ public class Serde {
             if (document != null && document.fulfillsConditions())
                 serdes.add(document);
         }
+    }
+
+    public static PropertyValue<?> getValueProperty(Object o) {
+        Function<Object, PropertyValue<?>> constructor = PropertyValue.VALUES_REGISTRY.get(o.getClass());
+        if (constructor != null) {
+            return constructor.apply(o);
+        }
+        for (Map.Entry<Class<?>, Function<Object, PropertyValue<?>>> entry : PropertyValue.VALUES_REGISTRY.entrySet()) {
+            Class<?> clazz = entry.getKey();
+            Function<Object, PropertyValue<?>> subConstructor = entry.getValue();
+            if (clazz.isAssignableFrom(o.getClass()))
+                return subConstructor.apply(o);
+        }
+        return new PropertyValue.FallbackValue(o);
     }
 }

@@ -71,4 +71,16 @@ public class DocumentMethod extends AbstractDocument<DocumentMethod> {
     public int hashCode() {
         return Objects.hash(name, params, returns);
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public List<PropertyParam> getParams() {
+        return params;
+    }
+
+    public PropertyType<?> getReturns() {
+        return returns;
+    }
 }

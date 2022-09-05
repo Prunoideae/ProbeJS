@@ -34,7 +34,11 @@ public class PropertyComment extends AbstractProperty<PropertyComment> {
     }
 
     public List<String> formatLines(int indent) {
-        return new ArrayList<>();
+        List<String> formatted = new ArrayList<>();
+        formatted.add(" ".repeat(indent) + "/**");
+        lines.forEach(line -> formatted.add(" ".repeat(indent) + " * "));
+        formatted.add(" ".repeat(indent) + "*/");
+        return formatted;
     }
 
     @Override
@@ -50,5 +54,9 @@ public class PropertyComment extends AbstractProperty<PropertyComment> {
         comment.lines.add("");
         comment.lines.addAll(other.lines);
         return comment;
+    }
+
+    public boolean isEmpty() {
+        return lines.isEmpty();
     }
 }

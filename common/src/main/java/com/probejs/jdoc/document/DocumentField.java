@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.probejs.info.FieldInfo;
 import com.probejs.jdoc.Serde;
 import com.probejs.jdoc.property.PropertyType;
+import com.probejs.jdoc.property.PropertyValue;
 
 import java.util.Objects;
 
@@ -12,6 +13,7 @@ public class DocumentField extends AbstractDocument<DocumentField> {
     private boolean isStatic;
     private boolean isFinal;
     private PropertyType<?> type;
+    private PropertyValue<?> value;
 
     @Override
     public JsonObject serialize() {
@@ -20,6 +22,8 @@ public class DocumentField extends AbstractDocument<DocumentField> {
         object.addProperty("static", isStatic);
         object.addProperty("final", isFinal);
         object.add("fieldType", type.serialize());
+        if (value != null)
+            object.add("value", value.serialize());
         return object;
     }
 
@@ -30,6 +34,8 @@ public class DocumentField extends AbstractDocument<DocumentField> {
         isStatic = object.get("static").getAsBoolean();
         isFinal = object.get("final").getAsBoolean();
         type = (PropertyType<?>) Serde.deserializeProperty(object.get("fieldType").getAsJsonObject());
+        if (object.has("value"))
+            value = (PropertyValue<?>) Serde.deserializeProperty(object.get("value").getAsJsonObject());
     }
 
     public static DocumentField fromJava(FieldInfo info) {
@@ -38,6 +44,7 @@ public class DocumentField extends AbstractDocument<DocumentField> {
         document.isFinal = info.isFinal();
         document.isStatic = info.isStatic();
         document.type = Serde.deserializeFromJavaType(info.getType());
+        document.value = Serde.getValueProperty(info.getStaticValue());
         return document;
     }
 
@@ -63,5 +70,25 @@ public class DocumentField extends AbstractDocument<DocumentField> {
     @Override
     public int hashCode() {
         return Objects.hash(name, type);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public PropertyType<?> getType() {
+        return type;
+    }
+
+    public PropertyValue<?> getValue() {
+        return value;
+    }
+
+    public boolean isFinal() {
+        return isFinal;
+    }
+
+    public boolean isStatic() {
+        return isStatic;
     }
 }

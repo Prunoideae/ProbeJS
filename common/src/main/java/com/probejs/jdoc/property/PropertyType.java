@@ -1,8 +1,12 @@
 package com.probejs.jdoc.property;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.probejs.ProbeJS;
 import com.probejs.formatter.NameResolver;
 import com.probejs.info.type.*;
+import com.probejs.jdoc.ISerde;
 import com.probejs.jdoc.Serde;
 
 import javax.annotation.Nullable;
@@ -398,6 +402,7 @@ public abstract class PropertyType<T extends PropertyType<T>> extends AbstractPr
     }
 
     public static class JSObject extends PropertyType<JSObject> {
+
         private final Map<Object, PropertyType<?>> keyValues = new HashMap<>();
 
         public JSObject() {
@@ -416,18 +421,44 @@ public abstract class PropertyType<T extends PropertyType<T>> extends AbstractPr
 
         @Override
         public JsonObject serialize() {
-            JsonObject serialize = super.serialize();
-            return serialize;
+            JsonObject object = super.serialize();
+            JsonArray keyValuePairs = new JsonArray();
+            for (Map.Entry<Object, PropertyType<?>> entry : keyValues.entrySet()) {
+                Object key = entry.getKey();
+                PropertyType<?> value = entry.getValue();
+                JsonObject pair = new JsonObject();
+                if (key instanceof String stringKey) {
+                    pair.addProperty("key", stringKey);
+                } else if (key instanceof PropertyType<?> propertyType) {
+                    pair.add("key", propertyType.serialize());
+                }
+                pair.add("value", value.serialize());
+                keyValuePairs.add(pair);
+            }
+            object.add("members", keyValuePairs);
+            return object;
         }
 
         @Override
         public void deserialize(JsonObject object) {
-
+            for (JsonElement element : object.get("members").getAsJsonArray()) {
+                JsonObject keyValuePair = element.getAsJsonObject();
+                JsonElement keyJson = keyValuePair.get("key");
+                Object key = keyJson.isJsonObject() ? Serde.deserializeProperty(keyJson.getAsJsonObject()) : keyJson.getAsString();
+                keyValues.put(key, (PropertyType<?>) Serde.deserializeProperty(keyValuePair.get("value").getAsJsonObject()));
+            }
         }
 
         @Override
         public String getTypeName() {
-            return null;
+            return "{%s}".formatted(keyValues.entrySet().stream().map(entry -> {
+                Object key = entry.getKey();
+                PropertyType<?> value = entry.getValue();
+                return "%s: %s".formatted((
+                        key instanceof PropertyType<?> propertyType ?
+                                "[key: (%s) & string]".formatted(propertyType.getTypeName()) :
+                                ProbeJS.GSON.toJson(key)), value.getTypeName());
+            }).collect(Collectors.joining(", ")));
         }
 
         @Override
@@ -446,17 +477,12 @@ public abstract class PropertyType<T extends PropertyType<T>> extends AbstractPr
         }
 
         @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            if (!super.equals(o)) return false;
-            JSObject jsObject = (JSObject) o;
-            return Objects.equals(keyValues, jsObject.keyValues);
-        }
-
-        @Override
         public int hashCode() {
             return Objects.hash(keyValues);
+        }
+
+        public Map<Object, PropertyType<?>> getKeyValues() {
+            return keyValues;
         }
     }
 
@@ -466,5 +492,10 @@ public abstract class PropertyType<T extends PropertyType<T>> extends AbstractPr
         if (obj == null)
             return false;
         return this.getClass() == obj.getClass() && this.typeEquals((T) obj);
+    }
+
+    @Override
+    public String toString() {
+        return getTypeName();
     }
 }

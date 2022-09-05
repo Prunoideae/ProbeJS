@@ -13,10 +13,12 @@ import com.probejs.document.comment.CommentHandler;
 import com.probejs.document.parser.processor.DocumentProviderHandler;
 import com.probejs.formatter.ClassResolver;
 import com.probejs.formatter.NameResolver;
+import com.probejs.formatter.formatter.jdoc.FormatterType;
 import com.probejs.info.ClassInfo;
 import com.probejs.info.MethodInfo;
 import com.probejs.jdoc.Serde;
 import com.probejs.jdoc.document.DocumentClass;
+import com.probejs.jdoc.property.PropertyParam;
 import dev.latvian.mods.kubejs.KubeJSPaths;
 import dev.latvian.mods.kubejs.item.ingredient.IngredientJS;
 import net.minecraft.commands.CommandSourceStack;
@@ -120,7 +122,14 @@ public class ProbeCommands {
                                         String serialized = ProbeJS.GSON.toJson(document.serialize());
                                         ProbeJS.LOGGER.info(document.serialize().toString());
                                         DocumentClass clazz = (DocumentClass) Serde.deserializeDocument(ProbeJS.GSON.fromJson(serialized, JsonObject.class));
-                                        ProbeJS.LOGGER.info(clazz.getMethods().equals(document.getMethods()));
+                                        assert clazz != null;
+                                        clazz.getMethods()
+                                                .forEach(method -> method
+                                                        .getParams()
+                                                        .stream()
+                                                        .map(PropertyParam::getType)
+                                                        .map(FormatterType::getFormatter)
+                                                        .forEach(formatter -> ProbeJS.LOGGER.info(formatter.formatFirst())));
                                     } catch (Exception e) {
                                         e.printStackTrace();
                                     }
