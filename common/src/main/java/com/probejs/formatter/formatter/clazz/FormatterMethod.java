@@ -19,10 +19,6 @@ import java.util.stream.Collectors;
 public class FormatterMethod extends DocumentReceiver<DocumentMethod> implements IFormatter {
     private final MethodInfo methodInfo;
 
-    private static String getCamelCase(String text) {
-        return Character.toLowerCase(text.charAt(0)) + text.substring(1);
-    }
-
     public FormatterMethod(MethodInfo methodInfo) {
         this.methodInfo = methodInfo;
     }
@@ -36,11 +32,11 @@ public class FormatterMethod extends DocumentReceiver<DocumentMethod> implements
         if (methodName.equals("is") || methodName.equals("get") || methodName.equals("set"))
             return null;
         if (methodName.startsWith("is") && methodInfo.getParams().size() == 0 && (methodInfo.getReturnType().assignableFrom(new TypeInfoClass(Boolean.class)) || methodInfo.getReturnType().assignableFrom(new TypeInfoClass(Boolean.TYPE))))
-            return getCamelCase(methodName.substring(2));
+            return com.probejs.formatter.formatter.jdoc.FormatterMethod.FormatterBean.getCamelCase(methodName.substring(2));
         if (methodName.startsWith("get") && methodInfo.getParams().size() == 0)
-            return getCamelCase(methodName.substring(3));
+            return com.probejs.formatter.formatter.jdoc.FormatterMethod.FormatterBean.getCamelCase(methodName.substring(3));
         if (methodName.startsWith("set") && methodInfo.getParams().size() == 1)
-            return getCamelCase(methodName.substring(3));
+            return com.probejs.formatter.formatter.jdoc.FormatterMethod.FormatterBean.getCamelCase(methodName.substring(3));
         return null;
     }
 

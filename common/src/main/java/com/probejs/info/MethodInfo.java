@@ -6,6 +6,7 @@ import com.probejs.info.type.InfoTypeResolver;
 import com.probejs.info.type.TypeInfoClass;
 import dev.latvian.mods.rhino.mod.util.RemappingHelper;
 import dev.latvian.mods.rhino.util.HideFromJS;
+import dev.latvian.mods.rhino.util.RemapForJS;
 import dev.latvian.mods.rhino.util.Remapper;
 
 import javax.annotation.Nonnull;
@@ -17,7 +18,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class MethodInfo {
-
 
     private final String name;
     private final boolean shouldHide;
@@ -52,7 +52,7 @@ public class MethodInfo {
         if (method.getDeclaringClass() != from) {
             typeGenericMap.putAll(rewindGenerics(method, from));
         }
-        this.name = getRemappedOrDefault(method, method.getDeclaringClass());
+        this.name = method.isAnnotationPresent(RemapForJS.class) ? method.getAnnotation(RemapForJS.class).value() : getRemappedOrDefault(method, method.getDeclaringClass());
         this.shouldHide = method.getAnnotation(HideFromJS.class) != null;
         this.nonnull = SpecialTypes.isNotNullable(method);
         this.from = from;

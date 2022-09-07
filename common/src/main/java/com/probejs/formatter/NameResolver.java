@@ -13,6 +13,7 @@ import dev.latvian.mods.kubejs.util.ClassWrapper;
 import dev.latvian.mods.rhino.BaseFunction;
 import dev.latvian.mods.rhino.NativeJavaObject;
 import dev.latvian.mods.rhino.NativeObject;
+import dev.latvian.mods.rhino.util.RemapForJS;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.damagesource.DamageSource;
 
@@ -89,6 +90,8 @@ public class NameResolver {
     }
 
     public static void putResolvedName(Class<?> className, String resolvedName) {
+        if (className.isAnnotationPresent(RemapForJS.class))
+            resolvedName = className.getAnnotation(RemapForJS.class).value();
         putResolvedName(className, new ResolvedName(Arrays.stream(resolvedName.split("\\.")).toList()));
     }
 

@@ -6,7 +6,6 @@ import com.google.gson.JsonObject;
 import com.probejs.ProbeJS;
 import com.probejs.formatter.NameResolver;
 import com.probejs.info.type.*;
-import com.probejs.jdoc.ISerde;
 import com.probejs.jdoc.Serde;
 
 import javax.annotation.Nullable;
@@ -427,10 +426,10 @@ public abstract class PropertyType<T extends PropertyType<T>> extends AbstractPr
                 Object key = entry.getKey();
                 PropertyType<?> value = entry.getValue();
                 JsonObject pair = new JsonObject();
-                if (key instanceof String stringKey) {
-                    pair.addProperty("key", stringKey);
-                } else if (key instanceof PropertyType<?> propertyType) {
+                if (key instanceof PropertyType<?> propertyType) {
                     pair.add("key", propertyType.serialize());
+                } else {
+                    pair.add("key", Serde.getPrimitive(key));
                 }
                 pair.add("value", value.serialize());
                 keyValuePairs.add(pair);
@@ -444,7 +443,7 @@ public abstract class PropertyType<T extends PropertyType<T>> extends AbstractPr
             for (JsonElement element : object.get("members").getAsJsonArray()) {
                 JsonObject keyValuePair = element.getAsJsonObject();
                 JsonElement keyJson = keyValuePair.get("key");
-                Object key = keyJson.isJsonObject() ? Serde.deserializeProperty(keyJson.getAsJsonObject()) : keyJson.getAsString();
+                Object key = keyJson.isJsonObject() ? Serde.deserializeProperty(keyJson.getAsJsonObject()) : Serde.getAsPrimitive(keyJson);
                 keyValues.put(key, (PropertyType<?>) Serde.deserializeProperty(keyValuePair.get("value").getAsJsonObject()));
             }
         }
@@ -486,9 +485,67 @@ public abstract class PropertyType<T extends PropertyType<T>> extends AbstractPr
         }
     }
 
+    public static class JSArray extends PropertyType<JSArray> {
+        private final List<PropertyType<?>> types = new ArrayList<>();
+
+        public JSArray() {
+
+        }
+
+        public JSArray(List<PropertyType<?>> types) {
+            this.types.addAll(types);
+        }
+
+        @Override
+        public JSArray copy() {
+            return new JSArray(types);
+        }
+
+        @Override
+        public JsonObject serialize() {
+            JsonObject object = super.serialize();
+            Serde.serializeCollection(object, "types", types);
+            return object;
+        }
+
+        @Override
+        public void deserialize(JsonObject object) {
+            Serde.deserializeDocuments(types, object.get("types"));
+        }
+
+        @Override
+        public String getTypeName() {
+            return "[%s]".formatted(types.stream().map(PropertyType::getTypeName).collect(Collectors.joining(", ")));
+        }
+
+        @Override
+        public void fromJava(ITypeInfo type) {
+
+        }
+
+        @Override
+        public boolean equalsToJavaType(ITypeInfo type) {
+            return false;
+        }
+
+        @Override
+        public boolean typeEquals(JSArray type) {
+            return types.equals(type.types);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(types);
+        }
+
+        public List<PropertyType<?>> getTypes() {
+            return types;
+        }
+    }
+
     @Override
     @SuppressWarnings("unchecked")
-    public boolean equals(Object obj) {
+    public final boolean equals(Object obj) {
         if (obj == null)
             return false;
         return this.getClass() == obj.getClass() && this.typeEquals((T) obj);

@@ -3,8 +3,12 @@ package com.probejs.formatter.formatter.jdoc;
 import com.probejs.ProbeJS;
 import com.probejs.formatter.NameResolver;
 import com.probejs.formatter.formatter.IFormatter;
+import com.probejs.jdoc.Serde;
 import com.probejs.jdoc.property.PropertyType;
+import com.probejs.jdoc.property.PropertyUnderscored;
+import com.probejs.util.Util;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,10 +18,11 @@ import java.util.stream.Collectors;
 public abstract class FormatterType<T extends PropertyType<T>> extends DocumentFormatter<T> {
     public static Map<Class<? extends PropertyType<?>>, Function<PropertyType<?>, FormatterType<?>>> FORMATTER_REGISTRY = new HashMap<>();
 
-    protected boolean underscored;
+    protected boolean underscored = false;
 
     public FormatterType(T document) {
         super(document);
+        document.findProperty(PropertyUnderscored.class).ifPresent(property -> underscored(property.isUnderscored()));
     }
 
     @Override
@@ -25,12 +30,19 @@ public abstract class FormatterType<T extends PropertyType<T>> extends DocumentF
         return false;
     }
 
-    public void setUnderscored(boolean underscored) {
-        this.underscored = underscored;
+    @Override
+    public boolean canHide() {
+        return false;
+    }
+
+    public FormatterType<T> underscored(boolean underscored) {
+        if (!document.hasProperty(PropertyUnderscored.class))
+            this.underscored = underscored;
+        return this;
     }
 
     public FormatterType<T> underscored() {
-        setUnderscored(true);
+        underscored(true);
         return this;
     }
 
@@ -41,7 +53,7 @@ public abstract class FormatterType<T extends PropertyType<T>> extends DocumentF
 
         @Override
         public List<String> formatDocument(Integer indent, Integer stepIndent) {
-            return List.of(" ".repeat(indent) + document.getTypeName() + (underscored ? "_" : ""));
+            return List.of(Util.indent(indent) + document.getTypeName() + (underscored ? "_" : ""));
         }
     }
 
@@ -51,10 +63,11 @@ public abstract class FormatterType<T extends PropertyType<T>> extends DocumentF
         }
 
         @Override
-        public void setUnderscored(boolean underscored) {
+        public Clazz underscored(boolean underscored) {
             //Shield the underscore if the type is primitive
-            if (!NameResolver.resolvedPrimitives.contains(document.getTypeName()))
-                super.setUnderscored(underscored);
+            if (!NameResolver.resolvedPrimitives.contains(document.getClassName()))
+                super.underscored(underscored);
+            return this;
         }
     }
 
@@ -64,14 +77,21 @@ public abstract class FormatterType<T extends PropertyType<T>> extends DocumentF
         }
 
         @Override
-        public void setUnderscored(boolean underscored) {
+        public Native underscored(boolean underscored) {
             //Shield the underscore since it's builtin in JS/TS
+            return this;
         }
     }
 
     public static class Variable extends Named<PropertyType.Variable> {
         public Variable(PropertyType.Variable type) {
             super(type);
+        }
+
+        @Override
+        public Variable underscored(boolean underscored) {
+            //Shield the underscore since it's generic name
+            return this;
         }
     }
 
@@ -80,18 +100,20 @@ public abstract class FormatterType<T extends PropertyType<T>> extends DocumentF
 
         public Joint(T type) {
             super(type);
-            types = type.getTypes().stream().map(FormatterType::getFormatter).collect(Collectors.toList());
+            types = type.getTypes().stream().map(Serde::getTypeFormatter).collect(Collectors.toList());
         }
 
         @Override
-        public void setUnderscored(boolean underscored) {
-            types.forEach(type -> type.setUnderscored(underscored));
+        public Joint<T> underscored(boolean underscored) {
+            if (!document.hasProperty(PropertyUnderscored.class))
+                types.forEach(type -> type.underscored(underscored));
+            return this;
         }
 
         @Override
         public List<String> formatDocument(Integer indent, Integer stepIndent) {
             return List.of(
-                    " ".repeat(indent) + types.stream()
+                    Util.indent(indent) + types.stream()
                             .map(t -> (t instanceof FormatterType.Joint ? "(%s)" : "%s").formatted(t.format()))
                             .collect(Collectors.joining(document.getDelimiter()))
             );
@@ -116,21 +138,22 @@ public abstract class FormatterType<T extends PropertyType<T>> extends DocumentF
 
         public Parameterized(PropertyType.Parameterized type) {
             super(type);
-            base = FormatterType.getFormatter(type.getBase());
-            params = type.getParams().stream().map(FormatterType::getFormatter).collect(Collectors.toList());
+            base = Serde.getTypeFormatter(type.getBase());
+            params = type.getParams().stream().map(Serde::getTypeFormatter).collect(Collectors.toList());
         }
 
         @Override
-        public void setUnderscored(boolean underscored) {
-            base.setUnderscored(underscored);
-            params.forEach(param -> param.setUnderscored(underscored));
+        public Parameterized underscored(boolean underscored) {
+            base.underscored(underscored);
+            params.forEach(param -> param.underscored(underscored));
+            return this;
         }
 
         @Override
         public List<String> formatDocument(Integer indent, Integer stepIndent) {
             return List.of(
                     "%s<%s>".formatted(
-                            base.format(),
+                            base.formatFirst(),
                             params.stream().map(IFormatter::formatFirst).collect(Collectors.joining(", "))
                     ));
         }
@@ -141,12 +164,13 @@ public abstract class FormatterType<T extends PropertyType<T>> extends DocumentF
 
         public Array(PropertyType.Array type) {
             super(type);
-            formatter = FormatterType.getFormatter(type.getComponent());
+            formatter = Serde.getTypeFormatter(type.getComponent());
         }
 
         @Override
-        public void setUnderscored(boolean underscored) {
-            formatter.setUnderscored(underscored);
+        public Array underscored(boolean underscored) {
+            formatter.underscored(underscored);
+            return this;
         }
 
         @Override
@@ -163,14 +187,15 @@ public abstract class FormatterType<T extends PropertyType<T>> extends DocumentF
             document.getKeyValues()
                     .forEach((key, value) -> keyValues.put(
                             key instanceof PropertyType<?> type ?
-                                    FormatterType.getFormatter(type).underscored() :
+                                    Serde.getTypeFormatter(type).underscored() :
                                     key,
-                            FormatterType.getFormatter(value)));
+                            Serde.getTypeFormatter(value)));
         }
 
         @Override
-        public void setUnderscored(boolean underscored) {
-            keyValues.values().forEach(value -> value.setUnderscored(underscored));
+        public JSObject underscored(boolean underscored) {
+            keyValues.values().forEach(value -> value.underscored(underscored));
+            return this;
         }
 
         @Override
@@ -180,18 +205,31 @@ public abstract class FormatterType<T extends PropertyType<T>> extends DocumentF
                 FormatterType<?> value = pair.getValue();
                 return "%s: %s".formatted(
                         key instanceof FormatterType<?> formatter ?
-                                "[key: (%s) & string]".formatted(formatter.formatFirst()) :
+                                "[key: (%s)]".formatted(formatter.formatFirst()) :
                                 ProbeJS.GSON.toJson(key),
                         value.formatFirst());
             }).collect(Collectors.joining(", "))));
         }
     }
 
-    public static FormatterType<?> getFormatter(PropertyType<?> type) {
-        Function<PropertyType<?>, FormatterType<?>> constructor = FORMATTER_REGISTRY.get(type.getClass());
-        if (constructor != null)
-            return constructor.apply(type);
-        return new Native(new PropertyType.Native("any"));
+    public static class JSArray extends FormatterType<PropertyType.JSArray> {
+        private final List<FormatterType<?>> types = new ArrayList<>();
+
+        public JSArray(PropertyType.JSArray document) {
+            super(document);
+            document.getTypes().forEach(type -> types.add(Serde.getTypeFormatter(type)));
+        }
+
+        @Override
+        public FormatterType<PropertyType.JSArray> underscored(boolean underscored) {
+            types.forEach(type -> type.underscored(underscored));
+            return this;
+        }
+
+        @Override
+        public List<String> formatDocument(Integer indent, Integer stepIndent) {
+            return List.of("[%s]".formatted(types.stream().map(IFormatter::formatFirst).collect(Collectors.joining(", "))));
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -208,5 +246,6 @@ public abstract class FormatterType<T extends PropertyType<T>> extends DocumentF
         addFormatter(PropertyType.Parameterized.class, Parameterized::new);
         addFormatter(PropertyType.Array.class, Array::new);
         addFormatter(PropertyType.JSObject.class, JSObject::new);
+        addFormatter(PropertyType.JSArray.class, JSArray::new);
     }
 }

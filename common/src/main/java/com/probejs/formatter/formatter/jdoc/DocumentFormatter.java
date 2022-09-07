@@ -14,16 +14,20 @@ public abstract class DocumentFormatter<T extends AbstractDocument<T>> implement
         this.document = document;
     }
 
-    public abstract List<String> formatDocument(Integer indent, Integer stepIndent);
+    protected abstract List<String> formatDocument(Integer indent, Integer stepIndent);
 
     public boolean hasComment() {
+        return true;
+    }
+
+    public boolean canHide() {
         return true;
     }
 
     @Override
     public final List<String> format(Integer indent, Integer stepIndent) {
         //Apply document-wide changes here
-        if (document.isHidden())
+        if (document.isHidden() && canHide())
             return List.of();
         List<String> lines = new ArrayList<>();
         PropertyComment comments = document.getMergedComment();

@@ -75,7 +75,7 @@ public class SpecialTypes {
     }
 
     public static boolean isNotNullable(AnnotatedElement element) {
-        return element.isAnnotationPresent(NotNull.class) || element.isAnnotationPresent(Nonnull.class);
+        return false;
     }
 
     public static void processFunctionalInterfaces(Set<Class<?>> globalClasses) {

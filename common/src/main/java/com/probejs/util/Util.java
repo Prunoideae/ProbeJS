@@ -12,4 +12,8 @@ public class Util {
     public interface TrySupplier<T> {
         T get() throws Exception;
     }
+
+    public static String indent(int num) {
+        return " ".repeat(num);
+    }
 }

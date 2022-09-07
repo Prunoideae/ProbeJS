@@ -106,6 +106,14 @@ public class DocumentClass extends AbstractDocument<DocumentClass> {
         return Objects.hash(name);
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public Set<DocumentConstructor> getConstructors() {
+        return constructors;
+    }
+
     public Set<DocumentMethod> getMethods() {
         return methods;
     }
@@ -120,5 +128,17 @@ public class DocumentClass extends AbstractDocument<DocumentClass> {
 
     public List<PropertyType<?>> getGenerics() {
         return generics;
+    }
+
+    public PropertyType<?> getParent() {
+        return parent;
+    }
+
+    public boolean isAbstract() {
+        return isAbstract;
+    }
+
+    public boolean isInterface() {
+        return isInterface;
     }
 }

@@ -63,6 +63,7 @@ public class ClassInfo {
                     .collect(Collectors.toList());
         } catch (Error | Exception e) {
             ProbeJS.LOGGER.warn("Unable to access methods of class %s".formatted(name));
+            e.printStackTrace();
         }
         methodInfo = metInfo;
 

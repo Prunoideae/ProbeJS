@@ -20,6 +20,5 @@ public class ProbeJS {
     public static void init() {
         CommandRegistrationEvent.EVENT.register((dispatcher, selection) -> ProbeCommands.register(dispatcher));
         Serde.init();
-        FormatterType.init();
     }
 }

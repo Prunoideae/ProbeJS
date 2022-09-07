@@ -83,4 +83,8 @@ public class DocumentMethod extends AbstractDocument<DocumentMethod> {
     public PropertyType<?> getReturns() {
         return returns;
     }
+
+    public boolean isStatic() {
+        return isStatic;
+    }
 }

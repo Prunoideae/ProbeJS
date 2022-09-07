@@ -13,7 +13,7 @@ public class DocumentField extends AbstractDocument<DocumentField> {
     private boolean isStatic;
     private boolean isFinal;
     private PropertyType<?> type;
-    private PropertyValue<?> value;
+    private PropertyValue<?, ?> value;
 
     @Override
     public JsonObject serialize() {
@@ -35,7 +35,7 @@ public class DocumentField extends AbstractDocument<DocumentField> {
         isFinal = object.get("final").getAsBoolean();
         type = (PropertyType<?>) Serde.deserializeProperty(object.get("fieldType").getAsJsonObject());
         if (object.has("value"))
-            value = (PropertyValue<?>) Serde.deserializeProperty(object.get("value").getAsJsonObject());
+            value = (PropertyValue<?, ?>) Serde.deserializeProperty(object.get("value").getAsJsonObject());
     }
 
     public static DocumentField fromJava(FieldInfo info) {
@@ -80,7 +80,7 @@ public class DocumentField extends AbstractDocument<DocumentField> {
         return type;
     }
 
-    public PropertyValue<?> getValue() {
+    public PropertyValue<?, ?> getValue() {
         return value;
     }
 

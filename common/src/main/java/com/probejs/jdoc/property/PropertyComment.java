@@ -3,6 +3,7 @@ package com.probejs.jdoc.property;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.probejs.util.Util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,9 +36,9 @@ public class PropertyComment extends AbstractProperty<PropertyComment> {
 
     public List<String> formatLines(int indent) {
         List<String> formatted = new ArrayList<>();
-        formatted.add(" ".repeat(indent) + "/**");
+        formatted.add(Util.indent(indent) + "/**");
         lines.forEach(line -> formatted.add(" ".repeat(indent) + " * "));
-        formatted.add(" ".repeat(indent) + "*/");
+        formatted.add(Util.indent(indent) + "*/");
         return formatted;
     }
 

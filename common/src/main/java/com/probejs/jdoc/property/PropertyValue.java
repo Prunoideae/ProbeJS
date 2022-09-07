@@ -7,27 +7,28 @@ import com.google.gson.JsonPrimitive;
 import com.probejs.info.type.TypeInfoClass;
 import com.probejs.jdoc.Serde;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
-public abstract class PropertyValue<T> extends AbstractProperty<PropertyValue<T>> {
-    public static Map<Class<?>, Function<Object, PropertyValue<?>>> VALUES_REGISTRY = new HashMap<>();
-    protected T value;
+public abstract class PropertyValue<T extends PropertyValue<T, J>, J> extends AbstractProperty<T> {
+    public static Map<Class<?>, Function<Object, PropertyValue<?, ?>>> VALUES_REGISTRY = new HashMap<>();
+    protected J value;
 
     public PropertyValue() {
 
     }
 
-    public PropertyValue(T value) {
+    public PropertyValue(J value) {
         this.value = value;
     }
 
     public abstract JsonElement serializeValue();
 
-    public abstract T deserializeValue(JsonElement value);
+    public abstract J deserializeValue(JsonElement value);
+
+    public J getValue() {
+        return value;
+    }
 
     @Override
     public final JsonObject serialize() {
@@ -44,17 +45,12 @@ public abstract class PropertyValue<T> extends AbstractProperty<PropertyValue<T>
             value = deserializeValue(object.get("value"));
     }
 
-    @Override
-    public PropertyValue<T> copy() {
-        return this;
-    }
-
     @SuppressWarnings("unchecked")
-    public static <T> void addValueTransformer(Class<T> clazz, Function<T, PropertyValue<T>> constructor) {
-        VALUES_REGISTRY.put(clazz, (value) -> constructor.apply((T) value));
+    public static <T extends PropertyValue<T, J>, J> void addValueTransformer(Class<J> clazz, Function<J, PropertyValue<T, J>> constructor) {
+        VALUES_REGISTRY.put(clazz, (value) -> constructor.apply((J) value));
     }
 
-    public static class NumberValue extends PropertyValue<Number> {
+    public static class NumberValue extends PropertyValue<NumberValue, Number> {
         public NumberValue() {
 
         }
@@ -72,9 +68,14 @@ public abstract class PropertyValue<T> extends AbstractProperty<PropertyValue<T>
         public Integer deserializeValue(JsonElement value) {
             return value.getAsInt();
         }
+
+        @Override
+        public NumberValue copy() {
+            return new NumberValue(value);
+        }
     }
 
-    public static class BooleanValue extends PropertyValue<Boolean> {
+    public static class BooleanValue extends PropertyValue<BooleanValue, Boolean> {
         public BooleanValue() {
         }
 
@@ -91,9 +92,14 @@ public abstract class PropertyValue<T> extends AbstractProperty<PropertyValue<T>
         public Boolean deserializeValue(JsonElement value) {
             return value.getAsBoolean();
         }
+
+        @Override
+        public BooleanValue copy() {
+            return new BooleanValue(value);
+        }
     }
 
-    public static class StringValue extends PropertyValue<String> {
+    public static class StringValue extends PropertyValue<StringValue, String> {
 
         public StringValue() {
         }
@@ -111,9 +117,14 @@ public abstract class PropertyValue<T> extends AbstractProperty<PropertyValue<T>
         public String deserializeValue(JsonElement value) {
             return value.getAsString();
         }
+
+        @Override
+        public StringValue copy() {
+            return new StringValue(value);
+        }
     }
 
-    public static class CharacterValue extends PropertyValue<Character> {
+    public static class CharacterValue extends PropertyValue<CharacterValue, Character> {
         public CharacterValue() {
         }
 
@@ -130,9 +141,14 @@ public abstract class PropertyValue<T> extends AbstractProperty<PropertyValue<T>
         public Character deserializeValue(JsonElement value) {
             return value.getAsString().charAt(0);
         }
+
+        @Override
+        public CharacterValue copy() {
+            return new CharacterValue(value);
+        }
     }
 
-    public static class FallbackValue extends PropertyValue<Object> {
+    public static class FallbackValue extends PropertyValue<FallbackValue, Object> {
 
         public FallbackValue() {
         }
@@ -156,9 +172,14 @@ public abstract class PropertyValue<T> extends AbstractProperty<PropertyValue<T>
         public Object deserializeValue(JsonElement value) {
             return Serde.deserializeProperty(value.getAsJsonObject());
         }
+
+        @Override
+        public FallbackValue copy() {
+            return new FallbackValue(value);
+        }
     }
 
-    public static class MapValue extends PropertyValue<Map<?, ?>> {
+    public static class MapValue extends PropertyValue<MapValue, Map<?, ?>> {
         public MapValue() {
         }
 
@@ -170,8 +191,8 @@ public abstract class PropertyValue<T> extends AbstractProperty<PropertyValue<T>
         public JsonElement serializeValue() {
             JsonArray array = new JsonArray();
             for (Map.Entry<?, ?> entry : value.entrySet()) {
-                PropertyValue<?> keyObj = Serde.getValueProperty(entry.getKey());
-                PropertyValue<?> valueObj = Serde.getValueProperty(entry.getValue());
+                PropertyValue<?, ?> keyObj = Serde.getValueProperty(entry.getKey());
+                PropertyValue<?, ?> valueObj = Serde.getValueProperty(entry.getValue());
                 JsonObject object = new JsonObject();
                 object.add("key", keyObj.serialize());
                 object.add("value", valueObj.serialize());
@@ -185,16 +206,21 @@ public abstract class PropertyValue<T> extends AbstractProperty<PropertyValue<T>
             HashMap<Object, Object> map = new HashMap<>();
             for (JsonElement element : value.getAsJsonArray()) {
                 JsonObject keyValue = element.getAsJsonObject();
-                PropertyValue<?> keyProperty = (PropertyValue<?>) Serde.deserializeProperty(keyValue.get("key").getAsJsonObject());
-                PropertyValue<?> valueProperty = (PropertyValue<?>) Serde.deserializeProperty(keyValue.get("value").getAsJsonObject());
+                PropertyValue<?, ?> keyProperty = (PropertyValue<?, ?>) Serde.deserializeProperty(keyValue.get("key").getAsJsonObject());
+                PropertyValue<?, ?> valueProperty = (PropertyValue<?, ?>) Serde.deserializeProperty(keyValue.get("value").getAsJsonObject());
                 if (keyProperty != null && valueProperty != null)
                     map.put(keyProperty.value, valueProperty.value);
             }
             return map;
         }
+
+        @Override
+        public MapValue copy() {
+            return new MapValue(value);
+        }
     }
 
-    public static class ListValue extends PropertyValue<List<?>> {
+    public static class ListValue extends PropertyValue<ListValue, List<?>> {
         public ListValue() {
         }
 
@@ -213,11 +239,16 @@ public abstract class PropertyValue<T> extends AbstractProperty<PropertyValue<T>
         public List<?> deserializeValue(JsonElement value) {
             List<Object> values = new ArrayList<>();
             for (JsonElement element : value.getAsJsonArray()) {
-                PropertyValue<?> valueProperty = (PropertyValue<?>) Serde.deserializeProperty(element.getAsJsonObject());
+                PropertyValue<?, ?> valueProperty = (PropertyValue<?, ?>) Serde.deserializeProperty(element.getAsJsonObject());
                 if (valueProperty != null)
                     values.add(valueProperty.value);
             }
             return values;
+        }
+
+        @Override
+        public ListValue copy() {
+            return new ListValue(value);
         }
     }
 
@@ -229,5 +260,18 @@ public abstract class PropertyValue<T> extends AbstractProperty<PropertyValue<T>
         addValueTransformer(Character.class, CharacterValue::new);
         addValueTransformer((Class<Map<?, ?>>) ((Class<?>) Map.class), MapValue::new);
         addValueTransformer((Class<List<?>>) ((Class<?>) List.class), ListValue::new);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PropertyValue<?, ?> that = (PropertyValue<?, ?>) o;
+        return Objects.equals(value, that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value);
     }
 }

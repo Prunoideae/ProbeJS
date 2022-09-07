@@ -3,6 +3,9 @@ package com.probejs.jdoc;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
+import com.probejs.formatter.formatter.jdoc.FormatterType;
+import com.probejs.formatter.formatter.jdoc.FormatterValue;
 import com.probejs.info.type.*;
 import com.probejs.jdoc.document.*;
 import com.probejs.jdoc.property.*;
@@ -23,6 +26,8 @@ public class Serde {
         AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyType.Native.class, "type:primitive");
         AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyType.Intersection.class, "type:intersection");
         AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyType.Union.class, "type:union");
+        AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyType.JSObject.class, "type:object");
+        AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyType.JSArray.class, "type:jsArray");
 
         //Properties
         AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyComment.class, "property:comment");
@@ -46,6 +51,11 @@ public class Serde {
         AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyValue.FallbackValue.class, "value:fallback");
         AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyValue.MapValue.class, "value:map");
         AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyValue.ListValue.class, "value:list");
+
+        //We separate property holder and formatter here since we want to make a language-independent backend
+        PropertyValue.init();
+        FormatterValue.init();
+        FormatterType.init();
     }
 
     public static AbstractDocument<?> deserializeDocument(JsonObject obj) {
@@ -125,17 +135,54 @@ public class Serde {
         }
     }
 
-    public static PropertyValue<?> getValueProperty(Object o) {
-        Function<Object, PropertyValue<?>> constructor = PropertyValue.VALUES_REGISTRY.get(o.getClass());
+    public static PropertyValue<?, ?> getValueProperty(Object o) {
+        Function<Object, PropertyValue<?, ?>> constructor = PropertyValue.VALUES_REGISTRY.get(o.getClass());
         if (constructor != null) {
             return constructor.apply(o);
         }
-        for (Map.Entry<Class<?>, Function<Object, PropertyValue<?>>> entry : PropertyValue.VALUES_REGISTRY.entrySet()) {
+        for (Map.Entry<Class<?>, Function<Object, PropertyValue<?, ?>>> entry : PropertyValue.VALUES_REGISTRY.entrySet()) {
             Class<?> clazz = entry.getKey();
-            Function<Object, PropertyValue<?>> subConstructor = entry.getValue();
+            Function<Object, PropertyValue<?, ?>> subConstructor = entry.getValue();
             if (clazz.isAssignableFrom(o.getClass()))
                 return subConstructor.apply(o);
         }
         return new PropertyValue.FallbackValue(o);
+    }
+
+    public static FormatterValue<?, ?> getValueFormatter(PropertyValue<?, ?> property) {
+        Function<PropertyValue<?, ?>, FormatterValue<?, ?>> constructor = FormatterValue.VALUE_FORMATTERS_REGISTRY.get(property.getClass());
+        if (constructor != null)
+            return constructor.apply(property);
+        return null;
+    }
+
+    public static FormatterType<?> getTypeFormatter(PropertyType<?> type) {
+        Function<PropertyType<?>, FormatterType<?>> constructor = FormatterType.FORMATTER_REGISTRY.get(type.getClass());
+        if (constructor != null)
+            return constructor.apply(type);
+        return new FormatterType.Native(new PropertyType.Native("any"));
+    }
+
+    public static JsonElement getPrimitive(Object o) {
+        if (o instanceof Boolean bool)
+            return new JsonPrimitive(bool);
+        if (o instanceof String string)
+            return new JsonPrimitive(string);
+        if (o instanceof Number number)
+            return new JsonPrimitive(number);
+        if (o instanceof Character character)
+            return new JsonPrimitive(character);
+        throw new IllegalArgumentException("The argument is not primitive type!");
+    }
+
+    public static Object getAsPrimitive(JsonElement element) {
+        JsonPrimitive primitive = element.getAsJsonPrimitive();
+        if (primitive.isBoolean())
+            return primitive.getAsBoolean();
+        if (primitive.isNumber())
+            return primitive.getAsNumber();
+        if (primitive.isString())
+            return primitive.getAsString();
+        throw new IllegalArgumentException("The argument is not primitive value!");
     }
 }

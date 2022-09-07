@@ -63,11 +63,12 @@ public abstract class AbstractDocument<T extends AbstractDocument<T>> implements
         Serde.deserializeDocuments(properties, object.get("properties"));
     }
 
-    public final Optional<AbstractProperty<?>> findProperty(Class<? extends AbstractProperty<?>> property) {
-        return this.properties.stream().filter(p -> p.getClass() == property).findFirst();
+    @SuppressWarnings("unchecked")
+    public final <P extends AbstractProperty<P>> Optional<P> findProperty(Class<P> property) {
+        return this.properties.stream().filter(p -> p.getClass() == property).map(p -> (P) p).findFirst();
     }
 
-    public final boolean hasProperty(Class<? extends AbstractProperty<?>> property) {
+    public final <P extends AbstractProperty<P>> boolean hasProperty(Class<P> property) {
         return findProperty(property).isPresent();
     }
 

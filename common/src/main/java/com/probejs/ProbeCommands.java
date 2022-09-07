@@ -1,8 +1,5 @@
 package com.probejs;
 
-import com.google.gson.JsonObject;
-import com.mojang.blaze3d.Blaze3D;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.probejs.compiler.SchemaCompiler;
@@ -13,28 +10,23 @@ import com.probejs.document.comment.CommentHandler;
 import com.probejs.document.parser.processor.DocumentProviderHandler;
 import com.probejs.formatter.ClassResolver;
 import com.probejs.formatter.NameResolver;
-import com.probejs.formatter.formatter.jdoc.FormatterType;
+import com.probejs.formatter.formatter.jdoc.FormatterClass;
 import com.probejs.info.ClassInfo;
-import com.probejs.info.MethodInfo;
-import com.probejs.jdoc.Serde;
 import com.probejs.jdoc.document.DocumentClass;
-import com.probejs.jdoc.property.PropertyParam;
 import dev.latvian.mods.kubejs.KubeJSPaths;
 import dev.latvian.mods.kubejs.item.ingredient.IngredientJS;
+import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
+import it.unimi.dsi.fastutil.objects.AbstractObject2ObjectFunction;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraft.server.level.ServerLevel;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
+import java.util.function.IntFunction;
 
 public class ProbeCommands {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
@@ -118,18 +110,10 @@ public class ProbeCommands {
                                 .requires(source -> true)
                                 .executes(context -> {
                                     try {
-                                        DocumentClass document = DocumentClass.fromJava(ClassInfo.getOrCache(IngredientJS.class));
-                                        String serialized = ProbeJS.GSON.toJson(document.serialize());
-                                        ProbeJS.LOGGER.info(document.serialize().toString());
-                                        DocumentClass clazz = (DocumentClass) Serde.deserializeDocument(ProbeJS.GSON.fromJson(serialized, JsonObject.class));
-                                        assert clazz != null;
-                                        clazz.getMethods()
-                                                .forEach(method -> method
-                                                        .getParams()
-                                                        .stream()
-                                                        .map(PropertyParam::getType)
-                                                        .map(FormatterType::getFormatter)
-                                                        .forEach(formatter -> ProbeJS.LOGGER.info(formatter.formatFirst())));
+                                        DocumentClass document = DocumentClass.fromJava(ClassInfo.getOrCache(AbstractObject2ObjectFunction.class));
+                                        ProbeJS.LOGGER.info(document.isAbstract());
+                                        ProbeJS.LOGGER.info(ProbeJS.GSON.toJson(document.serialize()));
+                                        ProbeJS.LOGGER.info(String.join("\n", new FormatterClass(document).format(0, 4)));
                                     } catch (Exception e) {
                                         e.printStackTrace();
                                     }

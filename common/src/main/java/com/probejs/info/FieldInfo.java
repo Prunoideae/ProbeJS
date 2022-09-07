@@ -6,6 +6,7 @@ import com.probejs.info.type.ITypeInfo;
 import com.probejs.info.type.InfoTypeResolver;
 import com.probejs.util.Util;
 import dev.latvian.mods.rhino.util.HideFromJS;
+import dev.latvian.mods.rhino.util.RemapForJS;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -20,6 +21,8 @@ public class FieldInfo {
 
     private static String getRemappedOrDefault(Field field) {
         String s = MethodInfo.RUNTIME.getMappedField(field.getDeclaringClass(), field);
+        if (field.isAnnotationPresent(RemapForJS.class))
+            s = field.getAnnotation(RemapForJS.class).value();
         return s.isEmpty() ? field.getName() : s;
     }
 
