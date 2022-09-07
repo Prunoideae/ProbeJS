@@ -2,14 +2,15 @@ package com.probejs.formatter.formatter;
 
 import java.util.List;
 
+@FunctionalInterface
 public interface IFormatter {
     List<String> format(Integer indent, Integer stepIndent);
 
     default List<String> format() {
-        return format(0, 0);
+        return format(0, 4);
     }
 
     default String formatFirst() {
-        return format().get(0);
+        return String.join("\n", format());
     }
 }

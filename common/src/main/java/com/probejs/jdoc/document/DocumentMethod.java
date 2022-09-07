@@ -13,6 +13,7 @@ import java.util.Objects;
 public class DocumentMethod extends AbstractDocument<DocumentMethod> {
     private String name;
     private boolean isStatic;
+    private boolean isAbstract;
     private PropertyType<?> returns;
     private final List<PropertyParam> params = new ArrayList<>();
 
@@ -22,6 +23,7 @@ public class DocumentMethod extends AbstractDocument<DocumentMethod> {
         JsonObject object = super.serialize();
         object.addProperty("name", name);
         object.addProperty("static", isStatic);
+        object.addProperty("abstract", isAbstract);
         Serde.serializeCollection(object, "params", params);
         object.add("returns", returns.serialize());
         return object;
@@ -32,6 +34,7 @@ public class DocumentMethod extends AbstractDocument<DocumentMethod> {
         super.deserialize(object);
         name = object.get("name").getAsString();
         isStatic = object.get("static").getAsBoolean();
+        isAbstract = object.get("abstract").getAsBoolean();
         Serde.deserializeDocuments(params, object.get("params"));
         returns = (PropertyType<?>) Serde.deserializeProperty(object.get("returns").getAsJsonObject());
     }
@@ -43,6 +46,7 @@ public class DocumentMethod extends AbstractDocument<DocumentMethod> {
         if (info.isNonnull())
             document.returns = PropertyType.wrapNonNull(document.returns);
         document.isStatic = info.isStatic();
+        document.isAbstract = info.isAbstract();
         info.getParams().stream()
                 .map(PropertyParam::fromJava)
                 .forEach(document.params::add);
@@ -86,5 +90,9 @@ public class DocumentMethod extends AbstractDocument<DocumentMethod> {
 
     public boolean isStatic() {
         return isStatic;
+    }
+
+    public boolean isAbstract() {
+        return isAbstract;
     }
 }

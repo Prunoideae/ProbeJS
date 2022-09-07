@@ -5,6 +5,7 @@ import com.probejs.formatter.formatter.IFormatter;
 import com.probejs.jdoc.Serde;
 import com.probejs.jdoc.property.PropertyType;
 import com.probejs.jdoc.property.PropertyValue;
+import dev.latvian.mods.rhino.ScriptableObject;
 
 import java.util.HashMap;
 import java.util.List;
@@ -94,6 +95,26 @@ public abstract class FormatterValue<T extends PropertyValue<T, J>, J> extends D
         }
     }
 
+    public static class ObjectFormatter extends FormatterValue<PropertyValue.ObjectValue, ScriptableObject> {
+
+        public ObjectFormatter(PropertyValue.ObjectValue document) {
+            super(document);
+        }
+
+        @Override
+        protected List<String> formatDocument(Integer indent, Integer stepIndent) {
+            if (document.getTypeName() == null)
+                return List.of(document.getTypeName());
+            return List.of("{%s}".formatted(document.getKeyValues().entrySet().stream().map(entry -> {
+                FormatterValue<?, ?> key = Serde.getValueFormatter(entry.getKey());
+                FormatterValue<?, ?> value = Serde.getValueFormatter(entry.getValue());
+                if (key != null && value != null)
+                    return "%s: %s".formatted(key.formatFirst(), value.formatFirst());
+                return null;
+            }).filter(Objects::nonNull).collect(Collectors.joining(", "))));
+        }
+    }
+
     @SuppressWarnings("unchecked")
     public static <T extends PropertyValue<T, J>, J> void addValueFormatter(Class<T> clazz, Function<T, FormatterValue<T, J>> constructor) {
         VALUE_FORMATTERS_REGISTRY.put(clazz, (value) -> constructor.apply((T) value));
@@ -107,5 +128,6 @@ public abstract class FormatterValue<T extends PropertyValue<T, J>, J> extends D
         addValueFormatter(PropertyValue.FallbackValue.class, FallbackFormatter::new);
         addValueFormatter(PropertyValue.MapValue.class, MapFormatter::new);
         addValueFormatter(PropertyValue.ListValue.class, ListFormatter::new);
+        addValueFormatter(PropertyValue.ObjectValue.class, ObjectFormatter::new);
     }
 }

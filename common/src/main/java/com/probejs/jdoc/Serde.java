@@ -36,6 +36,7 @@ public class Serde {
         AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyModify.class, "property:modify");
         AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyReturns.class, "property:returns");
         AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyParam.class, "property:param");
+        AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyAssign.class, "property:assign");
 
         //Documents
         AbstractDocument.DOCUMENT_TYPE_REGISTRY.put(DocumentClass.class, "document:class");

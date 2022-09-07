@@ -3,13 +3,17 @@ package com.probejs.formatter;
 import com.mojang.serialization.Codec;
 import com.probejs.ProbeJS;
 import com.probejs.compiler.SpecialCompiler;
+import com.probejs.formatter.formatter.IFormatter;
 import com.probejs.formatter.formatter.clazz.FormatterClass;
 import com.probejs.formatter.formatter.clazz.FormatterType;
+import com.probejs.formatter.formatter.jdoc.FormatterMethod;
 import com.probejs.formatter.formatter.special.FormatterRegistry;
 import com.probejs.info.ClassInfo;
 import com.probejs.info.MethodInfo;
 import com.probejs.info.type.*;
-import dev.latvian.mods.kubejs.NonnullByDefault;
+import com.probejs.jdoc.Serde;
+import com.probejs.jdoc.document.DocumentClass;
+import com.probejs.jdoc.document.DocumentMethod;
 import dev.latvian.mods.rhino.BaseFunction;
 import dev.latvian.mods.rhino.NativeJavaObject;
 import dev.latvian.mods.rhino.Scriptable;
@@ -17,9 +21,7 @@ import dev.latvian.mods.rhino.ScriptableObject;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
@@ -86,6 +88,17 @@ public class SpecialTypes {
                 ClassInfo info = ClassInfo.getOrCache(clazz);
                 if (info.getMethodInfo().stream().filter(MethodInfo::isAbstract).count() != 1)
                     continue;
+                com.probejs.formatter.formatter.jdoc.FormatterClass.SPECIAL_FORMATTER_REGISTRY.put(info.getName(), (document) -> (indent, stepIndent) -> {
+                    DocumentMethod documentMethod = document.getMethods().stream().filter(DocumentMethod::isAbstract).findFirst().get();
+                    return List.of("((%s)=>%s)".formatted(
+                            documentMethod.getParams()
+                                    .stream()
+                                    .map(FormatterMethod.FormatterParam::new)
+                                    .map(FormatterMethod.FormatterParam::underscored)
+                                    .map(IFormatter::formatFirst)
+                                    .collect(Collectors.joining(", ")),
+                            Serde.getTypeFormatter(documentMethod.getReturns()).formatFirst()));
+                });
                 for (MethodInfo method : info.getMethodInfo()) {
                     if (method.isAbstract()) {
                         FormatterLambda formatter = new FormatterLambda(method);
@@ -206,7 +219,7 @@ public class SpecialTypes {
 
     public static <T> void assignRegistry(Class<T> clazz, ResourceKey<Registry<T>> registry) {
         SpecialCompiler.specialCompilers.add(new FormatterRegistry<>(registry, clazz));
-        List<String> remappedName = Arrays.stream(MethodInfo.RUNTIME.getMappedClass(clazz).split("\\.")).collect(Collectors.toList());
+        List<String> remappedName = Arrays.stream(MethodInfo.RUNTIME.getMappedClass(clazz).split("\\.")).toList();
         NameResolver.putSpecialAssignments(clazz, () -> List.of("Special.%s".formatted(remappedName.get(remappedName.size() - 1))));
     }
 

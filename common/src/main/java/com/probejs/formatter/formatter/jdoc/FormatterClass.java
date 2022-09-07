@@ -1,18 +1,24 @@
 package com.probejs.formatter.formatter.jdoc;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import com.probejs.formatter.NameResolver;
 import com.probejs.formatter.formatter.IFormatter;
 import com.probejs.jdoc.Serde;
 import com.probejs.jdoc.document.DocumentClass;
+import com.probejs.jdoc.property.PropertyAssign;
 import com.probejs.jdoc.property.PropertyType;
 import com.probejs.util.Util;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class FormatterClass extends DocumentFormatter<DocumentClass> {
+    public static Multimap<String, Function<DocumentClass, IFormatter>> SPECIAL_FORMATTER_REGISTRY = ArrayListMultimap.create();
+
     public FormatterClass(DocumentClass document) {
         super(document);
     }
@@ -54,7 +60,7 @@ public class FormatterClass extends DocumentFormatter<DocumentClass> {
                 parents.addAll(document.getInterfaces());
             }
             if (!parents.isEmpty()) {
-                header.append("extends %s".formatted(parents.stream()
+                header.append("extends %s ".formatted(parents.stream()
                         .map(Serde::getTypeFormatter)
                         .map(IFormatter::formatFirst)
                         .collect(Collectors.joining(", "))
@@ -69,6 +75,14 @@ public class FormatterClass extends DocumentFormatter<DocumentClass> {
         document.getMethods().stream().map(FormatterMethod::new).map(FormatterMethod::getBeanFormatter).filter(Optional::isPresent).map(Optional::get).forEach(formatter -> lines.addAll(formatter.format(indent + stepIndent, stepIndent)));
         document.getFields().forEach(field -> lines.addAll(new FormatterField(field).format(indent + stepIndent, stepIndent)));
         lines.add(Util.indent(indent) + "}");
+        List<String> typesAssignable = new ArrayList<>();
+        if (document.findPropertiesOf(PropertyAssign.class).stream().noneMatch(PropertyAssign::isShieldOriginal))
+            typesAssignable.add(NameResolver.getResolvedName(document.getName()).getLastName());
+        document.findPropertiesOf(PropertyAssign.class).forEach(property -> typesAssignable.add(Serde.getTypeFormatter(property.getType()).formatFirst()));
+        for (Function<DocumentClass, IFormatter> formatter : SPECIAL_FORMATTER_REGISTRY.get(document.getName())) {
+            typesAssignable.add(formatter.apply(document).formatFirst());
+        }
+        lines.add(Util.indent(indent) + "type %s_ = %s;".formatted(typesAssignable.get(0), String.join(" | ", typesAssignable)));
         return lines;
     }
 }

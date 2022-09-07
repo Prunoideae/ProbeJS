@@ -4,6 +4,7 @@ import com.probejs.ProbeJS;
 import com.probejs.document.type.IType;
 import com.probejs.document.type.TypeNamed;
 import com.probejs.document.type.TypeParameterized;
+import com.probejs.formatter.formatter.jdoc.FormatterClass;
 import com.probejs.info.MethodInfo;
 import com.probejs.info.type.ITypeInfo;
 import dev.latvian.mods.kubejs.block.MaterialJS;

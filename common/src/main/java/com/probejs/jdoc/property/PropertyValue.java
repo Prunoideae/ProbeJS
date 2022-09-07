@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.probejs.info.type.TypeInfoClass;
 import com.probejs.jdoc.Serde;
+import dev.latvian.mods.rhino.*;
 
 import java.util.*;
 import java.util.function.Function;
@@ -252,6 +253,84 @@ public abstract class PropertyValue<T extends PropertyValue<T, J>, J> extends Ab
         }
     }
 
+    public static class ObjectValue extends PropertyValue<ObjectValue, ScriptableObject> {
+        private Map<PropertyValue<?, ?>, PropertyValue<?, ?>> keyValues = new HashMap<>();
+        private String typeName;
+
+        public ObjectValue() {
+        }
+
+        private ObjectValue(Map<PropertyValue<?, ?>, PropertyValue<?, ?>> keyValues) {
+            this.keyValues = keyValues;
+        }
+
+        public ObjectValue(ScriptableObject value) {
+            super(value);
+            Scriptable prototype = value.getPrototype();
+            if (prototype.get("constructor", prototype) instanceof BaseFunction fun) {
+                typeName = fun.getFunctionName();
+                if (!typeName.isEmpty() && typeName.equals("Object"))
+                    return;
+            }
+            for (Object id : value.getIds()) {
+                PropertyValue<?, ?> key = Serde.getValueProperty(id);
+                PropertyValue<?, ?> propertyValue = Serde.getValueProperty(value.get(key));
+                keyValues.put(key, propertyValue);
+            }
+            for (Object id : prototype.getIds()) {
+                PropertyValue<?, ?> key = Serde.getValueProperty(id);
+                PropertyValue<?, ?> propertyValue = Serde.getValueProperty(value.get(key));
+                keyValues.put(key, propertyValue);
+            }
+        }
+
+        @Override
+        public ObjectValue copy() {
+            return new ObjectValue(keyValues);
+        }
+
+        @Override
+        public JsonElement serializeValue() {
+            JsonObject object = new JsonObject();
+            JsonArray keyValuePairs = new JsonArray();
+            for (Map.Entry<PropertyValue<?, ?>, PropertyValue<?, ?>> entry : keyValues.entrySet()) {
+                PropertyValue<?, ?> key = entry.getKey();
+                PropertyValue<?, ?> memberValue = entry.getValue();
+                JsonObject pair = new JsonObject();
+                pair.add("key", key.serialize());
+                pair.add("value", memberValue.serialize());
+                keyValuePairs.add(pair);
+            }
+            if (!keyValues.isEmpty())
+                object.add("members", keyValuePairs);
+            if (typeName != null)
+                object.addProperty("typeName", typeName);
+            return object;
+        }
+
+        @Override
+        public ScriptableObject deserializeValue(JsonElement value) {
+            JsonObject object = value.getAsJsonObject();
+            if (object.has("members"))
+                for (JsonElement element : object.get("members").getAsJsonArray()) {
+                    PropertyValue<?, ?> key = (PropertyValue<?, ?>) Serde.deserializeProperty(element.getAsJsonObject().get("key").getAsJsonObject());
+                    PropertyValue<?, ?> memberValue = (PropertyValue<?, ?>) Serde.deserializeProperty(element.getAsJsonObject().get("value").getAsJsonObject());
+                    keyValues.put(key, memberValue);
+                }
+            if (object.has("typeName"))
+                typeName = object.get("typeName").getAsString();
+            return null;
+        }
+
+        public Map<PropertyValue<?, ?>, PropertyValue<?, ?>> getKeyValues() {
+            return keyValues;
+        }
+
+        public String getTypeName() {
+            return typeName;
+        }
+    }
+
     @SuppressWarnings("unchecked")
     public static void init() {
         addValueTransformer(Number.class, NumberValue::new);
@@ -260,6 +339,7 @@ public abstract class PropertyValue<T extends PropertyValue<T, J>, J> extends Ab
         addValueTransformer(Character.class, CharacterValue::new);
         addValueTransformer((Class<Map<?, ?>>) ((Class<?>) Map.class), MapValue::new);
         addValueTransformer((Class<List<?>>) ((Class<?>) List.class), ListValue::new);
+        addValueTransformer(ScriptableObject.class, ObjectValue::new);
     }
 
     @Override

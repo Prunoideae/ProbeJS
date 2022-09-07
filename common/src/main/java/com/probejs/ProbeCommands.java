@@ -110,7 +110,7 @@ public class ProbeCommands {
                                 .requires(source -> true)
                                 .executes(context -> {
                                     try {
-                                        DocumentClass document = DocumentClass.fromJava(ClassInfo.getOrCache(AbstractObject2ObjectFunction.class));
+                                        DocumentClass document = DocumentClass.fromJava(ClassInfo.getOrCache(IngredientJS.class));
                                         ProbeJS.LOGGER.info(document.isAbstract());
                                         ProbeJS.LOGGER.info(ProbeJS.GSON.toJson(document.serialize()));
                                         ProbeJS.LOGGER.info(String.join("\n", new FormatterClass(document).format(0, 4)));

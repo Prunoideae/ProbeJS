@@ -67,14 +67,13 @@ public class DocumentClass extends AbstractDocument<DocumentClass> {
 
     @Override
     public DocumentClass merge(DocumentClass other) {
-        //Overwrites everything basing on current document
+        //Overwrites everything basing on current document.
+        //Generics are not overwritten tho
         DocumentClass document = copy();
         document.parent = other.parent;
         document.interfaces.addAll(other.interfaces);
         document.methods.addAll(other.methods);
         document.fields.addAll(other.fields);
-        //Retains all comments
-        document.properties = properties.stream().filter(prop -> prop instanceof PropertyComment).collect(Collectors.toCollection(ArrayList::new));
         document.properties.addAll(other.properties);
         return document;
     }
