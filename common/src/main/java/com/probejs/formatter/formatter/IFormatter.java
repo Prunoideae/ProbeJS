@@ -10,6 +10,10 @@ public interface IFormatter {
         return format(0, 4);
     }
 
+    default String formatString(Integer indent, Integer stepIndent) {
+        return String.join("\n", format(indent, stepIndent));
+    }
+
     default String formatFirst() {
         return String.join("\n", format());
     }

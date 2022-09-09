@@ -55,7 +55,7 @@ public class ClassInfo {
         List<MethodInfo> metInfo = new ArrayList<>();
         try {
             metInfo = Arrays.stream(clazzRaw.getMethods())
-                    .filter(m -> !m.isSynthetic())
+                    .filter(m -> !m.isSynthetic() )
                     .filter(m -> m.getDeclaringClass() == clazz || m.isDefault())
                     .map(m -> new MethodInfo(m, clazz))
                     .filter(m -> (ClassResolver.acceptMethod(m.getName()) || ProbeConfig.INSTANCE.allowObfuscated))

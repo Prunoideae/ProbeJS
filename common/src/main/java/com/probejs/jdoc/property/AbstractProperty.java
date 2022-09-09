@@ -11,10 +11,5 @@ import com.probejs.jdoc.document.AbstractDocument;
  */
 public abstract class AbstractProperty<T extends AbstractDocument<T>> extends AbstractDocument<T> {
 
-    @Override
-    public T merge(T other) {
-        return other.copy();
-    }
-
     public abstract void deserialize(JsonObject object);
 }

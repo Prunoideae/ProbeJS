@@ -69,6 +69,8 @@ public class DocumentClass extends AbstractDocument<DocumentClass> {
     public DocumentClass merge(DocumentClass other) {
         //Overwrites everything basing on current document.
         //Generics are not overwritten tho
+        if (this == other)
+            return this;
         DocumentClass document = copy();
         document.parent = other.parent;
         document.interfaces.addAll(other.interfaces);

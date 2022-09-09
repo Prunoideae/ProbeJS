@@ -1,12 +1,16 @@
 package com.probejs.formatter;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import com.probejs.ProbeJS;
 import com.probejs.document.type.IType;
 import com.probejs.document.type.TypeNamed;
 import com.probejs.document.type.TypeParameterized;
 import com.probejs.formatter.formatter.jdoc.FormatterClass;
+import com.probejs.info.ClassInfo;
 import com.probejs.info.MethodInfo;
 import com.probejs.info.type.ITypeInfo;
+import com.probejs.jdoc.document.DocumentClass;
 import dev.latvian.mods.kubejs.block.MaterialJS;
 import dev.latvian.mods.kubejs.block.MaterialListJS;
 import dev.latvian.mods.kubejs.item.ingredient.IngredientJS;
@@ -154,6 +158,19 @@ public class NameResolver {
         }
     }
 
+    public static void resolveName(DocumentClass document) {
+        String name = document.getName();
+        if (resolvedNames.containsKey(name))
+            return;
+        ResolvedName resolved = new ResolvedName(Arrays.stream(name.split("\\.")).toList());
+        ResolvedName internal = new ResolvedName(List.of("Internal", resolved.getLastName()));
+        if (findResolvedName(internal)) {
+            putResolvedName(name, resolved);
+        } else {
+            putResolvedName(name, internal);
+        }
+    }
+
     public static void resolveNames(List<Class<?>> classes) {
         for (Class<?> clazz : classes) {
             resolveName(clazz);
@@ -207,6 +224,27 @@ public class NameResolver {
             partMap.computeIfAbsent(index, i -> new ArrayList<>()).add(clazz);
         }
         List<Class<?>> result = new ArrayList<>();
+        for (int i = 0; i < nameResolveSpecials.size(); i++) {
+            if (partMap.containsKey(i))
+                result.addAll(partMap.get(i));
+        }
+        if (partMap.containsKey(-1))
+            result.addAll(partMap.get(-1));
+        return result;
+    }
+
+    public static List<DocumentClass> priorSortClasses(Iterable<DocumentClass> classes) {
+        Multimap<Integer, DocumentClass> partMap = ArrayListMultimap.create();
+        for (DocumentClass clazz : classes) {
+            int index = -1;
+            String name = clazz.getName();
+            for (int i = 0; i < nameResolveSpecials.size(); i++) {
+                if (name.startsWith(nameResolveSpecials.get(i)))
+                    index = i;
+            }
+            partMap.put(index, clazz);
+        }
+        ArrayList<DocumentClass> result = new ArrayList<>();
         for (int i = 0; i < nameResolveSpecials.size(); i++) {
             if (partMap.containsKey(i))
                 result.addAll(partMap.get(i));

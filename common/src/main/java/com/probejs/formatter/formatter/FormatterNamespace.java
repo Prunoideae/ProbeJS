@@ -1,13 +1,14 @@
 package com.probejs.formatter.formatter;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class FormatterNamespace implements IFormatter {
     private final String path;
-    private final List<? extends IFormatter> formatters;
+    private final Collection<? extends IFormatter> formatters;
 
-    public FormatterNamespace(String path, List<? extends IFormatter> formatters) {
+    public FormatterNamespace(String path, Collection<? extends IFormatter> formatters) {
         this.formatters = formatters;
         this.path = path;
     }

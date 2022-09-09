@@ -19,6 +19,8 @@ import java.util.stream.Collectors;
 public class FormatterClass extends DocumentFormatter<DocumentClass> {
     public static Multimap<String, Function<DocumentClass, IFormatter>> SPECIAL_FORMATTER_REGISTRY = ArrayListMultimap.create();
 
+    private boolean internal = false;
+
     public FormatterClass(DocumentClass document) {
         super(document);
     }
@@ -27,6 +29,8 @@ public class FormatterClass extends DocumentFormatter<DocumentClass> {
     public List<String> formatDocument(Integer indent, Integer stepIndent) {
         List<String> lines = new ArrayList<>();
         StringBuilder header = new StringBuilder();
+        if (!internal)
+            header.append("declare ");
         if (document.isAbstract() && !document.isInterface())
             header.append("abstract ");
         header.append(document.isInterface() ? "interface" : "class");
@@ -84,5 +88,10 @@ public class FormatterClass extends DocumentFormatter<DocumentClass> {
         }
         lines.add(Util.indent(indent) + "type %s_ = %s;".formatted(typesAssignable.get(0), String.join(" | ", typesAssignable)));
         return lines;
+    }
+
+    public FormatterClass setInternal(boolean internal) {
+        this.internal = internal;
+        return this;
     }
 }

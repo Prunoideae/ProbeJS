@@ -45,6 +45,8 @@ public abstract class AbstractDocument<T extends AbstractDocument<T>> implements
      * @return a merged new document
      */
     public T merge(T other) {
+        if (this == other)
+            return other;
         T document = other.copy();
         properties.addAll(0, properties.stream().filter(prop -> prop instanceof PropertyComment).toList());
         return document;
@@ -79,6 +81,10 @@ public abstract class AbstractDocument<T extends AbstractDocument<T>> implements
     @SuppressWarnings("unchecked")
     public final <E extends AbstractProperty<?>> List<E> findPropertiesOf(Class<E> property) {
         return this.properties.stream().filter(prop -> property.isAssignableFrom(prop.getClass())).map(prop -> (E) prop).collect(Collectors.toList());
+    }
+
+    public final void addProperty(AbstractProperty<?> property) {
+        this.properties.add(property);
     }
 
     public final boolean fulfillsConditions() {
