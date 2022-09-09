@@ -44,7 +44,8 @@ public class DocumentField extends AbstractDocument<DocumentField> {
         document.isFinal = info.isFinal();
         document.isStatic = info.isStatic();
         document.type = Serde.deserializeFromJavaType(info.getType());
-        document.value = Serde.getValueProperty(info.getStaticValue());
+        if (info.getStaticValue() != null)
+            document.value = Serde.getValueProperty(info.getStaticValue());
         return document;
     }
 

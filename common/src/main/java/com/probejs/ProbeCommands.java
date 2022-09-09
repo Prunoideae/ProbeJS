@@ -2,12 +2,9 @@ package com.probejs;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
+import com.probejs.compiler.DocCompiler;
 import com.probejs.compiler.SchemaCompiler;
 import com.probejs.compiler.SnippetCompiler;
-import com.probejs.compiler.TypingCompiler;
-import com.probejs.document.Manager;
-import com.probejs.document.comment.CommentHandler;
-import com.probejs.document.parser.processor.DocumentProviderHandler;
 import com.probejs.formatter.ClassResolver;
 import com.probejs.formatter.NameResolver;
 import com.probejs.formatter.formatter.jdoc.FormatterClass;
@@ -15,8 +12,6 @@ import com.probejs.info.ClassInfo;
 import com.probejs.jdoc.document.DocumentClass;
 import dev.latvian.mods.kubejs.KubeJSPaths;
 import dev.latvian.mods.kubejs.item.ingredient.IngredientJS;
-import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
-import it.unimi.dsi.fastutil.objects.AbstractObject2ObjectFunction;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.TextComponent;
@@ -26,7 +21,6 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.TimeUnit;
-import java.util.function.IntFunction;
 
 public class ProbeCommands {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
@@ -41,12 +35,9 @@ public class ProbeCommands {
                                     try {
                                         SnippetCompiler.compile();
                                         SchemaCompiler.compile();
-                                        DocumentProviderHandler.init();
-                                        CommentHandler.init();
-                                        Manager.init();
                                         ClassResolver.init();
                                         NameResolver.init();
-                                        TypingCompiler.compile();
+                                        DocCompiler.compile();
                                         if (ProbeConfig.INSTANCE.exportClassNames)
                                             SnippetCompiler.compileClassNames();
                                     } catch (Exception e) {

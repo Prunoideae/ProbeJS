@@ -39,8 +39,9 @@ public class Walker {
 
     private Set<Class<?>> walkType(ITypeInfo type) {
         Set<Class<?>> result = new HashSet<>();
-        if (type instanceof TypeInfoParameterized parType && walkType)
+        if (type instanceof TypeInfoParameterized parType && walkType) {
             parType.getParamTypes().forEach(info -> result.addAll(walkType(info)));
+        }
         if (!(type instanceof TypeInfoVariable))
             result.add(type.getResolvedClass());
         result.removeIf(Objects::isNull);

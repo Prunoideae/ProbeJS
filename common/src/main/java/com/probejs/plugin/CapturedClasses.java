@@ -1,5 +1,7 @@
 package com.probejs.plugin;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.probejs.event.CapturedEvent;
 import dev.latvian.mods.kubejs.RegistryObjectBuilderTypes;
 
@@ -21,5 +23,17 @@ public class CapturedClasses {
 
     public static boolean isEventIgnored(Class<?> clazz) {
         return ignoredEvents.stream().anyMatch(ignored -> ignored.isAssignableFrom(clazz));
+    }
+
+    public static Map<String, CapturedEvent> getCapturedEvents() {
+        return ImmutableMap.copyOf(capturedEvents);
+    }
+
+    public static Map<String, Class<?>> getCapturedRawEvents() {
+        return ImmutableMap.copyOf(capturedRawEvents);
+    }
+
+    public static Set<Class<?>> getCapturedJavaClasses() {
+        return ImmutableSet.copyOf(capturedJavaClasses);
     }
 }

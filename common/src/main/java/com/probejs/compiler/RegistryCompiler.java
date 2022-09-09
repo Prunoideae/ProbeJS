@@ -2,10 +2,8 @@ package com.probejs.compiler;
 
 import com.probejs.ProbeJS;
 import com.probejs.ProbePaths;
-import com.probejs.formatter.formatter.clazz.FormatterClass;
 import com.probejs.formatter.formatter.FormatterNamespace;
 import com.probejs.formatter.formatter.IFormatter;
-import com.probejs.info.type.TypeInfoClass;
 import dev.latvian.mods.kubejs.RegistryObjectBuilderTypes;
 
 import java.io.BufferedWriter;
@@ -68,12 +66,12 @@ public class RegistryCompiler {
         public List<String> format(Integer indent, Integer stepIndent) {
             List<String> formatted = new ArrayList<>();
             int stepped = indent + stepIndent;
-            formatted.add(" ".repeat(indent) + "class %s extends %s {".formatted(name, FormatterClass.formatTypeParameterized(new TypeInfoClass(RegistryObjectBuilderTypes.RegistryEventJS.class))));
+            formatted.add(" ".repeat(indent) + "class %s extends %s {".formatted(name, DocCompiler.formatMaybeParameterized(RegistryObjectBuilderTypes.RegistryEventJS.class)));
             for (RegistryObjectBuilderTypes.BuilderType<?> builder : types.types.values()) {
-                formatted.add(" ".repeat(stepped) + "create(id: string, type: %s): %s;".formatted(ProbeJS.GSON.toJson(builder.type()), FormatterClass.formatTypeParameterized(new TypeInfoClass(builder.builderClass()))));
+                formatted.add(" ".repeat(stepped) + "create(id: string, type: %s): %s;".formatted(ProbeJS.GSON.toJson(builder.type()), DocCompiler.formatMaybeParameterized(builder.builderClass())));
             }
             if (types.getDefaultType() != null) {
-                formatted.add(" ".repeat(stepped) + "create(id: string): %s;".formatted(FormatterClass.formatTypeParameterized(new TypeInfoClass(types.getDefaultType().builderClass()))));
+                formatted.add(" ".repeat(stepped) + "create(id: string): %s;".formatted(DocCompiler.formatMaybeParameterized(types.getDefaultType().builderClass())));
             }
             formatted.add(" ".repeat(indent) + "}");
             return formatted;

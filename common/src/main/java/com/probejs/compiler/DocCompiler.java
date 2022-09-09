@@ -6,7 +6,6 @@ import com.google.gson.*;
 import com.google.gson.stream.JsonWriter;
 import com.probejs.ProbeJS;
 import com.probejs.ProbePaths;
-import com.probejs.document.DocumentComment;
 import com.probejs.event.CapturedEvent;
 import com.probejs.formatter.ClassResolver;
 import com.probejs.formatter.NameResolver;
@@ -14,11 +13,12 @@ import com.probejs.formatter.SpecialTypes;
 import com.probejs.formatter.formatter.FormatterNamespace;
 import com.probejs.formatter.formatter.IFormatter;
 import com.probejs.formatter.formatter.jdoc.FormatterClass;
+import com.probejs.formatter.formatter.jdoc.FormatterType;
 import com.probejs.info.Walker;
-import com.probejs.info.type.TypeInfoClass;
 import com.probejs.jdoc.Manager;
 import com.probejs.jdoc.document.DocumentClass;
 import com.probejs.jdoc.property.PropertyComment;
+import com.probejs.jdoc.property.PropertyType;
 import com.probejs.plugin.CapturedClasses;
 import dev.latvian.mods.kubejs.KubeJSPaths;
 import dev.latvian.mods.kubejs.event.EventJS;
@@ -37,7 +37,7 @@ import java.util.*;
 public class DocCompiler {
 
     public static void compileGlobal(Collection<DocumentClass> globalClasses) throws IOException {
-        BufferedWriter writer = Files.newBufferedWriter(ProbePaths.GENERATED.resolve("globals-new.d.ts"));
+        BufferedWriter writer = Files.newBufferedWriter(ProbePaths.GENERATED.resolve("globals.d.ts"));
         Multimap<String, IFormatter> namespaces = ArrayListMultimap.create();
         for (DocumentClass clazz : globalClasses) {
             FormatterClass formatter = new FormatterClass(clazz);
@@ -63,6 +63,29 @@ public class DocCompiler {
         writer.flush();
     }
 
+    private static String formatJavaType(DocumentClass c) {
+        var formatter = new FormatterType.Clazz(new PropertyType.Clazz(c.getName()));
+        if (c.isInterface()) {
+            return "declare function java(name: %s): %s;\n".formatted(
+                    ProbeJS.GSON.toJson(c.getName()),
+                    formatter.formatFirst()
+            );
+        } else {
+            return "declare function java(name: %s): typeof %s;\n".formatted(
+                    ProbeJS.GSON.toJson(c.getName()),
+                    formatter.formatFirst()
+            );
+        }
+    }
+
+    public static void compileJava(Collection<DocumentClass> globalClasses) throws IOException {
+        BufferedWriter writer = Files.newBufferedWriter(ProbePaths.GENERATED.resolve("java.d.ts"));
+        writer.write("/// <reference path=\"./globals.d.ts\" />\n");
+        for (DocumentClass c : globalClasses) {
+            if (ServerScriptManager.instance.scriptManager.isClassAllowed(c.getName()))
+                writer.write(formatJavaType(c));
+        }
+    }
 
     public static Set<Class<?>> readCachedClasses(String fileName) throws IOException {
         Set<Class<?>> cachedClasses = new HashSet<>();
@@ -169,24 +192,46 @@ public class DocCompiler {
         touchableClasses.addAll(cachedClasses);
         touchableClasses.addAll(typeMap.values().stream().map(recipeTypeJS -> recipeTypeJS.factory.get().getClass()).toList());
         bindingEvent.getConstantDumpMap().values().stream().map(DummyBindingEvent::getConstantClassRecursive).forEach(touchableClasses::addAll);
-        touchableClasses.addAll(CapturedClasses.capturedEvents.values().stream().map(CapturedEvent::getCaptured).toList());
-        touchableClasses.addAll(CapturedClasses.capturedRawEvents.values());
-        touchableClasses.addAll(CapturedClasses.capturedJavaClasses);
+        touchableClasses.addAll(CapturedClasses.getCapturedEvents().values().stream().map(CapturedEvent::getCaptured).toList());
+        touchableClasses.addAll(CapturedClasses.getCapturedRawEvents().values());
+        touchableClasses.addAll(CapturedClasses.getCapturedJavaClasses());
 
         Walker walker = new Walker(touchableClasses);
         return walker.walk();
     }
 
-    public static void compileEvents(Map<String, CapturedEvent> cachedEvents, Map<String, Class<?>> cachedForgeEvents) throws IOException {
+    public static String formatMaybeParameterized(Class<?> clazz) {
+        if (clazz.getTypeParameters().length == 0) {
+            return new FormatterType.Clazz(new PropertyType.Clazz(clazz.getName())).formatFirst();
+        } else {
+            return new FormatterType.Parameterized(
+                    new PropertyType.Parameterized(
+                            new PropertyType.Clazz(clazz.getName()),
+                            Collections.nCopies(clazz.getTypeParameters().length, new PropertyType.Clazz(Object.class.getName()))
+                    )
+            ).formatFirst();
+        }
+    }
+
+    public static String formatMaybeParameterized(DocumentClass clazz) {
+        if (clazz.getGenerics().isEmpty()) {
+            return new FormatterType.Clazz(new PropertyType.Clazz(clazz.getName())).formatFirst();
+        } else {
+            return new FormatterType.Parameterized(
+                    new PropertyType.Parameterized(
+                            new PropertyType.Clazz(clazz.getName()),
+                            Collections.nCopies(clazz.getGenerics().size(), new PropertyType.Clazz(Object.class.getName())))
+            ).formatFirst();
+        }
+    }
+
+    public static void compileEvents(Map<String, CapturedEvent> cachedEvents, Map<String, Class<?>> cachedForgeEvents, Map<String, DocumentClass> globalClasses) throws IOException {
         cachedEvents.putAll(CapturedClasses.capturedEvents);
         cachedForgeEvents.putAll(CapturedClasses.capturedRawEvents);
         BufferedWriter writer = Files.newBufferedWriter(ProbePaths.GENERATED.resolve("events.d.ts"));
-        BufferedWriter writerDoc = Files.newBufferedWriter(ProbePaths.GENERATED.resolve("events.documented.d.ts"));
 
         writer.write("/// <reference path=\"./globals.d.ts\" />\n");
         writer.write("/// <reference path=\"./registries.d.ts\" />\n");
-        writerDoc.write("/// <reference path=\"./globals.d.ts\" />\n");
-        writerDoc.write("/// <reference path=\"./registries.d.ts\" />\n");
 
         Set<CapturedEvent> wildcards = new HashSet<>();
         for (Map.Entry<String, CapturedEvent> entry : cachedEvents.entrySet()) {
@@ -194,61 +239,41 @@ public class DocCompiler {
             String id = capturedEvent.getId();
             Class<?> event = capturedEvent.getCaptured();
             String sub = capturedEvent.getSub();
+            String name = id + (sub == null ? "" : ("." + sub));
             if (capturedEvent.hasSub())
                 wildcards.add(capturedEvent);
-            Optional<DocumentComment> document = com.probejs.document.Manager.classDocuments
-                    .getOrDefault(event.getName(), new ArrayList<>())
-                    .stream()
-                    .map(com.probejs.document.DocumentClass::getComment)
-                    .filter(Objects::nonNull)
-                    .findFirst();
-            String name = id + (sub == null ? "" : ("." + sub));
-            if (document.isPresent()) {
-                List<String> docStrings = document.get().format(0, 4);
-                docStrings.addAll(docStrings.size() - 1, getAdditionalEventComments(capturedEvent));
-                for (String s : docStrings)
-                    writerDoc.write(s + "\n");
-                writerDoc.write("declare function onEvent(name: %s, handler: (event: %s) => void);\n".formatted(ProbeJS.GSON.toJson(name), com.probejs.formatter.formatter.clazz.FormatterClass.formatTypeParameterized(new TypeInfoClass(event))));
+            DocumentClass clazz = globalClasses.get(event.getName());
+            if (clazz == null)
                 continue;
-            }
-            List<String> docStrings = new ArrayList<>();
-            docStrings.add("/**");
-            docStrings.addAll(getAdditionalEventComments(capturedEvent));
-            docStrings.add("*/");
-            for (String s : docStrings)
-                writer.write(s + "\n");
-            writer.write("declare function onEvent(name: %s, handler: (event: %s) => void);\n".formatted(ProbeJS.GSON.toJson(name), com.probejs.formatter.formatter.clazz.FormatterClass.formatTypeParameterized(new TypeInfoClass(event))));
+            PropertyComment mergedComment = clazz.getMergedComment();
+            mergedComment.getLines().addAll(getAdditionalEventComments(capturedEvent));
+            writer.write(String.join("\n", mergedComment.formatLines(0)) + "\n");
+            writer.write("declare function onEvent(name: %s, handler: (event: %s) => void);\n".formatted(ProbeJS.GSON.toJson(name), formatMaybeParameterized(clazz)));
         }
 
         Set<String> writtenWildcards = new HashSet<>();
         for (CapturedEvent wildcard : wildcards) {
             String id = ProbeJS.GSON.toJson(wildcard.getId());
+            id = id.substring(1, id.length() - 1);
             if (writtenWildcards.contains(id))
                 continue;
             writtenWildcards.add(id);
-            Optional<DocumentComment> document = com.probejs.document.Manager.classDocuments
-                    .getOrDefault(wildcard.getCaptured().getName(), new ArrayList<>())
-                    .stream()
-                    .map(com.probejs.document.DocumentClass::getComment)
-                    .filter(Objects::nonNull)
-                    .findFirst();
-            if (document.isPresent()) {
-                for (String s : document.get().format(0, 4))
-                    writerDoc.write(s + "\n");
-                writerDoc.write("declare function onEvent(name: `%s`, handler: (event: %s) => void);\n".formatted(id.substring(1, id.length() - 1), com.probejs.formatter.formatter.clazz.FormatterClass.formatTypeParameterized(new TypeInfoClass(wildcard.getCaptured()))));
+            Class<?> event = wildcard.getCaptured();
+            DocumentClass clazz = globalClasses.get(event.getName());
+            if (clazz == null)
                 continue;
-            }
-            writer.write("declare function onEvent(name: `%s`, handler: (event: %s) => void);\n".formatted(id.substring(1, id.length() - 1), com.probejs.formatter.formatter.clazz.FormatterClass.formatTypeParameterized(new TypeInfoClass(wildcard.getCaptured()))));
+            PropertyComment mergedComment = clazz.getMergedComment();
+            mergedComment.getLines().addAll(getAdditionalEventComments(wildcard));
+            writer.write("declare function onEvent(name: `%s`, handler: (event: %s) => void);\n".formatted(id, formatMaybeParameterized(clazz)));
         }
 
         for (Map.Entry<String, Class<?>> entry : cachedForgeEvents.entrySet()) {
             String name = entry.getKey();
             Class<?> event = entry.getValue();
-            writer.write("declare function onForgeEvent(name: %s, handler: (event: %s) => void);\n".formatted(ProbeJS.GSON.toJson(name), com.probejs.formatter.formatter.clazz.FormatterClass.formatTypeParameterized(new TypeInfoClass(event))));
+            writer.write("declare function onForgeEvent(name: %s, handler: (event: %s) => void);\n".formatted(ProbeJS.GSON.toJson(name), formatMaybeParameterized(event)));
         }
         RegistryCompiler.compileEventRegistries(writer);
         writer.flush();
-        writerDoc.flush();
     }
 
     public static void compileConstants(DummyBindingEvent bindingEvent) throws IOException {
@@ -258,7 +283,7 @@ public class DocCompiler {
             String name = entry.getKey();
             Object value = entry.getValue();
             String resolved = NameResolver.formatValue(value);
-            writer.write("declare const %s: %s;\n".formatted(name, resolved == null ? com.probejs.formatter.formatter.clazz.FormatterClass.formatTypeParameterized(new TypeInfoClass(value.getClass())) : resolved));
+            writer.write("declare const %s: %s;\n".formatted(name, resolved == null ? formatMaybeParameterized(value.getClass()) : resolved));
         }
         writer.flush();
     }
@@ -299,12 +324,12 @@ public class DocCompiler {
     private static List<String> getAdditionalEventComments(CapturedEvent event) {
         List<String> comments = new ArrayList<>();
         if (!event.getScriptTypes().isEmpty()) {
-            comments.add("* ");
-            comments.add("* The event fires on: %s.".formatted(event.getFormattedTypeString()));
+            comments.add("");
+            comments.add("The event fires on: %s.".formatted(event.getFormattedTypeString()));
         }
 
-        comments.add("* ");
-        comments.add("* The event is %scancellable.".formatted(event.isCancellable() ? "" : "**not** "));
+        comments.add("");
+        comments.add("The event is %scancellable.".formatted(event.isCancellable() ? "" : "**not** "));
         return comments;
     }
 
@@ -341,9 +366,12 @@ public class DocCompiler {
         globalClasses.removeIf(c -> ClassResolver.skipped.contains(c));
         bindingEvent.getClassDumpMap().forEach((s, c) -> NameResolver.putResolvedName(c, s));
         SpecialTypes.processFunctionalInterfaces(globalClasses);
+        SpecialTypes.processEnums(globalClasses);
 
         //Load and merge documents
         List<DocumentClass> documents = Manager.loadJavaClasses(globalClasses);
+        //Marks up native java classes
+        documents.forEach(document -> document.addProperty(new PropertyComment("@nativeJava")));
         List<DocumentClass> modDocs = Manager.loadModDocuments();
         List<DocumentClass> userDocs = Manager.loadUserDocuments();
         @SuppressWarnings("unchecked")
@@ -354,9 +382,32 @@ public class DocCompiler {
         //Compile things
         compileGlobal(mergedDocs);
         RegistryCompiler.compileRegistries();
-        compileEvents(cachedEvents, cachedForgeEvents);
+        compileEvents(cachedEvents, cachedForgeEvents, mergedDocsMap);
         compileConstants(bindingEvent);
-
+        compileJava(documents);
+        compileAdditionalTypeNames();
+        RawCompiler.compileRaw();
+        compileJSConfig();
+        compileVSCodeConfig();
+        cachedJavaClasses.addAll(CapturedClasses.capturedJavaClasses);
+        DocCompiler.writeCachedEvents("cachedEvents.json", cachedEvents);
+        DocCompiler.writeCachedForgeEvents("cachedForgedEvents.json", cachedForgeEvents);
+        DocCompiler.writeCachedClasses("cachedJava.json", cachedJavaClasses);
     }
 
+    public static void compileAdditionalTypeNames() throws IOException {
+        Path path = ProbePaths.GENERATED.resolve("names.d.ts");
+        if (Files.exists(path))
+            return;
+        BufferedWriter writer = Files.newBufferedWriter(ProbePaths.GENERATED.resolve("names.d.ts"));
+        writer.write("/// <reference path=\"./globals.d.ts\" />\n");
+        for (Map.Entry<String, List<NameResolver.ResolvedName>> entry : NameResolver.resolvedNames.entrySet()) {
+            List<NameResolver.ResolvedName> exportedNames = entry.getValue();
+            if (exportedNames.size() > 1) {
+                for (int i = 1; i < exportedNames.size(); i++)
+                    writer.write("const %s: typeof %s\n".formatted(exportedNames.get(i).getLastName(), exportedNames.get(0).getLastName()));
+            }
+        }
+        writer.flush();
+    }
 }

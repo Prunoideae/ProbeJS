@@ -69,7 +69,7 @@ public abstract class FormatterValue<T extends PropertyValue<T, J>, J> extends D
                 FormatterValue<?, ?> keyValue = Serde.getValueFormatter(Serde.getValueProperty(entry.getKey()));
                 FormatterValue<?, ?> propertyValue = Serde.getValueFormatter(Serde.getValueProperty(entry.getValue()));
                 if (keyValue != null && propertyValue != null)
-                    return (keyValue instanceof FallbackFormatter ? "[key: %s]: %s" : "%s: %s".formatted(keyValue.formatFirst(), propertyValue.formatFirst()));
+                    return ((keyValue instanceof FallbackFormatter ? "[key: %s]: %s" : "%s: %s").formatted(keyValue.formatFirst(), propertyValue.formatFirst()));
                 return null;
             }).filter(Objects::nonNull).collect(Collectors.joining(", "))));
         }

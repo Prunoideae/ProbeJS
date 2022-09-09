@@ -3,21 +3,11 @@ package com.probejs.formatter;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.probejs.ProbeJS;
-import com.probejs.document.type.IType;
-import com.probejs.document.type.TypeNamed;
-import com.probejs.document.type.TypeParameterized;
-import com.probejs.formatter.formatter.jdoc.FormatterClass;
-import com.probejs.info.ClassInfo;
 import com.probejs.info.MethodInfo;
 import com.probejs.info.type.ITypeInfo;
 import com.probejs.jdoc.document.DocumentClass;
 import dev.latvian.mods.kubejs.block.MaterialJS;
 import dev.latvian.mods.kubejs.block.MaterialListJS;
-import dev.latvian.mods.kubejs.item.ingredient.IngredientJS;
-import dev.latvian.mods.kubejs.util.ClassWrapper;
-import dev.latvian.mods.rhino.BaseFunction;
-import dev.latvian.mods.rhino.NativeJavaObject;
-import dev.latvian.mods.rhino.NativeObject;
 import dev.latvian.mods.rhino.util.RemapForJS;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.damagesource.DamageSource;
@@ -71,11 +61,10 @@ public class NameResolver {
     }
 
     public static final HashMap<String, List<ResolvedName>> resolvedNames = new HashMap<>();
-    public static final HashMap<Class<?>, List<IType>> specialExtension = new HashMap<>();
     public static final HashMap<Class<?>, Function<ITypeInfo, String>> specialTypeFormatters = new HashMap<>();
     public static final HashMap<Class<?>, Function<Object, String>> specialValueFormatters = new HashMap<>();
     public static final HashMap<Class<?>, Boolean> specialTypeGuards = new HashMap<>();
-    public static final HashMap<Class<?>, Supplier<List<String>>> specialClassAssigner = new HashMap<>();
+    public static final Multimap<String, Supplier<List<String>>> specialClassAssigner = ArrayListMultimap.create();
     public static final List<String> nameResolveSpecials = new ArrayList<>();
     public static final Set<String> keywords = new HashSet<>();
     public static final Set<String> resolvedPrimitives = new HashSet<>();
@@ -122,11 +111,6 @@ public class NameResolver {
         return specialTypeFormatters.containsKey(clazz);
     }
 
-    public static void putValueFormatter(Function<Object, String> transformer, Class<?>... classes) {
-        for (Class<?> clazz : classes)
-            specialValueFormatters.put(clazz, transformer);
-    }
-
     public static String formatValue(Object object) {
         if (object == null)
             return "null";
@@ -171,12 +155,6 @@ public class NameResolver {
         }
     }
 
-    public static void resolveNames(List<Class<?>> classes) {
-        for (Class<?> clazz : classes) {
-            resolveName(clazz);
-        }
-    }
-
     public static void addKeyword(String kw) {
         keywords.add(kw);
     }
@@ -191,46 +169,19 @@ public class NameResolver {
     }
 
     public static void putSpecialAssignments(Class<?> clazz, Supplier<List<String>> assigns) {
-        specialClassAssigner.put(clazz, assigns);
+        specialClassAssigner.put(MethodInfo.RUNTIME.getMappedClass(clazz), assigns);
     }
 
-    public static List<String> getClassAssignments(Class<?> clazz) {
-        return specialClassAssigner.getOrDefault(clazz, ArrayList::new).get();
-    }
-
-    public static void putSpecialExtension(Class<?> clazz, String base) {
-        putSpecialExtension(clazz, new TypeNamed(base));
-    }
-
-    public static void putSpecialExtension(Class<?> clazz, IType type) {
-        specialExtension.computeIfAbsent(clazz, c -> new ArrayList<>()).add(type);
+    public static List<String> getClassAssignments(String clazz) {
+        ArrayList<String> assignables = new ArrayList<>();
+        specialClassAssigner.get(clazz).stream().map(Supplier::get).forEach(assignables::addAll);
+        return assignables;
     }
 
     public static void addPrioritizedPackage(String prior) {
         //Add a point to the end to prevent overlapping of package names
         //For example, net.minecraft and net.minecraftforge
         nameResolveSpecials.add(prior + ".");
-    }
-
-    public static List<Class<?>> priorSortClasses(Set<Class<?>> classes) {
-        Map<Integer, List<Class<?>>> partMap = new HashMap<>();
-        for (Class<?> clazz : classes) {
-            int index = -1;
-            String remappedName = MethodInfo.RUNTIME.getMappedClass(clazz);
-            for (int i = 0; i < nameResolveSpecials.size(); i++) {
-                if (remappedName.startsWith(nameResolveSpecials.get(i)))
-                    index = i;
-            }
-            partMap.computeIfAbsent(index, i -> new ArrayList<>()).add(clazz);
-        }
-        List<Class<?>> result = new ArrayList<>();
-        for (int i = 0; i < nameResolveSpecials.size(); i++) {
-            if (partMap.containsKey(i))
-                result.addAll(partMap.get(i));
-        }
-        if (partMap.containsKey(-1))
-            result.addAll(partMap.get(-1));
-        return result;
     }
 
     public static List<DocumentClass> priorSortClasses(Iterable<DocumentClass> classes) {
@@ -287,20 +238,6 @@ public class NameResolver {
         putResolvedPrimitive(Boolean.class, "boolean");
         putResolvedPrimitive(Boolean.TYPE, "boolean");
 
-
-        putValueFormatter(ProbeJS.GSON::toJson,
-                String.class, Character.class, Character.TYPE,
-                Long.class, Long.TYPE, Integer.class, Integer.TYPE,
-                Short.class, Short.TYPE, Byte.class, Byte.TYPE,
-                Double.class, Double.TYPE, Float.class, Float.TYPE,
-                Boolean.class, Boolean.TYPE);
-        putValueFormatter(SpecialTypes::formatMap, Map.class);
-        putValueFormatter(SpecialTypes::formatList, List.class);
-        putValueFormatter(SpecialTypes::formatScriptable, NativeObject.class);
-        putValueFormatter(SpecialTypes::formatFunction, BaseFunction.class);
-        putValueFormatter(SpecialTypes::formatNJO, NativeJavaObject.class);
-        //putValueFormatter(SpecialTypes::formatScriptable, Scriptable.class);
-
         putSpecialAssignments(DamageSource.class, () -> {
             List<String> result = new ArrayList<>();
             try {
@@ -314,17 +251,9 @@ public class NameResolver {
             }
             return result;
         });
-
         putSpecialAssignments(MaterialJS.class, () -> MaterialListJS.INSTANCE.map.keySet().stream().map(ProbeJS.GSON::toJson).collect(Collectors.toList()));
 
         SpecialTypes.assignRegistries();
-        putTypeFormatter(Class.class, SpecialTypes::formatClassLike);
-        putTypeFormatter(ClassWrapper.class, SpecialTypes::formatClassLike);
-        putTypeGuard(true, Class.class, ClassWrapper.class);
-        putTypeGuard(false, IngredientJS.class);
-
-        putSpecialExtension(List.class, new TypeParameterized(new TypeNamed("Array"), List.of(new TypeNamed("E"))));
-        putSpecialExtension(AbstractMap.class, new TypeParameterized(new TypeNamed("TSDoc.JSMap"), List.of(new TypeNamed("K"), new TypeNamed("V"))));
 
         addKeyword("function");
         addKeyword("debugger");

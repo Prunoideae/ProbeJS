@@ -151,11 +151,12 @@ public abstract class FormatterType<T extends PropertyType<T>> extends DocumentF
 
         @Override
         public List<String> formatDocument(Integer indent, Integer stepIndent) {
+            String baseString = base.formatFirst();
             return List.of(
-                    "%s<%s>".formatted(
-                            base.formatFirst(),
+                    !baseString.equals("any") ? "%s<%s>".formatted(
+                            baseString,
                             params.stream().map(IFormatter::formatFirst).collect(Collectors.joining(", "))
-                    ));
+                    ) : "any");
         }
     }
 

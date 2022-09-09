@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FormatterField extends DocumentFormatter<DocumentField> {
-    
+
     public FormatterField(DocumentField document) {
         super(document);
     }
@@ -29,7 +29,7 @@ public class FormatterField extends DocumentFormatter<DocumentField> {
                 modifiers.isEmpty() ? "" : String.join(" ", modifiers) + " ",
                 ProbeJS.GSON.toJson(document.getName()),
                 shouldFormatValue() ?
-                        Serde.getValueFormatter(document.getValue()) :
+                        Serde.getValueFormatter(document.getValue()).formatFirst() :
                         Serde.getTypeFormatter(document.getType()).formatFirst()
         ));
     }

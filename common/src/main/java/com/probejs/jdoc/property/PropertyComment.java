@@ -42,7 +42,7 @@ public class PropertyComment extends AbstractProperty<PropertyComment> {
     public List<String> formatLines(int indent) {
         List<String> formatted = new ArrayList<>();
         formatted.add(Util.indent(indent) + "/**");
-        lines.forEach(line -> formatted.add(" ".repeat(indent) + " * "));
+        lines.forEach(line -> formatted.add(" ".repeat(indent) + " * " + line));
         formatted.add(Util.indent(indent) + "*/");
         return formatted;
     }
@@ -59,7 +59,8 @@ public class PropertyComment extends AbstractProperty<PropertyComment> {
         if (this == other)
             return this;
         PropertyComment comment = copy();
-        comment.lines.add("");
+        if (!isEmpty())
+            comment.lines.add("");
         comment.lines.addAll(other.lines);
         return comment;
     }

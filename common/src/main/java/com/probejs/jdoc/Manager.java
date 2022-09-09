@@ -26,13 +26,12 @@ public class Manager {
         return javaClasses;
     }
 
-    public static List<DocumentClass> loadJSONDocument(Path path) throws IOException {
+    public static List<DocumentClass> loadJsonClassDoc(Path path) throws IOException {
         JsonArray docsJson = ProbeJS.GSON.fromJson(Files.newBufferedReader(path), JsonArray.class);
         List<DocumentClass> documents = new ArrayList<>();
         for (JsonElement element : docsJson) {
-            DocumentClass document = (DocumentClass) Serde.deserializeDocument(element.getAsJsonObject());
-            if (document != null)
-                documents.add(document);
+            if (Serde.deserializeDocument(element.getAsJsonObject()) instanceof DocumentClass documentClass)
+                documents.add(documentClass);
         }
         return documents;
     }
@@ -50,7 +49,7 @@ public class Manager {
                     Optional<Path> entryPath = mod.findResource(entry);
                     if (entryPath.isPresent()) {
                         ProbeJS.LOGGER.info("Loading document inside jar - %s".formatted(entryPath));
-                        List<DocumentClass> jsonDoc = loadJSONDocument(entryPath.get());
+                        List<DocumentClass> jsonDoc = loadJsonClassDoc(entryPath.get());
                         documents.addAll(jsonDoc);
                     } else {
                         ProbeJS.LOGGER.warn("Document from file is not found - %s".formatted(entryPath));
@@ -64,8 +63,10 @@ public class Manager {
     public static List<DocumentClass> loadUserDocuments() throws IOException {
         List<DocumentClass> documents = new ArrayList<>();
         for (File file : Objects.requireNonNull(ProbePaths.DOCS.toFile().listFiles())) {
+            if (!file.getName().endsWith(".json"))
+                continue;
             Path path = Paths.get(file.toURI());
-            documents.addAll(loadJSONDocument(path));
+            documents.addAll(loadJsonClassDoc(path));
         }
         return documents;
     }
@@ -73,7 +74,13 @@ public class Manager {
     public static Map<String, DocumentClass> mergeDocuments(List<DocumentClass>... sources) {
         Map<String, DocumentClass> documents = new HashMap<>();
         for (List<DocumentClass> source : sources) {
-            
+            for (DocumentClass clazz : source) {
+                if (!documents.containsKey(clazz.getName())) {
+                    documents.put(clazz.getName(), clazz);
+                } else {
+                    documents.put(clazz.getName(), documents.get(clazz.getName()).merge(clazz));
+                }
+            }
         }
         return documents;
     }

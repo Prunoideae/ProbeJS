@@ -86,6 +86,7 @@ public class FormatterClass extends DocumentFormatter<DocumentClass> {
         for (Function<DocumentClass, IFormatter> formatter : SPECIAL_FORMATTER_REGISTRY.get(document.getName())) {
             typesAssignable.add(formatter.apply(document).formatFirst());
         }
+        typesAssignable.addAll(NameResolver.getClassAssignments(document.getName()));
         lines.add(Util.indent(indent) + "type %s_ = %s;".formatted(typesAssignable.get(0), String.join(" | ", typesAssignable)));
         return lines;
     }

@@ -1,5 +1,6 @@
 package com.probejs.formatter.formatter.jdoc;
 
+import com.probejs.formatter.NameResolver;
 import com.probejs.formatter.formatter.IFormatter;
 import com.probejs.jdoc.Serde;
 import com.probejs.jdoc.document.DocumentMethod;
@@ -29,12 +30,15 @@ public class FormatterMethod extends DocumentFormatter<DocumentMethod> {
     }
 
     public Optional<FormatterBean> getBeanFormatter() {
+        String name = document.getName();
+        if (name.length() < 4) //get set is
+            return Optional.empty();
         FormatterBean bean = null;
-        if (document.getName().startsWith("get") && document.getParams().isEmpty())
+        if (name.startsWith("get") && document.getParams().isEmpty() && !Character.isDigit(name.charAt(3)))
             bean = new FormatterObjectGetter(document);
-        if (document.getName().startsWith("set") && document.getParams().size() == 1)
+        if (name.startsWith("set") && document.getParams().size() == 1 && !Character.isDigit(name.charAt(3)))
             bean = new FormatterObjectSetter(document);
-        if (document.getName().startsWith("is") && document.getParams().isEmpty() && document.getReturns().getTypeName().equals("bool") || document.getReturns().getTypeName().equals("java.lang.Boolean"))
+        if (name.startsWith("is") && document.getParams().isEmpty() && (document.getReturns().getTypeName().equals("bool") || document.getReturns().getTypeName().equals("java.lang.Boolean")) && !Character.isDigit(name.charAt(2)))
             bean = new FormatterIsGetter(document);
 
         return Optional.ofNullable(bean);
@@ -117,7 +121,7 @@ public class FormatterMethod extends DocumentFormatter<DocumentMethod> {
 
         @Override
         public List<String> formatDocument(Integer indent, Integer stepIndent) {
-            return List.of("%s: %s".formatted(document.getName(), Serde.getTypeFormatter(document.getType()).underscored(underscored).formatFirst()));
+            return List.of("%s: %s".formatted(NameResolver.getNameSafe(document.getName()), Serde.getTypeFormatter(document.getType()).underscored(underscored).formatFirst()));
         }
 
         public FormatterParam underscored(boolean flag) {
