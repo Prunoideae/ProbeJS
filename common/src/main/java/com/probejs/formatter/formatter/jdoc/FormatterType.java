@@ -114,7 +114,7 @@ public abstract class FormatterType<T extends PropertyType<T>> extends DocumentF
         public List<String> formatDocument(Integer indent, Integer stepIndent) {
             return List.of(
                     Util.indent(indent) + types.stream()
-                            .map(t -> (t instanceof FormatterType.Joint ? "(%s)" : "%s").formatted(t.format()))
+                            .map(t -> (t instanceof FormatterType.Joint ? "(%s)" : "%s").formatted(t.formatFirst()))
                             .collect(Collectors.joining(document.getDelimiter()))
             );
         }
@@ -181,15 +181,13 @@ public abstract class FormatterType<T extends PropertyType<T>> extends DocumentF
     }
 
     public static class JSObject extends FormatterType<PropertyType.JSObject> {
-        private final Map<Object, FormatterType<?>> keyValues = new HashMap<>();
+        private final Map<PropertyType.JSObjectKey, FormatterType<?>> keyValues = new HashMap<>();
 
         public JSObject(PropertyType.JSObject document) {
             super(document);
             document.getKeyValues()
                     .forEach((key, value) -> keyValues.put(
-                            key instanceof PropertyType<?> type ?
-                                    Serde.getTypeFormatter(type).underscored() :
-                                    key,
+                            key,
                             Serde.getTypeFormatter(value)));
         }
 
@@ -202,12 +200,10 @@ public abstract class FormatterType<T extends PropertyType<T>> extends DocumentF
         @Override
         public List<String> formatDocument(Integer indent, Integer stepIndent) {
             return List.of("{%s}".formatted(keyValues.entrySet().stream().map(pair -> {
-                Object key = pair.getKey();
+                PropertyType.JSObjectKey key = pair.getKey();
                 FormatterType<?> value = pair.getValue();
                 return "%s: %s".formatted(
-                        key instanceof FormatterType<?> formatter ?
-                                "[key: (%s)]".formatted(formatter.formatFirst()) :
-                                ProbeJS.GSON.toJson(key),
+                        key.format(),
                         value.formatFirst());
             }).collect(Collectors.joining(", "))));
         }

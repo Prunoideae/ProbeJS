@@ -1,7 +1,8 @@
-package com.probejs.jdoc.property;
+package com.probejs.jdoc.property.condition;
 
 import com.google.gson.JsonObject;
 import com.probejs.jdoc.IConditional;
+import com.probejs.jdoc.property.AbstractProperty;
 import dev.architectury.platform.Platform;
 
 public class PropertyMod extends AbstractProperty<PropertyMod> implements IConditional {

@@ -16,6 +16,7 @@ import com.probejs.formatter.formatter.jdoc.FormatterClass;
 import com.probejs.formatter.formatter.jdoc.FormatterType;
 import com.probejs.info.Walker;
 import com.probejs.jdoc.Manager;
+import com.probejs.jdoc.Serde;
 import com.probejs.jdoc.document.DocumentClass;
 import com.probejs.jdoc.property.PropertyComment;
 import com.probejs.jdoc.property.PropertyType;
@@ -85,6 +86,7 @@ public class DocCompiler {
             if (ServerScriptManager.instance.scriptManager.isClassAllowed(c.getName()))
                 writer.write(formatJavaType(c));
         }
+        writer.flush();
     }
 
     public static Set<Class<?>> readCachedClasses(String fileName) throws IOException {
@@ -283,7 +285,7 @@ public class DocCompiler {
             String name = entry.getKey();
             Object value = entry.getValue();
             String resolved = NameResolver.formatValue(value);
-            writer.write("declare const %s: %s;\n".formatted(name, resolved == null ? formatMaybeParameterized(value.getClass()) : resolved));
+            writer.write("declare const %s: %s;\n".formatted(name, Objects.requireNonNull(Serde.getValueFormatter(Serde.getValueProperty(value))).formatFirst()));
         }
         writer.flush();
     }
@@ -308,12 +310,18 @@ public class DocCompiler {
                 """
                         {
                             "json.schemas": [
-                                {
-                                    "fileMatch": [
-                                        "/lang/*.json"
-                                    ],
-                                    "url": "./.vscode/schema.json"
-                                }
+                                    {
+                                        "fileMatch": [
+                                            "/lang/*.json"
+                                        ],
+                                        "url": "./.vscode/probe.lang-schema.json"
+                                    },
+                                    {
+                                        "fileMatch": [
+                                            "/probe/docs/*.json"
+                                        ],
+                                        "url": "./.vscode/probe.doc-schema.json"
+                                    }
                             ]
                         }
                         """
@@ -341,6 +349,21 @@ public class DocCompiler {
         jsonWriter.setIndent("    ");
         ProbeJS.GSON_WRITER.toJson(original, JsonObject.class, jsonWriter);
         jsonWriter.flush();
+    }
+
+    private static void exportClasses(List<DocumentClass> documents, Path path) throws IOException {
+        JsonArray classes = new JsonArray();
+        documents.forEach(document -> classes.add(document.serialize()));
+        BufferedWriter writer = Files.newBufferedWriter(path);
+        JsonWriter jsonWriter = ProbeJS.GSON_WRITER.newJsonWriter(writer);
+        jsonWriter.setIndent("    ");
+        ProbeJS.GSON_WRITER.toJson(classes, JsonArray.class, jsonWriter);
+        jsonWriter.flush();
+    }
+
+    private static void exportSerializedClasses(List<DocumentClass> documents, List<DocumentClass> mergedDocuments) throws IOException {
+        exportClasses(documents, KubeJSPaths.EXPORTED.resolve("javaClasses.json"));
+        exportClasses(mergedDocuments, KubeJSPaths.EXPORTED.resolve("mergedClasses.json"));
     }
 
     public static void compile() throws IOException {
@@ -371,7 +394,7 @@ public class DocCompiler {
         //Load and merge documents
         List<DocumentClass> documents = Manager.loadJavaClasses(globalClasses);
         //Marks up native java classes
-        documents.forEach(document -> document.addProperty(new PropertyComment("@nativeJava")));
+        //documents.forEach(document -> document.addProperty(new PropertyComment("@nativeJava")));
         List<DocumentClass> modDocs = Manager.loadModDocuments();
         List<DocumentClass> userDocs = Manager.loadUserDocuments();
         @SuppressWarnings("unchecked")
@@ -380,6 +403,7 @@ public class DocCompiler {
         NameResolver.priorSortClasses(mergedDocs).forEach(NameResolver::resolveName);
 
         //Compile things
+        exportSerializedClasses(documents, mergedDocs);
         compileGlobal(mergedDocs);
         RegistryCompiler.compileRegistries();
         compileEvents(cachedEvents, cachedForgeEvents, mergedDocsMap);
@@ -390,6 +414,7 @@ public class DocCompiler {
         compileJSConfig();
         compileVSCodeConfig();
         cachedJavaClasses.addAll(CapturedClasses.capturedJavaClasses);
+        SchemaCompiler.compile(mergedDocs);
         DocCompiler.writeCachedEvents("cachedEvents.json", cachedEvents);
         DocCompiler.writeCachedForgeEvents("cachedForgedEvents.json", cachedForgeEvents);
         DocCompiler.writeCachedClasses("cachedJava.json", cachedJavaClasses);

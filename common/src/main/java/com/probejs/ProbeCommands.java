@@ -1,7 +1,11 @@
 package com.probejs;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.stream.JsonWriter;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.probejs.compiler.DocCompiler;
 import com.probejs.compiler.SchemaCompiler;
 import com.probejs.compiler.SnippetCompiler;
@@ -14,8 +18,11 @@ import dev.latvian.mods.kubejs.KubeJSPaths;
 import dev.latvian.mods.kubejs.item.ingredient.IngredientJS;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.network.chat.TextComponent;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
@@ -34,12 +41,9 @@ public class ProbeCommands {
                                     Instant start = Instant.now();
                                     try {
                                         SnippetCompiler.compile();
-                                        SchemaCompiler.compile();
                                         ClassResolver.init();
                                         NameResolver.init();
                                         DocCompiler.compile();
-                                        if (ProbeConfig.INSTANCE.exportClassNames)
-                                            SnippetCompiler.compileClassNames();
                                     } catch (Exception e) {
                                         e.printStackTrace();
                                         context.getSource().sendSuccess(new TextComponent("Uncaught exception happened in wrapper, please report to the Github issue with complete latest.log."), false);
@@ -96,6 +100,36 @@ public class ProbeCommands {
                                             ProbeConfig.INSTANCE.save();
                                             return Command.SINGLE_SUCCESS;
                                         }))
+                        )
+                        .then(Commands.literal("export")
+                                .requires(source -> source.getServer().isSingleplayer())
+                                .then(Commands.argument("className", StringArgumentType.string())
+                                        .suggests((ctx, builder) -> SharedSuggestionProvider.suggest(
+                                                ClassInfo.CLASS_CACHE
+                                                        .values()
+                                                        .stream()
+                                                        .map(ClassInfo::getName),
+                                                builder)
+                                        )
+                                        .executes(ctx -> {
+                                            String className = StringArgumentType.getString(ctx, "className");
+                                            ClassInfo info = ClassInfo.CLASS_NAME_CACHE.get(className);
+                                            String[] nameParts = info.getName().split("\\.");
+                                            JsonObject document = DocumentClass.fromJava(info).serialize();
+                                            JsonArray outArray = new JsonArray();
+                                            outArray.add(document);
+                                            try {
+                                                BufferedWriter writer = Files.newBufferedWriter(KubeJSPaths.EXPORTED.resolve(nameParts[nameParts.length - 1] + ".json"));
+                                                JsonWriter jsonWriter = ProbeJS.GSON_WRITER.newJsonWriter(writer);
+                                                jsonWriter.setIndent("    ");
+                                                ProbeJS.GSON_WRITER.toJson(outArray, JsonArray.class, jsonWriter);
+                                                jsonWriter.flush();
+                                            } catch (IOException e) {
+                                                throw new RuntimeException(e);
+                                            }
+                                            return Command.SINGLE_SUCCESS;
+                                        })
+                                )
                         )
                         .then(Commands.literal("test")
                                 .requires(source -> true)

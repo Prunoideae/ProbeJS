@@ -16,17 +16,21 @@ public class PropertyReturns extends AbstractProperty<PropertyReturns> {
     @Override
     public JsonObject serialize() {
         JsonObject object = super.serialize();
-        object.add("type", type.serialize());
+        object.add("returns", type.serialize());
         return object;
     }
 
     @Override
     public void deserialize(JsonObject object) {
-        type = (PropertyType<?>) Serde.deserializeProperty(object.get("type").getAsJsonObject());
+        type = (PropertyType<?>) Serde.deserializeProperty(object.get("returns").getAsJsonObject());
     }
 
     @Override
     public PropertyReturns copy() {
         return new PropertyReturns(type);
+    }
+
+    public PropertyType<?> getType() {
+        return type;
     }
 }

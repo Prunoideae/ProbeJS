@@ -5,13 +5,16 @@ import com.probejs.info.FieldInfo;
 import com.probejs.jdoc.Serde;
 import com.probejs.jdoc.property.PropertyType;
 import com.probejs.jdoc.property.PropertyValue;
+import dev.latvian.mods.rhino.util.RemapForJS;
 
+import java.lang.annotation.Annotation;
 import java.util.Objects;
 
 public class DocumentField extends AbstractDocument<DocumentField> {
     private String name;
     private boolean isStatic;
     private boolean isFinal;
+    private boolean shouldGSON = false;
     private PropertyType<?> type;
     private PropertyValue<?, ?> value;
 
@@ -31,8 +34,10 @@ public class DocumentField extends AbstractDocument<DocumentField> {
     public void deserialize(JsonObject object) {
         super.deserialize(object);
         name = object.get("name").getAsString();
-        isStatic = object.get("static").getAsBoolean();
-        isFinal = object.get("final").getAsBoolean();
+        if (object.has("static"))
+            isStatic = object.get("static").getAsBoolean();
+        if (object.has("final"))
+            isFinal = object.get("final").getAsBoolean();
         type = (PropertyType<?>) Serde.deserializeProperty(object.get("fieldType").getAsJsonObject());
         if (object.has("value"))
             value = (PropertyValue<?, ?>) Serde.deserializeProperty(object.get("value").getAsJsonObject());
@@ -44,9 +49,18 @@ public class DocumentField extends AbstractDocument<DocumentField> {
         document.isFinal = info.isFinal();
         document.isStatic = info.isStatic();
         document.type = Serde.deserializeFromJavaType(info.getType());
+        document.shouldGSON = true;
         if (info.getStaticValue() != null)
             document.value = Serde.getValueProperty(info.getStaticValue());
+        info.getAnnotations().stream()
+                .filter(annotation -> !(annotation instanceof RemapForJS))
+                .map(Annotation::toString).forEach(document.builtinComments::add);
         return document;
+    }
+
+    @Override
+    public DocumentField applyProperties() {
+        return this;
     }
 
     @Override
@@ -55,6 +69,7 @@ public class DocumentField extends AbstractDocument<DocumentField> {
         document.name = name;
         document.isStatic = isStatic;
         document.isFinal = isFinal;
+        document.shouldGSON = shouldGSON;
         document.type = type;
         document.properties.addAll(properties);
         return document;
@@ -91,5 +106,9 @@ public class DocumentField extends AbstractDocument<DocumentField> {
 
     public boolean isStatic() {
         return isStatic;
+    }
+
+    public boolean isShouldGSON() {
+        return shouldGSON;
     }
 }

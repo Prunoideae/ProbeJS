@@ -6,6 +6,7 @@ import com.probejs.jdoc.Serde;
 import com.probejs.jdoc.property.PropertyComment;
 import com.probejs.jdoc.property.PropertyType;
 
+import java.lang.annotation.Annotation;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -28,8 +29,7 @@ public class DocumentClass extends AbstractDocument<DocumentClass> {
     public JsonObject serialize() {
         JsonObject object = super.serialize();
         object.addProperty("className", name);
-        if (parent != null)
-            object.add("parent", parent.serialize());
+        if (parent != null) object.add("parent", parent.serialize());
         Serde.serializeCollection(object, "fields", fields);
         Serde.serializeCollection(object, "methods", methods);
         Serde.serializeCollection(object, "variables", generics, true);
@@ -62,21 +62,33 @@ public class DocumentClass extends AbstractDocument<DocumentClass> {
         document.generics.addAll(info.getParameters().stream().map(Serde::deserializeFromJavaType).toList());
         info.getFieldInfo().stream().map(DocumentField::fromJava).forEach(document.fields::add);
         info.getMethodInfo().stream().map(DocumentMethod::fromJava).forEach(document.methods::add);
+        info.getConstructorInfo().stream().map(DocumentConstructor::fromJava).forEach(document.constructors::add);
+        info.getAnnotations().stream().map(Annotation::toString).forEach(document.builtinComments::add);
+        document.builtinComments.add("@JavaClass");
         return document;
     }
 
     @Override
+    public DocumentClass applyProperties() {
+        return this;
+    }
+
+    @Override
     public DocumentClass merge(DocumentClass other) {
-        //Overwrites everything basing on current document.
+        //Overwrites everything basing on document.
         //Generics are not overwritten tho
-        if (this == other)
-            return this;
-        DocumentClass document = copy();
-        document.parent = other.parent;
-        document.interfaces.addAll(other.interfaces);
-        document.methods.addAll(other.methods);
-        document.fields.addAll(other.fields);
-        document.properties.addAll(other.properties);
+        if (this == other) return this;
+        DocumentClass document = other.copy();
+        document.parent = parent;
+        document.interfaces.addAll(interfaces);
+        document.methods.addAll(methods);
+        document.fields.addAll(fields);
+        document.properties.addAll(properties);
+        document.constructors = constructors;
+        document.generics = generics;
+        document.isInterface = isInterface;
+        document.isAbstract = isAbstract;
+        document.builtinComments.addAll(builtinComments);
         return document;
     }
 
@@ -91,6 +103,7 @@ public class DocumentClass extends AbstractDocument<DocumentClass> {
         document.properties.addAll(properties);
         document.methods.addAll(methods);
         document.fields.addAll(fields);
+        document.builtinComments.addAll(builtinComments);
         return document;
     }
 

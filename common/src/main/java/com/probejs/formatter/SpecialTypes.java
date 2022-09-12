@@ -18,13 +18,11 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 
-import java.lang.reflect.AnnotatedElement;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class SpecialTypes {
@@ -39,10 +37,6 @@ public class SpecialTypes {
             if (isFunctionalInterface(superInterface))
                 return true;
         }
-        return false;
-    }
-
-    public static boolean isNotNullable(AnnotatedElement element) {
         return false;
     }
 
@@ -105,5 +99,15 @@ public class SpecialTypes {
                 }
             }
         }
+    }
+
+    public static String formatAnnotationToJSDoc(Annotation annotation) {
+        String className = MethodInfo.RUNTIME.getMappedClass(annotation.annotationType());
+        String[] nameParts = className.split("\\.");
+        Map<String, String> values = new HashMap<>();
+        for (Method method : annotation.annotationType().getMethods()) {
+            
+        }
+        return "@%s ".formatted(nameParts[nameParts.length - 1]);
     }
 }

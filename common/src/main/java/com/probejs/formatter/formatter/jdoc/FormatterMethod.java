@@ -31,14 +31,17 @@ public class FormatterMethod extends DocumentFormatter<DocumentMethod> {
 
     public Optional<FormatterBean> getBeanFormatter() {
         String name = document.getName();
-        if (name.length() < 4) //get set is
+        if (name.length() < 4 && !name.startsWith("is")) //get set
             return Optional.empty();
+        if (name.equals("is"))
+            return Optional.empty();
+
         FormatterBean bean = null;
         if (name.startsWith("get") && document.getParams().isEmpty() && !Character.isDigit(name.charAt(3)))
             bean = new FormatterObjectGetter(document);
         if (name.startsWith("set") && document.getParams().size() == 1 && !Character.isDigit(name.charAt(3)))
             bean = new FormatterObjectSetter(document);
-        if (name.startsWith("is") && document.getParams().isEmpty() && (document.getReturns().getTypeName().equals("bool") || document.getReturns().getTypeName().equals("java.lang.Boolean")) && !Character.isDigit(name.charAt(2)))
+        if (name.startsWith("is") && document.getParams().isEmpty() && (document.getReturns().getTypeName().equals("boolean") || document.getReturns().getTypeName().equals("java.lang.Boolean")) && !Character.isDigit(name.charAt(2)))
             bean = new FormatterIsGetter(document);
 
         return Optional.ofNullable(bean);
@@ -49,8 +52,20 @@ public class FormatterMethod extends DocumentFormatter<DocumentMethod> {
             super(document);
         }
 
-        public static String getCamelCase(String text) {
-            return Character.toLowerCase(text.charAt(0)) + text.substring(1);
+        public static String getBeanPropertyName(String text) {
+            String beanPropertyName = text;
+            char ch0 = text.charAt(0);
+            if (Character.isUpperCase(ch0)) {
+                if (text.length() == 1) {
+                    beanPropertyName = text.toLowerCase();
+                } else {
+                    char ch1 = text.charAt(1);
+                    if (!Character.isUpperCase(ch1)) {
+                        beanPropertyName = Character.toLowerCase(ch0) + text.substring(1);
+                    }
+                }
+            }
+            return beanPropertyName;
         }
 
         protected abstract String getBeanName();
@@ -69,7 +84,7 @@ public class FormatterMethod extends DocumentFormatter<DocumentMethod> {
 
         @Override
         protected String getBeanName() {
-            return getCamelCase(document.getName().substring(3));
+            return getBeanPropertyName(document.getName().substring(3));
         }
     }
 
@@ -80,7 +95,7 @@ public class FormatterMethod extends DocumentFormatter<DocumentMethod> {
 
         @Override
         protected String getBeanName() {
-            return getCamelCase(document.getName().substring(2));
+            return getBeanPropertyName(document.getName().substring(2));
         }
     }
 
@@ -97,7 +112,7 @@ public class FormatterMethod extends DocumentFormatter<DocumentMethod> {
 
         @Override
         protected String getBeanName() {
-            return getCamelCase(document.getName().substring(3));
+            return getBeanPropertyName(document.getName().substring(3));
         }
     }
 
@@ -121,7 +136,7 @@ public class FormatterMethod extends DocumentFormatter<DocumentMethod> {
 
         @Override
         public List<String> formatDocument(Integer indent, Integer stepIndent) {
-            return List.of("%s: %s".formatted(NameResolver.getNameSafe(document.getName()), Serde.getTypeFormatter(document.getType()).underscored(underscored).formatFirst()));
+            return List.of((document.isVarArg() ? "..." : "") + "%s: %s".formatted(NameResolver.getNameSafe(document.getName()), Serde.getTypeFormatter(document.getType()).underscored(underscored).formatFirst()));
         }
 
         public FormatterParam underscored(boolean flag) {

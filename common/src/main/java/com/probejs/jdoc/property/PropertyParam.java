@@ -9,10 +9,12 @@ import java.util.Objects;
 public class PropertyParam extends AbstractProperty<PropertyParam> {
     private String name;
     private PropertyType<?> type;
+    private boolean varArg;
 
-    public PropertyParam(String name, PropertyType<?> type) {
+    public PropertyParam(String name, PropertyType<?> type, boolean isVarArg) {
         this.name = name;
         this.type = type;
+        varArg = isVarArg;
     }
 
     public PropertyParam() {
@@ -24,6 +26,7 @@ public class PropertyParam extends AbstractProperty<PropertyParam> {
         JsonObject object = super.serialize();
         object.addProperty("name", name);
         object.add("paramType", type.serialize());
+        object.addProperty("varArg", varArg);
         return object;
     }
 
@@ -31,6 +34,8 @@ public class PropertyParam extends AbstractProperty<PropertyParam> {
     public void deserialize(JsonObject object) {
         name = object.get("name").getAsString();
         type = (PropertyType<?>) Serde.deserializeProperty(object.get("paramType").getAsJsonObject());
+        if (object.has("varArg"))
+            varArg = object.get("varArg").getAsBoolean();
     }
 
     @Override
@@ -58,15 +63,17 @@ public class PropertyParam extends AbstractProperty<PropertyParam> {
         PropertyParam param = new PropertyParam();
         param.name = info.getName();
         param.type = Serde.deserializeFromJavaType(info.getType());
-        if (info.isNonnull()) {
-            param.type = PropertyType.wrapNonNull(param.type);
-        }
+        param.varArg = info.isVararg();
         return param;
 
     }
 
     @Override
     public PropertyParam copy() {
-        return new PropertyParam(name, type);
+        return new PropertyParam(name, type, varArg);
+    }
+
+    public boolean isVarArg() {
+        return varArg;
     }
 }

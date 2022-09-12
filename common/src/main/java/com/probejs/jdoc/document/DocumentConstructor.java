@@ -1,7 +1,9 @@
 package com.probejs.jdoc.document;
 
 import com.google.gson.JsonObject;
+import com.probejs.info.ConstructorInfo;
 import com.probejs.jdoc.Serde;
+import com.probejs.jdoc.property.PropertyModify;
 import com.probejs.jdoc.property.PropertyParam;
 
 import java.util.ArrayList;
@@ -34,6 +36,20 @@ public class DocumentConstructor extends AbstractDocument<DocumentConstructor> {
     }
 
     @Override
+    public DocumentConstructor applyProperties() {
+        DocumentConstructor copy = copy();
+        copy.findPropertiesOf(PropertyModify.class).forEach(modify -> {
+            PropertyParam param = copy.params.get(modify.getOrdinal());
+            copy.params.set(modify.getOrdinal(), new PropertyParam(
+                    modify.getName() != null ? modify.getName() : param.getName(),
+                    modify.getNewType() != null ? modify.getNewType() : param.getType(),
+                    param.isVarArg()
+            ));
+        });
+        return copy;
+    }
+
+    @Override
     public DocumentConstructor copy() {
         return new DocumentConstructor(params);
     }
@@ -53,5 +69,11 @@ public class DocumentConstructor extends AbstractDocument<DocumentConstructor> {
 
     public List<PropertyParam> getParams() {
         return params;
+    }
+
+    public static DocumentConstructor fromJava(ConstructorInfo info) {
+        DocumentConstructor document = new DocumentConstructor();
+        info.getParams().stream().map(PropertyParam::fromJava).forEach(document.params::add);
+        return document;
     }
 }

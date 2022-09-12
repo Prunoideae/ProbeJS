@@ -9,12 +9,9 @@ import dev.latvian.mods.rhino.util.HideFromJS;
 import dev.latvian.mods.rhino.util.RemapForJS;
 import dev.latvian.mods.rhino.util.Remapper;
 
-import javax.annotation.Nonnull;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class MethodInfo {
@@ -22,13 +19,12 @@ public class MethodInfo {
     private final String name;
     private final boolean shouldHide;
     private final boolean defaultMethod;
-    private boolean nonnull;
-
     private final int modifiers;
     private final Class<?> from;
     private ITypeInfo returnType;
     private List<ParamInfo> params;
     private List<ITypeInfo> typeVariables;
+    private final List<Annotation> annotations;
     public static final Remapper RUNTIME = RemappingHelper.getMinecraftRemapper();
 
     private static String getRemappedOrDefault(Method method, Class<?> from) {
@@ -54,7 +50,6 @@ public class MethodInfo {
         }
         this.name = method.isAnnotationPresent(RemapForJS.class) ? method.getAnnotation(RemapForJS.class).value() : getRemappedOrDefault(method, method.getDeclaringClass());
         this.shouldHide = method.getAnnotation(HideFromJS.class) != null;
-        this.nonnull = SpecialTypes.isNotNullable(method);
         this.from = from;
         this.modifiers = method.getModifiers();
         this.returnType = InfoTypeResolver.resolveType(
@@ -64,6 +59,7 @@ public class MethodInfo {
         this.params = Arrays.stream(method.getParameters()).map(param -> new ParamInfo(param, typeGenericMap)).collect(Collectors.toList());
         this.typeVariables = Arrays.stream(method.getTypeParameters()).map(InfoTypeResolver::resolveType).collect(Collectors.toList());
         this.defaultMethod = method.isDefault();
+        this.annotations = List.of(method.getAnnotations());
     }
 
     public String getName() {
@@ -80,14 +76,6 @@ public class MethodInfo {
 
     public boolean isAbstract() {
         return Modifier.isAbstract(modifiers);
-    }
-
-    public boolean isNonnull() {
-        return nonnull;
-    }
-
-    public void setNonnull(boolean nonnull) {
-        this.nonnull = nonnull;
     }
 
     public boolean isDefaultMethod() {
@@ -122,10 +110,13 @@ public class MethodInfo {
         this.typeVariables = typeVariables;
     }
 
+    public List<Annotation> getAnnotations() {
+        return annotations;
+    }
+
     public static class ParamInfo {
         private final String name;
         private final boolean isVararg;
-        private boolean nonnull;
         private ITypeInfo type;
 
         public ParamInfo(Parameter parameter) {
@@ -135,7 +126,6 @@ public class MethodInfo {
         public ParamInfo(Parameter parameter, Map<Type, Type> typeMap) {
             this.name = parameter.getName();
             this.isVararg = parameter.isVarArgs();
-            this.nonnull = SpecialTypes.isNotNullable(parameter);
             try {
                 this.type = InfoTypeResolver.resolveType(parameter.getParameterizedType(), t -> typeMap.getOrDefault(t, t));
             } catch (Exception e) {
@@ -155,14 +145,6 @@ public class MethodInfo {
 
         public boolean isVararg() {
             return isVararg;
-        }
-
-        public boolean isNonnull() {
-            return nonnull;
-        }
-
-        public void setNonnull(boolean nonnull) {
-            this.nonnull = nonnull;
         }
 
         public void setTypeInfo(ITypeInfo type) {

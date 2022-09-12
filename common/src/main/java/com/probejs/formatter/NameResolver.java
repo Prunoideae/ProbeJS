@@ -264,8 +264,8 @@ public class NameResolver {
         addKeyword("const");
 
         addPrioritizedPackage("java");
+        addPrioritizedPackage("dev.latvian.mods");
         addPrioritizedPackage("net.minecraft");
         addPrioritizedPackage("net.minecraftforge");
-        addPrioritizedPackage("dev.latvian.mods");
     }
 }

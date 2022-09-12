@@ -10,6 +10,11 @@ import com.probejs.jdoc.document.AbstractDocument;
  * on any other stateful objects. As this property might be constructed at any time.
  */
 public abstract class AbstractProperty<T extends AbstractDocument<T>> extends AbstractDocument<T> {
+    @Override
+    @SuppressWarnings("unchecked")
+    public T applyProperties() {
+        return (T) this;
+    }
 
     public abstract void deserialize(JsonObject object);
 }

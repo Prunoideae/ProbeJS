@@ -2,10 +2,12 @@ package com.probejs.jdoc;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.probejs.ProbeJS;
 import com.probejs.ProbePaths;
 import com.probejs.info.ClassInfo;
 import com.probejs.jdoc.document.DocumentClass;
+import com.probejs.jdoc.property.AbstractProperty;
 import dev.architectury.platform.Mod;
 import dev.architectury.platform.Platform;
 
@@ -27,9 +29,19 @@ public class Manager {
     }
 
     public static List<DocumentClass> loadJsonClassDoc(Path path) throws IOException {
-        JsonArray docsJson = ProbeJS.GSON.fromJson(Files.newBufferedReader(path), JsonArray.class);
+        JsonObject docsObject = ProbeJS.GSON.fromJson(Files.newBufferedReader(path), JsonObject.class);
+        if (docsObject.has("properties")) {
+            List<AbstractProperty<?>> properties = new ArrayList<>();
+            Serde.deserializeDocuments(properties, docsObject.get("properties"));
+            for (AbstractProperty<?> property : properties) {
+                if (property instanceof IConditional condition && !condition.test()) {
+                    return List.of();
+                }
+            }
+        }
+        JsonArray docsArray = docsObject.get("classes").getAsJsonArray();
         List<DocumentClass> documents = new ArrayList<>();
-        for (JsonElement element : docsJson) {
+        for (JsonElement element : docsArray) {
             if (Serde.deserializeDocument(element.getAsJsonObject()) instanceof DocumentClass documentClass)
                 documents.add(documentClass);
         }

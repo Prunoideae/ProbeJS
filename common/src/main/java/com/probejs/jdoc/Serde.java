@@ -9,6 +9,7 @@ import com.probejs.formatter.formatter.jdoc.FormatterValue;
 import com.probejs.info.type.*;
 import com.probejs.jdoc.document.*;
 import com.probejs.jdoc.property.*;
+import com.probejs.jdoc.property.condition.PropertyMod;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
@@ -91,9 +92,12 @@ public class Serde {
         return property;
     }
 
-    public static PropertyType<?> deserializeFromJavaType(ITypeInfo type) {
-        if (type instanceof TypeInfoClass) {
-            return constructType(PropertyType.Clazz::new, type);
+    public static PropertyType<?> deserializeFromJavaType(ITypeInfo type, boolean insideType) {
+        if (type instanceof TypeInfoClass clazz) {
+            if (!clazz.getTypeVariables().isEmpty() && !insideType)
+                return constructType(PropertyType.Parameterized::new, clazz);
+            else
+                return constructType(PropertyType.Clazz::new, clazz);
         }
         if (type instanceof TypeInfoArray) {
             return constructType(PropertyType.Array::new, type);
@@ -108,6 +112,10 @@ public class Serde {
             return constructType(PropertyType.Clazz::new, new TypeInfoClass(Object.class));
         }
         return null;
+    }
+
+    public static PropertyType<?> deserializeFromJavaType(ITypeInfo type) {
+        return deserializeFromJavaType(type, false);
     }
 
 

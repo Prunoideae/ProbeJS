@@ -9,7 +9,6 @@ import com.probejs.jdoc.Serde;
 import com.probejs.jdoc.property.AbstractProperty;
 import com.probejs.jdoc.property.PropertyComment;
 import com.probejs.jdoc.property.PropertyHide;
-import com.probejs.jdoc.property.PropertyMod;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +32,25 @@ public abstract class AbstractDocument<T extends AbstractDocument<T>> implements
     public static final BiMap<Class<? extends AbstractDocument<?>>, String> DOCUMENT_TYPE_REGISTRY = HashBiMap.create();
 
     protected List<AbstractProperty<?>> properties = new ArrayList<>();
+    /**
+     * Some lines of built-in comments.
+     * <p>
+     * They are modified at runtime, and not serialized.
+     * <p>
+     * Mostly they occur like annotation, tho there might be exceptions.
+     * <p>
+     * Built-in comments will always appear at the end of the comment.
+     */
+    protected List<String> builtinComments = new ArrayList<>();
+
+    /**
+     * Apply properties modification to current document.
+     * <p>
+     * This returns a new document.
+     *
+     * @return the document with properties applied
+     */
+    public abstract T applyProperties();
 
     /**
      * Merges other document into this document.
@@ -100,6 +118,7 @@ public abstract class AbstractDocument<T extends AbstractDocument<T>> implements
         for (PropertyComment partialComment : findPropertiesOf(PropertyComment.class)) {
             comment = comment.merge(partialComment);
         }
+        comment = comment.merge(new PropertyComment(builtinComments.toArray(String[]::new)));
         return comment;
     }
 }

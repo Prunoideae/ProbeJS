@@ -123,24 +123,4 @@ public class SnippetCompiler {
         writer.flush();
     }
 
-    public static void compileClassNames() throws IOException {
-        JsonObject resultJson = new JsonObject();
-        for (Map.Entry<String, List<NameResolver.ResolvedName>> entry : NameResolver.resolvedNames.entrySet()) {
-            String className = entry.getKey();
-            List<NameResolver.ResolvedName> resolvedNames = entry.getValue();
-            for (NameResolver.ResolvedName resolvedName : resolvedNames) {
-                JsonObject classJson = new JsonObject();
-                JsonArray prefix = new JsonArray();
-                prefix.add("!%s".formatted(resolvedName.getFullName().replace("$", "\\$")));
-                classJson.add("prefix", prefix);
-                classJson.addProperty("body", className);
-                resultJson.add(resolvedName.getFullName(), classJson);
-            }
-        }
-
-        Path codeFile = ProbePaths.WORKSPACE_SETTINGS.resolve("classNames.code-snippets");
-        BufferedWriter writer = Files.newBufferedWriter(codeFile);
-        ProbeJS.GSON.toJson(resultJson, writer);
-        writer.flush();
-    }
 }

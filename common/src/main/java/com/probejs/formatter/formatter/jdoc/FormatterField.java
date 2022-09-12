@@ -27,7 +27,7 @@ public class FormatterField extends DocumentFormatter<DocumentField> {
             modifiers.add("static");
         return List.of(Util.indent(indent) + "%s%s: %s;".formatted(
                 modifiers.isEmpty() ? "" : String.join(" ", modifiers) + " ",
-                ProbeJS.GSON.toJson(document.getName()),
+                document.isShouldGSON() ? ProbeJS.GSON.toJson(document.getName()) : document.getName(),
                 shouldFormatValue() ?
                         Serde.getValueFormatter(document.getValue()).formatFirst() :
                         Serde.getTypeFormatter(document.getType()).formatFirst()

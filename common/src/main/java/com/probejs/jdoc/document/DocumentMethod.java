@@ -1,11 +1,16 @@
 package com.probejs.jdoc.document;
 
 import com.google.gson.JsonObject;
+import com.probejs.ProbeJS;
 import com.probejs.info.MethodInfo;
 import com.probejs.jdoc.Serde;
+import com.probejs.jdoc.property.PropertyModify;
 import com.probejs.jdoc.property.PropertyParam;
+import com.probejs.jdoc.property.PropertyReturns;
 import com.probejs.jdoc.property.PropertyType;
+import dev.latvian.mods.rhino.util.RemapForJS;
 
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -33,8 +38,10 @@ public class DocumentMethod extends AbstractDocument<DocumentMethod> {
     public void deserialize(JsonObject object) {
         super.deserialize(object);
         name = object.get("name").getAsString();
-        isStatic = object.get("static").getAsBoolean();
-        isAbstract = object.get("abstract").getAsBoolean();
+        if (object.has("static"))
+            isStatic = object.get("static").getAsBoolean();
+        if (object.has("abstract"))
+            isAbstract = object.get("abstract").getAsBoolean();
         Serde.deserializeDocuments(params, object.get("params"));
         returns = (PropertyType<?>) Serde.deserializeProperty(object.get("returns").getAsJsonObject());
     }
@@ -43,14 +50,32 @@ public class DocumentMethod extends AbstractDocument<DocumentMethod> {
         DocumentMethod document = new DocumentMethod();
         document.name = info.getName();
         document.returns = Serde.deserializeFromJavaType(info.getReturnType());
-        if (info.isNonnull())
-            document.returns = PropertyType.wrapNonNull(document.returns);
         document.isStatic = info.isStatic();
         document.isAbstract = info.isAbstract();
         info.getParams().stream()
                 .map(PropertyParam::fromJava)
                 .forEach(document.params::add);
+        info.getAnnotations().stream()
+                .filter(annotation -> !(annotation instanceof RemapForJS))
+                .map(Annotation::toString).forEach(document.builtinComments::add);
         return document;
+    }
+
+    @Override
+    public DocumentMethod applyProperties() {
+        DocumentMethod copy = copy();
+        copy.findPropertiesOf(PropertyModify.class).forEach(modify -> {
+            PropertyParam param = copy.params.get(modify.getOrdinal());
+            copy.params.set(modify.getOrdinal(), new PropertyParam(
+                    modify.getName() != null ? modify.getName() : param.getName(),
+                    modify.getNewType() != null ? modify.getNewType() : param.getType(),
+                    param.isVarArg()
+            ));
+        });
+        copy.findProperty(PropertyReturns.class).ifPresent(propertyReturns -> {
+            copy.returns = propertyReturns.getType();
+        });
+        return copy;
     }
 
     @Override
@@ -60,6 +85,8 @@ public class DocumentMethod extends AbstractDocument<DocumentMethod> {
         document.params.addAll(params);
         document.returns = returns;
         document.properties.addAll(properties);
+        document.isStatic = isStatic;
+        document.isAbstract = isAbstract;
         return document;
     }
 
