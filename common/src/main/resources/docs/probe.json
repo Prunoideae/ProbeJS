@@ -1,0 +1,34 @@
+{
+    "classes": [
+        {
+            "type": "document:class",
+            "className": "com.prunoideae.probejs.types.ArrayOrSelf",
+            "variables": [
+                {
+                    "type": "type:variable",
+                    "name": "T"
+                }
+            ],
+            "properties": [
+                {
+                    "type": "property:assign",
+                    "assign": {
+                        "type": "type:variable",
+                        "name": "T"
+                    },
+                    "shield": true
+                },
+                {
+                    "type": "property:assign",
+                    "assign": {
+                        "type": "type:array",
+                        "component": {
+                            "type": "type:variable",
+                            "name": "T"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}
