@@ -3,6 +3,7 @@ package com.probejs.formatter.formatter.jdoc;
 import com.probejs.ProbeJS;
 import com.probejs.jdoc.Serde;
 import com.probejs.jdoc.document.DocumentField;
+import com.probejs.jdoc.property.PropertyValue;
 import com.probejs.util.Util;
 
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ public class FormatterField extends DocumentFormatter<DocumentField> {
     }
 
     public boolean shouldFormatValue() {
-        return document.isStatic() && document.getValue() != null;
+        return document.isStatic() && document.getValue() != null && !(document.getValue() instanceof PropertyValue.NullValue);
     }
 
     @Override

@@ -56,6 +56,56 @@ allprojects {
                 includeGroup "mezz.jei"
             }
         }
+
+        maven {
+            url "https://maven.architectury.dev/"
+            content {
+                includeGroup "me.shedaniel"
+            }
+        }
+        maven {
+            url "https://maven.saps.dev/minecraft"
+            content {
+                includeGroup "dev.latvian.mods"
+                includeGroup "dev.ftb.mods"
+            }
+        }
+        maven {
+            name = "Modmuss"
+            url = "https://maven.modmuss50.me/"
+        }
+        maven {
+            name = "Jared"
+            url = "https://maven.blamejared.com/"
+        }
+        maven {
+            url = "https://maven.terraformersmc.com/" // for trinkets
+        }
+        maven {
+            name = "Ladysnake Libs"
+            url = 'https://ladysnake.jfrog.io/artifactory/mods'
+        }
+        maven {
+            name = "BuildCraft" // for LBA
+            url = "https://mod-buildcraft.com/maven"
+        }
+        maven {
+            name "entity reach"
+            url "https://maven.jamieswhiteshirt.com/libs-release/"
+        }
+        maven {
+            url "https://jitpack.io" // for step height eam
+        }
+        maven {
+            url "https://maven.shedaniel.me/" // for rei
+        }
+        maven {
+            url "https://server.bbkr.space/artifactory/libs-release/" // for bannerplusplus
+        }
+        maven {
+            name = "ParchmentMC"
+            url = "https://maven.parchmentmc.net/"
+        }
     }
 
     tasks.withType(JavaCompile) {

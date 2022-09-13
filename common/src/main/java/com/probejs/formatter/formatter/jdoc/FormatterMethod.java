@@ -3,8 +3,10 @@ package com.probejs.formatter.formatter.jdoc;
 import com.probejs.formatter.NameResolver;
 import com.probejs.formatter.formatter.IFormatter;
 import com.probejs.jdoc.Serde;
+import com.probejs.jdoc.document.DocumentClass;
 import com.probejs.jdoc.document.DocumentMethod;
 import com.probejs.jdoc.property.PropertyParam;
+import com.probejs.jdoc.property.PropertyType;
 import com.probejs.util.Util;
 
 import java.util.List;
@@ -12,8 +14,32 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class FormatterMethod extends DocumentFormatter<DocumentMethod> {
-    public FormatterMethod(DocumentMethod document) {
+    private final DocumentClass classDocument;
+
+    public FormatterMethod(DocumentMethod document, DocumentClass declaringClass) {
         super(document);
+        classDocument = declaringClass;
+    }
+
+    private boolean isReturningThis() {
+        PropertyType<?> returningType = document.getReturns();
+        if (returningType instanceof PropertyType.Clazz clazz) {
+            return classDocument.getName().equals(clazz.getName());
+        }
+        if (returningType instanceof PropertyType.Parameterized parameterized) {
+            if (!parameterized.getBase().equals(new PropertyType.Clazz(classDocument.getName())))
+                return false;
+            List<PropertyType<?>> paramsReturn = parameterized.getParams();
+            List<PropertyType<?>> paramsClazz = classDocument.getGenerics();
+            if (parameterized.getParams().size() != classDocument.getGenerics().size())
+                return false;
+            for (int i = 0; i < parameterized.getParams().size(); i++) {
+                if (!paramsReturn.get(i).equals(paramsClazz.get(i)))
+                    return false;
+            }
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -26,7 +52,7 @@ public class FormatterMethod extends DocumentFormatter<DocumentMethod> {
                         .map(FormatterParam::underscored)
                         .map(IFormatter::formatFirst)
                         .collect(Collectors.joining(", ")),
-                Serde.getTypeFormatter(document.getReturns()).formatFirst()));
+                isReturningThis() ? "this" : Serde.getTypeFormatter(document.getReturns()).formatFirst()));
     }
 
     public Optional<FormatterBean> getBeanFormatter() {
