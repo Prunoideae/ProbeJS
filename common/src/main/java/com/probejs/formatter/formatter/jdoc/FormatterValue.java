@@ -115,6 +115,18 @@ public abstract class FormatterValue<T extends PropertyValue<T, J>, J> extends D
         }
     }
 
+    public static class NullFormatter extends FormatterValue<PropertyValue.NullValue, Object> {
+
+        public NullFormatter(PropertyValue.NullValue document) {
+            super(document);
+        }
+
+        @Override
+        protected List<String> formatDocument(Integer indent, Integer stepIndent) {
+            return List.of("null");
+        }
+    }
+
     @SuppressWarnings("unchecked")
     public static <T extends PropertyValue<T, J>, J> void addValueFormatter(Class<T> clazz, Function<T, FormatterValue<T, J>> constructor) {
         VALUE_FORMATTERS_REGISTRY.put(clazz, (value) -> constructor.apply((T) value));
@@ -129,5 +141,6 @@ public abstract class FormatterValue<T extends PropertyValue<T, J>, J> extends D
         addValueFormatter(PropertyValue.MapValue.class, MapFormatter::new);
         addValueFormatter(PropertyValue.ListValue.class, ListFormatter::new);
         addValueFormatter(PropertyValue.ObjectValue.class, ObjectFormatter::new);
+        addValueFormatter(PropertyValue.NullValue.class, NullFormatter::new);
     }
 }

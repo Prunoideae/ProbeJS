@@ -42,6 +42,7 @@ public abstract class PropertyValue<T extends PropertyValue<T, J>, J> extends Ab
 
     @Override
     public final void deserialize(JsonObject object) {
+        super.deserialize(object);
         if (object.has("value"))
             value = deserializeValue(object.get("value"));
     }
@@ -177,6 +178,24 @@ public abstract class PropertyValue<T extends PropertyValue<T, J>, J> extends Ab
         @Override
         public FallbackValue copy() {
             return new FallbackValue(value);
+        }
+    }
+
+    public static class NullValue extends PropertyValue<NullValue, Object> {
+
+        @Override
+        public NullValue copy() {
+            return new NullValue();
+        }
+
+        @Override
+        public JsonElement serializeValue() {
+            return new JsonPrimitive("null");
+        }
+
+        @Override
+        public Object deserializeValue(JsonElement value) {
+            return null;
         }
     }
 

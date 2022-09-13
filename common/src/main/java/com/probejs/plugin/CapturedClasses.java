@@ -9,11 +9,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class CapturedClasses {
 
-    public static Map<String, CapturedEvent> capturedEvents = new HashMap<>();
-    public static Map<String, Class<?>> capturedRawEvents = new HashMap<>();
+    public static Map<String, CapturedEvent> capturedEvents = new ConcurrentHashMap<>();
+    public static Map<String, Class<?>> capturedRawEvents = new ConcurrentHashMap<>();
     public static Set<Class<?>> capturedJavaClasses = new HashSet<>();
     public static Set<Class<?>> ignoredEvents = new HashSet<>();
 

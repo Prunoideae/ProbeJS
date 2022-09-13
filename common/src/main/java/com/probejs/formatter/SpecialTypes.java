@@ -49,15 +49,15 @@ public class SpecialTypes {
                 if (info.getMethodInfo().stream().filter(MethodInfo::isAbstract).count() != 1)
                     continue;
                 FormatterClass.SPECIAL_FORMATTER_REGISTRY.put(info.getName(), (document) -> (indent, stepIndent) -> {
-                    DocumentMethod documentMethod = document.getMethods().stream().filter(DocumentMethod::isAbstract).findFirst().get();
+                    DocumentMethod documentMethod = document.getMethods().stream().filter(DocumentMethod::isAbstract).map(DocumentMethod::applyProperties).findFirst().get();
+                    //
                     return List.of("((%s)=>%s)".formatted(
                             documentMethod.getParams()
                                     .stream()
                                     .map(FormatterMethod.FormatterParam::new)
-                                    .map(FormatterMethod.FormatterParam::underscored)
                                     .map(IFormatter::formatFirst)
                                     .collect(Collectors.joining(", ")),
-                            Serde.getTypeFormatter(documentMethod.getReturns()).formatFirst()));
+                            Serde.getTypeFormatter(documentMethod.getReturns()).underscored().formatFirst()));
                 });
             }
         }
@@ -106,7 +106,7 @@ public class SpecialTypes {
         String[] nameParts = className.split("\\.");
         Map<String, String> values = new HashMap<>();
         for (Method method : annotation.annotationType().getMethods()) {
-            
+
         }
         return "@%s ".formatted(nameParts[nameParts.length - 1]);
     }

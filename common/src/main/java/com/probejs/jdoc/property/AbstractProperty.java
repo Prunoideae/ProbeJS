@@ -16,5 +16,5 @@ public abstract class AbstractProperty<T extends AbstractDocument<T>> extends Ab
         return (T) this;
     }
 
-    public abstract void deserialize(JsonObject object);
+    //public abstract void deserialize(JsonObject object);
 }

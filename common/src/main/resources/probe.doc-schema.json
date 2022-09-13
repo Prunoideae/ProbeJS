@@ -228,6 +228,9 @@
                         "properties": {
                             "type": {
                                 "const": "property:underscored"
+                            },
+                            "underscored": {
+                                "type": "boolean"
                             }
                         }
                     }
@@ -340,6 +343,9 @@
                 },
                 "newType": {
                     "$ref": "#/definitions/propertyType"
+                },
+                "name": {
+                    "type": "string"
                 }
             }
         },

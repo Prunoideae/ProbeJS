@@ -38,6 +38,7 @@ public class Serde {
         AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyReturns.class, "property:returns");
         AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyParam.class, "property:param");
         AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyAssign.class, "property:assign");
+        AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyUnderscored.class, "property:underscored");
 
         //Documents
         AbstractDocument.DOCUMENT_TYPE_REGISTRY.put(DocumentClass.class, "document:class");
@@ -51,6 +52,7 @@ public class Serde {
         AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyValue.StringValue.class, "value:string");
         AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyValue.CharacterValue.class, "value:character");
         AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyValue.FallbackValue.class, "value:fallback");
+        AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyValue.NullValue.class, "value:null");
         AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyValue.MapValue.class, "value:map");
         AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyValue.ListValue.class, "value:list");
 
@@ -145,6 +147,8 @@ public class Serde {
     }
 
     public static PropertyValue<?, ?> getValueProperty(Object o) {
+        if (o == null)
+            return new PropertyValue.NullValue();
         Function<Object, PropertyValue<?, ?>> constructor = PropertyValue.VALUES_REGISTRY.get(o.getClass());
         if (constructor != null) {
             return constructor.apply(o);

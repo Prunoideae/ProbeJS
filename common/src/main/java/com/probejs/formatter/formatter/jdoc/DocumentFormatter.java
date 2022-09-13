@@ -11,7 +11,7 @@ public abstract class DocumentFormatter<T extends AbstractDocument<T>> implement
     protected final T document;
 
     public DocumentFormatter(T document) {
-        this.document = document.applyProperties();
+        this.document = document;
     }
 
     protected abstract List<String> formatDocument(Integer indent, Integer stepIndent);

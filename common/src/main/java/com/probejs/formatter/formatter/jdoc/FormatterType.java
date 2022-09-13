@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 public abstract class FormatterType<T extends PropertyType<T>> extends DocumentFormatter<T> {
     public static Map<Class<? extends PropertyType<?>>, Function<PropertyType<?>, FormatterType<?>>> FORMATTER_REGISTRY = new HashMap<>();
 
-    protected boolean underscored = false;
+    protected Boolean underscored = null;
 
     public FormatterType(T document) {
         super(document);
@@ -35,8 +35,12 @@ public abstract class FormatterType<T extends PropertyType<T>> extends DocumentF
         return false;
     }
 
+    public Boolean getUnderscored() {
+        return underscored != null && underscored;
+    }
+
     public FormatterType<T> underscored(boolean underscored) {
-        if (!document.hasProperty(PropertyUnderscored.class))
+        if (this.underscored == null)
             this.underscored = underscored;
         return this;
     }
@@ -53,7 +57,7 @@ public abstract class FormatterType<T extends PropertyType<T>> extends DocumentF
 
         @Override
         public List<String> formatDocument(Integer indent, Integer stepIndent) {
-            return List.of(Util.indent(indent) + document.getTypeName() + (underscored ? "_" : ""));
+            return List.of(Util.indent(indent) + document.getTypeName() + (getUnderscored() ? "_" : ""));
         }
     }
 

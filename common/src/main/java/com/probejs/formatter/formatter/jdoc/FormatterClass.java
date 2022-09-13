@@ -6,6 +6,9 @@ import com.probejs.formatter.NameResolver;
 import com.probejs.formatter.formatter.IFormatter;
 import com.probejs.jdoc.Serde;
 import com.probejs.jdoc.document.DocumentClass;
+import com.probejs.jdoc.document.DocumentConstructor;
+import com.probejs.jdoc.document.DocumentField;
+import com.probejs.jdoc.document.DocumentMethod;
 import com.probejs.jdoc.property.PropertyAssign;
 import com.probejs.jdoc.property.PropertyType;
 import com.probejs.util.Util;
@@ -20,7 +23,7 @@ public class FormatterClass extends DocumentFormatter<DocumentClass> {
     private boolean internal = false;
 
     public FormatterClass(DocumentClass document) {
-        super(document);
+        super(document.applyProperties());
     }
 
     public String getClassGeneric() {
@@ -78,10 +81,10 @@ public class FormatterClass extends DocumentFormatter<DocumentClass> {
 
         header.append("{");
         lines.add(Util.indent(indent) + header);
-        document.getConstructors().forEach(constructor -> lines.addAll(new FormatterConstructor(constructor).format(indent + stepIndent, stepIndent)));
-        document.getMethods().forEach(method -> lines.addAll(new FormatterMethod(method).format(indent + stepIndent, stepIndent)));
-        document.getMethods().stream().map(FormatterMethod::new).map(FormatterMethod::getBeanFormatter).filter(Optional::isPresent).map(Optional::get).forEach(formatter -> lines.addAll(formatter.format(indent + stepIndent, stepIndent)));
-        document.getFields().forEach(field -> lines.addAll(new FormatterField(field).format(indent + stepIndent, stepIndent)));
+        document.getConstructors().stream().map(DocumentConstructor::applyProperties).forEach(constructor -> lines.addAll(new FormatterConstructor(constructor).format(indent + stepIndent, stepIndent)));
+        document.getMethods().stream().map(DocumentMethod::applyProperties).forEach(method -> lines.addAll(new FormatterMethod(method).format(indent + stepIndent, stepIndent)));
+        document.getMethods().stream().map(DocumentMethod::applyProperties).map(FormatterMethod::new).map(FormatterMethod::getBeanFormatter).filter(Optional::isPresent).map(Optional::get).forEach(formatter -> lines.addAll(formatter.format(indent + stepIndent, stepIndent)));
+        document.getFields().stream().map(DocumentField::applyProperties).forEach(field -> lines.addAll(new FormatterField(field).format(indent + stepIndent, stepIndent)));
         lines.add(Util.indent(indent) + "}");
         Set<String> typesAssignable = new HashSet<>();
         String typeName = NameResolver.getResolvedName(document.getName()).getLastName();

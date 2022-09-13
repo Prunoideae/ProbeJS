@@ -46,6 +46,7 @@ public abstract class PropertyType<T extends PropertyType<T>> extends AbstractPr
 
         @Override
         public void deserialize(JsonObject object) {
+            super.deserialize(object);
             name = object.get("name").getAsString();
         }
 
@@ -189,6 +190,7 @@ public abstract class PropertyType<T extends PropertyType<T>> extends AbstractPr
 
         @Override
         public void deserialize(JsonObject object) {
+            super.deserialize(object);
             Serde.deserializeDocuments(params, object.get("params"));
             base = (PropertyType<?>) Serde.deserializeProperty(object.get("base").getAsJsonObject());
         }
@@ -264,6 +266,7 @@ public abstract class PropertyType<T extends PropertyType<T>> extends AbstractPr
 
         @Override
         public void deserialize(JsonObject object) {
+            super.deserialize(object);
             Serde.deserializeDocuments(types, object.get("types"));
         }
 
@@ -370,6 +373,7 @@ public abstract class PropertyType<T extends PropertyType<T>> extends AbstractPr
 
         @Override
         public void deserialize(JsonObject object) {
+            super.deserialize(object);
             component = (PropertyType<?>) Serde.deserializeProperty(object.get("component").getAsJsonObject());
         }
 
@@ -502,6 +506,7 @@ public abstract class PropertyType<T extends PropertyType<T>> extends AbstractPr
 
         @Override
         public void deserialize(JsonObject object) {
+            super.deserialize(object);
             for (JsonElement element : object.get("members").getAsJsonArray()) {
                 JsonObject keyValuePair = element.getAsJsonObject();
                 JSObjectKey key = new JSObjectKey();
@@ -513,12 +518,9 @@ public abstract class PropertyType<T extends PropertyType<T>> extends AbstractPr
         @Override
         public String getTypeName() {
             return "{%s}".formatted(keyValues.entrySet().stream().map(entry -> {
-                Object key = entry.getKey();
+                JSObjectKey key = entry.getKey();
                 PropertyType<?> value = entry.getValue();
-                return "%s: %s".formatted((
-                        key instanceof PropertyType<?> propertyType ?
-                                "[key: (%s) & string]".formatted(propertyType.getTypeName()) :
-                                ProbeJS.GSON.toJson(key)), value.getTypeName());
+                return "%s: %s".formatted(key.serialize(), value.getTypeName());
             }).collect(Collectors.joining(", ")));
         }
 
@@ -572,6 +574,7 @@ public abstract class PropertyType<T extends PropertyType<T>> extends AbstractPr
 
         @Override
         public void deserialize(JsonObject object) {
+            super.deserialize(object);
             Serde.deserializeDocuments(types, object.get("types"));
         }
 
