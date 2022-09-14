@@ -60,11 +60,11 @@ public class Manager {
                     }
                     Optional<Path> entryPath = mod.findResource(entry);
                     if (entryPath.isPresent()) {
-                        ProbeJS.LOGGER.info("Loading document inside jar - %s".formatted(entryPath));
+                        ProbeJS.LOGGER.info("Loading document inside jar - %s".formatted(entry));
                         List<DocumentClass> jsonDoc = loadJsonClassDoc(entryPath.get());
                         documents.addAll(jsonDoc);
                     } else {
-                        ProbeJS.LOGGER.warn("Document from file is not found - %s".formatted(entryPath));
+                        ProbeJS.LOGGER.warn("Document from file is not found - %s".formatted(entry));
                     }
                 }
             }

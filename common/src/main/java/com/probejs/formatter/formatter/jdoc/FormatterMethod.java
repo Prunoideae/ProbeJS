@@ -22,6 +22,8 @@ public class FormatterMethod extends DocumentFormatter<DocumentMethod> {
     }
 
     private boolean isReturningThis() {
+        if (document.isStatic())
+            return false;
         PropertyType<?> returningType = document.getReturns();
         if (returningType instanceof PropertyType.Clazz clazz) {
             return classDocument.getName().equals(clazz.getName());

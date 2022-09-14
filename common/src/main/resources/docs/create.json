@@ -513,11 +513,21 @@
                             "type": "property:param",
                             "name": "input",
                             "paramType": {
-                                "type": "type:array",
-                                "component": {
+                                "type": "type:parameterized",
+                                "base": {
                                     "type": "type:class",
-                                    "name": "com.prunoideae.probejs.create.IngredientOrFluid"
-                                }
+                                    "name": "com.prunoideae.probejs.types.Of2"
+                                },
+                                "params": [
+                                    {
+                                        "type": "type:class",
+                                        "name": "dev.latvian.mods.kubejs.item.ingredient.IngredientJS"
+                                    },
+                                    {
+                                        "type": "type:class",
+                                        "name": "dev.latvian.mods.kubejs.fluid.FluidStackJS"
+                                    }
+                                ]
                             }
                         }
                     ]
@@ -534,11 +544,21 @@
                             "type": "property:param",
                             "name": "outputs",
                             "paramType": {
-                                "type": "type:array",
-                                "component": {
+                                "type": "type:parameterized",
+                                "base": {
                                     "type": "type:class",
-                                    "name": "com.prunoideae.probejs.create.ItemStackOrFluid"
-                                }
+                                    "name": "com.prunoideae.probejs.types.Of2"
+                                },
+                                "params": [
+                                    {
+                                        "type": "type:class",
+                                        "name": "dev.latvian.mods.kubejs.item.ItemStackJS"
+                                    },
+                                    {
+                                        "type": "type:class",
+                                        "name": "dev.latvian.mods.kubejs.fluid.FluidStackJS"
+                                    }
+                                ]
                             }
                         },
                         {
