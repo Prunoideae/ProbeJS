@@ -397,7 +397,6 @@ public class DocCompiler {
         //documents.forEach(document -> document.addProperty(new PropertyComment("@nativeJava")));
         List<DocumentClass> modDocs = Manager.loadModDocuments();
         List<DocumentClass> userDocs = Manager.loadUserDocuments();
-        @SuppressWarnings("unchecked")
         Map<String, DocumentClass> mergedDocsMap = Manager.mergeDocuments(documents, modDocs, userDocs);
         List<DocumentClass> mergedDocs = mergedDocsMap.values().stream().toList();
         NameResolver.priorSortClasses(mergedDocs).forEach(NameResolver::resolveName);

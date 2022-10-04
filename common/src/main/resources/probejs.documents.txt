@@ -15,3 +15,4 @@ docs/extendedcrafting.json
 docs/multiblocked.json
 docs/mekanism.json
 docs/immersiveengineering.json
+docs/thermal.json

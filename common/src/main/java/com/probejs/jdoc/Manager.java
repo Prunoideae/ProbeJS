@@ -83,6 +83,7 @@ public class Manager {
         return documents;
     }
 
+    @SafeVarargs
     public static Map<String, DocumentClass> mergeDocuments(List<DocumentClass>... sources) {
         Map<String, DocumentClass> documents = new HashMap<>();
         for (List<DocumentClass> source : sources) {
