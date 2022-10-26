@@ -2,10 +2,8 @@ package com.probejs.plugin;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.probejs.event.CapturedEvent;
 import dev.latvian.mods.kubejs.RegistryObjectBuilderTypes;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -13,21 +11,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class CapturedClasses {
 
-    public static Map<String, CapturedEvent> capturedEvents = new ConcurrentHashMap<>();
     public static Map<String, Class<?>> capturedRawEvents = new ConcurrentHashMap<>();
     public static Set<Class<?>> capturedJavaClasses = new HashSet<>();
     public static Set<Class<?>> ignoredEvents = new HashSet<>();
 
     static {
         ignoredEvents.add(RegistryObjectBuilderTypes.RegistryEventJS.class);
-    }
-
-    public static boolean isEventIgnored(Class<?> clazz) {
-        return ignoredEvents.stream().anyMatch(ignored -> ignored.isAssignableFrom(clazz));
-    }
-
-    public static Map<String, CapturedEvent> getCapturedEvents() {
-        return ImmutableMap.copyOf(capturedEvents);
     }
 
     public static Map<String, Class<?>> getCapturedRawEvents() {

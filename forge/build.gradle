@@ -35,11 +35,6 @@ dependencies {
 
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive = false }
-    
-    //Mods
-    modCompileOnly "mekanism:Mekanism:${rootProject.mekanism_version}:api"
-    modCompileOnly "vazkii.botania:Botania:${rootProject.botania_version}:api"
-    modCompileOnly "vazkii.botania:Botania:${rootProject.botania_version}"
 }
 
 processResources {

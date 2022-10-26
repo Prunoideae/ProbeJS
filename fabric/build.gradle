@@ -26,7 +26,6 @@ dependencies {
     modImplementation "dev.latvian.mods:rhino:${rootProject.rhino_version}"
     // Remove the next line if you don't want to depend on the API
     modApi "dev.architectury:architectury-fabric:${rootProject.architectury_version}"
-    modImplementation "vazkii.botania:Botania:${rootProject.botania_version}-FABRIC"
 
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionFabric")) { transitive false }

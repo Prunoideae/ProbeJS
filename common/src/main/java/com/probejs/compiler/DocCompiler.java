@@ -6,7 +6,6 @@ import com.google.gson.*;
 import com.google.gson.stream.JsonWriter;
 import com.probejs.ProbeJS;
 import com.probejs.ProbePaths;
-import com.probejs.event.CapturedEvent;
 import com.probejs.formatter.ClassResolver;
 import com.probejs.formatter.NameResolver;
 import com.probejs.formatter.SpecialTypes;
@@ -21,10 +20,11 @@ import com.probejs.jdoc.document.DocumentClass;
 import com.probejs.jdoc.property.PropertyComment;
 import com.probejs.jdoc.property.PropertyType;
 import com.probejs.plugin.CapturedClasses;
+import com.probejs.util.PlatformSpecial;
 import dev.latvian.mods.kubejs.KubeJSPaths;
 import dev.latvian.mods.kubejs.event.EventJS;
 import dev.latvian.mods.kubejs.recipe.RecipeTypeJS;
-import dev.latvian.mods.kubejs.recipe.RegisterRecipeHandlersEvent;
+import dev.latvian.mods.kubejs.recipe.RegisterRecipeTypesEvent;
 import dev.latvian.mods.kubejs.server.ServerScriptManager;
 import dev.latvian.mods.kubejs.util.KubeJSPlugins;
 import net.minecraft.resources.ResourceLocation;
@@ -64,31 +64,6 @@ public class DocCompiler {
         writer.flush();
     }
 
-    private static String formatJavaType(DocumentClass c) {
-        var formatter = new FormatterType.Clazz(new PropertyType.Clazz(c.getName()));
-        if (c.isInterface()) {
-            return "declare function java(name: %s): %s;\n".formatted(
-                    ProbeJS.GSON.toJson(c.getName()),
-                    formatter.formatFirst()
-            );
-        } else {
-            return "declare function java(name: %s): typeof %s;\n".formatted(
-                    ProbeJS.GSON.toJson(c.getName()),
-                    formatter.formatFirst()
-            );
-        }
-    }
-
-    public static void compileJava(Collection<DocumentClass> globalClasses) throws IOException {
-        BufferedWriter writer = Files.newBufferedWriter(ProbePaths.GENERATED.resolve("java.d.ts"));
-        writer.write("/// <reference path=\"./globals.d.ts\" />\n");
-        for (DocumentClass c : globalClasses) {
-            if (ServerScriptManager.instance.scriptManager.isClassAllowed(c.getName()))
-                writer.write(formatJavaType(c));
-        }
-        writer.flush();
-    }
-
     public static Set<Class<?>> readCachedClasses(String fileName) throws IOException {
         Set<Class<?>> cachedClasses = new HashSet<>();
         Path cachedClassesPath = KubeJSPaths.EXPORTED.resolve(fileName);
@@ -120,27 +95,6 @@ public class DocCompiler {
         cacheWriter.flush();
     }
 
-    public static Map<String, CapturedEvent> readCachedEvents(String fileName) throws IOException {
-        Map<String, CapturedEvent> cachedEvents = new HashMap<>();
-        Path cachedEventPath = KubeJSPaths.EXPORTED.resolve(fileName);
-        if (Files.exists(cachedEventPath)) {
-            try {
-                JsonObject cachedMap = ProbeJS.GSON.fromJson(Files.newBufferedReader(cachedEventPath), JsonObject.class);
-                for (Map.Entry<String, JsonElement> entry : cachedMap.entrySet()) {
-                    String key = entry.getKey();
-                    JsonElement value = entry.getValue();
-                    if (value.isJsonObject()) {
-                        CapturedEvent.fromJson(value.getAsJsonObject())
-                                .ifPresent(event -> cachedEvents.put(key, event));
-                    }
-                }
-            } catch (JsonSyntaxException | JsonIOException e) {
-                ProbeJS.LOGGER.warn("Cannot read malformed cache, ignoring.");
-            }
-        }
-        return cachedEvents;
-    }
-
     public static Map<String, Class<?>> readCachedForgeEvents(String fileName) throws IOException {
         Map<String, Class<?>> cachedEvents = new HashMap<>();
         Path cachedEventPath = KubeJSPaths.EXPORTED.resolve(fileName);
@@ -165,18 +119,6 @@ public class DocCompiler {
         return cachedEvents;
     }
 
-    public static void writeCachedEvents(String fileName, Map<String, CapturedEvent> events) throws IOException {
-        BufferedWriter cacheWriter = Files.newBufferedWriter(KubeJSPaths.EXPORTED.resolve(fileName));
-        JsonObject outJson = new JsonObject();
-        for (Map.Entry<String, CapturedEvent> entry : events.entrySet()) {
-            String eventName = entry.getKey();
-            CapturedEvent eventClass = entry.getValue();
-            outJson.add(eventName, eventClass.toJson());
-        }
-        ProbeJS.GSON.toJson(outJson, cacheWriter);
-        cacheWriter.flush();
-    }
-
     public static void writeCachedForgeEvents(String fileName, Map<String, Class<?>> events) throws IOException {
         BufferedWriter cacheWriter = Files.newBufferedWriter(KubeJSPaths.EXPORTED.resolve(fileName));
         JsonObject outJson = new JsonObject();
@@ -194,7 +136,6 @@ public class DocCompiler {
         touchableClasses.addAll(cachedClasses);
         touchableClasses.addAll(typeMap.values().stream().map(recipeTypeJS -> recipeTypeJS.factory.get().getClass()).toList());
         bindingEvent.getConstantDumpMap().values().stream().map(DummyBindingEvent::getConstantClassRecursive).forEach(touchableClasses::addAll);
-        touchableClasses.addAll(CapturedClasses.getCapturedEvents().values().stream().map(CapturedEvent::getCaptured).toList());
         touchableClasses.addAll(CapturedClasses.getCapturedRawEvents().values());
         touchableClasses.addAll(CapturedClasses.getCapturedJavaClasses());
 
@@ -202,89 +143,66 @@ public class DocCompiler {
         return walker.walk();
     }
 
-    public static String formatMaybeParameterized(Class<?> clazz) {
-        if (clazz.getTypeParameters().length == 0) {
-            return new FormatterType.Clazz(new PropertyType.Clazz(clazz.getName())).formatFirst();
-        } else {
-            return new FormatterType.Parameterized(
-                    new PropertyType.Parameterized(
-                            new PropertyType.Clazz(clazz.getName()),
-                            Collections.nCopies(clazz.getTypeParameters().length, new PropertyType.Clazz(Object.class.getName()))
-                    )
-            ).formatFirst();
+    /*
+        public static void compileEvents(Map<String, CapturedEvent> cachedEvents, Map<String, Class<?>> cachedForgeEvents, Map<String, DocumentClass> globalClasses) throws IOException {
+
+            cachedEvents.putAll(CapturedClasses.capturedEvents);
+            cachedForgeEvents.putAll(CapturedClasses.capturedRawEvents);
+            BufferedWriter writer = Files.newBufferedWriter(ProbePaths.GENERATED.resolve("events.d.ts"));
+
+            writer.write("/// <reference path=\"./globals.d.ts\" />\n");
+            writer.write("/// <reference path=\"./registries.d.ts\" />\n");
+
+            Set<CapturedEvent> wildcards = new HashSet<>();
+            for (Map.Entry<String, CapturedEvent> entry : cachedEvents.entrySet()) {
+                CapturedEvent capturedEvent = entry.getValue();
+                String id = capturedEvent.getId();
+                Class<?> event = capturedEvent.getCaptured();
+                String sub = capturedEvent.getSub();
+                String name = id + (sub == null ? "" : ("." + sub));
+                if (capturedEvent.hasSub())
+                    wildcards.add(capturedEvent);
+                DocumentClass clazz = globalClasses.get(event.getName());
+                if (clazz == null)
+                    continue;
+                PropertyComment mergedComment = clazz.getMergedComment();
+                mergedComment.getLines().addAll(getAdditionalEventComments(capturedEvent));
+                writer.write(String.join("\n", mergedComment.formatLines(0)) + "\n");
+                writer.write("declare function onEvent(name: %s, handler: (event: %s) => void);\n".formatted(ProbeJS.GSON.toJson(name), formatMaybeParameterized(clazz)));
+            }
+
+            Set<String> writtenWildcards = new HashSet<>();
+            for (CapturedEvent wildcard : wildcards) {
+                String id = ProbeJS.GSON.toJson(wildcard.getId());
+                id = id.substring(1, id.length() - 1);
+                if (writtenWildcards.contains(id))
+                    continue;
+                writtenWildcards.add(id);
+                Class<?> event = wildcard.getCaptured();
+                DocumentClass clazz = globalClasses.get(event.getName());
+                if (clazz == null)
+                    continue;
+                PropertyComment mergedComment = clazz.getMergedComment();
+                mergedComment.getLines().addAll(getAdditionalEventComments(wildcard));
+                writer.write("declare function onEvent(name: `%s`, handler: (event: %s) => void);\n".formatted(id, formatMaybeParameterized(clazz)));
+            }
+
+            for (Map.Entry<String, Class<?>> entry : cachedForgeEvents.entrySet()) {
+                String name = entry.getKey();
+                Class<?> event = entry.getValue();
+                writer.write("declare function onForgeEvent(name: %s, handler: (event: %s) => void);\n".formatted(ProbeJS.GSON.toJson(name), formatMaybeParameterized(event)));
+            }
+            RegistryCompiler.compileEventRegistries(writer);
+            writer.flush();
+
         }
-    }
-
-    public static String formatMaybeParameterized(DocumentClass clazz) {
-        if (clazz.getGenerics().isEmpty()) {
-            return new FormatterType.Clazz(new PropertyType.Clazz(clazz.getName())).formatFirst();
-        } else {
-            return new FormatterType.Parameterized(
-                    new PropertyType.Parameterized(
-                            new PropertyType.Clazz(clazz.getName()),
-                            Collections.nCopies(clazz.getGenerics().size(), new PropertyType.Clazz(Object.class.getName())))
-            ).formatFirst();
-        }
-    }
-
-    public static void compileEvents(Map<String, CapturedEvent> cachedEvents, Map<String, Class<?>> cachedForgeEvents, Map<String, DocumentClass> globalClasses) throws IOException {
-        cachedEvents.putAll(CapturedClasses.capturedEvents);
-        cachedForgeEvents.putAll(CapturedClasses.capturedRawEvents);
-        BufferedWriter writer = Files.newBufferedWriter(ProbePaths.GENERATED.resolve("events.d.ts"));
-
-        writer.write("/// <reference path=\"./globals.d.ts\" />\n");
-        writer.write("/// <reference path=\"./registries.d.ts\" />\n");
-
-        Set<CapturedEvent> wildcards = new HashSet<>();
-        for (Map.Entry<String, CapturedEvent> entry : cachedEvents.entrySet()) {
-            CapturedEvent capturedEvent = entry.getValue();
-            String id = capturedEvent.getId();
-            Class<?> event = capturedEvent.getCaptured();
-            String sub = capturedEvent.getSub();
-            String name = id + (sub == null ? "" : ("." + sub));
-            if (capturedEvent.hasSub())
-                wildcards.add(capturedEvent);
-            DocumentClass clazz = globalClasses.get(event.getName());
-            if (clazz == null)
-                continue;
-            PropertyComment mergedComment = clazz.getMergedComment();
-            mergedComment.getLines().addAll(getAdditionalEventComments(capturedEvent));
-            writer.write(String.join("\n", mergedComment.formatLines(0)) + "\n");
-            writer.write("declare function onEvent(name: %s, handler: (event: %s) => void);\n".formatted(ProbeJS.GSON.toJson(name), formatMaybeParameterized(clazz)));
-        }
-
-        Set<String> writtenWildcards = new HashSet<>();
-        for (CapturedEvent wildcard : wildcards) {
-            String id = ProbeJS.GSON.toJson(wildcard.getId());
-            id = id.substring(1, id.length() - 1);
-            if (writtenWildcards.contains(id))
-                continue;
-            writtenWildcards.add(id);
-            Class<?> event = wildcard.getCaptured();
-            DocumentClass clazz = globalClasses.get(event.getName());
-            if (clazz == null)
-                continue;
-            PropertyComment mergedComment = clazz.getMergedComment();
-            mergedComment.getLines().addAll(getAdditionalEventComments(wildcard));
-            writer.write("declare function onEvent(name: `%s`, handler: (event: %s) => void);\n".formatted(id, formatMaybeParameterized(clazz)));
-        }
-
-        for (Map.Entry<String, Class<?>> entry : cachedForgeEvents.entrySet()) {
-            String name = entry.getKey();
-            Class<?> event = entry.getValue();
-            writer.write("declare function onForgeEvent(name: %s, handler: (event: %s) => void);\n".formatted(ProbeJS.GSON.toJson(name), formatMaybeParameterized(event)));
-        }
-        RegistryCompiler.compileEventRegistries(writer);
-        writer.flush();
-    }
-
+      */
     public static void compileConstants(DummyBindingEvent bindingEvent) throws IOException {
         BufferedWriter writer = Files.newBufferedWriter(ProbePaths.GENERATED.resolve("constants.d.ts"));
         writer.write("/// <reference path=\"./globals.d.ts\" />\n");
         for (Map.Entry<String, Object> entry : bindingEvent.getConstantDumpMap().entrySet()) {
             String name = entry.getKey();
             Object value = entry.getValue();
-            String resolved = NameResolver.formatValue(value);
             writer.write("declare const %s: %s;\n".formatted(name, Objects.requireNonNull(Serde.getValueFormatter(Serde.getValueProperty(value))).formatFirst()));
         }
         writer.flush();
@@ -329,16 +247,8 @@ public class DocCompiler {
 
     }
 
-    private static List<String> getAdditionalEventComments(CapturedEvent event) {
-        List<String> comments = new ArrayList<>();
-        if (!event.getScriptTypes().isEmpty()) {
-            comments.add("");
-            comments.add("The event fires on: %s.".formatted(event.getFormattedTypeString()));
-        }
+    public static void compileGitIgnore() throws IOException {
 
-        comments.add("");
-        comments.add("The event is %scancellable.".formatted(event.isCancellable() ? "" : "**not** "));
-        return comments;
     }
 
     private static void writeMergedConfig(Path path, String config) throws IOException {
@@ -367,21 +277,20 @@ public class DocCompiler {
     }
 
     public static void compile() throws IOException {
-        DummyBindingEvent bindingEvent = new DummyBindingEvent(ServerScriptManager.instance.scriptManager);
+        DummyBindingEvent bindingEvent = new DummyBindingEvent(ServerScriptManager.getScriptManager());
         Map<ResourceLocation, RecipeTypeJS> typeMap = new HashMap<>();
-        RegisterRecipeHandlersEvent recipeEvent = new RegisterRecipeHandlersEvent(typeMap);
+        RegisterRecipeTypesEvent recipeEvent = new RegisterRecipeTypesEvent(typeMap);
 
-        KubeJSPlugins.forEachPlugin(plugin -> plugin.addRecipes(recipeEvent));
-        KubeJSPlugins.forEachPlugin(plugin -> plugin.addBindings(bindingEvent));
+        KubeJSPlugins.forEachPlugin(plugin -> plugin.registerRecipeTypes(recipeEvent));
+        KubeJSPlugins.forEachPlugin(plugin -> plugin.registerBindings(bindingEvent));
 
         //Fetch all cached classes
-        Map<String, CapturedEvent> cachedEvents = readCachedEvents("cachedEvents.json");
-        Map<String, Class<?>> cachedForgeEvents = readCachedForgeEvents("cachedForgeEvents.json");
-        Set<Class<?>> cachedJavaClasses = readCachedClasses("cachedJava.json");
+        CapturedClasses.capturedRawEvents.putAll(readCachedForgeEvents("cachedForgeEvents.json"));
+        CapturedClasses.capturedJavaClasses.addAll(readCachedClasses("cachedJava.json"));
         Set<Class<?>> cachedClasses = new HashSet<>();
-        cachedEvents.values().forEach(v -> cachedClasses.add(v.getCaptured()));
-        cachedClasses.addAll(cachedForgeEvents.values());
-        cachedClasses.addAll(cachedJavaClasses);
+        cachedClasses.addAll(EventCompiler.fetchEventClasses());
+        cachedClasses.addAll(CapturedClasses.capturedRawEvents.values());
+        cachedClasses.addAll(CapturedClasses.capturedJavaClasses);
         cachedClasses.addAll(RegistryCompiler.getRegistryClasses());
 
         //Fetch all classes
@@ -393,6 +302,8 @@ public class DocCompiler {
 
         //Load and merge documents
         List<DocumentClass> documents = Manager.loadJavaClasses(globalClasses);
+        //Insert some special documents to extend the function
+        documents.addAll(PlatformSpecial.INSTANCE.get().getPlatformDocuments(documents));
         //Marks up native java classes
         //documents.forEach(document -> document.addProperty(new PropertyComment("@nativeJava")));
         List<DocumentClass> modDocs = Manager.loadModDocuments();
@@ -405,18 +316,17 @@ public class DocCompiler {
         exportSerializedClasses(documents, mergedDocs);
         compileGlobal(mergedDocs);
         RegistryCompiler.compileRegistries();
-        compileEvents(cachedEvents, cachedForgeEvents, mergedDocsMap);
+        EventCompiler.compileEvents(mergedDocsMap);
         compileConstants(bindingEvent);
-        compileJava(documents);
         compileAdditionalTypeNames();
         RawCompiler.compileRaw();
         compileJSConfig();
         compileVSCodeConfig();
-        cachedJavaClasses.addAll(CapturedClasses.capturedJavaClasses);
+        compileGitIgnore();
+
         SchemaCompiler.compile(mergedDocs);
-        DocCompiler.writeCachedEvents("cachedEvents.json", cachedEvents);
-        DocCompiler.writeCachedForgeEvents("cachedForgedEvents.json", cachedForgeEvents);
-        DocCompiler.writeCachedClasses("cachedJava.json", cachedJavaClasses);
+        DocCompiler.writeCachedForgeEvents("cachedForgedEvents.json", CapturedClasses.getCapturedRawEvents());
+        DocCompiler.writeCachedClasses("cachedJava.json", CapturedClasses.capturedJavaClasses);
     }
 
     public static void compileAdditionalTypeNames() throws IOException {

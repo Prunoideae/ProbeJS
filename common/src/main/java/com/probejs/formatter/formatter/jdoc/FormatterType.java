@@ -233,6 +233,26 @@ public abstract class FormatterType<T extends PropertyType<T>> extends DocumentF
         }
     }
 
+    public static class TypeOf extends FormatterType<PropertyType.TypeOf> {
+
+        private final FormatterType<?> formatter;
+
+        public TypeOf(PropertyType.TypeOf type) {
+            super(type);
+            formatter = Serde.getTypeFormatter(type.getComponent());
+        }
+
+        @Override
+        public TypeOf underscored(boolean underscored) {
+            return this;
+        }
+
+        @Override
+        public List<String> formatDocument(Integer indent, Integer stepIndent) {
+            return List.of("typeof " + formatter.formatFirst());
+        }
+    }
+
     @SuppressWarnings("unchecked")
     public static <T extends PropertyType<T>> void addFormatter(Class<T> clazz, Function<T, FormatterType<T>> constructor) {
         FORMATTER_REGISTRY.put(clazz, type -> constructor.apply((T) type));
@@ -248,5 +268,6 @@ public abstract class FormatterType<T extends PropertyType<T>> extends DocumentF
         addFormatter(PropertyType.Array.class, Array::new);
         addFormatter(PropertyType.JSObject.class, JSObject::new);
         addFormatter(PropertyType.JSArray.class, JSArray::new);
+        addFormatter(PropertyType.TypeOf.class, TypeOf::new);
     }
 }

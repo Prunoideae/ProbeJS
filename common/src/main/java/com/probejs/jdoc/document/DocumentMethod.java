@@ -16,12 +16,11 @@ import java.util.List;
 import java.util.Objects;
 
 public class DocumentMethod extends AbstractDocument<DocumentMethod> {
-    private String name;
-    private boolean isStatic;
-    private boolean isAbstract;
-    private PropertyType<?> returns;
-    private final List<PropertyParam> params = new ArrayList<>();
-
+    public String name;
+    public boolean isStatic;
+    public boolean isAbstract;
+    public PropertyType<?> returns;
+    public final List<PropertyParam> params = new ArrayList<>();
 
     @Override
     public JsonObject serialize() {

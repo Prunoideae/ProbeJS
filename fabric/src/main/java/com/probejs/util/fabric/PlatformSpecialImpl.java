@@ -1,25 +1,24 @@
 package com.probejs.util.fabric;
 
-import com.probejs.formatter.SpecialTypes;
+import com.faux.ingredientextension.api.ingredient.IngredientHelper;
+import com.faux.ingredientextension.api.ingredient.serializer.IIngredientSerializer;
 import com.probejs.formatter.formatter.IFormatter;
+import com.probejs.jdoc.document.DocumentClass;
 import com.probejs.util.PlatformSpecial;
-import dev.architectury.platform.Platform;
-import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
-import vazkii.botania.api.brew.Brew;
-import vazkii.botania.common.brew.ModBrews;
 
 import java.util.List;
 
 public class PlatformSpecialImpl extends PlatformSpecial {
-    private boolean inited = false;
 
     @NotNull
     @Override
     public List<ResourceLocation> getIngredientTypes() {
-        //Custom Ingredients are not supported by fabric.
+        //Custom Ingredients are not supported by fabric?
+        for (IIngredientSerializer<?> iIngredientSerializer : IngredientHelper.INGREDIENT_SERIALIZER_REGISTRY) {
+
+        }
         return List.of();
     }
 
@@ -27,12 +26,12 @@ public class PlatformSpecialImpl extends PlatformSpecial {
     @Override
     @SuppressWarnings("unchecked")
     public List<IFormatter> getPlatformFormatters() {
-        if (!inited) {
-            if (Platform.isModLoaded("kubejs_botania")) {
-                SpecialTypes.assignRegistry(Brew.class, (ResourceKey<Registry<Brew>>) ModBrews.registry.key());
-            }
-            inited = true;
-        }
         return List.of();
+    }
+
+    @NotNull
+    @Override
+    public List<DocumentClass> getPlatformDocuments(List<DocumentClass> globalClasses) {
+        return super.getPlatformDocuments(globalClasses);
     }
 }

@@ -4,6 +4,8 @@ import com.probejs.ProbeJS;
 import com.probejs.ProbePaths;
 import com.probejs.formatter.formatter.FormatterNamespace;
 import com.probejs.formatter.formatter.IFormatter;
+import com.probejs.formatter.formatter.jdoc.FormatterType;
+import com.probejs.jdoc.property.PropertyType;
 import dev.latvian.mods.kubejs.RegistryObjectBuilderTypes;
 
 import java.io.BufferedWriter;
@@ -21,18 +23,6 @@ public class RegistryCompiler {
         return result;
     }
 
-    public static void compileEventRegistries(BufferedWriter writer) throws IOException {
-        for (var types : RegistryObjectBuilderTypes.MAP.values()) {
-            String fullName = types.registryKey.location().getNamespace() + "." + types.registryKey.location().getPath().replace('/', '.') + ".registry";
-            String registryName = FormatterRegistry.getFormattedRegistryName(types);
-            writer.write("declare function onEvent(name: %s, handler: (event: Registry.%s) => void);\n".formatted(ProbeJS.GSON.toJson(fullName), registryName));
-            if (types.registryKey.location().getNamespace().equals("minecraft")) {
-                String shortName = types.registryKey.location().getPath().replace('/', '.') + ".registry";
-                writer.write("declare function onEvent(name: %s, handler: (event: Registry.%s) => void);\n".formatted(ProbeJS.GSON.toJson(shortName), registryName));
-            }
-        }
-    }
-
     public static void compileRegistries() throws IOException {
         BufferedWriter writer = Files.newBufferedWriter(ProbePaths.GENERATED.resolve("registries.d.ts"));
         writer.write("/// <reference path=\"./globals.d.ts\" />\n");
@@ -41,7 +31,7 @@ public class RegistryCompiler {
         writer.flush();
     }
 
-    private static class FormatterRegistry implements IFormatter {
+    public static class FormatterRegistry implements IFormatter {
         RegistryObjectBuilderTypes<?> types;
         String name;
 
@@ -49,7 +39,7 @@ public class RegistryCompiler {
             return s.substring(0, 1).toUpperCase() + s.substring(1);
         }
 
-        private static String getFormattedRegistryName(RegistryObjectBuilderTypes<?> types) {
+        public static String getFormattedRegistryName(RegistryObjectBuilderTypes<?> types) {
             return Arrays.stream(types.registryKey.location().getPath().split("/"))
                     .map(str -> Arrays.stream(str.split("_"))
                             .map(FormatterRegistry::getCapitalized)
@@ -66,15 +56,28 @@ public class RegistryCompiler {
         public List<String> format(Integer indent, Integer stepIndent) {
             List<String> formatted = new ArrayList<>();
             int stepped = indent + stepIndent;
-            formatted.add(" ".repeat(indent) + "class %s extends %s {".formatted(name, DocCompiler.formatMaybeParameterized(RegistryObjectBuilderTypes.RegistryEventJS.class)));
+            formatted.add(" ".repeat(indent) + "class %s extends %s {".formatted(name, formatMaybeParameterized(RegistryObjectBuilderTypes.RegistryEventJS.class)));
             for (RegistryObjectBuilderTypes.BuilderType<?> builder : types.types.values()) {
-                formatted.add(" ".repeat(stepped) + "create(id: string, type: %s): %s;".formatted(ProbeJS.GSON.toJson(builder.type()), DocCompiler.formatMaybeParameterized(builder.builderClass())));
+                formatted.add(" ".repeat(stepped) + "create(id: string, type: %s): %s;".formatted(ProbeJS.GSON.toJson(builder.type()), formatMaybeParameterized(builder.builderClass())));
             }
             if (types.getDefaultType() != null) {
-                formatted.add(" ".repeat(stepped) + "create(id: string): %s;".formatted(DocCompiler.formatMaybeParameterized(types.getDefaultType().builderClass())));
+                formatted.add(" ".repeat(stepped) + "create(id: string): %s;".formatted(formatMaybeParameterized(types.getDefaultType().builderClass())));
             }
             formatted.add(" ".repeat(indent) + "}");
             return formatted;
+        }
+    }
+
+    public static String formatMaybeParameterized(Class<?> clazz) {
+        if (clazz.getTypeParameters().length == 0) {
+            return new FormatterType.Clazz(new PropertyType.Clazz(clazz.getName())).formatFirst();
+        } else {
+            return new FormatterType.Parameterized(
+                    new PropertyType.Parameterized(
+                            new PropertyType.Clazz(clazz.getName()),
+                            Collections.nCopies(clazz.getTypeParameters().length, new PropertyType.Clazz(Object.class.getName()))
+                    )
+            ).formatFirst();
         }
     }
 }

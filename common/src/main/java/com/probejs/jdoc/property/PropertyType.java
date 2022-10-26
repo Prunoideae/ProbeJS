@@ -608,6 +608,60 @@ public abstract class PropertyType<T extends PropertyType<T>> extends AbstractPr
         }
     }
 
+    public static class TypeOf extends PropertyType<TypeOf> {
+        private PropertyType<?> component;
+
+        public TypeOf(PropertyType<?> component) {
+            this.component = component;
+        }
+
+        public TypeOf() {
+
+        }
+
+        @Override
+        public TypeOf copy() {
+            return new TypeOf(component);
+        }
+
+        @Override
+        public String getTypeName() {
+            return "typeof %s".formatted(component.getTypeName());
+        }
+
+        @Override
+        public void fromJava(ITypeInfo type) {
+
+        }
+
+        @Override
+        public boolean equalsToJavaType(ITypeInfo type) {
+            return false;
+        }
+
+        @Override
+        public boolean typeEquals(TypeOf type) {
+            return type.component.equals(component);
+        }
+
+        @Override
+        public JsonObject serialize() {
+            JsonObject object = super.serialize();
+            object.add("component", component.serialize());
+            return object;
+        }
+
+        @Override
+        public void deserialize(JsonObject object) {
+            super.deserialize(object);
+            component = (PropertyType<?>) Serde.deserializeProperty(object.get("component").getAsJsonObject());
+        }
+
+        public PropertyType<?> getComponent() {
+            return component;
+        }
+    }
+
     @Override
     @SuppressWarnings("unchecked")
     public final boolean equals(Object obj) {

@@ -62,7 +62,6 @@ public class NameResolver {
 
     public static final HashMap<String, List<ResolvedName>> resolvedNames = new HashMap<>();
     public static final HashMap<Class<?>, Function<ITypeInfo, String>> specialTypeFormatters = new HashMap<>();
-    public static final HashMap<Class<?>, Function<Object, String>> specialValueFormatters = new HashMap<>();
     public static final HashMap<Class<?>, Boolean> specialTypeGuards = new HashMap<>();
     public static final Multimap<String, Supplier<List<String>>> specialClassAssigner = ArrayListMultimap.create();
     public static final List<String> nameResolveSpecials = new ArrayList<>();
@@ -111,37 +110,12 @@ public class NameResolver {
         return specialTypeFormatters.containsKey(clazz);
     }
 
-    public static String formatValue(Object object) {
-        if (object == null)
-            return "null";
-        if (specialValueFormatters.containsKey(object.getClass()))
-            return specialValueFormatters.get(object.getClass()).apply(object);
-        for (Map.Entry<Class<?>, Function<Object, String>> entry : specialValueFormatters.entrySet()) {
-            if (entry.getKey().isAssignableFrom(object.getClass()))
-                return entry.getValue().apply(object);
-        }
-        return null;
-    }
-
     public static boolean findResolvedName(ResolvedName name) {
         return resolvedNames.values().stream().anyMatch(names -> names.contains(name));
     }
 
     //Resolves a name.
     //Will skip if the name is already resolved.
-    public static void resolveName(Class<?> clazz) {
-        String remappedName = MethodInfo.RUNTIME.getMappedClass(clazz);
-        if (resolvedNames.containsKey(remappedName))
-            return;
-        ResolvedName resolved = new ResolvedName(Arrays.stream(remappedName.split("\\.")).toList());
-        ResolvedName internal = new ResolvedName(List.of("Internal", resolved.getLastName()));
-        if (findResolvedName(internal))
-            putResolvedName(remappedName, resolved);
-        else {
-            putResolvedName(remappedName, internal);
-        }
-    }
-
     public static void resolveName(DocumentClass document) {
         String name = document.getName();
         if (resolvedNames.containsKey(name))

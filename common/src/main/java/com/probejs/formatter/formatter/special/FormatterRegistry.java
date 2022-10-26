@@ -33,7 +33,7 @@ public class FormatterRegistry<T> implements IFormatter {
         } catch (Exception e) {
             items.add("never");
         }
-        List<String> remappedName = Arrays.stream(MethodInfo.RUNTIME.getMappedClass(clazz).split("\\.")).collect(Collectors.toList());
+        List<String> remappedName = Arrays.stream(MethodInfo.RUNTIME.getMappedClass(clazz).split("\\.")).toList();
         return List.of("%stype %s = %s;".formatted(" ".repeat(indent), remappedName.get(remappedName.size() - 1), String.join(" | ", items)));
     }
 }

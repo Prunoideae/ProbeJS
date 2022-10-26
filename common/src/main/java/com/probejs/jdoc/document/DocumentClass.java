@@ -15,10 +15,10 @@ public class DocumentClass extends AbstractDocument<DocumentClass> {
     protected String name;
     protected List<PropertyType<?>> generics = new ArrayList<>();
     protected PropertyType<?> parent;
-    protected Set<PropertyType<?>> interfaces = new HashSet<>();
-    protected Set<DocumentField> fields = new HashSet<>();
-    protected Set<DocumentMethod> methods = new HashSet<>();
-    protected Set<DocumentConstructor> constructors = new HashSet<>();
+    public Set<PropertyType<?>> interfaces = new HashSet<>();
+    public Set<DocumentField> fields = new HashSet<>();
+    public Set<DocumentMethod> methods = new HashSet<>();
+    public Set<DocumentConstructor> constructors = new HashSet<>();
 
     protected boolean isAbstract = false;
     protected boolean isInterface = false;
