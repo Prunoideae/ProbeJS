@@ -7,6 +7,7 @@ import com.probejs.info.type.InfoTypeResolver;
 import com.probejs.util.Util;
 import dev.latvian.mods.rhino.util.HideFromJS;
 import dev.latvian.mods.rhino.util.RemapForJS;
+import dev.latvian.mods.rhino.util.RemapPrefixForJS;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -28,6 +29,9 @@ public class FieldInfo {
             s = field.getName();
         if (field.isAnnotationPresent(RemapForJS.class))
             s = field.getAnnotation(RemapForJS.class).value();
+        RemapPrefixForJS prefixAnnotation = field.getDeclaringClass().getAnnotation(RemapPrefixForJS.class);
+        if (prefixAnnotation != null && s.startsWith(prefixAnnotation.value()))
+            s = s.substring(prefixAnnotation.value().length());
         return s.isEmpty() ? field.getName() : s;
     }
 

@@ -60,7 +60,20 @@ public class Walker {
                 info.getInterfaces().stream().map(ClassInfo::getClazzRaw).forEach(result::add);
             }
             if (walkField)
-                info.getFieldInfo().forEach(f -> result.addAll(walkType(f.getType())));
+                info.getFieldInfo().forEach(f -> {
+                    result.addAll(walkType(f.getType()));
+                    if (f.isStatic()) {
+                        Object value = f.getStaticValue();
+                        if (value != null) {
+                            Class<?> valueClazz = value.getClass();
+                            if (!valueClazz.isAnonymousClass() &&
+                                    !valueClazz.isSynthetic() &&
+                                    !valueClazz.isArray()
+                            )
+                                result.add(value.getClass());
+                        }
+                    }
+                });
             if (walkMethod)
                 info.getMethodInfo().forEach(m -> {
                     result.addAll(walkType(m.getReturnType()));

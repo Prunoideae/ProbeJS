@@ -6,6 +6,7 @@ import com.probejs.info.type.TypeInfoClass;
 import dev.latvian.mods.rhino.mod.util.RemappingHelper;
 import dev.latvian.mods.rhino.util.HideFromJS;
 import dev.latvian.mods.rhino.util.RemapForJS;
+import dev.latvian.mods.rhino.util.RemapPrefixForJS;
 import dev.latvian.mods.rhino.util.Remapper;
 
 import java.lang.annotation.Annotation;
@@ -33,6 +34,21 @@ public class MethodInfo {
         return remapped;
     }
 
+    public static List<String> getRemapPrefix(Class<?> clazz) {
+        if (clazz == null)
+            return List.of();
+        ArrayList<String> result = new ArrayList<>();
+        RemapPrefixForJS prefix = clazz.getAnnotation(RemapPrefixForJS.class);
+        if (prefix != null)
+            result.add(prefix.value());
+        for (Class<?> mixinImpl : clazz.getInterfaces()) {
+            result.addAll(getRemapPrefix(mixinImpl));
+        }
+        if (clazz.getSuperclass() != null)
+            result.addAll(getRemapPrefix(clazz.getSuperclass()));
+        return result;
+    }
+
     private static String getRemappedOrDefault(Method method, Class<?> from) {
         String s = method.getName();
         while (from != null && from != Object.class) {
@@ -46,7 +62,15 @@ public class MethodInfo {
             }
             from = from.getSuperclass();
         }
-        return s.isEmpty() ? method.getName() : s;
+        s = s.isEmpty() ? method.getName() : s;
+        List<String> pre = getRemapPrefix(from);
+        for (String prefix : pre) {
+            if (s.startsWith(prefix)) {
+                s = s.substring(prefix.length());
+                break;
+            }
+        }
+        return s;
     }
 
     public MethodInfo(Method method, Class<?> from) {

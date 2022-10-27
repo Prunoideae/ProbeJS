@@ -40,6 +40,8 @@ public class ClassInfo {
     private final List<ClassInfo> interfaces;
     private final List<Annotation> annotations;
 
+    //TODO: Use JavaMembers
+    //Use Context.getCurrent() to get a context, then JavaMembers.lookupClass to get JavaMembers, then getAccessibleMethods/Fields/Constructors
     private ClassInfo(Class<?> clazz) {
         clazzRaw = clazz;
         name = MethodInfo.getRemappedOrOriginalClass(clazzRaw);
@@ -57,14 +59,7 @@ public class ClassInfo {
             constructorInfo = List.of();
             return;
         }
-        Package pack = clazz.getPackage();
-        if (pack != null) {
-            try {
-                annotations.addAll(List.of(pack.getAnnotations()));
-            } catch (NullPointerException e) {
-                //Don't know why, might because all package-info classes are not loaded by weird reason
-            }
-        }
+
         List<ConstructorInfo> conInfo = new ArrayList<>();
         try {
             conInfo = Arrays.stream(clazzRaw.getConstructors()).map(ConstructorInfo::new).collect(Collectors.toList());
