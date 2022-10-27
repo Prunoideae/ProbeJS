@@ -45,7 +45,7 @@
                             "name": "input",
                             "paramType": {
                                 "type": "type:class",
-                                "name": "dev.latvian.mods.kubejs.item.ingredient.IngredientJS"
+                                "name": "net.minecraft.world.item.crafting.Ingredient"
                             }
                         }
                     ],
@@ -74,7 +74,7 @@
                             "name": "input",
                             "paramType": {
                                 "type": "type:class",
-                                "name": "dev.latvian.mods.kubejs.item.ingredient.IngredientJS"
+                                "name": "net.minecraft.world.item.crafting.Ingredient"
                             }
                         }
                     ],

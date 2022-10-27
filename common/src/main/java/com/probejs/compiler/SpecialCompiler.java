@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SpecialCompiler {
-    public static boolean specialInitialized = false;
     public static final List<IFormatter> specialCompilers = new ArrayList<>();
 
     public static List<IFormatter> compileSpecial() {
@@ -26,5 +25,9 @@ public class SpecialCompiler {
         formatters.addAll(PlatformSpecial.INSTANCE.get().getPlatformFormatters());
         formatters.addAll(specialCompilers);
         return formatters;
+    }
+
+    public static List<String> compileTagEvents() {
+        return List.of();
     }
 }

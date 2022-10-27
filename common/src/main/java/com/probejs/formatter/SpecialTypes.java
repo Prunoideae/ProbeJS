@@ -80,8 +80,8 @@ public class SpecialTypes {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> void assignRegistries() {
-        for (var field : Registry.class.getFields()) {
+    public static <T> void assignRegistries(Class<?> registryClazz) {
+        for (var field : registryClazz.getFields()) {
             if (field.getType() == ResourceKey.class && Modifier.isStatic(field.getModifiers())) {
                 try {
                     ResourceKey<Registry<T>> key = (ResourceKey<Registry<T>>) field.get(null);

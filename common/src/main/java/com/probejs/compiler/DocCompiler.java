@@ -199,8 +199,8 @@ public class DocCompiler {
 
     public static void compileGitIgnore() throws IOException {
         BufferedWriter writer = Files.newBufferedWriter(ProbePaths.PROBE.resolve(".gitignore"));
-        writer.write("*");
-        writer.write("*/");
+        writer.write("*\n");
+        writer.write("*/\n");
         writer.flush();
     }
 
@@ -268,6 +268,7 @@ public class DocCompiler {
         exportSerializedClasses(javaDocs, mergedDocs);
         compileGlobal(mergedDocs);
         RegistryCompiler.compileRegistries();
+        EventCompiler.initSpecialEvents();
         EventCompiler.compileEvents(mergedDocsMap);
         compileConstants(bindingEvent);
         compileAdditionalTypeNames();
@@ -290,8 +291,16 @@ public class DocCompiler {
         for (Map.Entry<String, List<NameResolver.ResolvedName>> entry : NameResolver.resolvedNames.entrySet()) {
             List<NameResolver.ResolvedName> exportedNames = entry.getValue();
             if (exportedNames.size() > 1) {
-                for (int i = 1; i < exportedNames.size(); i++)
+                for (int i = 1; i < exportedNames.size(); i++) {
+                    //FIXME: I don't know what went wrong in name resolving but I don't want to fix it later
+                    if (NameResolver.resolvedPrimitives.contains(exportedNames.get(i).getLastName()))
+                        continue;
+                    if (exportedNames.get(0).getLastName().equals("any"))
+                        continue;
+                    if (exportedNames.get(0).getLastName().equals(exportedNames.get(i).getLastName()))
+                        continue;
                     writer.write("const %s: typeof %s\n".formatted(exportedNames.get(i).getLastName(), exportedNames.get(0).getLastName()));
+                }
             }
         }
         writer.flush();

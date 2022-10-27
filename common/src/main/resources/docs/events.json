@@ -83,7 +83,7 @@
                             "index": 0,
                             "newType": {
                                 "type": "type:class",
-                                "name": "dev.latvian.mods.kubejs.item.ingredient.IngredientJS"
+                                "name": "net.minecraft.world.item.crafting.Ingredient"
                             }
                         }
                     ]
@@ -123,7 +123,7 @@
                             "index": 0,
                             "newType": {
                                 "type": "type:class",
-                                "name": "dev.latvian.mods.kubejs.item.ingredient.IngredientJS"
+                                "name": "net.minecraft.world.item.crafting.Ingredient"
                             }
                         },
                         {

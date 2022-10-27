@@ -10,6 +10,7 @@ import dev.latvian.mods.kubejs.block.MaterialJS;
 import dev.latvian.mods.kubejs.block.MaterialListJS;
 import dev.latvian.mods.rhino.util.RemapForJS;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.Registry;
 import net.minecraft.world.damagesource.DamageSource;
 
 import java.lang.reflect.Modifier;
@@ -74,7 +75,9 @@ public class NameResolver {
 
     //Put a resolved name to the class.
     public static void putResolvedName(String className, ResolvedName resolvedName) {
-        resolvedNames.computeIfAbsent(className, s -> new ArrayList<>()).add(resolvedName);
+        List<ResolvedName> resolvedNameList = resolvedNames.computeIfAbsent(className, s -> new ArrayList<>());
+        if (!resolvedNameList.contains(resolvedName))
+            resolvedNameList.add(resolvedName);
     }
 
     public static void putResolvedName(Class<?> className, ResolvedName resolvedName) {
@@ -187,6 +190,8 @@ public class NameResolver {
             return;
         initialized = true;
 
+        resolvedNames.clear();
+
         putResolvedPrimitive(Object.class, "any");
         putResolvedPrimitive(String.class, "string");
         putResolvedPrimitive(Character.class, "string");
@@ -227,7 +232,7 @@ public class NameResolver {
         });
         putSpecialAssignments(MaterialJS.class, () -> MaterialListJS.INSTANCE.map.keySet().stream().map(ProbeJS.GSON::toJson).collect(Collectors.toList()));
 
-        SpecialTypes.assignRegistries();
+        SpecialTypes.assignRegistries(Registry.class);
 
         addKeyword("function");
         addKeyword("debugger");

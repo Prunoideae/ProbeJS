@@ -330,7 +330,7 @@
                     "type": "property:assign",
                     "assign": {
                         "type": "type:class",
-                        "name": "dev.latvian.mods.kubejs.item.ingredient.IngredientJS"
+                        "name": "net.minecraft.world.item.crafting.Ingredient"
                     }
                 },
                 {
@@ -342,7 +342,7 @@
                                 "key": "item",
                                 "value": {
                                     "type": "type:class",
-                                    "name": "dev.latvian.mods.kubejs.item.ingredient.IngredientJS"
+                                    "name": "net.minecraft.world.item.crafting.Ingredient"
                                 }
                             },
                             {
@@ -441,7 +441,7 @@
         },
         {
             "type": "document:class",
-            "className": "dev.latvian.mods.kubejs.item.ingredient.IngredientJS",
+            "className": "net.minecraft.world.item.crafting.Ingredient",
             "properties": [
                 {
                     "type": "property:assign",
@@ -490,23 +490,6 @@
                     "assign": {
                         "type": "type:primitive",
                         "name": "RegExp"
-                    }
-                },
-                {
-                    "type": "property:assign",
-                    "assign": {
-                        "type": "type:class",
-                        "name": "net.minecraft.world.item.crafting.Ingredient"
-                    }
-                },
-                {
-                    "type": "property:assign",
-                    "assign": {
-                        "type": "type:array",
-                        "component": {
-                            "type": "type:class",
-                            "name": "dev.latvian.mods.kubejs.item.ingredient.IngredientJS"
-                        }
                     }
                 },
                 {
@@ -704,7 +687,7 @@
                                 },
                                 "value": {
                                     "type": "type:class",
-                                    "name": "dev.latvian.mods.kubejs.item.ingredient.IngredientJS"
+                                    "name": "net.minecraft.world.item.crafting.Ingredient"
                                 }
                             },
                             {
@@ -714,7 +697,7 @@
                                 },
                                 "value": {
                                     "type": "type:class",
-                                    "name": "dev.latvian.mods.kubejs.item.ingredient.IngredientJS"
+                                    "name": "net.minecraft.world.item.crafting.Ingredient"
                                 }
                             }
                         ]

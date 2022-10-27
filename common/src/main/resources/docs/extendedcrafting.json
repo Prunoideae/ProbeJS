@@ -60,7 +60,7 @@
                                         },
                                         "value": {
                                             "type": "type:class",
-                                            "name": "dev.latvian.mods.kubejs.item.ingredient.IngredientJS"
+                                            "name": "net.minecraft.world.item.crafting.Ingredient"
                                         }
                                     }
                                 ]
@@ -91,7 +91,7 @@
                                 "type": "type:array",
                                 "component": {
                                     "type": "type:class",
-                                    "name": "dev.latvian.mods.kubejs.item.ingredient.IngredientJS"
+                                    "name": "net.minecraft.world.item.crafting.Ingredient"
                                 }
                             }
                         }
