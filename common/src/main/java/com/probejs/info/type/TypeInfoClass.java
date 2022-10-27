@@ -35,7 +35,7 @@ public class TypeInfoClass implements ITypeInfo {
 
     @Override
     public String getTypeName() {
-        return MethodInfo.RUNTIME.getMappedClass(type);
+        return MethodInfo.getRemappedOrOriginalClass(type);
     }
 
     @Override

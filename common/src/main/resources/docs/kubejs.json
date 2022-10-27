@@ -407,7 +407,7 @@
         {
             "type": "document:class",
             "properties": [],
-            "className": "dev.latvian.mods.kubejs.recipe.RecipeEventJS",
+            "className": "dev.latvian.mods.kubejs.recipe.RecipesEventJS",
             "methods": [
                 {
                     "type": "document:method",

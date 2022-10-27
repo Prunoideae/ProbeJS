@@ -31,6 +31,20 @@ public class RegistryCompiler {
         writer.flush();
     }
 
+    public static List<String> getRegistryEventLines() {
+        ArrayList<String> lines = new ArrayList<>();
+        for (RegistryObjectBuilderTypes<?> types : RegistryObjectBuilderTypes.MAP.values()) {
+            String fullName = types.registryKey.location().getNamespace() + "." + types.registryKey.location().getPath().replace('/', '.');
+            String registryName = RegistryCompiler.FormatterRegistry.getFormattedRegistryName(types);
+            lines.add("registry(type: %s, handler: (event: Registry.%s) => void),".formatted(ProbeJS.GSON.toJson(fullName), registryName));
+            if (types.registryKey.location().getNamespace().equals("minecraft")) {
+                String shortName = types.registryKey.location().getPath().replace('/', '.');
+                lines.add("registry(type: %s, handler: (event: Registry.%s) => void),".formatted(ProbeJS.GSON.toJson(shortName), registryName));
+            }
+        }
+        return lines;
+    }
+
     public static class FormatterRegistry implements IFormatter {
         RegistryObjectBuilderTypes<?> types;
         String name;

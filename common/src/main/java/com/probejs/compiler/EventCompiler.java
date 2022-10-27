@@ -31,19 +31,7 @@ public class EventCompiler {
                 .collect(Collectors.toList());
     }
 
-    public static List<String> getRegistryEventLines() {
-        ArrayList<String> lines = new ArrayList<>();
-        for (RegistryObjectBuilderTypes<?> types : RegistryObjectBuilderTypes.MAP.values()) {
-            String fullName = types.registryKey.location().getNamespace() + "." + types.registryKey.location().getPath().replace('/', '.');
-            String registryName = RegistryCompiler.FormatterRegistry.getFormattedRegistryName(types);
-            lines.add("register(type: %s, handler: (event: Registry.%s) => void,".formatted(ProbeJS.GSON.toJson(fullName), registryName));
-            if (types.registryKey.location().getNamespace().equals("minecraft")) {
-                String shortName = types.registryKey.location().getPath().replace('/', '.');
-                lines.add("register(type: %s, handler: (event: Registry.%s) => void,".formatted(ProbeJS.GSON.toJson(shortName), registryName));
-            }
-        }
-        return lines;
-    }
+
 
     public static void compileEvents(Map<String, DocumentClass> globalClasses) throws IOException {
         BufferedWriter writer = Files.newBufferedWriter(ProbePaths.GENERATED.resolve("events.d.ts"));
@@ -63,8 +51,8 @@ public class EventCompiler {
                 Class<?> event = handler.eventType.get();
                 ClassInfo eventType = ClassInfo.getOrCache(event);
                 if (eventName.equals("registry") && name.equals("StartupEvents")) {
-                    elements.addAll(getRegistryEventLines());
-                    continue; //Overrides default registry event
+                    elements.addAll(RegistryCompiler.getRegistryEventLines());
+                    continue; //Overrides default event formatting
                 }
                 DocumentClass document = globalClasses.get(eventType.getName());
                 PropertyComment comment = document.getMergedComment()
@@ -85,6 +73,7 @@ public class EventCompiler {
             elements.add("};");
             writer.write("declare const %s: %s".formatted(name, String.join("\n", elements)));
         }
+        writer.flush();
     }
 
 }

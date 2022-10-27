@@ -49,15 +49,16 @@ public class SpecialTypes {
                 if (info.getMethodInfo().stream().filter(MethodInfo::isAbstract).count() != 1)
                     continue;
                 FormatterClass.SPECIAL_FORMATTER_REGISTRY.put(info.getName(), (document) -> (indent, stepIndent) -> {
-                    DocumentMethod documentMethod = document.getMethods().stream().filter(DocumentMethod::isAbstract).map(DocumentMethod::applyProperties).findFirst().get();
-                    //
+                    Optional<DocumentMethod> documentMethod = document.getMethods().stream().filter(DocumentMethod::isAbstract).map(DocumentMethod::applyProperties).findFirst();
+                    if (documentMethod.isEmpty())
+                        return List.of("any");
                     return List.of("((%s)=>%s)".formatted(
-                            documentMethod.getParams()
+                            documentMethod.get().getParams()
                                     .stream()
                                     .map(FormatterMethod.FormatterParam::new)
                                     .map(IFormatter::formatFirst)
                                     .collect(Collectors.joining(", ")),
-                            Serde.getTypeFormatter(documentMethod.getReturns()).underscored().formatFirst()));
+                            Serde.getTypeFormatter(documentMethod.get().getReturns()).underscored().formatFirst()));
                 });
             }
         }
@@ -74,7 +75,7 @@ public class SpecialTypes {
 
     public static <T> void assignRegistry(Class<T> clazz, ResourceKey<Registry<T>> registry) {
         SpecialCompiler.specialCompilers.add(new FormatterRegistry<>(registry, clazz));
-        List<String> remappedName = Arrays.stream(MethodInfo.RUNTIME.getMappedClass(clazz).split("\\.")).toList();
+        List<String> remappedName = Arrays.stream(MethodInfo.getRemappedOrOriginalClass(clazz).split("\\.")).toList();
         NameResolver.putSpecialAssignments(clazz, () -> List.of("Special.%s".formatted(remappedName.get(remappedName.size() - 1))));
     }
 
@@ -101,13 +102,4 @@ public class SpecialTypes {
         }
     }
 
-    public static String formatAnnotationToJSDoc(Annotation annotation) {
-        String className = MethodInfo.RUNTIME.getMappedClass(annotation.annotationType());
-        String[] nameParts = className.split("\\.");
-        Map<String, String> values = new HashMap<>();
-        for (Method method : annotation.annotationType().getMethods()) {
-
-        }
-        return "@%s ".formatted(nameParts[nameParts.length - 1]);
-    }
 }

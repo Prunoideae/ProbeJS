@@ -24,6 +24,8 @@ public class FieldInfo {
 
     private static String getRemappedOrDefault(Field field) {
         String s = MethodInfo.RUNTIME.getMappedField(field.getDeclaringClass(), field);
+        if (s.equals(""))
+            s = field.getName();
         if (field.isAnnotationPresent(RemapForJS.class))
             s = field.getAnnotation(RemapForJS.class).value();
         return s.isEmpty() ? field.getName() : s;

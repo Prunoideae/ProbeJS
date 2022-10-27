@@ -78,7 +78,7 @@ public class NameResolver {
     }
 
     public static void putResolvedName(Class<?> className, ResolvedName resolvedName) {
-        String remappedName = MethodInfo.RUNTIME.getMappedClass(className);
+        String remappedName = MethodInfo.getRemappedOrOriginalClass(className);
         putResolvedName(remappedName, resolvedName);
     }
 
@@ -143,7 +143,7 @@ public class NameResolver {
     }
 
     public static void putSpecialAssignments(Class<?> clazz, Supplier<List<String>> assigns) {
-        specialClassAssigner.put(MethodInfo.RUNTIME.getMappedClass(clazz), assigns);
+        specialClassAssigner.put(MethodInfo.getRemappedOrOriginalClass(clazz), assigns);
     }
 
     public static List<String> getClassAssignments(String clazz) {

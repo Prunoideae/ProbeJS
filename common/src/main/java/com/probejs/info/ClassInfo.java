@@ -42,7 +42,7 @@ public class ClassInfo {
 
     private ClassInfo(Class<?> clazz) {
         clazzRaw = clazz;
-        name = MethodInfo.RUNTIME.getMappedClass(clazzRaw);
+        name = MethodInfo.getRemappedOrOriginalClass(clazzRaw);
         modifiers = clazzRaw.getModifiers();
         isInterface = clazzRaw.isInterface();
         superClass = (clazzRaw.getSuperclass() == Object.class || clazzRaw.getSuperclass() == null) ? null : getOrCache(clazzRaw.getSuperclass());

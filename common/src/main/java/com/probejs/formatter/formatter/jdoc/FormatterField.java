@@ -29,7 +29,7 @@ public class FormatterField extends DocumentFormatter<DocumentField> {
         return List.of(Util.indent(indent) + "%s%s: %s;".formatted(
                 modifiers.isEmpty() ? "" : String.join(" ", modifiers) + " ",
                 document.isShouldGSON() ? ProbeJS.GSON.toJson(document.getName()) : document.getName(),
-                shouldFormatValue() ?
+                shouldFormatValue() && !Serde.getValueFormatter(document.getValue()).formatFirst().equals("any") ?
                         Serde.getValueFormatter(document.getValue()).formatFirst() :
                         Serde.getTypeFormatter(document.getType()).formatFirst()
         ));

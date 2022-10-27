@@ -1,6 +1,5 @@
 package com.probejs.info;
 
-import com.probejs.formatter.SpecialTypes;
 import com.probejs.info.type.ITypeInfo;
 import com.probejs.info.type.InfoTypeResolver;
 import com.probejs.info.type.TypeInfoClass;
@@ -26,6 +25,13 @@ public class MethodInfo {
     private List<ITypeInfo> typeVariables;
     private final List<Annotation> annotations;
     public static final Remapper RUNTIME = RemappingHelper.getMinecraftRemapper();
+
+    public static String getRemappedOrOriginalClass(Class<?> clazz) {
+        String remapped = RUNTIME.getMappedClass(clazz);
+        if (remapped.equals(""))
+            remapped = clazz.getName();
+        return remapped;
+    }
 
     private static String getRemappedOrDefault(Method method, Class<?> from) {
         String s = method.getName();

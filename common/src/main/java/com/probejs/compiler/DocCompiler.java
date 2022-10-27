@@ -22,6 +22,8 @@ import com.probejs.jdoc.property.PropertyType;
 import com.probejs.plugin.CapturedClasses;
 import com.probejs.util.PlatformSpecial;
 import dev.latvian.mods.kubejs.KubeJSPaths;
+import dev.latvian.mods.kubejs.event.EventGroup;
+import dev.latvian.mods.kubejs.event.EventGroupWrapper;
 import dev.latvian.mods.kubejs.event.EventJS;
 import dev.latvian.mods.kubejs.recipe.RecipeTypeJS;
 import dev.latvian.mods.kubejs.recipe.RegisterRecipeTypesEvent;
@@ -143,66 +145,14 @@ public class DocCompiler {
         return walker.walk();
     }
 
-    /*
-        public static void compileEvents(Map<String, CapturedEvent> cachedEvents, Map<String, Class<?>> cachedForgeEvents, Map<String, DocumentClass> globalClasses) throws IOException {
-
-            cachedEvents.putAll(CapturedClasses.capturedEvents);
-            cachedForgeEvents.putAll(CapturedClasses.capturedRawEvents);
-            BufferedWriter writer = Files.newBufferedWriter(ProbePaths.GENERATED.resolve("events.d.ts"));
-
-            writer.write("/// <reference path=\"./globals.d.ts\" />\n");
-            writer.write("/// <reference path=\"./registries.d.ts\" />\n");
-
-            Set<CapturedEvent> wildcards = new HashSet<>();
-            for (Map.Entry<String, CapturedEvent> entry : cachedEvents.entrySet()) {
-                CapturedEvent capturedEvent = entry.getValue();
-                String id = capturedEvent.getId();
-                Class<?> event = capturedEvent.getCaptured();
-                String sub = capturedEvent.getSub();
-                String name = id + (sub == null ? "" : ("." + sub));
-                if (capturedEvent.hasSub())
-                    wildcards.add(capturedEvent);
-                DocumentClass clazz = globalClasses.get(event.getName());
-                if (clazz == null)
-                    continue;
-                PropertyComment mergedComment = clazz.getMergedComment();
-                mergedComment.getLines().addAll(getAdditionalEventComments(capturedEvent));
-                writer.write(String.join("\n", mergedComment.formatLines(0)) + "\n");
-                writer.write("declare function onEvent(name: %s, handler: (event: %s) => void);\n".formatted(ProbeJS.GSON.toJson(name), formatMaybeParameterized(clazz)));
-            }
-
-            Set<String> writtenWildcards = new HashSet<>();
-            for (CapturedEvent wildcard : wildcards) {
-                String id = ProbeJS.GSON.toJson(wildcard.getId());
-                id = id.substring(1, id.length() - 1);
-                if (writtenWildcards.contains(id))
-                    continue;
-                writtenWildcards.add(id);
-                Class<?> event = wildcard.getCaptured();
-                DocumentClass clazz = globalClasses.get(event.getName());
-                if (clazz == null)
-                    continue;
-                PropertyComment mergedComment = clazz.getMergedComment();
-                mergedComment.getLines().addAll(getAdditionalEventComments(wildcard));
-                writer.write("declare function onEvent(name: `%s`, handler: (event: %s) => void);\n".formatted(id, formatMaybeParameterized(clazz)));
-            }
-
-            for (Map.Entry<String, Class<?>> entry : cachedForgeEvents.entrySet()) {
-                String name = entry.getKey();
-                Class<?> event = entry.getValue();
-                writer.write("declare function onForgeEvent(name: %s, handler: (event: %s) => void);\n".formatted(ProbeJS.GSON.toJson(name), formatMaybeParameterized(event)));
-            }
-            RegistryCompiler.compileEventRegistries(writer);
-            writer.flush();
-
-        }
-      */
     public static void compileConstants(DummyBindingEvent bindingEvent) throws IOException {
         BufferedWriter writer = Files.newBufferedWriter(ProbePaths.GENERATED.resolve("constants.d.ts"));
         writer.write("/// <reference path=\"./globals.d.ts\" />\n");
         for (Map.Entry<String, Object> entry : bindingEvent.getConstantDumpMap().entrySet()) {
             String name = entry.getKey();
             Object value = entry.getValue();
+            if (value instanceof EventGroupWrapper) //Skip exported event constants
+                continue;
             writer.write("declare const %s: %s;\n".formatted(name, Objects.requireNonNull(Serde.getValueFormatter(Serde.getValueProperty(value))).formatFirst()));
         }
         writer.flush();
@@ -248,7 +198,10 @@ public class DocCompiler {
     }
 
     public static void compileGitIgnore() throws IOException {
-
+        BufferedWriter writer = Files.newBufferedWriter(ProbePaths.PROBE.resolve(".gitignore"));
+        writer.write("*");
+        writer.write("*/");
+        writer.flush();
     }
 
     private static void writeMergedConfig(Path path, String config) throws IOException {
@@ -301,19 +254,18 @@ public class DocCompiler {
         SpecialTypes.processEnums(globalClasses);
 
         //Load and merge documents
-        List<DocumentClass> documents = Manager.loadJavaClasses(globalClasses);
+        List<DocumentClass> javaDocs = Manager.loadJavaClasses(globalClasses);
         //Insert some special documents to extend the function
-        documents.addAll(PlatformSpecial.INSTANCE.get().getPlatformDocuments(documents));
-        //Marks up native java classes
-        //documents.forEach(document -> document.addProperty(new PropertyComment("@nativeJava")));
+        javaDocs.addAll(PlatformSpecial.INSTANCE.get().getPlatformDocuments(javaDocs));
+
         List<DocumentClass> modDocs = Manager.loadModDocuments();
         List<DocumentClass> userDocs = Manager.loadUserDocuments();
-        Map<String, DocumentClass> mergedDocsMap = Manager.mergeDocuments(documents, modDocs, userDocs);
+        Map<String, DocumentClass> mergedDocsMap = Manager.mergeDocuments(javaDocs, modDocs, userDocs);
         List<DocumentClass> mergedDocs = mergedDocsMap.values().stream().toList();
         NameResolver.priorSortClasses(mergedDocs).forEach(NameResolver::resolveName);
 
         //Compile things
-        exportSerializedClasses(documents, mergedDocs);
+        exportSerializedClasses(javaDocs, mergedDocs);
         compileGlobal(mergedDocs);
         RegistryCompiler.compileRegistries();
         EventCompiler.compileEvents(mergedDocsMap);
