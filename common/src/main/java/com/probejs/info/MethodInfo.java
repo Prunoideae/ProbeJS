@@ -27,6 +27,13 @@ public class MethodInfo {
     private final List<Annotation> annotations;
     public static final Remapper RUNTIME = RemappingHelper.getMinecraftRemapper();
 
+    public static String getMappedOrDefaultClass(Class<?> clazz) {
+        String s = RUNTIME.getMappedClass(clazz);
+        if (s.equals(""))
+            s = clazz.getName();
+        return s;
+    }
+
     private static String getRemappedOrDefault(Method method, Class<?> from) {
         String s = method.getName();
         while (from != null && from != Object.class) {

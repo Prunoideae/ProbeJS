@@ -74,7 +74,7 @@ public class SpecialTypes {
 
     public static <T> void assignRegistry(Class<T> clazz, ResourceKey<Registry<T>> registry) {
         SpecialCompiler.specialCompilers.add(new FormatterRegistry<>(registry, clazz));
-        List<String> remappedName = Arrays.stream(MethodInfo.RUNTIME.getMappedClass(clazz).split("\\.")).toList();
+        List<String> remappedName = Arrays.stream(MethodInfo.getMappedOrDefaultClass(clazz).split("\\.")).toList();
         NameResolver.putSpecialAssignments(clazz, () -> List.of("Special.%s".formatted(remappedName.get(remappedName.size() - 1))));
     }
 
@@ -101,13 +101,4 @@ public class SpecialTypes {
         }
     }
 
-    public static String formatAnnotationToJSDoc(Annotation annotation) {
-        String className = MethodInfo.RUNTIME.getMappedClass(annotation.annotationType());
-        String[] nameParts = className.split("\\.");
-        Map<String, String> values = new HashMap<>();
-        for (Method method : annotation.annotationType().getMethods()) {
-
-        }
-        return "@%s ".formatted(nameParts[nameParts.length - 1]);
-    }
 }

@@ -29,8 +29,8 @@ public abstract class PlatformSpecial {
     @Nonnull
     public abstract List<IFormatter> getPlatformFormatters();
 
-    protected static <T> IFormatter assignRegistry(Class<T> clazz, ResourceKey<Registry<T>> registry) {
-        List<String> remappedName = Arrays.stream(MethodInfo.RUNTIME.getMappedClass(clazz).split("\\.")).collect(Collectors.toList());
+    public static <T> IFormatter assignRegistry(Class<T> clazz, ResourceKey<Registry<T>> registry) {
+        List<String> remappedName = Arrays.stream(MethodInfo.getMappedOrDefaultClass(clazz).split("\\.")).toList();
         NameResolver.putSpecialAssignments(clazz, () -> List.of("Special.%s".formatted(remappedName.get(remappedName.size() - 1))));
         return new FormatterRegistry<>(registry, clazz);
     }

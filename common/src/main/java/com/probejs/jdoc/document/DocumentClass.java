@@ -61,8 +61,6 @@ public class DocumentClass extends AbstractDocument<DocumentClass> {
         info.getFieldInfo().stream().map(DocumentField::fromJava).forEach(document.fields::add);
         info.getMethodInfo().stream().map(DocumentMethod::fromJava).forEach(document.methods::add);
         info.getConstructorInfo().stream().map(DocumentConstructor::fromJava).forEach(document.constructors::add);
-        info.getAnnotations().stream().map(Annotation::toString).forEach(document.builtinComments::add);
-        document.builtinComments.add("@JavaClass");
         return document;
     }
 
