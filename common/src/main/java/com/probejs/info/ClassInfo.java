@@ -1,6 +1,7 @@
 package com.probejs.info;
 
 
+import com.probejs.ProbeCommands;
 import com.probejs.ProbeConfig;
 import com.probejs.ProbeJS;
 import com.probejs.formatter.ClassResolver;
@@ -43,8 +44,7 @@ public class ClassInfo {
     private final List<Annotation> annotations;
 
     private ClassInfo(Class<?> clazz) {
-        Context context = Context.getCurrentContext();
-        JavaMembers members = JavaMembers.lookupClass(context.sharedContextData, clazz, clazz, false);
+        JavaMembers members = JavaMembers.lookupClass(ProbeCommands.CONTEXT_DATA, clazz, clazz, false);
 
         clazzRaw = clazz;
         name = MethodInfo.getMappedOrDefaultClass(clazzRaw);

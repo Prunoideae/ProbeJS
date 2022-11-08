@@ -41,7 +41,7 @@ public class MethodInfo {
         if (method.getDeclaringClass() != from) {
             typeGenericMap.putAll(rewindGenerics(method, from));
         }
-        this.name = methodInfo.name;
+        this.name = methodInfo.name.isEmpty() ? method.getName() : methodInfo.name;
         this.shouldHide = false;
         this.from = from;
         this.modifiers = method.getModifiers();

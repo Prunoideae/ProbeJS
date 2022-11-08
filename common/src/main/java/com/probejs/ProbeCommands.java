@@ -16,6 +16,11 @@ import com.probejs.info.ClassInfo;
 import com.probejs.jdoc.document.DocumentClass;
 import dev.latvian.mods.kubejs.KubeJSPaths;
 import dev.latvian.mods.kubejs.item.ingredient.IngredientJS;
+import dev.latvian.mods.kubejs.script.ScriptType;
+import dev.latvian.mods.rhino.Context;
+import dev.latvian.mods.rhino.Scriptable;
+import dev.latvian.mods.rhino.SharedContextData;
+import dev.latvian.mods.rhino.mod.util.RemappingHelper;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
@@ -30,6 +35,10 @@ import java.time.Instant;
 import java.util.concurrent.TimeUnit;
 
 public class ProbeCommands {
+    public static Context CONTEXT;
+    public static Scriptable SCOPE;
+    public static SharedContextData CONTEXT_DATA;
+
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
 
         dispatcher.register(
@@ -40,6 +49,14 @@ public class ProbeCommands {
                                 .executes(context -> {
                                     Instant start = Instant.now();
                                     try {
+                                        if (CONTEXT == null) {
+                                            CONTEXT = Context.enterWithNewFactory();
+                                            SCOPE = CONTEXT.initStandardObjects();
+                                            CONTEXT_DATA = SharedContextData.get(SCOPE);
+                                            CONTEXT_DATA.setExtraProperty("Type", ScriptType.SERVER);
+                                            CONTEXT_DATA.setExtraProperty("Console", ScriptType.SERVER.console);
+                                            CONTEXT_DATA.setRemapper(RemappingHelper.getMinecraftRemapper());
+                                        }
                                         SnippetCompiler.compile();
                                         ClassResolver.init();
                                         NameResolver.init();
