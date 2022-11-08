@@ -29,6 +29,7 @@ import dev.latvian.mods.kubejs.recipe.RecipeTypeJS;
 import dev.latvian.mods.kubejs.recipe.RegisterRecipeTypesEvent;
 import dev.latvian.mods.kubejs.server.ServerScriptManager;
 import dev.latvian.mods.kubejs.util.KubeJSPlugins;
+import dev.latvian.mods.rhino.util.SpecialEquality;
 import net.minecraft.resources.ResourceLocation;
 
 import java.io.BufferedWriter;

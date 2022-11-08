@@ -11,14 +11,15 @@ import com.probejs.plugin.CapturedClasses;
 import dev.latvian.mods.kubejs.forge.ForgeEventConsumer;
 import dev.latvian.mods.kubejs.forge.ForgeEventWrapper;
 import dev.latvian.mods.kubejs.forge.GenericForgeEventConsumer;
+import dev.latvian.mods.rhino.JavaMembers;
 
 import java.lang.reflect.Method;
 
 public class ForgeEventDocument {
     public static DocumentClass loadForgeEventDocument() throws NoSuchMethodException {
         DocumentClass document = DocumentClass.fromJava(ClassInfo.getOrCache(ForgeEventWrapper.class));
-        DocumentMethod onEvent = DocumentMethod.fromJava(new MethodInfo(ForgeEventWrapper.class.getMethod("onEvent", Object.class, ForgeEventConsumer.class), ForgeEventWrapper.class));
-        DocumentMethod onGenericEvent = DocumentMethod.fromJava(new MethodInfo(ForgeEventWrapper.class.getMethod("onGenericEvent", Object.class, Object.class, GenericForgeEventConsumer.class), ForgeEventWrapper.class));
+        DocumentMethod onEvent = DocumentMethod.fromJava(new MethodInfo(MethodInfo.getMethodInfo(ForgeEventWrapper.class.getMethod("onEvent", Object.class, ForgeEventConsumer.class), ForgeEventWrapper.class).get(), ForgeEventWrapper.class));
+        DocumentMethod onGenericEvent = DocumentMethod.fromJava(new MethodInfo(MethodInfo.getMethodInfo(ForgeEventWrapper.class.getMethod("onGenericEvent", Object.class, Object.class, GenericForgeEventConsumer.class), ForgeEventWrapper.class).get(), ForgeEventWrapper.class));
 
         for (Class<?> clazz : CapturedClasses.capturedRawEvents.values()) {
             ClassInfo info = ClassInfo.getOrCache(clazz);

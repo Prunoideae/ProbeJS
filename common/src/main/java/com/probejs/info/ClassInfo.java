@@ -1,6 +1,7 @@
 package com.probejs.info;
 
 
+import com.probejs.ProbeCommands;
 import com.probejs.ProbeConfig;
 import com.probejs.ProbeJS;
 import com.probejs.formatter.ClassResolver;
@@ -8,6 +9,7 @@ import com.probejs.info.type.ITypeInfo;
 import com.probejs.info.type.InfoTypeResolver;
 import dev.latvian.mods.rhino.Context;
 import dev.latvian.mods.rhino.JavaMembers;
+import dev.latvian.mods.rhino.SharedContextData;
 import dev.latvian.mods.rhino.util.HideFromJS;
 
 import java.lang.annotation.Annotation;
@@ -45,9 +47,7 @@ public class ClassInfo {
     //TODO: Use JavaMembers
     //Use Context.getCurrent() to get a context, then JavaMembers.lookupClass to get JavaMembers, then getAccessibleMethods/Fields/Constructors
     private ClassInfo(Class<?> clazz) {
-        Context context = Context.getCurrentContext();
-        JavaMembers members = JavaMembers.lookupClass(context.sharedContextData, clazz, clazz, false);
-
+        JavaMembers members = JavaMembers.lookupClass(ProbeCommands.CONTEXT_DATA, clazz, clazz, false);
         clazzRaw = clazz;
         name = MethodInfo.getRemappedOrOriginalClass(clazzRaw);
         modifiers = clazzRaw.getModifiers();

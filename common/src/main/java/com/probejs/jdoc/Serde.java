@@ -96,14 +96,14 @@ public class Serde {
     }
 
     public static PropertyType<?> deserializeFromJavaType(ITypeInfo type, boolean insideType) {
+        if (type instanceof TypeInfoArray) {
+            return constructType(PropertyType.Array::new, type);
+        }
         if (type instanceof TypeInfoClass clazz) {
             if (!clazz.getTypeVariables().isEmpty() && !insideType)
                 return constructType(PropertyType.Parameterized::new, clazz);
             else
                 return constructType(PropertyType.Clazz::new, clazz);
-        }
-        if (type instanceof TypeInfoArray) {
-            return constructType(PropertyType.Array::new, type);
         }
         if (type instanceof TypeInfoVariable) {
             return constructType(PropertyType.Variable::new, type);

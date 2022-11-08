@@ -26,7 +26,7 @@ public class FieldInfo {
 
     public FieldInfo(JavaMembers.FieldInfo fieldInfo) {
         Field field = fieldInfo.field;
-        name = fieldInfo.name;
+        name = fieldInfo.name.isEmpty() ? field.getName() : fieldInfo.name;
         modifiers = field.getModifiers();
         shouldHide = field.getAnnotation(HideFromJS.class) != null;
         info = InfoTypeResolver.resolveType(field.getGenericType());
