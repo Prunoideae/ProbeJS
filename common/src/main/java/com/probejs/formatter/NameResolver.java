@@ -3,6 +3,7 @@ package com.probejs.formatter;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.probejs.ProbeJS;
+import com.probejs.info.ClassInfo;
 import com.probejs.info.MethodInfo;
 import com.probejs.info.type.ITypeInfo;
 import com.probejs.jdoc.document.DocumentClass;
@@ -81,7 +82,7 @@ public class NameResolver {
     }
 
     public static void putResolvedName(Class<?> className, ResolvedName resolvedName) {
-        String remappedName = MethodInfo.getRemappedOrOriginalClass(className);
+        String remappedName = ClassInfo.getOrCache(className).getName();
         putResolvedName(remappedName, resolvedName);
     }
 

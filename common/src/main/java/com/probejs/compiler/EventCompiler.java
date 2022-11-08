@@ -65,12 +65,13 @@ public class EventCompiler {
                                 .formatted(handler.isCancelable() ? "" : "**not** ")))
                         .merge(new PropertyComment("This event fires on **%s**.".formatted(handler.scriptType.name)));
                 elements.addAll(comment.formatLines(4));
-                if (handler.getSupportsExtraId()) {
+                //FIXME: Wait for something to check if the event supports extra ID.
+                if (false) {
                     elements.add("%s(extra: string, handler: (event: %s) => void):void,".formatted(
                             eventName, RegistryCompiler.formatMaybeParameterized(event)
                     ));
                 }
-                if (!handler.getRequiresExtraId()) {
+                if (!false) {
                     elements.add("%s(handler: (event: %s) => void):void,".formatted(
                             eventName, RegistryCompiler.formatMaybeParameterized(event)
                     ));

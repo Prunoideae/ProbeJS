@@ -3,12 +3,13 @@ package com.probejs.info;
 import com.probejs.info.type.ITypeInfo;
 import com.probejs.info.type.InfoTypeResolver;
 import com.probejs.info.type.TypeInfoClass;
+import dev.latvian.mods.rhino.Context;
+import dev.latvian.mods.rhino.JavaMembers;
 import dev.latvian.mods.rhino.mod.util.RemappingHelper;
-import dev.latvian.mods.rhino.util.HideFromJS;
-import dev.latvian.mods.rhino.util.RemapForJS;
-import dev.latvian.mods.rhino.util.RemapPrefixForJS;
 import dev.latvian.mods.rhino.util.Remapper;
 
+import javax.annotation.Nullable;
+import javax.swing.text.html.Option;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.*;
@@ -34,52 +35,24 @@ public class MethodInfo {
         return remapped;
     }
 
-    public static List<String> getRemapPrefix(Class<?> clazz) {
-        if (clazz == null)
-            return List.of();
-        ArrayList<String> result = new ArrayList<>();
-        RemapPrefixForJS prefix = clazz.getAnnotation(RemapPrefixForJS.class);
-        if (prefix != null)
-            result.add(prefix.value());
-        for (Class<?> mixinImpl : clazz.getInterfaces()) {
-            result.addAll(getRemapPrefix(mixinImpl));
-        }
-        if (clazz.getSuperclass() != null)
-            result.addAll(getRemapPrefix(clazz.getSuperclass()));
-        return result;
+
+    public static Optional<JavaMembers.MethodInfo> getMethodInfo(Method method, Class<?> from) {
+        Context context = Context.getCurrentContext();
+        JavaMembers members = JavaMembers.lookupClass(context.sharedContextData, from, from, false);
+        return members.getAccessibleMethods(false)
+                .stream()
+                .filter(methodInfo -> methodInfo.method.equals(method))
+                .findFirst();
     }
 
-    private static String getRemappedOrDefault(Method method, Class<?> from) {
-        String s = method.getName();
-        while (from != null && from != Object.class) {
-            s = RUNTIME.getMappedMethod(from, method);
-            if (!s.equals(method.getName()))
-                break;
-            for (Class<?> implemented : from.getInterfaces()) {
-                s = RUNTIME.getMappedMethod(implemented, method);
-                if (!s.equals(method.getName()))
-                    break;
-            }
-            from = from.getSuperclass();
-        }
-        s = s.isEmpty() ? method.getName() : s;
-        List<String> pre = getRemapPrefix(from);
-        for (String prefix : pre) {
-            if (s.startsWith(prefix)) {
-                s = s.substring(prefix.length());
-                break;
-            }
-        }
-        return s;
-    }
-
-    public MethodInfo(Method method, Class<?> from) {
+    public MethodInfo(JavaMembers.MethodInfo methodInfo, Class<?> from) {
+        Method method = methodInfo.method;
         Map<Type, Type> typeGenericMap = new HashMap<>();
         if (method.getDeclaringClass() != from) {
             typeGenericMap.putAll(rewindGenerics(method, from));
         }
-        this.name = method.isAnnotationPresent(RemapForJS.class) ? method.getAnnotation(RemapForJS.class).value() : getRemappedOrDefault(method, method.getDeclaringClass());
-        this.shouldHide = method.getAnnotation(HideFromJS.class) != null;
+        this.name = methodInfo.name;
+        this.shouldHide = false;
         this.from = from;
         this.modifiers = method.getModifiers();
         this.returnType = InfoTypeResolver.resolveType(

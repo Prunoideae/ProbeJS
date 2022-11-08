@@ -45,7 +45,7 @@ public abstract class PlatformSpecial {
         try {
             //Document for Java.loadClass
             DocumentClass javaWrapper = DocumentClass.fromJava(ClassInfo.getOrCache(JavaWrapper.class));
-            DocumentMethod loadClass = DocumentMethod.fromJava(new MethodInfo(JavaWrapper.class.getMethod("loadClass", String.class), DocumentMethod.class));
+            DocumentMethod loadClass = DocumentMethod.fromJava(new MethodInfo(MethodInfo.getMethodInfo(JavaWrapper.class.getMethod("loadClass", String.class), JavaWrapper.class).get(), DocumentMethod.class));
             for (DocumentClass globalClass : globalClasses) {
                 if (ServerScriptManager.getScriptManager().isClassAllowed(globalClass.getName())) {
                     DocumentMethod method = loadClass.copy();
