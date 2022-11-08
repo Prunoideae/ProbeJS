@@ -42,7 +42,7 @@
                                                 "key": "item",
                                                 "value": {
                                                     "type": "type:class",
-                                                    "name": "dev.latvian.mods.kubejs.item.ItemStackJS"
+                                                    "name": "net.minecraft.world.item.ItemStack"
                                                 }
                                             },
                                             {
@@ -63,7 +63,7 @@
                                     },
                                     {
                                         "type": "type:class",
-                                        "name": "dev.latvian.mods.kubejs.item.ItemStackJS"
+                                        "name": "net.minecraft.world.item.ItemStack"
                                     }
                                 ]
                             }

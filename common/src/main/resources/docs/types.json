@@ -2,6 +2,25 @@
     "classes": [
         {
             "type": "document:class",
+            "className": "java.lang.Iterable",
+            "interfaces": [
+                {
+                    "type": "type:parameterized",
+                    "base": {
+                        "type": "type:primitive",
+                        "name": "Array"
+                    },
+                    "params": [
+                        {
+                            "type": "type:primitive",
+                            "name": "T"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "document:class",
             "className": "dev.latvian.mods.kubejs.level.gen.filter.biome.BiomeFilter",
             "properties": [
                 {
@@ -291,19 +310,6 @@
         },
         {
             "type": "document:class",
-            "className": "net.minecraft.world.item.ItemStack",
-            "properties": [
-                {
-                    "type": "property:assign",
-                    "assign": {
-                        "type": "type:class",
-                        "name": "dev.latvian.mods.kubejs.item.ItemStackJS"
-                    }
-                }
-            ]
-        },
-        {
-            "type": "document:class",
             "properties": [
                 {
                     "type": "property:assign",
@@ -397,7 +403,7 @@
         },
         {
             "type": "document:class",
-            "className": "dev.latvian.mods.kubejs.item.ItemStackJS",
+            "className": "net.minecraft.world.item.ItemStack",
             "properties": [
                 {
                     "type": "property:assign",
@@ -454,7 +460,7 @@
                     "type": "property:assign",
                     "assign": {
                         "type": "type:class",
-                        "name": "dev.latvian.mods.kubejs.item.ItemStackJS"
+                        "name": "net.minecraft.world.item.ItemStack"
                     }
                 },
                 {
@@ -516,7 +522,7 @@
                                 "key": "item",
                                 "value": {
                                     "type": "type:class",
-                                    "name": "dev.latvian.mods.kubejs.item.ItemStackJS"
+                                    "name": "net.minecraft.world.item.ItemStack"
                                 }
                             },
                             {

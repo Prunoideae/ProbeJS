@@ -33,7 +33,7 @@
                             "name": "output",
                             "paramType": {
                                 "type": "type:class",
-                                "name": "dev.latvian.mods.kubejs.item.ItemStackJS"
+                                "name": "net.minecraft.world.item.ItemStack"
                             }
                         },
                         {
