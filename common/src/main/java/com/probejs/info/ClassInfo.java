@@ -6,6 +6,8 @@ import com.probejs.ProbeJS;
 import com.probejs.formatter.ClassResolver;
 import com.probejs.info.type.ITypeInfo;
 import com.probejs.info.type.InfoTypeResolver;
+import dev.latvian.mods.rhino.Context;
+import dev.latvian.mods.rhino.JavaMembers;
 import dev.latvian.mods.rhino.util.HideFromJS;
 
 import java.lang.annotation.Annotation;
@@ -41,6 +43,9 @@ public class ClassInfo {
     private final List<Annotation> annotations;
 
     private ClassInfo(Class<?> clazz) {
+        Context context = Context.getCurrentContext();
+        JavaMembers members = JavaMembers.lookupClass(context.sharedContextData, clazz, clazz, false);
+
         clazzRaw = clazz;
         name = MethodInfo.getMappedOrDefaultClass(clazzRaw);
         modifiers = clazzRaw.getModifiers();
@@ -57,50 +62,18 @@ public class ClassInfo {
             constructorInfo = List.of();
             return;
         }
-        Package pack = clazz.getPackage();
-        if (pack != null) {
-            try {
-                annotations.addAll(List.of(pack.getAnnotations()));
-            } catch (NullPointerException e) {
-                //Don't know why, might because all package-info classes are not loaded by weird reason
-            }
-        }
-        List<ConstructorInfo> conInfo = new ArrayList<>();
-        try {
-            conInfo = Arrays.stream(clazzRaw.getConstructors()).map(ConstructorInfo::new).collect(Collectors.toList());
-        } catch (Error | Exception e) {
-            ProbeJS.LOGGER.warn("Unable to access constructors of class %s".formatted(name));
-        }
-        constructorInfo = conInfo;
 
-        List<MethodInfo> metInfo = new ArrayList<>();
-        try {
-            metInfo = Arrays.stream(clazzRaw.getMethods())
-                    .filter(m -> !m.isSynthetic())
-                    .filter(m -> m.getDeclaringClass() == clazz || m.isDefault())
-                    .map(m -> new MethodInfo(m, clazz))
-                    .filter(m -> (ClassResolver.acceptMethod(m.getName()) || ProbeConfig.INSTANCE.allowObfuscated))
-                    .filter(m -> !m.shouldHide())
-                    .collect(Collectors.toList());
-        } catch (Error | Exception e) {
-            ProbeJS.LOGGER.warn("Unable to access methods of class %s".formatted(name));
-            e.printStackTrace();
-        }
-        methodInfo = metInfo;
-
-        List<FieldInfo> fldInfo = new ArrayList<>();
-        try {
-            fldInfo = Arrays.stream(clazzRaw.getFields())
-                    .filter(f -> f.getDeclaringClass() == clazz)
-                    .map(FieldInfo::new)
-                    .filter(f -> ClassResolver.acceptField(f.getName()) || ProbeConfig.INSTANCE.allowObfuscated)
-                    .filter(f -> !f.shouldHide())
-                    .filter(f -> !f.isTransient())
-                    .collect(Collectors.toList());
-        } catch (Error | Exception e) {
-            ProbeJS.LOGGER.warn("Unable to access fields of class %s".formatted(name));
-        }
-        fieldInfo = fldInfo;
+        constructorInfo = members.getAccessibleConstructors().stream().map(ConstructorInfo::new).collect(Collectors.toList());
+        methodInfo = members.getAccessibleMethods(false)
+                .stream()
+                .filter(m -> m.method.getDeclaringClass() == clazz || m.method.isDefault())
+                .map(m -> new MethodInfo(m, clazz))
+                .collect(Collectors.toList());
+        fieldInfo = members.getAccessibleFields(false)
+                .stream()
+                .filter(f -> f.field.getDeclaringClass() == clazz)
+                .map(FieldInfo::new)
+                .collect(Collectors.toList());
     }
 
 

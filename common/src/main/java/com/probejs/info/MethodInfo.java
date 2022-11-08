@@ -4,6 +4,7 @@ import com.probejs.formatter.SpecialTypes;
 import com.probejs.info.type.ITypeInfo;
 import com.probejs.info.type.InfoTypeResolver;
 import com.probejs.info.type.TypeInfoClass;
+import dev.latvian.mods.rhino.JavaMembers;
 import dev.latvian.mods.rhino.mod.util.RemappingHelper;
 import dev.latvian.mods.rhino.util.HideFromJS;
 import dev.latvian.mods.rhino.util.RemapForJS;
@@ -34,29 +35,14 @@ public class MethodInfo {
         return s;
     }
 
-    private static String getRemappedOrDefault(Method method, Class<?> from) {
-        String s = method.getName();
-        while (from != null && from != Object.class) {
-            s = RUNTIME.getMappedMethod(from, method);
-            if (!s.equals(method.getName()))
-                break;
-            for (Class<?> implemented : from.getInterfaces()) {
-                s = RUNTIME.getMappedMethod(implemented, method);
-                if (!s.equals(method.getName()))
-                    break;
-            }
-            from = from.getSuperclass();
-        }
-        return s.isEmpty() ? method.getName() : s;
-    }
-
-    public MethodInfo(Method method, Class<?> from) {
+    public MethodInfo(JavaMembers.MethodInfo methodInfo, Class<?> from) {
+        Method method = methodInfo.method;
         Map<Type, Type> typeGenericMap = new HashMap<>();
         if (method.getDeclaringClass() != from) {
             typeGenericMap.putAll(rewindGenerics(method, from));
         }
-        this.name = method.isAnnotationPresent(RemapForJS.class) ? method.getAnnotation(RemapForJS.class).value() : getRemappedOrDefault(method, method.getDeclaringClass());
-        this.shouldHide = method.getAnnotation(HideFromJS.class) != null;
+        this.name = methodInfo.name;
+        this.shouldHide = false;
         this.from = from;
         this.modifiers = method.getModifiers();
         this.returnType = InfoTypeResolver.resolveType(

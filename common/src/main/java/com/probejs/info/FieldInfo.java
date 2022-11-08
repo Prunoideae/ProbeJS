@@ -5,6 +5,7 @@ import com.probejs.formatter.SpecialTypes;
 import com.probejs.info.type.ITypeInfo;
 import com.probejs.info.type.InfoTypeResolver;
 import com.probejs.util.Util;
+import dev.latvian.mods.rhino.JavaMembers;
 import dev.latvian.mods.rhino.util.HideFromJS;
 import dev.latvian.mods.rhino.util.RemapForJS;
 
@@ -22,17 +23,11 @@ public class FieldInfo {
     private ITypeInfo info;
     private final List<Annotation> annotations;
 
-    private static String getRemappedOrDefault(Field field) {
-        String s = MethodInfo.RUNTIME.getMappedField(field.getDeclaringClass(), field);
-        if (field.isAnnotationPresent(RemapForJS.class))
-            s = field.getAnnotation(RemapForJS.class).value();
-        return s.isEmpty() ? field.getName() : s;
-    }
-
-    public FieldInfo(Field field) {
-        name = getRemappedOrDefault(field);
+    public FieldInfo(JavaMembers.FieldInfo fieldInfo) {
+        Field field = fieldInfo.field;
+        name = fieldInfo.name;
         modifiers = field.getModifiers();
-        shouldHide = field.getAnnotation(HideFromJS.class) != null;
+        shouldHide = false;
         info = InfoTypeResolver.resolveType(field.getGenericType());
         value = Util.tryOrDefault(() -> isStatic() ? field.get(null) : null, null);
         annotations = List.of(field.getAnnotations());
