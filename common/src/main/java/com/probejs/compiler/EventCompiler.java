@@ -20,7 +20,8 @@ public class EventCompiler {
 
     public static void initSpecialEvents() {
         SPECIAL_EVENT_OVERRIDE.put(new Pair<>("StartupEvents", "registry"), handler -> RegistryCompiler.compileRegistryEvents());
-        SPECIAL_EVENT_OVERRIDE.put(new Pair<>("ServerEvents", "tags"), handler -> SpecialCompiler.compileTagEvents());
+        //TODO: Get this done
+        //SPECIAL_EVENT_OVERRIDE.put(new Pair<>("ServerEvents", "tags"), handler -> SpecialCompiler.compileTagEvents());
     }
 
     public static List<Class<?>> fetchEventClasses() {
@@ -65,13 +66,12 @@ public class EventCompiler {
                                 .formatted(handler.isCancelable() ? "" : "**not** ")))
                         .merge(new PropertyComment("This event fires on **%s**.".formatted(handler.scriptType.name)));
                 elements.addAll(comment.formatLines(4));
-                //FIXME: Wait for something to check if the event supports extra ID.
-                if (false) {
+                if (handler.extra != null) {
                     elements.add("%s(extra: string, handler: (event: %s) => void):void,".formatted(
                             eventName, RegistryCompiler.formatMaybeParameterized(event)
                     ));
                 }
-                if (!false) {
+                if (handler.extra == null || !handler.extra.required) {
                     elements.add("%s(handler: (event: %s) => void):void,".formatted(
                             eventName, RegistryCompiler.formatMaybeParameterized(event)
                     ));

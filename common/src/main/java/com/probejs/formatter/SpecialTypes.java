@@ -13,6 +13,7 @@ import com.probejs.info.type.ITypeInfo;
 import com.probejs.info.type.InfoTypeResolver;
 import com.probejs.jdoc.Serde;
 import com.probejs.jdoc.document.DocumentMethod;
+import com.probejs.util.Pair;
 import dev.latvian.mods.rhino.util.EnumTypeWrapper;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
@@ -101,5 +102,4 @@ public class SpecialTypes {
             }
         }
     }
-
 }

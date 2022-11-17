@@ -6,6 +6,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.probejs.info.type.TypeInfoClass;
 import com.probejs.jdoc.Serde;
+import dev.latvian.mods.kubejs.script.ScriptManager;
+import dev.latvian.mods.kubejs.server.ServerScriptManager;
 import dev.latvian.mods.rhino.*;
 
 import java.util.*;
@@ -285,20 +287,21 @@ public abstract class PropertyValue<T extends PropertyValue<T, J>, J> extends Ab
 
         public ObjectValue(ScriptableObject value) {
             super(value);
-            Scriptable prototype = value.getPrototype();
-            if (prototype.get("constructor", prototype) instanceof BaseFunction fun) {
+            Scriptable prototype = value.getPrototype(null);
+            ScriptManager manager = ServerScriptManager.getScriptManager();
+            if (prototype.get(manager.context, "constructor", prototype) instanceof BaseFunction fun) {
                 typeName = fun.getFunctionName();
                 if (!typeName.isEmpty() && typeName.equals("Object"))
                     return;
             }
-            for (Object id : value.getIds()) {
+            for (Object id : value.getIds(null)) {
                 PropertyValue<?, ?> key = Serde.getValueProperty(id);
-                PropertyValue<?, ?> propertyValue = Serde.getValueProperty(value.get(key));
+                PropertyValue<?, ?> propertyValue = Serde.getValueProperty(value.get(manager.context, key));
                 keyValues.put(key, propertyValue);
             }
-            for (Object id : prototype.getIds()) {
+            for (Object id : prototype.getIds(null)) {
                 PropertyValue<?, ?> key = Serde.getValueProperty(id);
-                PropertyValue<?, ?> propertyValue = Serde.getValueProperty(value.get(key));
+                PropertyValue<?, ?> propertyValue = Serde.getValueProperty(value.get(manager.context, key));
                 keyValues.put(key, propertyValue);
             }
         }

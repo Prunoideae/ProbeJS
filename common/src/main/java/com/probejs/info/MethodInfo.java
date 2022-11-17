@@ -3,13 +3,12 @@ package com.probejs.info;
 import com.probejs.info.type.ITypeInfo;
 import com.probejs.info.type.InfoTypeResolver;
 import com.probejs.info.type.TypeInfoClass;
-import dev.latvian.mods.rhino.Context;
+import dev.latvian.mods.kubejs.script.ScriptManager;
+import dev.latvian.mods.kubejs.server.ServerScriptManager;
 import dev.latvian.mods.rhino.JavaMembers;
 import dev.latvian.mods.rhino.mod.util.RemappingHelper;
 import dev.latvian.mods.rhino.util.Remapper;
 
-import javax.annotation.Nullable;
-import javax.swing.text.html.Option;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.*;
@@ -37,9 +36,9 @@ public class MethodInfo {
 
 
     public static Optional<JavaMembers.MethodInfo> getMethodInfo(Method method, Class<?> from) {
-        Context context = Context.getCurrentContext();
-        JavaMembers members = JavaMembers.lookupClass(context.sharedContextData, from, from, false);
-        return members.getAccessibleMethods(false)
+        ScriptManager scriptManager = ServerScriptManager.getScriptManager();
+        JavaMembers members = JavaMembers.lookupClass(scriptManager.context, scriptManager.topLevelScope, from, from, false);
+        return members.getAccessibleMethods(scriptManager.context, false)
                 .stream()
                 .filter(methodInfo -> methodInfo.method.equals(method))
                 .findFirst();

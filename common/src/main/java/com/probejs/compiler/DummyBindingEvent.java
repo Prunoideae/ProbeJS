@@ -3,7 +3,6 @@ package com.probejs.compiler;
 import dev.latvian.mods.kubejs.script.BindingsEvent;
 import dev.latvian.mods.kubejs.script.ScriptManager;
 import dev.latvian.mods.rhino.BaseFunction;
-import dev.latvian.mods.rhino.Scriptable;
 import dev.latvian.mods.rhino.ScriptableObject;
 
 import java.util.*;
@@ -45,8 +44,9 @@ public class DummyBindingEvent extends BindingsEvent {
         if (constantDump == null)
             return result;
         if (constantDump instanceof ScriptableObject scriptable) {
-            Arrays.stream(scriptable.getIds())
-                    .map(scriptable::get)
+
+            Arrays.stream(scriptable.getIds(null))
+                    .map(s -> scriptable.get(null, s))
                     .map(DummyBindingEvent::getConstantClassRecursive)
                     .forEach(result::addAll);
         } else if (constantDump instanceof Map<?, ?> map) {
