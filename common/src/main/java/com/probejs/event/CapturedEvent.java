@@ -81,7 +81,7 @@ public class CapturedEvent {
         Class<?> clazz;
         try {
             clazz = Class.forName(json.get("class").getAsString());
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException | NoClassDefFoundError e) {
             return Optional.empty();
         }
         EnumSet<ScriptType> types = EnumSet.noneOf(ScriptType.class);

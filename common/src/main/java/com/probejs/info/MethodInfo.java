@@ -127,7 +127,7 @@ public class MethodInfo {
                 this.type = InfoTypeResolver.resolveType(parameter.getParameterizedType(), t -> typeMap.getOrDefault(t, t));
             } catch (Exception e) {
                 //#3, WTF???
-                e.printStackTrace();
+                //e.printStackTrace();
                 this.type = new TypeInfoClass(Object.class);
             }
         }

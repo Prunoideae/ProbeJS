@@ -66,8 +66,12 @@ public class SpecialTypes {
     public static void processEnums(Set<Class<?>> globalClasses) {
         for (Class<?> clazz : globalClasses) {
             if (clazz.isEnum()) {
-                EnumTypeWrapper<?> wrapper = EnumTypeWrapper.get(clazz);
-                NameResolver.putSpecialAssignments(clazz, () -> wrapper.nameValues.keySet().stream().map(ProbeJS.GSON::toJson).collect(Collectors.toList()));
+                try {
+                    EnumTypeWrapper<?> wrapper = EnumTypeWrapper.get(clazz);
+                    NameResolver.putSpecialAssignments(clazz, () -> wrapper.nameValues.keySet().stream().map(ProbeJS.GSON::toJson).collect(Collectors.toList()));
+                } catch (Exception ignored) {
+
+                }
             }
         }
     }
