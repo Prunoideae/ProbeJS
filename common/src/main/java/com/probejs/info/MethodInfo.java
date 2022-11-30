@@ -45,10 +45,14 @@ public class MethodInfo {
         this.shouldHide = false;
         this.from = from;
         this.modifiers = method.getModifiers();
-        this.returnType = InfoTypeResolver.resolveType(
-                method.getGenericReturnType(),
-                type -> typeGenericMap.getOrDefault(type, type)
-        );
+        try {
+            this.returnType = InfoTypeResolver.resolveType(
+                    method.getGenericReturnType(),
+                    type -> typeGenericMap.getOrDefault(type, type)
+            );
+        } catch (Exception e) {
+            this.returnType = new TypeInfoClass(Object.class);
+        }
         this.params = Arrays.stream(method.getParameters()).map(param -> new ParamInfo(param, typeGenericMap)).collect(Collectors.toList());
         this.typeVariables = Arrays.stream(method.getTypeParameters()).map(InfoTypeResolver::resolveType).collect(Collectors.toList());
         this.defaultMethod = method.isDefault();
