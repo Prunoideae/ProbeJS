@@ -25,6 +25,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.server.level.ServerLevel;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -38,15 +39,17 @@ public class ProbeCommands {
     public static Context CONTEXT;
     public static Scriptable SCOPE;
     public static SharedContextData CONTEXT_DATA;
+    //Leaking access here since I don't want to think hard...
+    public static ServerLevel COMMAND_LEVEL;
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
-
         dispatcher.register(
                 Commands.literal("probejs")
                         .then(Commands.literal("dump")
                                 //SINGLE PLAYER IS NEEDED
                                 .requires(source -> source.getServer().isSingleplayer() && source.hasPermission(2))
                                 .executes(context -> {
+                                    COMMAND_LEVEL = context.getSource().getLevel();
                                     Instant start = Instant.now();
                                     try {
                                         if (CONTEXT == null) {

@@ -28,9 +28,6 @@ public class PlatformSpecialImpl extends PlatformSpecial {
     @SuppressWarnings("unchecked")
     public List<IFormatter> getPlatformFormatters() {
         if (!inited) {
-            if (Platform.isModLoaded("kubejs_botania")) {
-                SpecialTypes.assignRegistry(Brew.class, (ResourceKey<Registry<Brew>>) ModBrews.registry.key());
-            }
             inited = true;
         }
         return List.of();

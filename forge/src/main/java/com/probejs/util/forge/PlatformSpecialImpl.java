@@ -56,15 +56,6 @@ public class PlatformSpecialImpl extends PlatformSpecial {
     public List<IFormatter> getPlatformFormatters() {
         List<IFormatter> formatters = new ArrayList<>();
         if (!inited) {
-            if (Platform.isModLoaded("kubejs_mekanism")) {
-                SpecialTypes.assignRegistry(Gas.class, MekanismAPI.gasRegistry().getRegistryKey());
-                SpecialTypes.assignRegistry(Slurry.class, MekanismAPI.slurryRegistry().getRegistryKey());
-                SpecialTypes.assignRegistry(InfuseType.class, MekanismAPI.infuseTypeRegistry().getRegistryKey());
-                SpecialTypes.assignRegistry(Pigment.class, MekanismAPI.pigmentRegistry().getRegistryKey());
-            }
-            if (Platform.isModLoaded("kubejs_botania")) {
-                SpecialTypes.assignRegistry(Brew.class, (ResourceKey<Registry<Brew>>) ModBrews.registry.key());
-            }
             inited = true;
         }
         return formatters;
