@@ -48,9 +48,7 @@ public class DocCompiler {
                 if (clazz.isInterface())
                     writer.write("declare const %s: %s;\n".formatted(resolvedName.getFullName(), resolvedName.getFullName()));
             } else {
-                clazz.getConstructors().forEach(constructor -> constructor.addProperty(new PropertyComment(
-                        "Internal constructor, this means that it's not valid unless you use `java()`."
-                )));
+                clazz.getConstructors().forEach(constructor -> constructor.addProperty(new PropertyComment("Internal constructor, this means that it's not valid unless you use `java()`.")));
                 namespaces.put(resolvedName.getNamespace(), formatter.setInternal(true));
             }
         }
@@ -67,15 +65,9 @@ public class DocCompiler {
     private static String formatJavaType(DocumentClass c) {
         var formatter = new FormatterType.Clazz(new PropertyType.Clazz(c.getName()));
         if (c.isInterface()) {
-            return "declare function java(name: %s): %s;\n".formatted(
-                    ProbeJS.GSON.toJson(c.getName()),
-                    formatter.formatFirst()
-            );
+            return "declare function java(name: %s): %s;\n".formatted(ProbeJS.GSON.toJson(c.getName()), formatter.formatFirst());
         } else {
-            return "declare function java(name: %s): typeof %s;\n".formatted(
-                    ProbeJS.GSON.toJson(c.getName()),
-                    formatter.formatFirst()
-            );
+            return "declare function java(name: %s): typeof %s;\n".formatted(ProbeJS.GSON.toJson(c.getName()), formatter.formatFirst());
         }
     }
 
@@ -83,15 +75,14 @@ public class DocCompiler {
         BufferedWriter writer = Files.newBufferedWriter(ProbePaths.GENERATED.resolve("java.d.ts"));
         writer.write("/// <reference path=\"./globals.d.ts\" />\n");
         for (DocumentClass c : globalClasses) {
-            if (ServerScriptManager.instance.scriptManager.isClassAllowed(c.getName()))
-                writer.write(formatJavaType(c));
+            if (ServerScriptManager.instance.scriptManager.isClassAllowed(c.getName())) writer.write(formatJavaType(c));
         }
         writer.flush();
     }
 
     public static Set<Class<?>> readCachedClasses(String fileName) throws IOException {
         Set<Class<?>> cachedClasses = new HashSet<>();
-        Path cachedClassesPath = KubeJSPaths.EXPORTED.resolve(fileName);
+        Path cachedClassesPath = ProbePaths.CACHE.resolve(fileName);
         if (Files.exists(cachedClassesPath)) {
             try {
                 List<?> cachedList = ProbeJS.GSON.fromJson(Files.newBufferedReader(cachedClassesPath), List.class);
@@ -111,7 +102,7 @@ public class DocCompiler {
     }
 
     public static void writeCachedClasses(String fileName, Set<Class<?>> javaClasses) throws IOException {
-        BufferedWriter cacheWriter = Files.newBufferedWriter(KubeJSPaths.EXPORTED.resolve(fileName));
+        BufferedWriter cacheWriter = Files.newBufferedWriter(ProbePaths.CACHE.resolve(fileName));
         JsonArray outJson = new JsonArray();
         for (Class<?> clazz : javaClasses) {
             outJson.add(clazz.getName());
@@ -122,7 +113,7 @@ public class DocCompiler {
 
     public static Map<String, CapturedEvent> readCachedEvents(String fileName) throws IOException {
         Map<String, CapturedEvent> cachedEvents = new HashMap<>();
-        Path cachedEventPath = KubeJSPaths.EXPORTED.resolve(fileName);
+        Path cachedEventPath = ProbePaths.CACHE.resolve(fileName);
         if (Files.exists(cachedEventPath)) {
             try {
                 JsonObject cachedMap = ProbeJS.GSON.fromJson(Files.newBufferedReader(cachedEventPath), JsonObject.class);
@@ -130,8 +121,7 @@ public class DocCompiler {
                     String key = entry.getKey();
                     JsonElement value = entry.getValue();
                     if (value.isJsonObject()) {
-                        CapturedEvent.fromJson(value.getAsJsonObject())
-                                .ifPresent(event -> cachedEvents.put(key, event));
+                        CapturedEvent.fromJson(value.getAsJsonObject()).ifPresent(event -> cachedEvents.put(key, event));
                     }
                 }
             } catch (JsonSyntaxException | JsonIOException e) {
@@ -143,7 +133,7 @@ public class DocCompiler {
 
     public static Map<String, Class<?>> readCachedForgeEvents(String fileName) throws IOException {
         Map<String, Class<?>> cachedEvents = new HashMap<>();
-        Path cachedEventPath = KubeJSPaths.EXPORTED.resolve(fileName);
+        Path cachedEventPath = ProbePaths.CACHE.resolve(fileName);
         if (Files.exists(cachedEventPath)) {
             try {
                 Map<?, ?> cachedMap = ProbeJS.GSON.fromJson(Files.newBufferedReader(cachedEventPath), Map.class);
@@ -151,8 +141,7 @@ public class DocCompiler {
                     if (k instanceof String && v instanceof String) {
                         try {
                             Class<?> clazz = Class.forName((String) v);
-                            if (EventJS.class.isAssignableFrom(clazz))
-                                cachedEvents.put((String) k, clazz);
+                            if (EventJS.class.isAssignableFrom(clazz)) cachedEvents.put((String) k, clazz);
                         } catch (ClassNotFoundException e) {
                             ProbeJS.LOGGER.warn("Class %s was in the cache, but disappeared in packages now.".formatted(v));
                         }
@@ -166,7 +155,7 @@ public class DocCompiler {
     }
 
     public static void writeCachedEvents(String fileName, Map<String, CapturedEvent> events) throws IOException {
-        BufferedWriter cacheWriter = Files.newBufferedWriter(KubeJSPaths.EXPORTED.resolve(fileName));
+        BufferedWriter cacheWriter = Files.newBufferedWriter(ProbePaths.CACHE.resolve(fileName));
         JsonObject outJson = new JsonObject();
         for (Map.Entry<String, CapturedEvent> entry : events.entrySet()) {
             String eventName = entry.getKey();
@@ -178,7 +167,7 @@ public class DocCompiler {
     }
 
     public static void writeCachedForgeEvents(String fileName, Map<String, Class<?>> events) throws IOException {
-        BufferedWriter cacheWriter = Files.newBufferedWriter(KubeJSPaths.EXPORTED.resolve(fileName));
+        BufferedWriter cacheWriter = Files.newBufferedWriter(ProbePaths.CACHE.resolve(fileName));
         JsonObject outJson = new JsonObject();
         for (Map.Entry<String, Class<?>> entry : events.entrySet()) {
             String eventName = entry.getKey();
@@ -206,12 +195,7 @@ public class DocCompiler {
         if (clazz.getTypeParameters().length == 0) {
             return new FormatterType.Clazz(new PropertyType.Clazz(clazz.getName())).formatFirst();
         } else {
-            return new FormatterType.Parameterized(
-                    new PropertyType.Parameterized(
-                            new PropertyType.Clazz(clazz.getName()),
-                            Collections.nCopies(clazz.getTypeParameters().length, new PropertyType.Clazz(Object.class.getName()))
-                    )
-            ).formatFirst();
+            return new FormatterType.Parameterized(new PropertyType.Parameterized(new PropertyType.Clazz(clazz.getName()), Collections.nCopies(clazz.getTypeParameters().length, new PropertyType.Clazz(Object.class.getName())))).formatFirst();
         }
     }
 
@@ -219,11 +203,7 @@ public class DocCompiler {
         if (clazz.getGenerics().isEmpty()) {
             return new FormatterType.Clazz(new PropertyType.Clazz(clazz.getName())).formatFirst();
         } else {
-            return new FormatterType.Parameterized(
-                    new PropertyType.Parameterized(
-                            new PropertyType.Clazz(clazz.getName()),
-                            Collections.nCopies(clazz.getGenerics().size(), new PropertyType.Clazz(Object.class.getName())))
-            ).formatFirst();
+            return new FormatterType.Parameterized(new PropertyType.Parameterized(new PropertyType.Clazz(clazz.getName()), Collections.nCopies(clazz.getGenerics().size(), new PropertyType.Clazz(Object.class.getName())))).formatFirst();
         }
     }
 
@@ -242,11 +222,9 @@ public class DocCompiler {
             Class<?> event = capturedEvent.getCaptured();
             String sub = capturedEvent.getSub();
             String name = id + (sub == null ? "" : ("." + sub));
-            if (capturedEvent.hasSub())
-                wildcards.add(capturedEvent);
+            if (capturedEvent.hasSub()) wildcards.add(capturedEvent);
             DocumentClass clazz = globalClasses.get(event.getName());
-            if (clazz == null)
-                continue;
+            if (clazz == null) continue;
             PropertyComment mergedComment = clazz.getMergedComment();
             mergedComment.getLines().addAll(getAdditionalEventComments(capturedEvent));
             writer.write(String.join("\n", mergedComment.formatLines(0)) + "\n");
@@ -257,13 +235,11 @@ public class DocCompiler {
         for (CapturedEvent wildcard : wildcards) {
             String id = ProbeJS.GSON.toJson(wildcard.getId());
             id = id.substring(1, id.length() - 1);
-            if (writtenWildcards.contains(id))
-                continue;
+            if (writtenWildcards.contains(id)) continue;
             writtenWildcards.add(id);
             Class<?> event = wildcard.getCaptured();
             DocumentClass clazz = globalClasses.get(event.getName());
-            if (clazz == null)
-                continue;
+            if (clazz == null) continue;
             PropertyComment mergedComment = clazz.getMergedComment();
             mergedComment.getLines().addAll(getAdditionalEventComments(wildcard));
             writer.write("declare function onEvent(name: `%s`, handler: (event: %s) => void);\n".formatted(id, formatMaybeParameterized(clazz)));
@@ -291,41 +267,35 @@ public class DocCompiler {
     }
 
     public static void compileJSConfig() throws IOException {
-        writeMergedConfig(
-                KubeJSPaths.DIRECTORY.resolve("jsconfig.json"),
-                """
-                        {
-                            "compilerOptions": {
-                                "lib": ["ES5", "ES2015"],
-                                "typeRoots": ["./probe/generated", "./probe/user"],
-                                "target": "ES2015"
-                            }
-                        }"""
-        );
+        writeMergedConfig(KubeJSPaths.DIRECTORY.resolve("jsconfig.json"), """
+                {
+                    "compilerOptions": {
+                        "lib": ["ES5", "ES2015"],
+                        "typeRoots": ["./probe/generated", "./probe/user"],
+                        "target": "ES2015"
+                    }
+                }""");
     }
 
     public static void compileVSCodeConfig() throws IOException {
-        writeMergedConfig(
-                ProbePaths.WORKSPACE_SETTINGS.resolve("settings.json"),
-                """
-                        {
-                            "json.schemas": [
-                                    {
-                                        "fileMatch": [
-                                            "/lang/*.json"
-                                        ],
-                                        "url": "./.vscode/probe.lang-schema.json"
-                                    },
-                                    {
-                                        "fileMatch": [
-                                            "/probe/docs/*.json"
-                                        ],
-                                        "url": "./.vscode/probe.doc-schema.json"
-                                    }
-                            ]
-                        }
-                        """
-        );
+        writeMergedConfig(ProbePaths.WORKSPACE_SETTINGS.resolve("settings.json"), """
+                {
+                    "json.schemas": [
+                            {
+                                "fileMatch": [
+                                    "/lang/*.json"
+                                ],
+                                "url": "./.vscode/probe.lang-schema.json"
+                            },
+                            {
+                                "fileMatch": [
+                                    "/probe/docs/*.json"
+                                ],
+                                "url": "./.vscode/probe.doc-schema.json"
+                            }
+                    ]
+                }
+                """);
 
     }
 
@@ -362,8 +332,8 @@ public class DocCompiler {
     }
 
     private static void exportSerializedClasses(List<DocumentClass> documents, List<DocumentClass> mergedDocuments) throws IOException {
-        exportClasses(documents, KubeJSPaths.EXPORTED.resolve("javaClasses.json"));
-        exportClasses(mergedDocuments, KubeJSPaths.EXPORTED.resolve("mergedClasses.json"));
+        exportClasses(documents, ProbePaths.CACHE.resolve("javaClasses.json"));
+        exportClasses(mergedDocuments, ProbePaths.CACHE.resolve("mergedClasses.json"));
     }
 
     public static void compile() throws IOException {
@@ -395,9 +365,11 @@ public class DocCompiler {
         List<DocumentClass> documents = Manager.loadJavaClasses(globalClasses);
         //Marks up native java classes
         //documents.forEach(document -> document.addProperty(new PropertyComment("@nativeJava")));
+        Manager.downloadDocs();
         List<DocumentClass> modDocs = Manager.loadModDocuments();
+        List<DocumentClass> fetchedDocs = Manager.loadFetchedClassDoc();
         List<DocumentClass> userDocs = Manager.loadUserDocuments();
-        Map<String, DocumentClass> mergedDocsMap = Manager.mergeDocuments(documents, modDocs, userDocs);
+        Map<String, DocumentClass> mergedDocsMap = Manager.mergeDocuments(documents, fetchedDocs, modDocs, userDocs);
         List<DocumentClass> mergedDocs = mergedDocsMap.values().stream().toList();
         NameResolver.priorSortClasses(mergedDocs).forEach(NameResolver::resolveName);
 
@@ -421,8 +393,7 @@ public class DocCompiler {
 
     public static void compileAdditionalTypeNames() throws IOException {
         Path path = ProbePaths.GENERATED.resolve("names.d.ts");
-        if (Files.exists(path))
-            return;
+        if (Files.exists(path)) return;
         BufferedWriter writer = Files.newBufferedWriter(ProbePaths.GENERATED.resolve("names.d.ts"));
         writer.write("/// <reference path=\"./globals.d.ts\" />\n");
         for (Map.Entry<String, List<NameResolver.ResolvedName>> entry : NameResolver.resolvedNames.entrySet()) {

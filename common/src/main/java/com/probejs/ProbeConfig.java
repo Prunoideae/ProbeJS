@@ -19,6 +19,9 @@ public class ProbeConfig {
 
     public boolean allowObfuscated = false;
 
+    //public String docsUrl = "http://static.wolfgirl.moe/object-service/probejs/docs.zip";
+    public long docsTimestamp = 0;
+
     private static <E> E fetchPropertyOrDefault(Object key, Map<?, ?> value, E defaultValue) {
         Object v = value.get(key);
         return v == null ? defaultValue : (E) v;
@@ -34,6 +37,8 @@ public class ProbeConfig {
                 vanillaOrder = fetchPropertyOrDefault("vanillaOrder", obj, true);
                 exportClassNames = fetchPropertyOrDefault("exportClassNames", obj, false);
                 allowObfuscated = fetchPropertyOrDefault("allowObfuscated", obj, false);
+                //docsUrl = fetchPropertyOrDefault("docsUrl", obj, "http://static.wolfgirl.moe/object-service/probejs/docs.zip");
+                docsTimestamp = fetchPropertyOrDefault("docsTimestamp", obj, 0D).longValue();
             } catch (IOException e) {
                 ProbeJS.LOGGER.warn("Cannot read config properties, falling back to defaults.");
             }

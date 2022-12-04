@@ -3,6 +3,7 @@ package com.probejs.jdoc;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.probejs.ProbeConfig;
 import com.probejs.ProbeJS;
 import com.probejs.ProbePaths;
 import com.probejs.info.ClassInfo;
@@ -10,15 +11,25 @@ import com.probejs.jdoc.document.DocumentClass;
 import com.probejs.jdoc.property.AbstractProperty;
 import dev.architectury.platform.Mod;
 import dev.architectury.platform.Platform;
+import dev.latvian.mods.kubejs.util.UtilsJS;
+import org.apache.commons.io.FileUtils;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Stream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 public class Manager {
+    private static boolean docsDownloaded = false;
+
+    private static final String TIMESTAMP_API = "http://static.wolfgirl.moe/api/timestamp?path=probejs/docs-1.18.2.zip";
+    private static final String DOWNLOAD_API = "http://static.wolfgirl.moe/object-service/checked/probejs/docs-1.18.2.zip?timestamp=%s";
+
     public static List<DocumentClass> loadJavaClasses(Set<Class<?>> classes) {
         List<DocumentClass> javaClasses = new ArrayList<>();
         for (Class<?> clazz : classes) {
@@ -26,6 +37,54 @@ public class Manager {
             javaClasses.add(document);
         }
         return javaClasses;
+    }
+
+    public static void downloadDocs() throws IOException {
+        if (docsDownloaded) return;
+        ProbeJS.LOGGER.info("Checking docs timestamps...");
+        URL timestampApi = new URL(TIMESTAMP_API);
+        BufferedReader in = new BufferedReader(new InputStreamReader(timestampApi.openStream()));
+        long remoteTimestamp = Long.parseLong(in.readLine());
+        if (ProbeConfig.INSTANCE.docsTimestamp != remoteTimestamp) {
+            ProbeJS.LOGGER.info("Found timestamp mismatch (local=%s, remote=%s), downloading docs from remote.".formatted(ProbeConfig.INSTANCE.docsTimestamp, remoteTimestamp));
+            Path docsPath = ProbePaths.CACHE.resolve("docs");
+            if (Files.exists(docsPath)) {
+                FileUtils.deleteDirectory(docsPath.toFile());
+            }
+            UtilsJS.tryIO(() -> Files.createDirectories(docsPath));
+            URL downloadUrl = new URL(DOWNLOAD_API.formatted(ProbeConfig.INSTANCE.docsTimestamp));
+            ZipInputStream zipInputStream = new ZipInputStream(new BufferedInputStream(downloadUrl.openStream()));
+            ZipEntry entry = zipInputStream.getNextEntry();
+            byte[] buffer = new byte[1024];
+            while (entry != null) {
+                try (FileOutputStream outputStream = new FileOutputStream(docsPath.resolve(entry.getName()).toFile())) {
+                    int len;
+                    while ((len = zipInputStream.read(buffer)) > 0) {
+                        outputStream.write(buffer, 0, len);
+                    }
+                }
+                ProbeJS.LOGGER.info("Downloaded doc: %s".formatted(entry.getName()));
+                zipInputStream.closeEntry();
+                entry = zipInputStream.getNextEntry();
+            }
+            ProbeConfig.INSTANCE.docsTimestamp = remoteTimestamp;
+            ProbeConfig.INSTANCE.save();
+        } else {
+            ProbeJS.LOGGER.info("Timestamps are matched (local = remote = %s), no need to update docs.".formatted(remoteTimestamp));
+        }
+        docsDownloaded = true;
+    }
+
+    public static List<DocumentClass> loadFetchedClassDoc() throws IOException {
+        List<DocumentClass> docs = new ArrayList<>();
+        Path docsPath = ProbePaths.CACHE.resolve("docs");
+        if (Files.exists(docsPath)) {
+            for (File file : Objects.requireNonNull(docsPath.toFile().listFiles())) {
+                docs.addAll(loadJsonClassDoc(file.toPath()));
+                ProbeJS.LOGGER.info("Loaded fetched doc: %s".formatted(file.getName()));
+            }
+        }
+        return docs;
     }
 
     public static List<DocumentClass> loadJsonClassDoc(Path path) throws IOException {
@@ -75,8 +134,7 @@ public class Manager {
     public static List<DocumentClass> loadUserDocuments() throws IOException {
         List<DocumentClass> documents = new ArrayList<>();
         for (File file : Objects.requireNonNull(ProbePaths.DOCS.toFile().listFiles())) {
-            if (!file.getName().endsWith(".json"))
-                continue;
+            if (!file.getName().endsWith(".json")) continue;
             Path path = Paths.get(file.toURI());
             documents.addAll(loadJsonClassDoc(path));
         }

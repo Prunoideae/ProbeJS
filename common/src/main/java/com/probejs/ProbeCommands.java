@@ -28,11 +28,13 @@ import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerLevel;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class ProbeCommands {
@@ -77,15 +79,14 @@ public class ProbeCommands {
                         .then(Commands.literal("clear_cache")
                                 .requires(source -> source.getServer().isSingleplayer())
                                 .executes(context -> {
-                                    Path path = KubeJSPaths.EXPORTED.resolve("cachedEvents.json");
-                                    if (Files.exists(path)) {
-                                        if (path.toFile().delete()) {
-                                            context.getSource().sendSuccess(new TextComponent("Cache files removed."), false);
-                                        } else {
-                                            context.getSource().sendSuccess(new TextComponent("Failed to remove cache files."), false);
+                                    for (File file : Objects.requireNonNull(ProbePaths.CACHE.toFile().listFiles())) {
+                                        if (file.isFile()) {
+                                            if (file.delete()) {
+                                                ProbeJS.LOGGER.info("Removed %s".formatted(file.getName()));
+                                            } else {
+                                                ProbeJS.LOGGER.info("Failed to remove %s".formatted(file.getName()));
+                                            }
                                         }
-                                    } else {
-                                        context.getSource().sendSuccess(new TextComponent("No cached files to be cleared."), false);
                                     }
                                     return Command.SINGLE_SUCCESS;
                                 }))
