@@ -67,7 +67,9 @@ public class ProbeCommands {
                                         NameResolver.init();
                                         DocCompiler.compile();
                                     } catch (Exception e) {
-                                        e.printStackTrace();
+                                        for (StackTraceElement stackTraceElement : e.getStackTrace()) {
+                                            ProbeJS.LOGGER.error(stackTraceElement);
+                                        }
                                         context.getSource().sendSuccess(new TextComponent("Uncaught exception happened in wrapper, please report to the Github issue with complete latest.log."), false);
                                     }
                                     Instant end = Instant.now();
