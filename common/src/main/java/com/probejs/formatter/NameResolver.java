@@ -233,7 +233,7 @@ public class NameResolver {
         });
         putSpecialAssignments(MaterialJS.class, () -> MaterialListJS.INSTANCE.map.keySet().stream().map(ProbeJS.GSON::toJson).collect(Collectors.toList()));
 
-        SpecialTypes.assignRegistries(Registry.class);
+        SpecialTypes.assignRegistries();
 
         addKeyword("function");
         addKeyword("debugger");

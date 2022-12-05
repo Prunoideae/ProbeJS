@@ -1,6 +1,6 @@
 package com.probejs.formatter;
 
-import com.mojang.serialization.Codec;
+import com.probejs.ProbeCommands;
 import com.probejs.ProbeJS;
 import com.probejs.compiler.SpecialCompiler;
 import com.probejs.formatter.formatter.IFormatter;
@@ -9,20 +9,12 @@ import com.probejs.formatter.formatter.jdoc.FormatterMethod;
 import com.probejs.formatter.formatter.special.FormatterRegistry;
 import com.probejs.info.ClassInfo;
 import com.probejs.info.MethodInfo;
-import com.probejs.info.type.ITypeInfo;
-import com.probejs.info.type.InfoTypeResolver;
 import com.probejs.jdoc.Serde;
 import com.probejs.jdoc.document.DocumentMethod;
-import com.probejs.util.Pair;
 import dev.latvian.mods.rhino.util.EnumTypeWrapper;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -68,8 +60,12 @@ public class SpecialTypes {
     public static void processEnums(Set<Class<?>> globalClasses) {
         for (Class<?> clazz : globalClasses) {
             if (clazz.isEnum()) {
-                EnumTypeWrapper<?> wrapper = EnumTypeWrapper.get(clazz);
-                NameResolver.putSpecialAssignments(clazz, () -> wrapper.nameValues.keySet().stream().map(ProbeJS.GSON::toJson).collect(Collectors.toList()));
+                try {
+                    EnumTypeWrapper<?> wrapper = EnumTypeWrapper.get(clazz);
+                    NameResolver.putSpecialAssignments(clazz, () -> wrapper.nameValues.keySet().stream().map(ProbeJS.GSON::toJson).collect(Collectors.toList()));
+                } catch (Exception e) {
+                    ProbeJS.LOGGER.warn("Failed to process enum: %s".formatted(clazz.getName()));
+                }
             }
         }
     }
@@ -80,26 +76,57 @@ public class SpecialTypes {
         NameResolver.putSpecialAssignments(clazz, () -> List.of("Special.%s".formatted(remappedName.get(remappedName.size() - 1))));
     }
 
-    @SuppressWarnings("unchecked")
-    public static <T> void assignRegistries(Class<?> registryClazz) {
-        for (var field : registryClazz.getFields()) {
-            if (field.getType() == ResourceKey.class && Modifier.isStatic(field.getModifiers())) {
-                try {
-                    ResourceKey<Registry<T>> key = (ResourceKey<Registry<T>>) field.get(null);
-                    var type = field.getGenericType();
-                    var type1 = ((ParameterizedType) type).getActualTypeArguments()[0];
-                    var type2 = ((ParameterizedType) type1).getActualTypeArguments()[0];
-                    ITypeInfo typeInfo = InfoTypeResolver.resolveType(type2);
-                    if (typeInfo == null)
-                        continue;
-                    Class<T> clazz = (Class<T>) typeInfo.getResolvedClass();
-                    if (clazz == ResourceLocation.class || clazz == ResourceKey.class || clazz == Codec.class)
-                        continue;
-                    assignRegistry(clazz, key);
-                } catch (IllegalAccessException | IllegalArgumentException e) {
-                    ProbeJS.LOGGER.error("Can not touch field: %s of %s".formatted(field.getName(), field.getDeclaringClass()));
-                }
+    private static List<Class<?>> getParentInterfaces(List<Class<?>> putative, Class<?> o) {
+        List<Class<?>> result = new ArrayList<>();
+        for (Class<?> clazz : putative) {
+            if (!clazz.isAssignableFrom(o)) {
+                result.addAll(getParentInterfaces(List.of(clazz.getInterfaces()), o));
+            } else {
+                result.add(clazz);
             }
         }
+        return result;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> void assignRegistries() {
+        ProbeCommands.COMMAND_LEVEL.registryAccess().registries().forEach(entry -> {
+            //We know that, all objects in Registry<T> must extend or implement T
+            //So T must be the superclass or superinterface of all object in Registry<T>
+            //And it must not be synthetic class unless some people are really crazy
+            ResourceKey<?> key = entry.key();
+            Registry<?> registry = entry.value();
+            Class<?> putativeParent = null;
+            //We assume it's class based first
+            for (Object o : registry) {
+                if (putativeParent == null) {
+                    putativeParent = o.getClass();
+                    continue;
+                }
+                while (!putativeParent.isAssignableFrom(o.getClass())) {
+                    putativeParent = putativeParent.getSuperclass();
+                }
+            }
+            if (putativeParent == null) //No object present in registry, can only ignore
+                return;
+
+            while (putativeParent.isSynthetic()) //Wipe up the synthetic ass
+                putativeParent = putativeParent.getSuperclass();
+
+            //If result is object, probably it's using interface to register things
+            if (putativeParent == Object.class) {
+                List<Class<?>> putativeInterfaces = new ArrayList<>();
+                for (Object o : registry) {
+                    if (putativeInterfaces.isEmpty()) {
+                        putativeInterfaces.addAll(List.of(o.getClass().getInterfaces()));
+                        continue;
+                    }
+                    putativeInterfaces = getParentInterfaces(putativeInterfaces, o.getClass());
+                }
+                if (!putativeInterfaces.isEmpty())
+                    putativeParent = putativeInterfaces.get(0);
+            }
+            assignRegistry((Class<T>) putativeParent, (ResourceKey<Registry<T>>) key);
+        });
     }
 }

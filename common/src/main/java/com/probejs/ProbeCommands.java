@@ -19,16 +19,21 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class ProbeCommands {
+    public static ServerLevel COMMAND_LEVEL = null;
+
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
 
         dispatcher.register(
@@ -39,13 +44,15 @@ public class ProbeCommands {
                                 .executes(context -> {
                                     Instant start = Instant.now();
                                     try {
-
+                                        COMMAND_LEVEL = context.getSource().getLevel();
                                         SnippetCompiler.compile();
                                         ClassResolver.init();
                                         NameResolver.init();
                                         DocCompiler.compile();
                                     } catch (Exception e) {
-                                        e.printStackTrace();
+                                        for (StackTraceElement stackTraceElement : e.getStackTrace()) {
+                                            ProbeJS.LOGGER.error(stackTraceElement);
+                                        }
                                         context.getSource().sendSuccess(Component.literal("Uncaught exception happened in wrapper, please report to the Github issue with complete latest.log."), false);
                                     }
                                     Instant end = Instant.now();
@@ -57,15 +64,14 @@ public class ProbeCommands {
                         .then(Commands.literal("clear_cache")
                                 .requires(source -> source.getServer().isSingleplayer())
                                 .executes(context -> {
-                                    Path path = KubeJSPaths.EXPORTED.resolve("cachedEvents.json");
-                                    if (Files.exists(path)) {
-                                        if (path.toFile().delete()) {
-                                            context.getSource().sendSuccess(Component.literal("Cache files removed."), false);
-                                        } else {
-                                            context.getSource().sendSuccess(Component.literal("Failed to remove cache files."), false);
+                                    for (File file : Objects.requireNonNull(ProbePaths.CACHE.toFile().listFiles())) {
+                                        if (file.isFile()) {
+                                            if (file.delete()) {
+                                                ProbeJS.LOGGER.info("Removed %s".formatted(file.getName()));
+                                            } else {
+                                                ProbeJS.LOGGER.info("Failed to remove %s".formatted(file.getName()));
+                                            }
                                         }
-                                    } else {
-                                        context.getSource().sendSuccess(Component.literal("No cached files to be cleared."), false);
                                     }
                                     return Command.SINGLE_SUCCESS;
                                 }))

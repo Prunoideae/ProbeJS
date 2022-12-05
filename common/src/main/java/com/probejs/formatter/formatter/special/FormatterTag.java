@@ -20,14 +20,17 @@ public class FormatterTag implements IFormatter {
 
     @Override
     public List<String> format(Integer indent, Integer stepIndent) {
+        String tags = this.registry.getTagNames()
+                .map(TagKey::location)
+                .map(ResourceLocation::toString)
+                .map(ProbeJS.GSON::toJson)
+                .collect(Collectors.joining(" | "));
+        if (tags.isEmpty())
+            tags = "never";
         return List.of("%stype %s = %s;".formatted(
                 " ".repeat(indent),
                 this.name,
-                this.registry.getTagNames()
-                        .map(TagKey::location)
-                        .map(ResourceLocation::toString)
-                        .map(ProbeJS.GSON::toJson)
-                        .collect(Collectors.joining(" | "))));
+                tags));
     }
 
     public static List<String> getTagsFromRegistry(Registry<?> registry) {

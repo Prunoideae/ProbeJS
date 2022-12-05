@@ -69,7 +69,7 @@ public class DocCompiler {
 
     public static Set<Class<?>> readCachedClasses(String fileName) throws IOException {
         Set<Class<?>> cachedClasses = new HashSet<>();
-        Path cachedClassesPath = KubeJSPaths.EXPORTED.resolve(fileName);
+        Path cachedClassesPath = ProbePaths.CACHE.resolve(fileName);
         if (Files.exists(cachedClassesPath)) {
             try {
                 List<?> cachedList = ProbeJS.GSON.fromJson(Files.newBufferedReader(cachedClassesPath), List.class);
@@ -89,7 +89,7 @@ public class DocCompiler {
     }
 
     public static void writeCachedClasses(String fileName, Set<Class<?>> javaClasses) throws IOException {
-        BufferedWriter cacheWriter = Files.newBufferedWriter(KubeJSPaths.EXPORTED.resolve(fileName));
+        BufferedWriter cacheWriter = Files.newBufferedWriter(ProbePaths.CACHE.resolve(fileName));
         JsonArray outJson = new JsonArray();
         for (Class<?> clazz : javaClasses) {
             outJson.add(clazz.getName());
@@ -100,7 +100,7 @@ public class DocCompiler {
 
     public static Map<String, Class<?>> readCachedForgeEvents(String fileName) throws IOException {
         Map<String, Class<?>> cachedEvents = new HashMap<>();
-        Path cachedEventPath = KubeJSPaths.EXPORTED.resolve(fileName);
+        Path cachedEventPath = ProbePaths.CACHE.resolve(fileName);
         if (Files.exists(cachedEventPath)) {
             try {
                 Map<?, ?> cachedMap = ProbeJS.GSON.fromJson(Files.newBufferedReader(cachedEventPath), Map.class);
@@ -123,7 +123,7 @@ public class DocCompiler {
     }
 
     public static void writeCachedForgeEvents(String fileName, Map<String, Class<?>> events) throws IOException {
-        BufferedWriter cacheWriter = Files.newBufferedWriter(KubeJSPaths.EXPORTED.resolve(fileName));
+        BufferedWriter cacheWriter = Files.newBufferedWriter(ProbePaths.CACHE.resolve(fileName));
         JsonObject outJson = new JsonObject();
         for (Map.Entry<String, Class<?>> entry : events.entrySet()) {
             String eventName = entry.getKey();
@@ -226,8 +226,8 @@ public class DocCompiler {
     }
 
     private static void exportSerializedClasses(List<DocumentClass> documents, List<DocumentClass> mergedDocuments) throws IOException {
-        exportClasses(documents, KubeJSPaths.EXPORTED.resolve("javaClasses.json"));
-        exportClasses(mergedDocuments, KubeJSPaths.EXPORTED.resolve("mergedClasses.json"));
+        exportClasses(documents, ProbePaths.CACHE.resolve("javaClasses.json"));
+        exportClasses(mergedDocuments, ProbePaths.CACHE.resolve("mergedClasses.json"));
     }
 
     public static void compile() throws IOException {
@@ -259,9 +259,11 @@ public class DocCompiler {
         //Insert some special documents to extend the function
         javaDocs.addAll(PlatformSpecial.INSTANCE.get().getPlatformDocuments(javaDocs));
 
+        Manager.downloadDocs();
+        List<DocumentClass> fetchedDocs = Manager.loadFetchedClassDoc();
         List<DocumentClass> modDocs = Manager.loadModDocuments();
         List<DocumentClass> userDocs = Manager.loadUserDocuments();
-        Map<String, DocumentClass> mergedDocsMap = Manager.mergeDocuments(javaDocs, modDocs, userDocs);
+        Map<String, DocumentClass> mergedDocsMap = Manager.mergeDocuments(javaDocs, fetchedDocs, modDocs, userDocs);
         List<DocumentClass> mergedDocs = mergedDocsMap.values().stream().toList();
         NameResolver.priorSortClasses(mergedDocs).forEach(NameResolver::resolveName);
 
