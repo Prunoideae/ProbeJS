@@ -10,20 +10,22 @@ documents to override auto-generated typing!
 ProbeJS also has builtin documents to support some other mods' recipes, but it's not completed, if you want to add
 something to the document, maybe you can send a PR too!
 
+Remote fetching of documents is now online, updates of builtin documents are not limited by mod versions.
+
 Current progress of mod documents:
 
-- Minecraft (Completed)
-- Create (Completed)
-- Integrated Dynamics (Completed)
-- ArsNouveau (Completed)
-- ArtisanWorktables (Completed)
-- Botania (Builtin in KubeJS Botania)
-- Cucumber (Completed)
-- DankStorage (Completed)
-- ExtendedCrafting (Completed)
-- Mekanism (Completed)
-- Immersive Engineering (Completed)
-- Thermal Expansion (Completed)
+- Minecraft
+- Create
+- Integrated Dynamics
+- ArsNouveau
+- ArtisanWorktables
+- Botania
+- Cucumber
+- DankStorage
+- ExtendedCrafting
+- Mekanism
+- Immersive Engineering
+- Thermal Expansion
 - Others (Please PR)
 
 For the detailed information about documents, please refer to the wiki page.
