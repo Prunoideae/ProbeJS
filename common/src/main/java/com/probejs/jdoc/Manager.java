@@ -32,9 +32,14 @@ public class Manager {
     public static void downloadDocs() throws IOException {
         if (docsDownloaded) return;
         ProbeJS.LOGGER.info("Checking docs timestamps...");
-        URL timestampApi = new URL(TIMESTAMP_API);
-        BufferedReader in = new BufferedReader(new InputStreamReader(timestampApi.openStream()));
-        long remoteTimestamp = Long.parseLong(in.readLine());
+        long remoteTimestamp;
+        try {
+            URL timestampApi = new URL(TIMESTAMP_API);
+            BufferedReader in = new BufferedReader(new InputStreamReader(timestampApi.openStream()));
+            remoteTimestamp = Long.parseLong(in.readLine());
+        } catch (Exception e) {
+            remoteTimestamp = -1;
+        }
         if (ProbeConfig.INSTANCE.docsTimestamp != remoteTimestamp) {
             ProbeJS.LOGGER.info("Found timestamp mismatch (local=%s, remote=%s), downloading docs from remote.".formatted(ProbeConfig.INSTANCE.docsTimestamp, remoteTimestamp));
             Path docsPath = ProbePaths.CACHE.resolve("docs");

@@ -25,7 +25,7 @@ public class NameResolver {
         public static final ResolvedName UNRESOLVED = new ResolvedName(List.of("any"));
         private final List<String> names;
 
-        private ResolvedName(List<String> names) {
+        public ResolvedName(List<String> names) {
             this.names = names.stream().map(NameResolver::getNameSafe).collect(Collectors.toList());
         }
 

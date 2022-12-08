@@ -1,6 +1,8 @@
 package com.probejs.info;
 
 
+import com.probejs.ProbeJS;
+import com.probejs.formatter.NameResolver;
 import com.probejs.info.type.ITypeInfo;
 import com.probejs.info.type.InfoTypeResolver;
 import dev.latvian.mods.kubejs.script.ScriptManager;
@@ -33,9 +35,9 @@ public class ClassInfo {
     private final int modifiers;
     private final boolean isInterface;
     private final List<ITypeInfo> parameters;
-    private final List<MethodInfo> methodInfo;
-    private final List<FieldInfo> fieldInfo;
-    private final List<ConstructorInfo> constructorInfo;
+    private List<MethodInfo> methodInfo;
+    private List<FieldInfo> fieldInfo;
+    private List<ConstructorInfo> constructorInfo;
     private final ClassInfo superClass;
     private final List<ClassInfo> interfaces;
     private final List<Annotation> annotations;
@@ -62,17 +64,24 @@ public class ClassInfo {
             return;
         }
 
-        constructorInfo = members.getAccessibleConstructors().stream().map(ConstructorInfo::new).collect(Collectors.toList());
-        methodInfo = members.getAccessibleMethods(manager.context, false).stream()
-                .filter(m -> m.method.getDeclaringClass() == clazz || m.method.isDefault())
-                .map(m -> new MethodInfo(m, clazz))
-                .collect(Collectors.toList());
-        fieldInfo = members.getAccessibleFields(manager.context, false)
-                .stream()
-                .filter(f -> f.field.getDeclaringClass() == clazz)
-                .map(FieldInfo::new)
-                .collect(Collectors.toList());
-        ;
+        try {
+            constructorInfo = members.getAccessibleConstructors().stream().map(ConstructorInfo::new).collect(Collectors.toList());
+            methodInfo = members.getAccessibleMethods(manager.context, false).stream()
+                    .filter(m -> m.method.getDeclaringClass() == clazz || m.method.isDefault())
+                    .map(m -> new MethodInfo(m, clazz))
+                    .collect(Collectors.toList());
+            fieldInfo = members.getAccessibleFields(manager.context, false)
+                    .stream()
+                    .filter(f -> f.field.getDeclaringClass() == clazz)
+                    .map(FieldInfo::new)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            ProbeJS.LOGGER.warn("Error occured when resolving class %s! Touching the class with KubeJS will likely to crash too!".formatted(clazz.getName()));
+            constructorInfo = List.of();
+            methodInfo = List.of();
+            fieldInfo = List.of();
+            NameResolver.putResolvedName(clazz, new NameResolver.ResolvedName(List.of("any")));
+        }
     }
 
 
