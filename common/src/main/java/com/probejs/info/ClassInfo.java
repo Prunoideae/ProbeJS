@@ -79,7 +79,7 @@ public class ClassInfo {
             constructorInfo = List.of();
             methodInfo = List.of();
             fieldInfo = List.of();
-            NameResolver.putResolvedName(clazz, new NameResolver.ResolvedName(List.of("any")));
+            NameResolver.putResolvedName(clazz, new NameResolver.ResolvedName(List.of("probejs", "internal", "NotResolved")));
         }
     }
 
