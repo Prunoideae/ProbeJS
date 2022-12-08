@@ -45,8 +45,6 @@ public class ClassInfo {
     private final List<Annotation> annotations;
 
     private ClassInfo(Class<?> clazz) {
-        JavaMembers members = JavaMembers.lookupClass(ProbeCommands.CONTEXT_DATA, clazz, clazz, false);
-
         clazzRaw = clazz;
         name = MethodInfo.getMappedOrDefaultClass(clazzRaw);
         modifiers = clazzRaw.getModifiers();
@@ -65,6 +63,7 @@ public class ClassInfo {
         }
 
         try {
+            JavaMembers members = JavaMembers.lookupClass(ProbeCommands.CONTEXT_DATA, clazz, clazz, false);
             constructorInfo = members.getAccessibleConstructors().stream().map(ConstructorInfo::new).collect(Collectors.toList());
             methodInfo = members.getAccessibleMethods(false).stream()
                     .filter(m -> m.method.getDeclaringClass() == clazz || m.method.isDefault())
@@ -75,7 +74,7 @@ public class ClassInfo {
                     .filter(f -> f.field.getDeclaringClass() == clazz)
                     .map(FieldInfo::new)
                     .collect(Collectors.toList());
-        } catch (Exception e) {
+        } catch (Throwable e) {
             ProbeJS.LOGGER.warn("Error occured when resolving class %s! Touching the class with KubeJS will likely to crash too!".formatted(clazz.getName()));
             constructorInfo = List.of();
             methodInfo = List.of();
