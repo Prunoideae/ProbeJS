@@ -43,11 +43,6 @@ public class SpecialCompiler {
 
     public static List<IFormatter> compileSpecial() {
         List<IFormatter> formatters = new ArrayList<>();
-
-        formatters.add(new FormatterTag("ItemTag", Registry.ITEM));
-        formatters.add(new FormatterTag("FluidTag", Registry.FLUID));
-        formatters.add(new FormatterTag("BlockTag", Registry.BLOCK));
-        formatters.add(new FormatterTag("EntityTypeTag", Registry.ENTITY_TYPE));
         formatters.add(new FormatterMod());
         formatters.add(new FormatterIngredient());
         formatters.add(new FormatterRecipeId());
