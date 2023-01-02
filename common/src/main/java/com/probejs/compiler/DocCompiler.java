@@ -313,7 +313,10 @@ public class DocCompiler {
 
     private static void writeMergedConfig(Path path, String config) throws IOException {
         JsonObject updates = ProbeJS.GSON.fromJson(config, JsonObject.class);
-        JsonObject original = Files.exists(path) ? ProbeJS.GSON.fromJson(Files.newBufferedReader(path), JsonObject.class) : new JsonObject();
+        JsonObject read = Files.exists(path) ? ProbeJS.GSON.fromJson(Files.newBufferedReader(path), JsonObject.class) : new JsonObject();
+        if (read == null)
+            read = new JsonObject();
+        JsonObject original = read;
         updates.entrySet().forEach((entry) -> original.add(entry.getKey(), entry.getValue()));
         JsonWriter jsonWriter = ProbeJS.GSON_WRITER.newJsonWriter(Files.newBufferedWriter(path));
         jsonWriter.setIndent("    ");

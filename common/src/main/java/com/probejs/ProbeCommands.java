@@ -2,6 +2,7 @@ package com.probejs;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.stream.JsonWriter;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
@@ -67,6 +68,7 @@ public class ProbeCommands {
                                         NameResolver.init();
                                         DocCompiler.compile();
                                     } catch (Exception e) {
+                                        ProbeJS.LOGGER.error(e.getMessage());
                                         for (StackTraceElement stackTraceElement : e.getStackTrace()) {
                                             ProbeJS.LOGGER.error(stackTraceElement);
                                         }
