@@ -33,6 +33,7 @@ import java.util.concurrent.TimeUnit;
 
 public class ProbeCommands {
     public static ServerLevel COMMAND_LEVEL = null;
+    public static boolean isRunning = false;
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
 
@@ -42,23 +43,32 @@ public class ProbeCommands {
                                 //SINGLE PLAYER IS NEEDED
                                 .requires(source -> source.getServer().isSingleplayer() && source.hasPermission(2))
                                 .executes(context -> {
-                                    Instant start = Instant.now();
-                                    try {
-                                        COMMAND_LEVEL = context.getSource().getLevel();
-                                        SnippetCompiler.compile();
-                                        ClassResolver.init();
-                                        NameResolver.init();
-                                        DocCompiler.compile();
-                                    } catch (Exception e) {
-                                        for (StackTraceElement stackTraceElement : e.getStackTrace()) {
-                                            ProbeJS.LOGGER.error(stackTraceElement);
-                                        }
-                                        context.getSource().sendSuccess(Component.literal("Uncaught exception happened in wrapper, please report to the Github issue with complete latest.log."), false);
+                                    if (isRunning) {
+                                        context.getSource().sendSuccess(Component.literal("ProbeJS is running! Please wait for current dump to finish."), false);
+                                        return Command.SINGLE_SUCCESS;
+                                    } else {
+                                        isRunning = true;
                                     }
-                                    Instant end = Instant.now();
-                                    Duration duration = Duration.between(start, end);
-                                    long sub = TimeUnit.MILLISECONDS.convert(duration.getNano(), TimeUnit.NANOSECONDS);
-                                    context.getSource().sendSuccess(Component.literal("ProbeJS typing generation finished in %s.%03ds.".formatted(duration.getSeconds(), sub)), false);
+                                    COMMAND_LEVEL = context.getSource().getLevel();
+                                    new Thread(() -> {
+                                        Instant start = Instant.now();
+                                        try {
+                                            SnippetCompiler.compile();
+                                            ClassResolver.init();
+                                            NameResolver.init();
+                                            DocCompiler.compile();
+                                        } catch (Exception e) {
+                                            for (StackTraceElement stackTraceElement : e.getStackTrace()) {
+                                                ProbeJS.LOGGER.error(stackTraceElement);
+                                            }
+                                            context.getSource().sendSuccess(Component.literal("Uncaught exception happened in wrapper, please report to the Github issue with complete latest.log."), false);
+                                        }
+                                        Instant end = Instant.now();
+                                        Duration duration = Duration.between(start, end);
+                                        long sub = TimeUnit.MILLISECONDS.convert(duration.getNano(), TimeUnit.NANOSECONDS);
+                                        context.getSource().sendSuccess(Component.literal("ProbeJS typing generation finished in %s.%03ds.".formatted(duration.getSeconds(), sub)), false);
+                                        isRunning = false;
+                                    }).start();
                                     return Command.SINGLE_SUCCESS;
                                 }))
                         .then(Commands.literal("clear_cache")

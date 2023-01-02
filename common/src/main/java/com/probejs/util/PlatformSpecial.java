@@ -12,7 +12,6 @@ import com.probejs.jdoc.document.DocumentClass;
 import com.probejs.jdoc.document.DocumentMethod;
 import com.probejs.jdoc.property.PropertyParam;
 import com.probejs.jdoc.property.PropertyType;
-import com.probejs.plugin.CapturedClasses;
 import dev.latvian.mods.kubejs.bindings.JavaWrapper;
 import dev.latvian.mods.kubejs.server.ServerScriptManager;
 import net.minecraft.core.Registry;
@@ -25,7 +24,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ServiceLoader;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 public abstract class PlatformSpecial {
     public static Supplier<PlatformSpecial> INSTANCE = Suppliers.memoize(() -> {

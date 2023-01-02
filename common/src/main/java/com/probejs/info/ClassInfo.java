@@ -45,8 +45,6 @@ public class ClassInfo {
     //TODO: Use JavaMembers
     //Use Context.getCurrent() to get a context, then JavaMembers.lookupClass to get JavaMembers, then getAccessibleMethods/Fields/Constructors
     private ClassInfo(Class<?> clazz) {
-        ScriptManager manager = ServerScriptManager.getScriptManager();
-        JavaMembers members = JavaMembers.lookupClass(manager.context, manager.topLevelScope, clazz, clazz, false);
         clazzRaw = clazz;
         name = MethodInfo.getRemappedOrOriginalClass(clazzRaw);
         modifiers = clazzRaw.getModifiers();
@@ -65,6 +63,8 @@ public class ClassInfo {
         }
 
         try {
+            ScriptManager manager = ServerScriptManager.getScriptManager();
+            JavaMembers members = JavaMembers.lookupClass(manager.context, manager.topLevelScope, clazz, clazz, false);
             constructorInfo = members.getAccessibleConstructors().stream().map(ConstructorInfo::new).collect(Collectors.toList());
             methodInfo = members.getAccessibleMethods(manager.context, false).stream()
                     .filter(m -> m.method.getDeclaringClass() == clazz || m.method.isDefault())
@@ -75,12 +75,12 @@ public class ClassInfo {
                     .filter(f -> f.field.getDeclaringClass() == clazz)
                     .map(FieldInfo::new)
                     .collect(Collectors.toList());
-        } catch (Exception e) {
+        } catch (Throwable e) {
             ProbeJS.LOGGER.warn("Error occured when resolving class %s! Touching the class with KubeJS will likely to crash too!".formatted(clazz.getName()));
             constructorInfo = List.of();
             methodInfo = List.of();
             fieldInfo = List.of();
-            NameResolver.putResolvedName(clazz, new NameResolver.ResolvedName(List.of("any")));
+            NameResolver.putResolvedName(clazz, new NameResolver.ResolvedName(List.of("probejs", "internal", "NotResolved")));
         }
     }
 
