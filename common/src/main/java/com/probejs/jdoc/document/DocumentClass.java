@@ -3,6 +3,7 @@ package com.probejs.jdoc.document;
 import com.google.gson.JsonObject;
 import com.probejs.info.ClassInfo;
 import com.probejs.jdoc.Serde;
+import com.probejs.jdoc.property.PropertyComment;
 import com.probejs.jdoc.property.PropertyType;
 
 import java.lang.annotation.Annotation;
@@ -61,6 +62,8 @@ public class DocumentClass extends AbstractDocument<DocumentClass> {
         info.getFieldInfo().stream().map(DocumentField::fromJava).forEach(document.fields::add);
         info.getMethodInfo().stream().map(DocumentMethod::fromJava).forEach(document.methods::add);
         info.getConstructorInfo().stream().map(DocumentConstructor::fromJava).forEach(document.constructors::add);
+        if (info.getAnnotations().stream().anyMatch(annotation -> annotation instanceof Deprecated))
+            document.properties.add(new PropertyComment("@deprecated"));
         return document;
     }
 

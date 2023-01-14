@@ -16,7 +16,7 @@ public class FormatterField extends DocumentFormatter<DocumentField> {
     }
 
     public boolean shouldFormatValue() {
-        return document.isStatic() && document.getValue() != null && !(document.getValue() instanceof PropertyValue.NullValue);
+        return document.isStatic() && document.getValue() != null && !(document.getValue() instanceof PropertyValue.NullValue) && !(Serde.getValueFormatter(document.getValue()) instanceof FormatterValue.FallbackFormatter);
     }
 
     @Override

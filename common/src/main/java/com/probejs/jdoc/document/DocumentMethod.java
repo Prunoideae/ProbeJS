@@ -21,6 +21,7 @@ public class DocumentMethod extends AbstractDocument<DocumentMethod> {
     public boolean isAbstract;
     public PropertyType<?> returns;
     public final List<PropertyParam> params = new ArrayList<>();
+    public final List<PropertyType<?>> variables = new ArrayList<>();
 
     @Override
     public JsonObject serialize() {
@@ -29,6 +30,7 @@ public class DocumentMethod extends AbstractDocument<DocumentMethod> {
         object.addProperty("static", isStatic);
         object.addProperty("abstract", isAbstract);
         Serde.serializeCollection(object, "params", params);
+        Serde.serializeCollection(object, "variables", variables);
         object.add("returns", returns.serialize());
         return object;
     }
@@ -42,6 +44,7 @@ public class DocumentMethod extends AbstractDocument<DocumentMethod> {
         if (object.has("abstract"))
             isAbstract = object.get("abstract").getAsBoolean();
         Serde.deserializeDocuments(params, object.get("params"));
+        Serde.deserializeDocuments(variables, object.get("variables"));
         returns = (PropertyType<?>) Serde.deserializeProperty(object.get("returns").getAsJsonObject());
     }
 
@@ -57,6 +60,9 @@ public class DocumentMethod extends AbstractDocument<DocumentMethod> {
         info.getAnnotations().stream()
                 .filter(annotation -> !(annotation instanceof RemapForJS))
                 .map(Annotation::toString).forEach(document.builtinComments::add);
+        info.getTypeVariables().stream()
+                .map(Serde::deserializeFromJavaType)
+                .forEach(document.variables::add);
         return document;
     }
 
@@ -84,6 +90,7 @@ public class DocumentMethod extends AbstractDocument<DocumentMethod> {
         document.params.addAll(params);
         document.returns = returns;
         document.properties.addAll(properties);
+        document.variables.addAll(variables);
         document.isStatic = isStatic;
         document.isAbstract = isAbstract;
         return document;
@@ -112,6 +119,10 @@ public class DocumentMethod extends AbstractDocument<DocumentMethod> {
 
     public PropertyType<?> getReturns() {
         return returns;
+    }
+
+    public List<PropertyType<?>> getVariables() {
+        return variables;
     }
 
     public boolean isStatic() {
