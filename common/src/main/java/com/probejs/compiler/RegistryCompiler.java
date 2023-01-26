@@ -15,7 +15,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class RegistryCompiler {
-    public static Set<Class<?>> getRegistryClasses() {
+    public static Set<Class<?>> getKJSRegistryClasses() {
         Set<Class<?>> result = new HashSet<>();
         result.add(RegistryObjectBuilderTypes.class);
         result.add(RegistryObjectBuilderTypes.RegistryEventJS.class);

@@ -55,6 +55,10 @@ public abstract class FormatterValue<T extends PropertyValue<T, J>, J> extends D
             FormatterType<?> typeFormatter = Serde.getTypeFormatter(type);
             return List.of(typeFormatter.formatFirst());
         }
+
+        public PropertyType<?> getType(){
+            return document.getType();
+        }
     }
 
     public static class MapFormatter extends FormatterValue<PropertyValue.MapValue, Map<?, ?>> {

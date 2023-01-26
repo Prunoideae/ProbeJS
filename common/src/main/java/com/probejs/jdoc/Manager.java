@@ -38,7 +38,9 @@ public class Manager {
             BufferedReader in = new BufferedReader(new InputStreamReader(timestampApi.openStream()));
             remoteTimestamp = Long.parseLong(in.readLine());
         } catch (Exception e) {
-            remoteTimestamp = -1;
+            ProbeJS.LOGGER.warn("Cannot connect to remote server, docs are not checked or downloaded!");
+            ProbeJS.LOGGER.warn("The server might come back online later, this is not an error.");
+            return;
         }
         if (ProbeConfig.INSTANCE.docsTimestamp != remoteTimestamp) {
             ProbeJS.LOGGER.info("Found timestamp mismatch (local=%s, remote=%s), downloading docs from remote.".formatted(ProbeConfig.INSTANCE.docsTimestamp, remoteTimestamp));

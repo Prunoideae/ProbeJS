@@ -3,6 +3,7 @@ package com.probejs.formatter.formatter.jdoc;
 import com.probejs.ProbeJS;
 import com.probejs.jdoc.Serde;
 import com.probejs.jdoc.document.DocumentField;
+import com.probejs.jdoc.property.PropertyType;
 import com.probejs.jdoc.property.PropertyValue;
 import com.probejs.util.Util;
 
@@ -16,7 +17,13 @@ public class FormatterField extends DocumentFormatter<DocumentField> {
     }
 
     public boolean shouldFormatValue() {
-        return document.isStatic() && document.getValue() != null && !(document.getValue() instanceof PropertyValue.NullValue) && !(Serde.getValueFormatter(document.getValue()) instanceof FormatterValue.FallbackFormatter);
+        //Of course
+        if (!document.isStatic() || document.getValue() == null || document.getValue() instanceof PropertyValue.NullValue)
+            return false;
+        //If we're resolving the type by value, ensure the value type is not parameterized to avoid type erasure
+        if (Serde.getValueFormatter(document.getValue()) instanceof FormatterValue.FallbackFormatter fallback)
+            return !(fallback.getType() instanceof PropertyType.Parameterized);
+        return true;
     }
 
     @Override

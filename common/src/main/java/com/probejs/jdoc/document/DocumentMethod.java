@@ -57,9 +57,13 @@ public class DocumentMethod extends AbstractDocument<DocumentMethod> {
         info.getParams().stream()
                 .map(PropertyParam::fromJava)
                 .forEach(document.params::add);
-        info.getAnnotations().stream()
-                .filter(annotation -> !(annotation instanceof RemapForJS))
-                .map(Annotation::toString).forEach(document.builtinComments::add);
+        info.getAnnotations().stream().filter(annotation -> annotation instanceof Deprecated).findFirst().ifPresent(annotation -> {
+            document.builtinComments.add("@deprecated");
+            if (((Deprecated) annotation).forRemoval()) {
+                document.builtinComments.add("This method is marked to be removed in future!");
+            }
+        });
+
         info.getTypeVariables().stream()
                 .map(Serde::deserializeFromJavaType)
                 .forEach(document.variables::add);

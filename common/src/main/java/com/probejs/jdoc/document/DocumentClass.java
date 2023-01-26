@@ -62,8 +62,12 @@ public class DocumentClass extends AbstractDocument<DocumentClass> {
         info.getFieldInfo().stream().map(DocumentField::fromJava).forEach(document.fields::add);
         info.getMethodInfo().stream().map(DocumentMethod::fromJava).forEach(document.methods::add);
         info.getConstructorInfo().stream().map(DocumentConstructor::fromJava).forEach(document.constructors::add);
-        if (info.getAnnotations().stream().anyMatch(annotation -> annotation instanceof Deprecated))
-            document.properties.add(new PropertyComment("@deprecated"));
+        info.getAnnotations().stream().filter(annotation -> annotation instanceof Deprecated).findFirst().ifPresent(annotation -> {
+            document.builtinComments.add("@deprecated");
+            if (((Deprecated) annotation).forRemoval()) {
+                document.builtinComments.add("This class is marked to be removed in future!");
+            }
+        });
         return document;
     }
 

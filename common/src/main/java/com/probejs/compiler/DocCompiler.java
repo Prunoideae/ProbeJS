@@ -12,24 +12,20 @@ import com.probejs.formatter.SpecialTypes;
 import com.probejs.formatter.formatter.FormatterNamespace;
 import com.probejs.formatter.formatter.IFormatter;
 import com.probejs.formatter.formatter.jdoc.FormatterClass;
-import com.probejs.formatter.formatter.jdoc.FormatterType;
 import com.probejs.info.Walker;
 import com.probejs.jdoc.Manager;
 import com.probejs.jdoc.Serde;
 import com.probejs.jdoc.document.DocumentClass;
 import com.probejs.jdoc.property.PropertyComment;
-import com.probejs.jdoc.property.PropertyType;
 import com.probejs.plugin.CapturedClasses;
 import com.probejs.util.PlatformSpecial;
 import dev.latvian.mods.kubejs.KubeJSPaths;
-import dev.latvian.mods.kubejs.event.EventGroup;
 import dev.latvian.mods.kubejs.event.EventGroupWrapper;
 import dev.latvian.mods.kubejs.event.EventJS;
 import dev.latvian.mods.kubejs.recipe.RecipeTypeJS;
 import dev.latvian.mods.kubejs.recipe.RegisterRecipeTypesEvent;
 import dev.latvian.mods.kubejs.server.ServerScriptManager;
 import dev.latvian.mods.kubejs.util.KubeJSPlugins;
-import dev.latvian.mods.rhino.util.SpecialEquality;
 import net.minecraft.resources.ResourceLocation;
 
 import java.io.BufferedWriter;
@@ -248,7 +244,8 @@ public class DocCompiler {
         cachedClasses.addAll(EventCompiler.fetchEventClasses());
         cachedClasses.addAll(CapturedClasses.capturedRawEvents.values());
         cachedClasses.addAll(CapturedClasses.capturedJavaClasses);
-        cachedClasses.addAll(RegistryCompiler.getRegistryClasses());
+        cachedClasses.addAll(RegistryCompiler.getKJSRegistryClasses());
+        cachedClasses.addAll(SpecialTypes.collectRegistryClasses());
 
         //Fetch all classes
         Set<Class<?>> globalClasses = DocCompiler.fetchClasses(typeMap, bindingEvent, cachedClasses);

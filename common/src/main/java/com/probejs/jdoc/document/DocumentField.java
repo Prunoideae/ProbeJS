@@ -52,9 +52,12 @@ public class DocumentField extends AbstractDocument<DocumentField> {
         document.shouldGSON = true;
         if (info.getStaticValue() != null)
             document.value = Serde.getValueProperty(info.getStaticValue());
-        info.getAnnotations().stream()
-                .filter(annotation -> !(annotation instanceof RemapForJS))
-                .map(Annotation::toString).forEach(document.builtinComments::add);
+        info.getAnnotations().stream().filter(annotation -> annotation instanceof Deprecated).findFirst().ifPresent(annotation -> {
+            document.builtinComments.add("@deprecated");
+            if (((Deprecated) annotation).forRemoval()) {
+                document.builtinComments.add("This field is marked to be removed in future!");
+            }
+        });
         return document;
     }
 

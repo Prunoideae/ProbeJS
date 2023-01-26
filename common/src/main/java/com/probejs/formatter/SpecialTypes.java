@@ -129,4 +129,20 @@ public class SpecialTypes {
             assignRegistry((Class<T>) putativeParent, (ResourceKey<Registry<T>>) key);
         });
     }
+
+    public static List<Class<?>> collectRegistryClasses() {
+        //Collects classes in registry so we can touch some more things.
+        //Like furnace block entity class
+        List<Class<?>> classes = new ArrayList<>();
+        ProbeCommands.COMMAND_LEVEL.registryAccess().registries().forEach(entry -> {
+            Registry<?> registry = entry.value();
+            for (Object o : registry) {
+                Class<?> clazz = o.getClass();
+                if (!clazz.isSynthetic())
+                    classes.add(o.getClass());
+            }
+
+        });
+        return classes;
+    }
 }
