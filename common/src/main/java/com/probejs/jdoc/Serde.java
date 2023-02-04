@@ -112,8 +112,8 @@ public class Serde {
         if (type instanceof TypeInfoParameterized) {
             return constructType(PropertyType.Parameterized::new, type);
         }
-        if (type instanceof TypeInfoWildcard) {
-            return constructType(PropertyType.Clazz::new, new TypeInfoClass(Object.class));
+        if (type instanceof TypeInfoWildcard wildcard) {
+            return deserializeFromJavaType(wildcard.getBaseType(), false);
         }
         return null;
     }
