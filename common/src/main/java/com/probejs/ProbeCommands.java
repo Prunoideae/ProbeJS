@@ -30,10 +30,12 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 public class ProbeCommands {
     public static ServerLevel COMMAND_LEVEL = null;
     public static boolean isRunning = false;
+    public static Thread runningThread = null;
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
 
@@ -43,20 +45,29 @@ public class ProbeCommands {
                                 //SINGLE PLAYER IS NEEDED
                                 .requires(source -> source.getServer().isSingleplayer() && source.hasPermission(2))
                                 .executes(context -> {
-                                    if (isRunning) {
+                                    if (runningThread != null && runningThread.isAlive()) {
                                         context.getSource().sendSuccess(Component.literal("ProbeJS is running! Please wait for current dump to finish."), false);
                                         return Command.SINGLE_SUCCESS;
-                                    } else {
-                                        isRunning = true;
+                                    } else if (runningThread != null) {
+                                        context.getSource().sendFailure(Component.literal("ProbeJS dumping thread is dead! Please check out latest.log and submit an error report."));
+                                        runningThread = null;
                                     }
                                     COMMAND_LEVEL = context.getSource().getLevel();
-                                    new Thread(() -> {
-                                        Instant start = Instant.now();
+                                    Instant start = Instant.now();
+                                    Consumer<String> sendMessage = s -> {
+                                        Instant end = Instant.now();
+                                        Duration duration = Duration.between(start, end);
+                                        long sub = TimeUnit.MILLISECONDS.convert(duration.getNano(), TimeUnit.NANOSECONDS);
+                                        context.getSource().sendSuccess(Component.literal(s + " [%s.%03ds]".formatted(duration.getSeconds(), sub)), false);
+                                    };
+                                    runningThread = new Thread(() -> {
                                         try {
+                                            sendMessage.accept("Started generating type files...");
                                             SnippetCompiler.compile();
+                                            sendMessage.accept("Snippets generated. ");
                                             ClassResolver.init();
                                             NameResolver.init();
-                                            DocCompiler.compile();
+                                            DocCompiler.compile(sendMessage);
                                         } catch (Exception e) {
                                             for (StackTraceElement stackTraceElement : e.getStackTrace()) {
                                                 ProbeJS.LOGGER.error(stackTraceElement);
@@ -67,8 +78,16 @@ public class ProbeCommands {
                                         Duration duration = Duration.between(start, end);
                                         long sub = TimeUnit.MILLISECONDS.convert(duration.getNano(), TimeUnit.NANOSECONDS);
                                         context.getSource().sendSuccess(Component.literal("ProbeJS typing generation finished in %s.%03ds.".formatted(duration.getSeconds(), sub)), false);
-                                        isRunning = false;
-                                    }).start();
+                                        runningThread = null;
+                                    });
+                                    runningThread.setUncaughtExceptionHandler((t, e) -> {
+                                        ProbeJS.LOGGER.error(e);
+                                        for (StackTraceElement stackTraceElement : e.getStackTrace()) {
+                                            ProbeJS.LOGGER.error(stackTraceElement.toString());
+                                        }
+                                    });
+                                    runningThread.setDaemon(true);
+                                    runningThread.start();
                                     return Command.SINGLE_SUCCESS;
                                 }))
                         .then(Commands.literal("clear_cache")
@@ -116,6 +135,14 @@ public class ProbeCommands {
                                             ProbeConfig.INSTANCE.save();
                                             return Command.SINGLE_SUCCESS;
                                         }))
+                                .then(Commands.literal("toggle_registry_dumps")
+                                        .executes(context -> {
+                                            ProbeConfig.INSTANCE.allowRegistryObjectDumps = !ProbeConfig.INSTANCE.allowRegistryObjectDumps;
+                                            context.getSource().sendSuccess(Component.literal("Dump of object classes in registries: %s".formatted(ProbeConfig.INSTANCE.exportClassNames ? "enabled" : "disabled")), false);
+                                            ProbeConfig.INSTANCE.save();
+                                            return Command.SINGLE_SUCCESS;
+                                        }))
+
                         )
                         .then(Commands.literal("export")
                                 .requires(source -> source.getServer().isSingleplayer())
@@ -139,7 +166,7 @@ public class ProbeCommands {
                                                 JsonWriter jsonWriter = ProbeJS.GSON_WRITER.newJsonWriter(writer);
                                                 jsonWriter.setIndent("    ");
                                                 ProbeJS.GSON_WRITER.toJson(outArray, JsonArray.class, jsonWriter);
-                                                jsonWriter.flush();
+                                                jsonWriter.close();
                                             } catch (IOException e) {
                                                 throw new RuntimeException(e);
                                             }

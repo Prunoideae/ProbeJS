@@ -16,6 +16,6 @@ public class RawCompiler {
                      readonly path: string
                 }
                 """);
-        writer.flush();
+        writer.close();
     }
 }

@@ -3,8 +3,10 @@ package com.probejs.compiler;
 import com.mojang.datafixers.util.Pair;
 import com.probejs.ProbePaths;
 import com.probejs.info.ClassInfo;
+import com.probejs.jdoc.Serde;
 import com.probejs.jdoc.document.DocumentClass;
 import com.probejs.jdoc.property.PropertyComment;
+import com.probejs.jdoc.property.PropertyExtra;
 import dev.latvian.mods.kubejs.event.EventGroup;
 import dev.latvian.mods.kubejs.event.EventHandler;
 
@@ -67,9 +69,13 @@ public class EventCompiler {
                         .merge(new PropertyComment("This event fires on **%s**.".formatted(handler.scriptType.name)));
                 elements.addAll(comment.formatLines(4));
                 if (handler.extra != null) {
-                    elements.add("%s(extra: string, handler: (event: %s) => void):void,".formatted(
-                            eventName, RegistryCompiler.formatMaybeParameterized(event)
-                    ));
+                    elements.add("%s(extra: %s, handler: (event: %s) => void):void,".formatted(
+                            eventName,
+                            document.findProperty(PropertyExtra.class)
+                                    .map(extra -> Serde.getTypeFormatter(extra.getType()).formatFirst())
+                                    .orElse("string"),
+                            RegistryCompiler.formatMaybeParameterized(event)));
+
                 }
                 if (handler.extra == null || !handler.extra.required) {
                     elements.add("%s(handler: (event: %s) => void):void,".formatted(
@@ -80,7 +86,7 @@ public class EventCompiler {
             elements.add("};\n");
             writer.write("declare const %s: %s".formatted(name, String.join("\n", elements)));
         }
-        writer.flush();
+        writer.close();
     }
 
 }

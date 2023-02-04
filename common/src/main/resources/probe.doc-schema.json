@@ -364,6 +364,21 @@
                 }
             }
         },
+        "propertyExtra": {
+            "type": "object",
+            "required": [
+                "type",
+                "extra"
+            ],
+            "properties": {
+                "type": {
+                    "const": "property:extra"
+                },
+                "extra": {
+                    "$ref": "#/definitions/propertyType"
+                }
+            }
+        },
         "propertyClass": {
             "properties": {
                 "type": {
@@ -372,7 +387,8 @@
                         "property:comment",
                         "property:hide",
                         "property:assign",
-                        "property:mod"
+                        "property:mod",
+                        "property:extra"
                     ]
                 }
             },
@@ -388,6 +404,9 @@
                 },
                 {
                     "$ref": "#/definitions/propertyMod"
+                },
+                {
+                    "$ref": "#/definitions/propertyExtra"
                 }
             ]
         },

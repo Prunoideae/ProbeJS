@@ -63,7 +63,7 @@ public class SpecialTypes {
                 try {
                     EnumTypeWrapper<?> wrapper = EnumTypeWrapper.get(clazz);
                     NameResolver.putSpecialAssignments(clazz, () -> wrapper.nameValues.keySet().stream().map(ProbeJS.GSON::toJson).collect(Collectors.toList()));
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     ProbeJS.LOGGER.warn("Failed to process enum: %s".formatted(clazz.getName()));
                 }
             }
@@ -131,7 +131,7 @@ public class SpecialTypes {
     }
 
     public static List<Class<?>> collectRegistryClasses() {
-        //Collects classes in registry so we can touch some more things.
+        //Collects classes in registry, so we can touch some more things.
         //Like furnace block entity class
         List<Class<?>> classes = new ArrayList<>();
         ProbeCommands.COMMAND_LEVEL.registryAccess().registries().forEach(entry -> {

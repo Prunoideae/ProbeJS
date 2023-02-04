@@ -2,6 +2,7 @@ package com.probejs.info;
 
 
 import com.probejs.ProbeJS;
+import com.probejs.formatter.ClassResolver;
 import com.probejs.formatter.NameResolver;
 import com.probejs.info.type.ITypeInfo;
 import com.probejs.info.type.InfoTypeResolver;
@@ -19,12 +20,18 @@ public class ClassInfo {
     public static final Map<Class<?>, ClassInfo> CLASS_CACHE = new HashMap<>();
     public static final Map<String, ClassInfo> CLASS_NAME_CACHE = new HashMap<>();
 
+    private static int classCount = 0;
+
     public static ClassInfo getOrCache(Class<?> clazz) {
         //No computeIfAbsent because new ClassInfo will call getOrCache for superclass lookup
         //This will cause a CME because multiple updates occurred in one computeIfAbsent
         if (CLASS_CACHE.containsKey(clazz))
             return CLASS_CACHE.get(clazz);
-        ClassInfo info = new ClassInfo(clazz);
+        classCount += 1;
+        if (classCount > 0 && classCount % 10000 == 0) {
+            ProbeJS.LOGGER.info("%s classes loaded".formatted(classCount));
+        }
+        ClassInfo info = ClassResolver.acceptClass(clazz.getName()) ? new ClassInfo(clazz) : new ClassInfo(Object.class);
         CLASS_CACHE.put(clazz, info);
         CLASS_NAME_CACHE.put(info.getName(), info);
         return info;
@@ -76,6 +83,7 @@ public class ClassInfo {
                     .map(FieldInfo::new)
                     .collect(Collectors.toList());
         } catch (Throwable e) {
+            e.printStackTrace();
             ProbeJS.LOGGER.warn("Error occured when resolving class %s! Touching the class with KubeJS will likely to crash too!".formatted(clazz.getName()));
             constructorInfo = List.of();
             methodInfo = List.of();

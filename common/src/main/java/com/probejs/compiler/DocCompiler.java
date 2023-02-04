@@ -4,6 +4,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.gson.*;
 import com.google.gson.stream.JsonWriter;
+import com.probejs.ProbeConfig;
 import com.probejs.ProbeJS;
 import com.probejs.ProbePaths;
 import com.probejs.formatter.ClassResolver;
@@ -33,6 +34,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.function.Consumer;
 
 public class DocCompiler {
 
@@ -60,7 +62,7 @@ public class DocCompiler {
             FormatterNamespace namespace = new FormatterNamespace(key, formatters);
             writer.write(namespace.formatString(0, 4) + "\n");
         }
-        writer.flush();
+        writer.close();
     }
 
     public static Set<Class<?>> readCachedClasses(String fileName) throws IOException {
@@ -91,7 +93,7 @@ public class DocCompiler {
             outJson.add(clazz.getName());
         }
         ProbeJS.GSON.toJson(outJson, cacheWriter);
-        cacheWriter.flush();
+        cacheWriter.close();
     }
 
     public static Map<String, Class<?>> readCachedForgeEvents(String fileName) throws IOException {
@@ -127,7 +129,7 @@ public class DocCompiler {
             outJson.addProperty(eventName, eventClass.getName());
         }
         ProbeJS.GSON.toJson(outJson, cacheWriter);
-        cacheWriter.flush();
+        cacheWriter.close();
     }
 
     public static Set<Class<?>> fetchClasses(Map<ResourceLocation, RecipeTypeJS> typeMap, DummyBindingEvent bindingEvent, Set<Class<?>> cachedClasses) {
@@ -152,7 +154,7 @@ public class DocCompiler {
                 continue;
             writer.write("declare const %s: %s;\n".formatted(name, Objects.requireNonNull(Serde.getValueFormatter(Serde.getValueProperty(value))).formatFirst()));
         }
-        writer.flush();
+        writer.close();
     }
 
     public static void compileJSConfig() throws IOException {
@@ -198,7 +200,45 @@ public class DocCompiler {
         BufferedWriter writer = Files.newBufferedWriter(ProbePaths.PROBE.resolve(".gitignore"));
         writer.write("*\n");
         writer.write("*/\n");
-        writer.flush();
+        writer.close();
+    }
+
+    private static JsonElement mergeJsonRecursively(JsonElement first, JsonElement second) {
+        if (first instanceof JsonObject firstObject && second instanceof JsonObject secondObject) {
+            var result = firstObject.deepCopy();
+            for (Map.Entry<String, JsonElement> entry : secondObject.entrySet()) {
+                String key = entry.getKey();
+                JsonElement value = entry.getValue();
+                if (result.has(key)) {
+                    result.add(key, mergeJsonRecursively(result.get(key), value));
+                } else {
+                    result.add(key, value);
+                }
+            }
+            return result;
+        }
+
+        if (first instanceof JsonArray firstArray && second instanceof JsonArray secondArray) {
+            List<JsonElement> elements = new ArrayList<>();
+            for (JsonElement element : firstArray) {
+                elements.add(element.deepCopy());
+            }
+            for (JsonElement element : secondArray) {
+                int index;
+                if ((index = elements.indexOf(element)) != -1) {
+                    elements.set(index, mergeJsonRecursively(elements.get(index), element));
+                } else {
+                    elements.add(element);
+                }
+            }
+            JsonArray result = new JsonArray();
+            for (JsonElement element : elements) {
+                result.add(element);
+            }
+            return result;
+        }
+
+        return second;
     }
 
     private static void writeMergedConfig(Path path, String config) throws IOException {
@@ -206,12 +246,11 @@ public class DocCompiler {
         JsonObject read = Files.exists(path) ? ProbeJS.GSON.fromJson(Files.newBufferedReader(path), JsonObject.class) : new JsonObject();
         if (read == null)
             read = new JsonObject();
-        JsonObject original = read;
-        updates.entrySet().forEach((entry) -> original.add(entry.getKey(), entry.getValue()));
+        JsonObject original = (JsonObject) mergeJsonRecursively(read, updates);
         JsonWriter jsonWriter = ProbeJS.GSON_WRITER.newJsonWriter(Files.newBufferedWriter(path));
         jsonWriter.setIndent("    ");
         ProbeJS.GSON_WRITER.toJson(original, JsonObject.class, jsonWriter);
-        jsonWriter.flush();
+        jsonWriter.close();
     }
 
     private static void exportClasses(List<DocumentClass> documents, Path path) throws IOException {
@@ -221,7 +260,7 @@ public class DocCompiler {
         JsonWriter jsonWriter = ProbeJS.GSON_WRITER.newJsonWriter(writer);
         jsonWriter.setIndent("    ");
         ProbeJS.GSON_WRITER.toJson(classes, JsonArray.class, jsonWriter);
-        jsonWriter.flush();
+        jsonWriter.close();
     }
 
     private static void exportSerializedClasses(List<DocumentClass> documents, List<DocumentClass> mergedDocuments) throws IOException {
@@ -229,13 +268,15 @@ public class DocCompiler {
         exportClasses(mergedDocuments, ProbePaths.CACHE.resolve("mergedClasses.json"));
     }
 
-    public static void compile() throws IOException {
+    public static void compile(Consumer<String> sendMessage) throws IOException {
         DummyBindingEvent bindingEvent = new DummyBindingEvent(ServerScriptManager.getScriptManager());
         Map<ResourceLocation, RecipeTypeJS> typeMap = new HashMap<>();
         RegisterRecipeTypesEvent recipeEvent = new RegisterRecipeTypesEvent(typeMap);
 
         KubeJSPlugins.forEachPlugin(plugin -> plugin.registerRecipeTypes(recipeEvent));
         KubeJSPlugins.forEachPlugin(plugin -> plugin.registerBindings(bindingEvent));
+
+        sendMessage.accept("KubeJS plugins reloaded.");
 
         //Fetch all cached classes
         CapturedClasses.capturedRawEvents.putAll(readCachedForgeEvents("cachedForgeEvents.json"));
@@ -245,26 +286,39 @@ public class DocCompiler {
         cachedClasses.addAll(CapturedClasses.capturedRawEvents.values());
         cachedClasses.addAll(CapturedClasses.capturedJavaClasses);
         cachedClasses.addAll(RegistryCompiler.getKJSRegistryClasses());
-        cachedClasses.addAll(SpecialTypes.collectRegistryClasses());
+        if (ProbeConfig.INSTANCE.allowRegistryObjectDumps)
+            cachedClasses.addAll(SpecialTypes.collectRegistryClasses());
 
         //Fetch all classes
+        sendMessage.accept("Start fetching classes...");
         Set<Class<?>> globalClasses = DocCompiler.fetchClasses(typeMap, bindingEvent, cachedClasses);
+        sendMessage.accept("Classes fetched.");
         globalClasses.removeIf(c -> ClassResolver.skipped.contains(c));
         bindingEvent.getClassDumpMap().forEach((s, c) -> NameResolver.putResolvedName(c, s));
         SpecialTypes.processFunctionalInterfaces(globalClasses);
         SpecialTypes.processEnums(globalClasses);
+        sendMessage.accept("Special types processed.");
 
         //Load and merge documents
+        sendMessage.accept("Started translating Java classes to JSON intermediates...");
         List<DocumentClass> javaDocs = Manager.loadJavaClasses(globalClasses);
         //Insert some special documents to extend the function
         javaDocs.addAll(PlatformSpecial.INSTANCE.get().getPlatformDocuments(javaDocs));
 
+        sendMessage.accept("Translation completed, started downloading docs...");
         Manager.downloadDocs();
+        sendMessage.accept("Docs downloaded, started merging docs...");
         List<DocumentClass> fetchedDocs = Manager.loadFetchedClassDoc();
         List<DocumentClass> modDocs = Manager.loadModDocuments();
-        List<DocumentClass> userDocs = Manager.loadUserDocuments();
+        List<DocumentClass> userDocs = new ArrayList<>();
+        try {
+            userDocs = Manager.loadUserDocuments();
+        } catch (Exception e) {
+            ProbeJS.LOGGER.error("Error loading User-defined docs!");
+        }
         Map<String, DocumentClass> mergedDocsMap = Manager.mergeDocuments(javaDocs, fetchedDocs, modDocs, userDocs);
         List<DocumentClass> mergedDocs = mergedDocsMap.values().stream().toList();
+        sendMessage.accept("Docs merged. Started compiling...");
         NameResolver.priorSortClasses(mergedDocs).forEach(NameResolver::resolveName);
 
         //Compile things
@@ -281,6 +335,7 @@ public class DocCompiler {
         compileGitIgnore();
 
         SchemaCompiler.compile(mergedDocs);
+
         DocCompiler.writeCachedForgeEvents("cachedForgedEvents.json", CapturedClasses.getCapturedRawEvents());
         DocCompiler.writeCachedClasses("cachedJava.json", CapturedClasses.capturedJavaClasses);
     }
@@ -306,6 +361,6 @@ public class DocCompiler {
                 }
             }
         }
-        writer.flush();
+        writer.close();
     }
 }

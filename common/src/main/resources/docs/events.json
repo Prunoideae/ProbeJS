@@ -2,50 +2,6 @@
     "classes": [
         {
             "type": "document:class",
-            "className": "dev.latvian.mods.kubejs.player.PlayerEventJS",
-            "methods": [
-                {
-                    "type": "document:method",
-                    "name": "getPlayer",
-                    "static": false,
-                    "abstract": false,
-                    "params": [],
-                    "returns": {
-                        "type": "type:parameterized",
-                        "params": [
-                            {
-                                "type": "type:class",
-                                "name": "java.lang.Object"
-                            }
-                        ],
-                        "base": {
-                            "type": "type:class",
-                            "name": "dev.latvian.mods.kubejs.player.PlayerJS"
-                        }
-                    },
-                    "properties": [
-                        {
-                            "type": "property:returns",
-                            "returns": {
-                                "type": "type:parameterized",
-                                "base": {
-                                    "type": "type:class",
-                                    "name": "dev.latvian.mods.kubejs.player.PlayerJS"
-                                },
-                                "params": [
-                                    {
-                                        "type": "type:class",
-                                        "name": "net.minecraft.world.entity.player.Player"
-                                    }
-                                ]
-                            }
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "type": "document:class",
             "className": "dev.latvian.mods.kubejs.item.ItemTooltipEventJS",
             "methods": [
                 {

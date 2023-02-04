@@ -6,6 +6,7 @@ import com.probejs.formatter.formatter.FormatterNamespace;
 import com.probejs.formatter.formatter.IFormatter;
 import com.probejs.formatter.formatter.jdoc.FormatterType;
 import com.probejs.jdoc.property.PropertyType;
+import com.probejs.util.Util;
 import dev.latvian.mods.kubejs.RegistryObjectBuilderTypes;
 
 import java.io.BufferedWriter;
@@ -28,7 +29,7 @@ public class RegistryCompiler {
         writer.write("/// <reference path=\"./globals.d.ts\" />\n");
         IFormatter namespace = new FormatterNamespace("Registry", RegistryObjectBuilderTypes.MAP.values().stream().map(FormatterRegistry::new).collect(Collectors.toList()));
         writer.write(String.join("\n", namespace.format(0, 4)));
-        writer.flush();
+        writer.close();
     }
 
     public static List<String> compileRegistryEvents() {
@@ -49,14 +50,10 @@ public class RegistryCompiler {
         RegistryObjectBuilderTypes<?> types;
         String name;
 
-        private static String getCapitalized(String s) {
-            return s.substring(0, 1).toUpperCase() + s.substring(1);
-        }
-
         public static String getFormattedRegistryName(RegistryObjectBuilderTypes<?> types) {
             return Arrays.stream(types.registryKey.location().getPath().split("/"))
                     .map(str -> Arrays.stream(str.split("_"))
-                            .map(FormatterRegistry::getCapitalized)
+                            .map(Util::getCapitalized)
                             .collect(Collectors.joining("")))
                     .collect(Collectors.joining(""));
         }

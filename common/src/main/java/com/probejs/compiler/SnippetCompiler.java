@@ -120,7 +120,7 @@ public class SnippetCompiler {
         KubeDump kubeDump = KubeDump.fetch();
         BufferedWriter writer = Files.newBufferedWriter(codeFile);
         writer.write(ProbeJS.GSON.toJson(kubeDump.toSnippet()));
-        writer.flush();
+        writer.close();
     }
 
 }
