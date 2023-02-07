@@ -64,11 +64,12 @@ public class ProbeCommands {
                                         try {
                                             sendMessage.accept("Started generating type files...");
                                             SnippetCompiler.compile();
-                                            sendMessage.accept("Snippets generated. ");
+                                            sendMessage.accept("Snippets generated.");
                                             ClassResolver.init();
                                             NameResolver.init();
                                             DocCompiler.compile(sendMessage);
                                         } catch (Exception e) {
+                                            ProbeJS.LOGGER.error(e);
                                             for (StackTraceElement stackTraceElement : e.getStackTrace()) {
                                                 ProbeJS.LOGGER.error(stackTraceElement);
                                             }
@@ -77,7 +78,7 @@ public class ProbeCommands {
                                         Instant end = Instant.now();
                                         Duration duration = Duration.between(start, end);
                                         long sub = TimeUnit.MILLISECONDS.convert(duration.getNano(), TimeUnit.NANOSECONDS);
-                                        context.getSource().sendSuccess(Component.literal("ProbeJS typing generation finished in %s.%03ds.".formatted(duration.getSeconds(), sub)), false);
+                                        sendMessage.accept("ProbeJS typing generation finished.");
                                         runningThread = null;
                                     });
                                     runningThread.setUncaughtExceptionHandler((t, e) -> {
@@ -85,6 +86,7 @@ public class ProbeCommands {
                                         for (StackTraceElement stackTraceElement : e.getStackTrace()) {
                                             ProbeJS.LOGGER.error(stackTraceElement.toString());
                                         }
+                                        sendMessage.accept("ProbeJS has run into an error! Please check out latest.log and report to GitHub!");
                                     });
                                     runningThread.setDaemon(true);
                                     runningThread.start();
