@@ -75,9 +75,6 @@ public class ProbeCommands {
                                             }
                                             context.getSource().sendSuccess(Component.literal("Uncaught exception happened in wrapper, please report to the Github issue with complete latest.log."), false);
                                         }
-                                        Instant end = Instant.now();
-                                        Duration duration = Duration.between(start, end);
-                                        long sub = TimeUnit.MILLISECONDS.convert(duration.getNano(), TimeUnit.NANOSECONDS);
                                         sendMessage.accept("ProbeJS typing generation finished.");
                                         runningThread = null;
                                     });
