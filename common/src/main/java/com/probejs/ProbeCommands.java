@@ -20,6 +20,7 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -43,7 +44,7 @@ public class ProbeCommands {
                 Commands.literal("probejs")
                         .then(Commands.literal("dump")
                                 //SINGLE PLAYER IS NEEDED
-                                .requires(source -> source.getServer().isSingleplayer() && source.hasPermission(2))
+                                .requires(source -> ProbeConfig.INSTANCE.requireSingleAndPerm && (source.getServer().isSingleplayer() && source.hasPermission(2)))
                                 .executes(context -> {
                                     if (runningThread != null && runningThread.isAlive()) {
                                         context.getSource().sendSuccess(Component.literal("ProbeJS is running! Please wait for current dump to finish."), false);
@@ -141,6 +142,16 @@ public class ProbeCommands {
                                             ProbeConfig.INSTANCE.save();
                                             return Command.SINGLE_SUCCESS;
                                         }))
+                                .then(Commands.literal("toggle_dump_req")
+                                        .executes(context -> {
+                                            ProbeConfig.INSTANCE.requireSingleAndPerm = !ProbeConfig.INSTANCE.requireSingleAndPerm;
+                                            context.getSource().sendSuccess(Component.literal("Dump command now %srequire%s single player and cheat enabled".formatted(
+                                                    ProbeConfig.INSTANCE.requireSingleAndPerm ? "" : "does not ",
+                                                    ProbeConfig.INSTANCE.requireSingleAndPerm ? "s" : ""
+                                            )), false);
+                                            ProbeConfig.INSTANCE.save();
+                                            return Command.SINGLE_SUCCESS;
+                                        }))
 
                         )
                         .then(Commands.literal("export")
@@ -173,16 +184,21 @@ public class ProbeCommands {
                                         })
                                 )
                         )
-                        .then(Commands.literal("test")
-                                .requires(source -> true)
-                                .executes(context -> {
-                                    try {
-                                        DocumentClass document = DocumentClass.fromJava(ClassInfo.getOrCache(IngredientJS.class));
-                                        ProbeJS.LOGGER.info(document.isAbstract());
-                                        ProbeJS.LOGGER.info(ProbeJS.GSON.toJson(document.serialize()));
-                                        ProbeJS.LOGGER.info(String.join("\n", new FormatterClass(document).format(0, 4)));
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
+                        .then(Commands.literal("test_availability")
+                                .executes(ctx -> {
+                                    ServerPlayer player = ctx.getSource().getPlayer();
+                                    boolean local = player != null && player.isLocalPlayer();
+                                    boolean perm = ctx.getSource().hasPermission(2);
+                                    Consumer<String> sendMessage = s -> ctx.getSource().sendSuccess(Component.literal(s), false);
+                                    if (local && perm) {
+                                        sendMessage.accept("You should can execute ProbeJS dump.");
+                                    } else {
+                                        if (!local) {
+                                            sendMessage.accept("This doesn't seem to be a Local environment, or the executor is not a player at all!");
+                                        } else {
+                                            sendMessage.accept("It doesn't seem like you have permission to execute the dump command!");
+                                        }
+
                                     }
                                     return Command.SINGLE_SUCCESS;
                                 }))

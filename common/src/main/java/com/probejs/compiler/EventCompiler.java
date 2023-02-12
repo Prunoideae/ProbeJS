@@ -1,6 +1,7 @@
 package com.probejs.compiler;
 
 import com.mojang.datafixers.util.Pair;
+import com.probejs.ProbeJS;
 import com.probejs.ProbePaths;
 import com.probejs.info.ClassInfo;
 import com.probejs.jdoc.Serde;
