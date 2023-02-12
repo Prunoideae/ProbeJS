@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.probejs.ProbeJS;
 import com.probejs.formatter.formatter.jdoc.FormatterType;
 import com.probejs.formatter.formatter.jdoc.FormatterValue;
 import com.probejs.info.type.*;
@@ -70,9 +71,8 @@ public class Serde {
             AbstractDocument<?> doc = AbstractDocument.DOCUMENT_TYPE_REGISTRY.inverse().get(type).getDeclaredConstructor().newInstance();
             doc.deserialize(obj);
             return doc;
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
-                 NoSuchMethodException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            ProbeJS.LOGGER.warn("Error occurred while deserializing document with type \"%s\"! If this is a user-defined document, it might be an error in docs. If it's not, then possibly it's because current doc requires a newer version of ProbeJS to load!".formatted(type));
         }
         return null;
     }
@@ -83,9 +83,8 @@ public class Serde {
             AbstractProperty<?> property = (AbstractProperty<?>) AbstractProperty.DOCUMENT_TYPE_REGISTRY.inverse().get(type).getDeclaredConstructor().newInstance();
             property.deserialize(obj);
             return property;
-        } catch (InstantiationException | IllegalAccessException
-                 | InvocationTargetException | NoSuchMethodException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            ProbeJS.LOGGER.warn("Error occurred while deserializing document with type \"%s\"! If this is a user-defined document, it might be an error in docs. If it's not, then possibly it's because current doc requires a newer version of ProbeJS to load!".formatted(type));
         }
         return null;
     }

@@ -31,7 +31,7 @@
                 },
                 "name": {
                     "type": "string",
-                    "$ref": "probe.class-definitions.json#/definitions/typeClassname"
+                    "$ref": "probe.class-definitions.json#/definitions/typeClassName"
                 }
             }
         },
@@ -517,7 +517,7 @@
                     "className": {
                         "type": "string",
                         "description": "The class name",
-                        "$ref": "probe.class-definitions.json#/definitions/typeClassname"
+                        "$ref": "probe.class-definitions.json#/definitions/typeClassName"
                     },
                     "properties": {
                         "type": "array",

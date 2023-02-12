@@ -19,6 +19,18 @@ public abstract class PropertyType<T extends PropertyType<T>> extends AbstractPr
         return new Parameterized(new Native("NonNullable"), List.of(inner));
     }
 
+    public static Optional<String> getClazzName(PropertyType<?> type) {
+        if (type == null)
+            return Optional.empty();
+        if (type instanceof Clazz) {
+            return Optional.ofNullable(type.getTypeName());
+        }
+        if (type instanceof Parameterized parameterized) {
+            return getClazzName(parameterized.getBase());
+        }
+        return Optional.empty();
+    }
+
     public abstract String getTypeName();
 
     public abstract void fromJava(ITypeInfo type);

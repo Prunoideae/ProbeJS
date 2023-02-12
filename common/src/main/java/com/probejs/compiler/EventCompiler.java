@@ -5,8 +5,10 @@ import com.probejs.ProbePaths;
 import com.probejs.info.ClassInfo;
 import com.probejs.jdoc.Serde;
 import com.probejs.jdoc.document.DocumentClass;
+import com.probejs.jdoc.property.AbstractProperty;
 import com.probejs.jdoc.property.PropertyComment;
 import com.probejs.jdoc.property.PropertyExtra;
+import com.probejs.jdoc.property.PropertyType;
 import dev.latvian.mods.kubejs.event.EventGroup;
 import dev.latvian.mods.kubejs.event.EventHandler;
 
@@ -37,6 +39,26 @@ public class EventCompiler {
                 .collect(Collectors.toList());
     }
 
+    private static <T extends AbstractProperty<T>> Optional<T> findProperty(Map<String, DocumentClass> globalClasses, DocumentClass documentClass, Class<T> propertyClass) {
+        var result = documentClass.findProperty(propertyClass);
+        if (result.isPresent())
+            return result;
+        var parent = PropertyType.getClazzName(documentClass.getParent()).orElse(null);
+        if (parent != null && globalClasses.containsKey(parent)) {
+            return findProperty(globalClasses, globalClasses.get(parent), propertyClass);
+        }
+
+        for (PropertyType<?> type : documentClass.getInterfaces()) {
+            String implemented = PropertyType.getClazzName(type).orElse(null);
+            if (implemented != null && globalClasses.containsKey(implemented)) {
+                Optional<T> found = findProperty(globalClasses, globalClasses.get(implemented), propertyClass);
+                if (found.isPresent())
+                    return found;
+            }
+        }
+
+        return Optional.empty();
+    }
 
     public static void compileEvents(Map<String, DocumentClass> globalClasses) throws IOException {
         BufferedWriter writer = Files.newBufferedWriter(ProbePaths.GENERATED.resolve("events.d.ts"));
@@ -71,7 +93,7 @@ public class EventCompiler {
                 if (handler.extra != null) {
                     elements.add("%s(extra: %s, handler: (event: %s) => void):void,".formatted(
                             eventName,
-                            document.findProperty(PropertyExtra.class)
+                            findProperty(globalClasses, document, PropertyExtra.class)
                                     .map(extra -> Serde.getTypeFormatter(extra.getType()).formatFirst())
                                     .orElse("string"),
                             RegistryCompiler.formatMaybeParameterized(event)));
