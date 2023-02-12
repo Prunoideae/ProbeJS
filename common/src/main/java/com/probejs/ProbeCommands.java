@@ -186,8 +186,7 @@ public class ProbeCommands {
                         )
                         .then(Commands.literal("test_availability")
                                 .executes(ctx -> {
-                                    ServerPlayer player = ctx.getSource().getPlayer();
-                                    boolean local = player != null && player.isLocalPlayer();
+                                    boolean local = ctx.getSource().getServer().isSingleplayer();
                                     boolean perm = ctx.getSource().hasPermission(2);
                                     Consumer<String> sendMessage = s -> ctx.getSource().sendSuccess(Component.literal(s), false);
                                     if (local && perm) {
@@ -198,7 +197,7 @@ public class ProbeCommands {
                                         } else {
                                             sendMessage.accept("It doesn't seem like you have permission to execute the dump command!");
                                         }
-
+                                        sendMessage.accept("If you're sure that you need a dump, run \"/probejs configure toggle_dump_req\" to turn off the check!");
                                     }
                                     return Command.SINGLE_SUCCESS;
                                 }))
