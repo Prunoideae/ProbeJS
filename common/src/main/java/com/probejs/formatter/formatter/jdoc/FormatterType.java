@@ -88,14 +88,37 @@ public abstract class FormatterType<T extends PropertyType<T>> extends DocumentF
     }
 
     public static class Variable extends Named<PropertyType.Variable> {
+        private final List<FormatterType<?>> bounds;
+
         public Variable(PropertyType.Variable type) {
             super(type);
+            bounds = type.getBounds().stream().map(Serde::getTypeFormatter).collect(Collectors.toList());
         }
 
         @Override
         public Variable underscored(boolean underscored) {
             //Shield the underscore since it's generic name
             return this;
+        }
+
+        @Override
+        public List<String> formatDocument(Integer indent, Integer stepIndent) {
+            bounds.removeIf(formatterType -> formatterType.formatFirst().equals("any"));
+            if (bounds.isEmpty()) {
+                return List.of(document.getTypeName());
+            } else {
+                return List.of("%s extends %s".formatted(document.getTypeName(), bounds.stream().map(IFormatter::formatParamVariable).collect(Collectors.joining(" & "))));
+            }
+        }
+
+        @Override
+        public String formatParamVariable() {
+            return document.getTypeName();
+        }
+
+        @Override
+        public String formatFieldVariable() {
+            return document.getTypeName();
         }
     }
 
@@ -115,12 +138,14 @@ public abstract class FormatterType<T extends PropertyType<T>> extends DocumentF
         }
 
         @Override
+        public String formatAdapted(Function<IFormatter, String> formatterMethod) {
+            return types.stream().map(t -> (t instanceof FormatterType.Joint ? "(%s)" : "%s").formatted(formatterMethod.apply(t)))
+                    .collect(Collectors.joining(document.getDelimiter()));
+        }
+
+        @Override
         public List<String> formatDocument(Integer indent, Integer stepIndent) {
-            return List.of(
-                    Util.indent(indent) + types.stream()
-                            .map(t -> (t instanceof FormatterType.Joint ? "(%s)" : "%s").formatted(t.formatFirst()))
-                            .collect(Collectors.joining(document.getDelimiter()))
-            );
+            return List.of(Util.indent(indent) + formatAdapted(IFormatter::formatFirst));
         }
     }
 
@@ -154,13 +179,17 @@ public abstract class FormatterType<T extends PropertyType<T>> extends DocumentF
         }
 
         @Override
+        public String formatAdapted(Function<IFormatter, String> formatterMethod) {
+            String baseString = formatterMethod.apply(base);
+            return !baseString.equals("any") ? "%s<%s>".formatted(
+                    baseString,
+                    params.stream().map(formatterMethod).collect(Collectors.joining(", "))
+            ) : "any";
+        }
+
+        @Override
         public List<String> formatDocument(Integer indent, Integer stepIndent) {
-            String baseString = base.formatFirst();
-            return List.of(
-                    !baseString.equals("any") ? "%s<%s>".formatted(
-                            baseString,
-                            params.stream().map(IFormatter::formatFirst).collect(Collectors.joining(", "))
-                    ) : "any");
+            return List.of(formatAdapted(IFormatter::formatFirst));
         }
     }
 
@@ -181,6 +210,11 @@ public abstract class FormatterType<T extends PropertyType<T>> extends DocumentF
         @Override
         public List<String> formatDocument(Integer indent, Integer stepIndent) {
             return List.of(formatter.formatFirst() + "[]");
+        }
+
+        @Override
+        public String formatAdapted(Function<IFormatter, String> formatterMethod) {
+            return formatterMethod.apply(formatter) + "[]";
         }
     }
 
@@ -211,6 +245,17 @@ public abstract class FormatterType<T extends PropertyType<T>> extends DocumentF
                         value.formatFirst());
             }).collect(Collectors.joining(", "))));
         }
+
+        @Override
+        public String formatAdapted(Function<IFormatter, String> formatterMethod) {
+            return "{%s}".formatted(keyValues.entrySet().stream().map(pair -> {
+                PropertyType.JSObjectKey key = pair.getKey();
+                FormatterType<?> value = pair.getValue();
+                return "%s: %s".formatted(
+                        key.format(),
+                        formatterMethod.apply(value));
+            }).collect(Collectors.joining(", ")));
+        }
     }
 
     public static class JSArray extends FormatterType<PropertyType.JSArray> {
@@ -230,6 +275,11 @@ public abstract class FormatterType<T extends PropertyType<T>> extends DocumentF
         @Override
         public List<String> formatDocument(Integer indent, Integer stepIndent) {
             return List.of("[%s]".formatted(types.stream().map(IFormatter::formatFirst).collect(Collectors.joining(", "))));
+        }
+
+        @Override
+        public String formatAdapted(Function<IFormatter, String> formatterMethod) {
+            return "[%s]".formatted(types.stream().map(formatterMethod).collect(Collectors.joining(", ")));
         }
     }
 

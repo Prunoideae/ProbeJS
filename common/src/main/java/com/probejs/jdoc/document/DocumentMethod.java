@@ -81,9 +81,7 @@ public class DocumentMethod extends AbstractDocument<DocumentMethod> {
                     param.isVarArg()
             ));
         });
-        copy.findProperty(PropertyReturns.class).ifPresent(propertyReturns -> {
-            copy.returns = propertyReturns.getType();
-        });
+        copy.findProperty(PropertyReturns.class).ifPresent(propertyReturns -> copy.returns = propertyReturns.getType());
         return copy;
     }
 

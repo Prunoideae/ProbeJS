@@ -42,8 +42,13 @@ public class Walker {
         if (type instanceof TypeInfoParameterized parType && walkType) {
             parType.getParamTypes().forEach(info -> result.addAll(walkType(info)));
         }
-        if (!(type instanceof TypeInfoVariable))
+        if (type instanceof TypeInfoVariable variable) {
+            for (ITypeInfo bound : variable.getBounds()) {
+                result.add(bound.getResolvedClass());
+            }
+        } else {
             result.add(type.getResolvedClass());
+        }
         result.removeIf(Objects::isNull);
         return result;
     }

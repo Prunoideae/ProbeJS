@@ -132,6 +132,9 @@ public abstract class PropertyType<T extends PropertyType<T>> extends AbstractPr
     }
 
     public static class Variable extends Named<Variable> {
+
+        private final List<PropertyType<?>> bounds = new ArrayList<>();
+
         public Variable(String name) {
             super(name);
         }
@@ -148,12 +151,33 @@ public abstract class PropertyType<T extends PropertyType<T>> extends AbstractPr
         public void fromJava(ITypeInfo type) {
             if (type instanceof TypeInfoVariable variable) {
                 name = variable.getTypeName();
+                for (ITypeInfo bound : variable.getBounds()) {
+                    bounds.add(Serde.deserializeFromJavaType(bound, false));
+                }
             }
         }
 
         @Override
         public Variable copy() {
             return new Variable(name);
+        }
+
+        @Override
+        public JsonObject serialize() {
+            JsonObject serialize = super.serialize();
+            Serde.serializeCollection(serialize, "bounds", bounds);
+            return serialize;
+        }
+
+        @Override
+        public void deserialize(JsonObject object) {
+            super.deserialize(object);
+            if (object.has("bounds"))
+                Serde.deserializeDocuments(bounds, object.get("bounds"));
+        }
+
+        public List<PropertyType<?>> getBounds() {
+            return bounds;
         }
     }
 

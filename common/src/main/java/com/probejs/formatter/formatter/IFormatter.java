@@ -1,6 +1,7 @@
 package com.probejs.formatter.formatter;
 
 import java.util.List;
+import java.util.function.Function;
 
 @FunctionalInterface
 public interface IFormatter {
@@ -16,5 +17,25 @@ public interface IFormatter {
 
     default String formatFirst() {
         return String.join("\n", format());
+    }
+
+    default String formatAdapted(Function<IFormatter, String> formatterMethod) {
+        return formatFirst();
+    }
+
+    default String formatClassVariable() {
+        return formatAdapted(IFormatter::formatClassVariable);
+    }
+
+    default String formatMethodVariable() {
+        return formatAdapted(IFormatter::formatMethodVariable);
+    }
+
+    default String formatParamVariable() {
+        return formatAdapted(IFormatter::formatParamVariable);
+    }
+
+    default String formatFieldVariable() {
+        return formatAdapted(IFormatter::formatParamVariable);
     }
 }

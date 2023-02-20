@@ -1,6 +1,8 @@
 package com.probejs;
 
+import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import dev.latvian.mods.kubejs.KubeJSPaths;
 
 import java.io.BufferedWriter;
@@ -11,7 +13,7 @@ import java.util.Map;
 
 public class ProbeConfig {
     public static ProbeConfig INSTANCE = new ProbeConfig();
-    private static final Path CONFIG = KubeJSPaths.CONFIG.resolve("probejs.json");
+    private static final int CONFIG_VERSION = 1;
     public boolean dumpMethod = true;
     public boolean noAggressiveProbing = false;
     public boolean vanillaOrder = true;
@@ -20,17 +22,21 @@ public class ProbeConfig {
     public boolean allowObfuscated = false;
     public long docsTimestamp = 0;
 
-    public boolean allowRegistryObjectDumps = true;
+    public boolean allowRegistryObjectDumps = false;
     public boolean requireSingleAndPerm = true;
 
     @SuppressWarnings("unchecked")
     private static <E> E fetchPropertyOrDefault(Object key, Map<?, ?> value, E defaultValue) {
+        if (value == null || !value.containsKey("version") || ((double) value.get("version")) < CONFIG_VERSION) {
+            ProbeJS.LOGGER.warn("Config version has changed! Config values are rolled back to default.");
+            return defaultValue;
+        }
         Object v = value.get(key);
         return v == null ? defaultValue : (E) v;
     }
 
     private ProbeConfig() {
-        Path cfg = KubeJSPaths.CONFIG.resolve("probejs.json");
+        var cfg = KubeJSPaths.CONFIG.resolve("probejs.json");
         if (Files.exists(cfg)) {
             try {
                 Map<?, ?> obj = ProbeJS.GSON.fromJson(Files.newBufferedReader(cfg), Map.class);
@@ -40,17 +46,22 @@ public class ProbeConfig {
                 exportClassNames = fetchPropertyOrDefault("exportClassNames", obj, false);
                 allowObfuscated = fetchPropertyOrDefault("allowObfuscated", obj, false);
                 docsTimestamp = fetchPropertyOrDefault("docsTimestamp", obj, 0D).longValue();
-                allowRegistryObjectDumps = fetchPropertyOrDefault("allowRegistryObjectDumps", obj, true);
+                allowRegistryObjectDumps = fetchPropertyOrDefault("allowRegistryObjectDumps", obj, false);
                 requireSingleAndPerm = fetchPropertyOrDefault("requireSingleAndPerm", obj, true);
             } catch (IOException e) {
                 ProbeJS.LOGGER.warn("Cannot read config properties, falling back to defaults.");
             }
         }
+        save();
     }
 
     public void save() {
-        try (BufferedWriter writer = Files.newBufferedWriter(CONFIG)) {
-            new GsonBuilder().setPrettyPrinting().create().toJson(this, writer);
+        var cfg = KubeJSPaths.CONFIG.resolve("probejs.json");
+        try (BufferedWriter writer = Files.newBufferedWriter(cfg)) {
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            JsonObject jObj = gson.toJsonTree(this).getAsJsonObject();
+            jObj.addProperty("version", CONFIG_VERSION);
+            gson.toJson(jObj, writer);
         } catch (IOException e) {
             ProbeJS.LOGGER.warn("Cannot write config, settings are not saved.");
         }

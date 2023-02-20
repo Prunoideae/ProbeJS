@@ -51,7 +51,7 @@ public class SpecialTypes {
                                     .map(FormatterMethod.FormatterParam::new)
                                     .map(IFormatter::formatFirst)
                                     .collect(Collectors.joining(", ")),
-                            Serde.getTypeFormatter(documentMethod.get().getReturns()).underscored().formatFirst()));
+                            Serde.getTypeFormatter(documentMethod.get().getReturns()).underscored().formatParamVariable()));
                 });
             }
         }
@@ -143,6 +143,6 @@ public class SpecialTypes {
             }
 
         });
-        return classes;
+        return classes.stream().limit(16384).collect(Collectors.toList());
     }
 }

@@ -38,7 +38,7 @@ public class FormatterField extends DocumentFormatter<DocumentField> {
                 document.isShouldGSON() ? ProbeJS.GSON.toJson(document.getName()) : document.getName(),
                 shouldFormatValue() && !Serde.getValueFormatter(document.getValue()).formatFirst().equals("any") ?
                         Serde.getValueFormatter(document.getValue()).formatFirst() :
-                        Serde.getTypeFormatter(document.getType()).formatFirst()
+                        Serde.getTypeFormatter(document.getType()).formatFieldVariable()
         ));
     }
 

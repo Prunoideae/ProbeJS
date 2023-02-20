@@ -29,6 +29,12 @@ public class FormatterClass extends DocumentFormatter<DocumentClass> {
     public String getClassGeneric() {
         if (document.getGenerics().isEmpty())
             return "";
+        return "<%s>".formatted(document.getGenerics().stream().map(Serde::getTypeFormatter).map(IFormatter::formatParamVariable).collect(Collectors.joining(", ")));
+    }
+
+    public String getTypeClassGeneric() {
+        if (document.getGenerics().isEmpty())
+            return "";
         return "<%s>".formatted(document.getGenerics().stream().map(Serde::getTypeFormatter).map(IFormatter::formatFirst).collect(Collectors.joining(", ")));
     }
 
@@ -46,19 +52,19 @@ public class FormatterClass extends DocumentFormatter<DocumentClass> {
         if (!document.getGenerics().isEmpty()) {
             header.append("<%s> ".formatted(document.getGenerics().stream()
                     .map(Serde::getTypeFormatter)
-                    .map(IFormatter::formatFirst)
+                    .map(IFormatter::formatClassVariable)
                     .collect(Collectors.joining(", "))
             ));
         }
 
         if (!document.isInterface()) {
             if (document.getParent() != null) {
-                header.append("extends %s ".formatted(Serde.getTypeFormatter(document.getParent()).formatFirst()));
+                header.append("extends %s ".formatted(Serde.getTypeFormatter(document.getParent()).formatParamVariable()));
             }
             if (!document.getInterfaces().isEmpty()) {
                 header.append("implements %s ".formatted(document.getInterfaces().stream()
                         .map(Serde::getTypeFormatter)
-                        .map(IFormatter::formatFirst)
+                        .map(IFormatter::formatParamVariable)
                         .collect(Collectors.joining(", "))
                 ));
             }
@@ -73,7 +79,7 @@ public class FormatterClass extends DocumentFormatter<DocumentClass> {
             if (!parents.isEmpty()) {
                 header.append("extends %s ".formatted(parents.stream()
                         .map(Serde::getTypeFormatter)
-                        .map(IFormatter::formatFirst)
+                        .map(IFormatter::formatParamVariable)
                         .collect(Collectors.joining(", "))
                 ));
             }
@@ -90,12 +96,12 @@ public class FormatterClass extends DocumentFormatter<DocumentClass> {
         String typeName = NameResolver.getResolvedName(document.getName()).getLastName();
         if (document.findPropertiesOf(PropertyAssign.class).stream().noneMatch(PropertyAssign::isShieldOriginal))
             typesAssignable.add(typeName + getClassGeneric());
-        document.findPropertiesOf(PropertyAssign.class).forEach(property -> typesAssignable.add(Serde.getTypeFormatter(property.getType()).underscored().formatFirst()));
+        document.findPropertiesOf(PropertyAssign.class).forEach(property -> typesAssignable.add(Serde.getTypeFormatter(property.getType()).underscored().formatParamVariable()));
         for (Function<DocumentClass, IFormatter> formatter : SPECIAL_FORMATTER_REGISTRY.get(document.getName())) {
             typesAssignable.add(formatter.apply(document).formatFirst());
         }
         typesAssignable.addAll(NameResolver.getClassAssignments(document.getName()));
-        lines.add(Util.indent(indent) + "type %s_%s = %s;".formatted(typeName, getClassGeneric(), String.join(" | ", typesAssignable)));
+        lines.add(Util.indent(indent) + "type %s_%s = %s;".formatted(typeName, getTypeClassGeneric(), String.join(" | ", typesAssignable)));
         return lines;
     }
 

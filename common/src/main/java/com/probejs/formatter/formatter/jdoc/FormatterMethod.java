@@ -49,13 +49,13 @@ public class FormatterMethod extends DocumentFormatter<DocumentMethod> {
         return List.of(Util.indent(indent) + "%s%s%s(%s): %s;".formatted(
                 document.isStatic() ? "static " : "",
                 document.getName(),
-                document.getVariables().isEmpty()?"":"<%s>".formatted(document.getVariables().stream().map(PropertyType::getTypeName).collect(Collectors.joining(", "))),
+                document.getVariables().isEmpty()?"":"<%s>".formatted(document.getVariables().stream().map(Serde::getTypeFormatter).map(IFormatter::formatMethodVariable).collect(Collectors.joining(", "))),
                 document.getParams().stream()
                         .map(FormatterParam::new)
                         .map(FormatterParam::underscored)
-                        .map(IFormatter::formatFirst)
+                        .map(IFormatter::formatParamVariable)
                         .collect(Collectors.joining(", ")),
-                isReturningThis() ? "this" : Serde.getTypeFormatter(document.getReturns()).formatFirst()));
+                isReturningThis() ? "this" : Serde.getTypeFormatter(document.getReturns()).formatParamVariable()));
     }
 
     public Optional<FormatterBean> getBeanFormatter() {
@@ -108,7 +108,7 @@ public class FormatterMethod extends DocumentFormatter<DocumentMethod> {
 
         @Override
         protected List<String> formatDocument(Integer indent, Integer stepIndent) {
-            return List.of(Util.indent(indent) + "get %s(): %s".formatted(getBeanName(), Serde.getTypeFormatter(document.getReturns()).formatFirst()));
+            return List.of(Util.indent(indent) + "get %s(): %s".formatted(getBeanName(), Serde.getTypeFormatter(document.getReturns()).formatParamVariable()));
         }
 
         @Override
@@ -165,7 +165,7 @@ public class FormatterMethod extends DocumentFormatter<DocumentMethod> {
 
         @Override
         public List<String> formatDocument(Integer indent, Integer stepIndent) {
-            return List.of((document.isVarArg() ? "..." : "") + "%s: %s".formatted(NameResolver.getNameSafe(document.getName()), Serde.getTypeFormatter(document.getType()).underscored(underscored).formatFirst()));
+            return List.of((document.isVarArg() ? "..." : "") + "%s: %s".formatted(NameResolver.getNameSafe(document.getName()), Serde.getTypeFormatter(document.getType()).underscored(underscored).formatParamVariable()));
         }
 
         public FormatterParam underscored(boolean flag) {

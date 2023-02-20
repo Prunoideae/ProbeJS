@@ -20,6 +20,7 @@ import com.probejs.jdoc.document.DocumentClass;
 import com.probejs.jdoc.property.PropertyComment;
 import com.probejs.plugin.CapturedClasses;
 import com.probejs.util.PlatformSpecial;
+import dev.architectury.platform.Platform;
 import dev.latvian.mods.kubejs.KubeJSPaths;
 import dev.latvian.mods.kubejs.event.EventGroupWrapper;
 import dev.latvian.mods.kubejs.event.EventJS;
