@@ -3,10 +3,13 @@ package com.probejs.formatter.formatter.jdoc;
 import com.probejs.ProbeJS;
 import com.probejs.formatter.NameResolver;
 import com.probejs.formatter.formatter.IFormatter;
+import com.probejs.info.type.ITypeInfo;
+import com.probejs.info.type.TypeInfoClass;
 import com.probejs.jdoc.Serde;
 import com.probejs.jdoc.property.PropertyType;
 import com.probejs.jdoc.property.PropertyUnderscored;
 import com.probejs.util.Util;
+import dev.latvian.mods.kubejs.util.ClassWrapper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -162,6 +165,9 @@ public abstract class FormatterType<T extends PropertyType<T>> extends DocumentF
     }
 
     public static class Parameterized extends FormatterType<PropertyType.Parameterized> {
+        private static final ITypeInfo CLASS_TYPE = new TypeInfoClass(Class.class);
+        private static final ITypeInfo CLASS_WRAPPER_TYPE = new TypeInfoClass(ClassWrapper.class);
+
         private final FormatterType<?> base;
         private final List<FormatterType<?>> params;
 
@@ -180,6 +186,12 @@ public abstract class FormatterType<T extends PropertyType<T>> extends DocumentF
 
         @Override
         public String formatAdapted(Function<IFormatter, String> formatterMethod) {
+            if (document.getBase().equalsToJavaType(CLASS_TYPE) || document.getBase().equalsToJavaType(CLASS_WRAPPER_TYPE)) {
+                if (params.get(0) instanceof Clazz) {
+                    return "typeof %s".formatted(formatterMethod.apply(params.get(0)));
+                }
+                return formatterMethod.apply(params.get(0));
+            }
             String baseString = formatterMethod.apply(base);
             return !baseString.equals("any") ? "%s<%s>".formatted(
                     baseString,

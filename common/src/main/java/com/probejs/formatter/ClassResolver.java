@@ -27,6 +27,12 @@ public class ClassResolver {
     }
 
     public static boolean acceptClass(String className) {
+        try {
+            // Triggers an exception by loading class and fetching name
+            var ignored = Class.forName(className).getSimpleName();
+        } catch (Throwable e) {
+            return false;
+        }
         return skippedPrefixes.stream().noneMatch(className::startsWith);
     }
 
