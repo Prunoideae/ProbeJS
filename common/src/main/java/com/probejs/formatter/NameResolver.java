@@ -142,7 +142,7 @@ public class NameResolver {
     }
 
     public static void putResolvedPrimitive(Class<?> clazz, String resolvedName) {
-        putResolvedName(clazz, resolvedName);
+        putResolvedName(clazz.getName(), resolvedName);
         resolvedPrimitives.add(clazz.getName());
     }
 
