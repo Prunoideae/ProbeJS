@@ -30,20 +30,12 @@ public class EventCompiler {
     }
 
     public static List<Class<?>> fetchEventClasses() {
-        return EventGroup.getGroups()
-                .values()
-                .stream()
-                .map(EventGroup::getHandlers)
-                .map(Map::values)
-                .flatMap(Collection::stream)
-                .map(handler -> handler.eventType.get())
-                .collect(Collectors.toList());
+        return EventGroup.getGroups().values().stream().map(EventGroup::getHandlers).map(Map::values).flatMap(Collection::stream).map(handler -> handler.eventType.get()).collect(Collectors.toList());
     }
 
     private static <T extends AbstractProperty<T>> Optional<T> findProperty(Map<String, DocumentClass> globalClasses, DocumentClass documentClass, Class<T> propertyClass) {
         var result = documentClass.findProperty(propertyClass);
-        if (result.isPresent())
-            return result;
+        if (result.isPresent()) return result;
         var parent = PropertyType.getClazzName(documentClass.getParent()).orElse(null);
         if (parent != null && globalClasses.containsKey(parent)) {
             return findProperty(globalClasses, globalClasses.get(parent), propertyClass);
@@ -53,8 +45,7 @@ public class EventCompiler {
             String implemented = PropertyType.getClazzName(type).orElse(null);
             if (implemented != null && globalClasses.containsKey(implemented)) {
                 Optional<T> found = findProperty(globalClasses, globalClasses.get(implemented), propertyClass);
-                if (found.isPresent())
-                    return found;
+                if (found.isPresent()) return found;
             }
         }
 
@@ -87,23 +78,25 @@ public class EventCompiler {
                 }
                 DocumentClass document = globalClasses.get(eventType.getName());
                 PropertyComment comment = document.getMergedComment()
-                        .merge(new PropertyComment("This event is %scancellable."
-                                .formatted(handler.isCancelable() ? "" : "**not** ")))
-                        .merge(new PropertyComment("This event fires on **%s**.".formatted(handler.scriptType.name)));
+                        .merge(new PropertyComment("This event does %s have results.".formatted(handler.getHasResult() ? "" : "**not** ")))
+                        .merge(new PropertyComment("This event fires on **%s**.".formatted(
+                                handler.scriptTypePredicate
+                                        .getValidTypes()
+                                        .stream()
+                                        .map(t -> t.name)
+                                        .collect(Collectors.joining(", "))
+                        )));
                 elements.addAll(comment.formatLines(4));
                 if (handler.extra != null) {
                     elements.add("%s(extra: %s, handler: (event: %s) => void):void,".formatted(
                             eventName,
                             findProperty(globalClasses, document, PropertyExtra.class)
                                     .map(extra -> Serde.getTypeFormatter(extra.getType()).formatFirst())
-                                    .orElse("string"),
-                            RegistryCompiler.formatMaybeParameterized(event)));
-
+                                    .orElse("string"), RegistryCompiler.formatMaybeParameterized(event)
+                    ));
                 }
                 if (handler.extra == null || !handler.extra.required) {
-                    elements.add("%s(handler: (event: %s) => void):void,".formatted(
-                            eventName, RegistryCompiler.formatMaybeParameterized(event)
-                    ));
+                    elements.add("%s(handler: (event: %s) => void):void,".formatted(eventName, RegistryCompiler.formatMaybeParameterized(event)));
                 }
             }
             elements.add("};\n");

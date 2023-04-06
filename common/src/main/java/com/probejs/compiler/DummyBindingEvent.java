@@ -59,4 +59,11 @@ public class DummyBindingEvent extends BindingsEvent {
         }
         return result;
     }
+
+    public DummyBindingEvent merge(DummyBindingEvent event) {
+        functionDump.putAll(event.functionDump);
+        classDumpMap.putAll(event.classDumpMap);
+        constantDumpMap.putAll(event.constantDumpMap);
+        return this;
+    }
 }

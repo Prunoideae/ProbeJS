@@ -21,11 +21,13 @@ import com.probejs.jdoc.property.PropertyComment;
 import com.probejs.plugin.CapturedClasses;
 import com.probejs.util.PlatformSpecial;
 import dev.architectury.platform.Platform;
+import dev.latvian.mods.kubejs.KubeJS;
 import dev.latvian.mods.kubejs.KubeJSPaths;
 import dev.latvian.mods.kubejs.event.EventGroupWrapper;
 import dev.latvian.mods.kubejs.event.EventJS;
 import dev.latvian.mods.kubejs.recipe.RecipeTypeJS;
 import dev.latvian.mods.kubejs.recipe.RegisterRecipeTypesEvent;
+import dev.latvian.mods.kubejs.script.ScriptManager;
 import dev.latvian.mods.kubejs.server.ServerScriptManager;
 import dev.latvian.mods.kubejs.util.KubeJSPlugins;
 import net.minecraft.resources.ResourceLocation;
@@ -269,8 +271,16 @@ public class DocCompiler {
         exportClasses(mergedDocuments, ProbePaths.CACHE.resolve("mergedClasses.json"));
     }
 
+    private static DummyBindingEvent fetchBindings(ScriptManager manager) {
+        DummyBindingEvent bindingEvent = new DummyBindingEvent(manager);
+        KubeJSPlugins.forEachPlugin(plugin -> plugin.registerBindings(bindingEvent));
+        return bindingEvent;
+    }
+
     public static void compile(Consumer<String> sendMessage) throws IOException {
-        DummyBindingEvent bindingEvent = new DummyBindingEvent(ServerScriptManager.getScriptManager());
+        DummyBindingEvent bindingEvent = fetchBindings(ServerScriptManager.getScriptManager())
+                .merge(fetchBindings(KubeJS.getClientScriptManager()))
+                .merge(fetchBindings(KubeJS.getStartupScriptManager()));
         Map<ResourceLocation, RecipeTypeJS> typeMap = new HashMap<>();
         RegisterRecipeTypesEvent recipeEvent = new RegisterRecipeTypesEvent(typeMap);
 
@@ -337,7 +347,7 @@ public class DocCompiler {
 
         SchemaCompiler.compile(mergedDocs);
 
-        DocCompiler.writeCachedForgeEvents("cachedForgedEvents.json", CapturedClasses.getCapturedRawEvents());
+        DocCompiler.writeCachedForgeEvents("cachedForgeEvents.json", CapturedClasses.getCapturedRawEvents());
         DocCompiler.writeCachedClasses("cachedJava.json", CapturedClasses.capturedJavaClasses);
     }
 

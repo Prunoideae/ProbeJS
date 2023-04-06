@@ -2,11 +2,15 @@ package com.probejs.compiler;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.probejs.ProbeConfig;
+import com.probejs.ProbeCommands;
 import com.probejs.ProbeJS;
 import com.probejs.ProbePaths;
-import com.probejs.formatter.NameResolver;
+import com.probejs.formatter.formatter.special.FormatterLootTable;
 import com.probejs.formatter.formatter.special.FormatterTag;
+import com.probejs.util.json.JArray;
+import com.probejs.util.json.JObject;
+import com.probejs.util.json.JPrimitive;
+import dev.architectury.platform.Platform;
 import dev.latvian.mods.kubejs.KubeJSRegistries;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
@@ -16,10 +20,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class SnippetCompiler {
@@ -40,17 +41,17 @@ public class SnippetCompiler {
             registries.put(type, KubeJSRegistries.genericRegistry(registry).getIds().stream().map(ResourceLocation::toString).toList());
         }
 
-        public static KubeDump fetch() {
+        @SuppressWarnings("unchecked")
+        public static <T> KubeDump fetch() {
             Map<String, Map<String, List<String>>> tags = new HashMap<>();
             Map<String, List<String>> registries = new HashMap<>();
-            putTag(tags, "items", Registry.ITEM);
-            putTag(tags, "blocks", Registry.BLOCK);
-            putTag(tags, "fluids", Registry.FLUID);
-            putTag(tags, "entity_types", Registry.ENTITY_TYPE);
-            putRegistry(registries, "items", Registry.ITEM_REGISTRY);
-            putRegistry(registries, "blocks", Registry.BLOCK_REGISTRY);
-            putRegistry(registries, "fluids", Registry.FLUID_REGISTRY);
-            putRegistry(registries, "entity_types", Registry.ENTITY_TYPE_REGISTRY);
+            ProbeCommands.COMMAND_LEVEL.registryAccess().registries().forEach(registry -> {
+                ResourceKey<? extends Registry<?>> key = registry.key();
+                String[] paths = key.location().getPath().split("/");
+                String name = paths[paths.length - 1];
+                putTag(tags, name, registry.value());
+                putRegistry(registries, name, (ResourceKey<Registry<T>>) key);
+            });
             return new KubeDump(tags, registries);
         }
 
@@ -62,54 +63,33 @@ public class SnippetCompiler {
                     '}';
         }
 
+        private static void addSnippets(JsonObject resultJson, String type, Collection<String> members) {
+            if (!members.isEmpty()) {
+                resultJson.add(type, new JObject()
+                        .add("prefix", new JArray().add(new JPrimitive("@" + type)))
+                        .add("body", new JPrimitive("\"${1|%s|}\"".formatted(String.join(",", members))))
+                        .serialize()
+                );
+            }
+        }
+
         public JsonObject toSnippet() {
             JsonObject resultJson = new JsonObject();
             // Compile normal entries to snippet
             for (Map.Entry<String, List<String>> entry : this.registries.entrySet()) {
                 String type = entry.getKey();
                 List<String> members = entry.getValue();
-                Map<String, List<String>> byModMembers = new HashMap<>();
-                members.stream().map(rl -> rl.split(":")).forEach(rl -> {
-                    if (!byModMembers.containsKey(rl[0]))
-                        byModMembers.put(rl[0], new ArrayList<>());
-                    byModMembers.get(rl[0]).add(rl[1]);
-                });
-                byModMembers.forEach((mod, modMembers) -> {
-                    JsonObject modMembersJson = new JsonObject();
-                    JsonArray prefixes = new JsonArray();
-                    if (ProbeConfig.INSTANCE.vanillaOrder)
-                        prefixes.add("@%s.%s".formatted(mod, type));
-                    else
-                        prefixes.add("@%s.%s".formatted(type, mod));
-                    modMembersJson.add("prefix", prefixes);
-                    modMembersJson.addProperty("body", "\"%s:${1|%s|}\"".formatted(mod, String.join(",", modMembers)));
-                    resultJson.add("%s_%s".formatted(type, mod), modMembersJson);
-                });
+                addSnippets(resultJson, type, members);
             }
 
             // Compile tag entries to snippet
             for (Map.Entry<String, Map<String, List<String>>> entry : this.tags.entrySet()) {
                 String type = entry.getKey();
                 List<String> members = entry.getValue().keySet().stream().toList();
-                Map<String, List<String>> byModMembers = new HashMap<>();
-                members.stream().map(rl -> rl.split(":")).forEach(rl -> {
-                    if (!byModMembers.containsKey(rl[0]))
-                        byModMembers.put(rl[0], new ArrayList<>());
-                    byModMembers.get(rl[0]).add(rl[1]);
-                });
-                byModMembers.forEach((mod, modMembers) -> {
-                    JsonObject modMembersJson = new JsonObject();
-                    JsonArray prefixes = new JsonArray();
-                    if (ProbeConfig.INSTANCE.vanillaOrder)
-                        prefixes.add("@%s.tags.%s".formatted(mod, type));
-                    else
-                        prefixes.add("@%s.tags.%s".formatted(type, mod));
-                    modMembersJson.add("prefix", prefixes);
-                    modMembersJson.addProperty("body", "\"%s:${1|%s|}\"".formatted(mod, String.join(",", modMembers)));
-                    resultJson.add("%s_tag_%s".formatted(type, mod), modMembersJson);
-                });
+                addSnippets(resultJson, type + "_tag", members);
             }
-
+            addSnippets(resultJson, "loot_table", FormatterLootTable.LOOT_TABLES.stream().map(ResourceLocation::toString).collect(Collectors.toList()));
+            addSnippets(resultJson, "mod", Platform.getModIds());
             return resultJson;
         }
 

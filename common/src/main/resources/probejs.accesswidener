@@ -2,3 +2,4 @@ accessWidener   v2  named
 accessible field net/minecraft/client/resources/language/ClientLanguage storage Ljava/util/Map;
 accessible field net/minecraft/client/renderer/texture/TextureAtlas texturesByName Ljava/util/Map;
 accessible field net/minecraft/client/renderer/texture/TextureManager byPath Ljava/util/Map;
+accessible field net/minecraft/client/resources/model/ModelManager bakedRegistry Ljava/util/Map;
