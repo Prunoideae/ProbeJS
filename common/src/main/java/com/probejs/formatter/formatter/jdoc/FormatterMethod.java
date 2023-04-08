@@ -48,7 +48,7 @@ public class FormatterMethod extends DocumentFormatter<DocumentMethod> {
     public List<String> formatDocument(Integer indent, Integer stepIndent) {
         return List.of(Util.indent(indent) + "%s%s%s(%s): %s;".formatted(
                 document.isStatic() ? "static " : "",
-                document.getName(),
+                Util.getSafeName(document.getName()),
                 document.getVariables().isEmpty()?"":"<%s>".formatted(document.getVariables().stream().map(Serde::getTypeFormatter).map(IFormatter::formatMethodVariable).collect(Collectors.joining(", "))),
                 document.getParams().stream()
                         .map(FormatterParam::new)
@@ -108,7 +108,7 @@ public class FormatterMethod extends DocumentFormatter<DocumentMethod> {
 
         @Override
         protected List<String> formatDocument(Integer indent, Integer stepIndent) {
-            return List.of(Util.indent(indent) + "get %s(): %s".formatted(getBeanName(), Serde.getTypeFormatter(document.getReturns()).formatParamVariable()));
+            return List.of(Util.indent(indent) + "get %s(): %s".formatted(Util.getSafeName(getBeanName()), Serde.getTypeFormatter(document.getReturns()).formatParamVariable()));
         }
 
         @Override
@@ -136,7 +136,7 @@ public class FormatterMethod extends DocumentFormatter<DocumentMethod> {
 
         @Override
         protected List<String> formatDocument(Integer indent, Integer stepIndent) {
-            return List.of(Util.indent(indent) + "set %s(%s)".formatted(getBeanName(), new FormatterParam(document.getParams().get(0)).underscored().formatFirst()));
+            return List.of(Util.indent(indent) + "set %s(%s)".formatted(Util.getSafeName(getBeanName()), new FormatterParam(document.getParams().get(0)).underscored().formatFirst()));
         }
 
         @Override
