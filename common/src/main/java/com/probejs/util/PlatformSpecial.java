@@ -48,7 +48,10 @@ public abstract class PlatformSpecial {
                 if (ServerScriptManager.getScriptManager().isClassAllowed(globalClass.getName())) {
                     DocumentMethod method = loadClass.copy();
                     method.params.set(0, new PropertyParam("className", new PropertyType.Native(ProbeJS.GSON.toJson(globalClass.getName())), false));
-                    method.returns = new PropertyType.TypeOf(new PropertyType.Clazz(globalClass.getName()));
+                    //Return interface directly since typeof Interface = any in Typescript
+                    method.returns = globalClass.isInterface() ?
+                            new PropertyType.Clazz(globalClass.getName()) :
+                            new PropertyType.TypeOf(new PropertyType.Clazz(globalClass.getName()));
                     javaWrapper.methods.add(method);
                 }
             }

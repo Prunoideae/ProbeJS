@@ -79,7 +79,7 @@ public class DocumentClass extends AbstractDocument<DocumentClass> {
     @Override
     public DocumentClass merge(DocumentClass other) {
         //Overwrites everything basing on document.
-        //Generics are not overwritten tho
+        //Generics are not overwritten tho, just added
         if (this == other) return this;
         DocumentClass document = other.copy();
         document.parent = parent;
@@ -88,7 +88,7 @@ public class DocumentClass extends AbstractDocument<DocumentClass> {
         document.fields.addAll(fields);
         document.properties.addAll(properties);
         document.constructors = constructors;
-        document.generics = generics;
+        document.generics.addAll(other.generics);
         document.isInterface = isInterface;
         document.isAbstract = isAbstract;
         document.builtinComments.addAll(builtinComments);
