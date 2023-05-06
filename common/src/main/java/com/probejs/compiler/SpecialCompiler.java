@@ -37,6 +37,7 @@ public class SpecialCompiler {
         List<IFormatter> formatters = new ArrayList<>();
         formatters.add(new FormatterMod());
         formatters.add(new FormatterIngredient());
+        formatters.add(new FormatterAdvancement());
         formatters.add(new FormatterRecipeId());
         formatters.add(new FormatterLang());
         formatters.add(new FormatterLootTable());

@@ -6,12 +6,14 @@ import com.probejs.ProbeCommands;
 import com.probejs.ProbeJS;
 import com.probejs.ProbePaths;
 import com.probejs.formatter.formatter.special.FormatterLootTable;
+import com.probejs.formatter.formatter.special.FormatterRecipeId;
 import com.probejs.formatter.formatter.special.FormatterTag;
 import com.probejs.util.json.JArray;
 import com.probejs.util.json.JObject;
 import com.probejs.util.json.JPrimitive;
 import dev.architectury.platform.Platform;
 import dev.latvian.mods.kubejs.KubeJSRegistries;
+import net.minecraft.advancements.Advancement;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -73,6 +75,15 @@ public class SnippetCompiler {
             }
         }
 
+        private static void addRecipeSnippets(JsonObject resultJson) {
+            FormatterRecipeId.ORIGINAL_RECIPES.forEach((rl, json) -> {
+                resultJson.add(rl.toString(), new JObject()
+                        .add("prefix", new JArray().add(new JPrimitive("#" + rl)))
+                        .add("body", new JPrimitive(ProbeJS.GSON_WRITER.toJson(json)))
+                        .serialize());
+            });
+        }
+
         public JsonObject toSnippet() {
             JsonObject resultJson = new JsonObject();
             // Compile normal entries to snippet
@@ -89,7 +100,15 @@ public class SnippetCompiler {
                 addSnippets(resultJson, type + "_tag", members);
             }
             addSnippets(resultJson, "loot_table", FormatterLootTable.LOOT_TABLES.stream().map(ResourceLocation::toString).collect(Collectors.toList()));
+            addSnippets(resultJson, "advancements", ProbeCommands.COMMAND_LEVEL.getServer()
+                    .getAdvancements()
+                    .getAllAdvancements()
+                    .stream()
+                    .map(Advancement::getId)
+                    .map(ResourceLocation::toString).collect(Collectors.toList()));
             addSnippets(resultJson, "mod", Platform.getModIds());
+            addRecipeSnippets(resultJson);
+
             return resultJson;
         }
 

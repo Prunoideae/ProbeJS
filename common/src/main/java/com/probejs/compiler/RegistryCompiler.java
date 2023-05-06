@@ -35,7 +35,7 @@ public class RegistryCompiler {
     public static List<String> compileRegistryEvents() {
         ArrayList<String> lines = new ArrayList<>();
         for (RegistryObjectBuilderTypes<?> types : RegistryObjectBuilderTypes.MAP.values()) {
-            String fullName = types.registryKey.location().getNamespace() + "." + types.registryKey.location().getPath().replace('/', '.');
+            String fullName = types.registryKey.location().toString();
             String registryName = RegistryCompiler.FormatterRegistry.getFormattedRegistryName(types);
             lines.add("registry(type: %s, handler: (event: Registry.%s) => void):void,".formatted(ProbeJS.GSON.toJson(fullName), registryName));
             if (types.registryKey.location().getNamespace().equals("minecraft")) {
