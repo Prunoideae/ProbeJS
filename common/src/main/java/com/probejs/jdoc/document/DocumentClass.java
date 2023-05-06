@@ -88,7 +88,7 @@ public class DocumentClass extends AbstractDocument<DocumentClass> {
         document.fields.addAll(fields);
         document.properties.addAll(properties);
         document.constructors = constructors;
-        document.generics.addAll(other.generics);
+        document.generics.addAll(generics);
         document.isInterface = isInterface;
         document.isAbstract = isAbstract;
         document.builtinComments.addAll(builtinComments);

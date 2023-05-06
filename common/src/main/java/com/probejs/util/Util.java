@@ -39,7 +39,10 @@ public class Util {
      * @return the original string if valid, otherwise it will be jsonify.
      */
     public static String getSafeName(String s) {
-        return !KEYWORDS.contains(s) && s.matches("^[$A-Z_][0-9A-Z_$]*$") ? s : ProbeJS.GSON.toJson(s);
+        return !KEYWORDS.contains(s) && (
+                s.toUpperCase().matches("^[$A-Z_][0-9A-Z_$]*$") |
+                        (s.startsWith("[") && s.endsWith("]"))
+        ) ? s : ProbeJS.GSON.toJson(s);
     }
 
     public interface TrySupplier<T> {
