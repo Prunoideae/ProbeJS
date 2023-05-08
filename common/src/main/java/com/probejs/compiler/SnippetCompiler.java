@@ -1,6 +1,5 @@
 package com.probejs.compiler;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.probejs.ProbeCommands;
 import com.probejs.ProbeJS;
@@ -8,6 +7,7 @@ import com.probejs.ProbePaths;
 import com.probejs.formatter.formatter.special.FormatterLootTable;
 import com.probejs.formatter.formatter.special.FormatterRecipeId;
 import com.probejs.formatter.formatter.special.FormatterTag;
+import com.probejs.jsgen.DocGenerationEventJS;
 import com.probejs.util.json.JArray;
 import com.probejs.util.json.JObject;
 import com.probejs.util.json.JPrimitive;
@@ -84,7 +84,7 @@ public class SnippetCompiler {
             });
         }
 
-        public JsonObject toSnippet() {
+        public JsonObject toSnippet(DocGenerationEventJS event) {
             JsonObject resultJson = new JsonObject();
             // Compile normal entries to snippet
             for (Map.Entry<String, List<String>> entry : this.registries.entrySet()) {
@@ -109,16 +109,17 @@ public class SnippetCompiler {
             addSnippets(resultJson, "mod", Platform.getModIds());
             addRecipeSnippets(resultJson);
 
+            event.getSnippets().forEach(consumer -> consumer.accept(resultJson));
             return resultJson;
         }
 
     }
 
-    public static void compile() throws IOException {
+    public static void compile(DocGenerationEventJS event) throws IOException {
         Path codeFile = ProbePaths.WORKSPACE_SETTINGS.resolve("probe.code-snippets");
         KubeDump kubeDump = KubeDump.fetch();
         BufferedWriter writer = Files.newBufferedWriter(codeFile);
-        writer.write(ProbeJS.GSON.toJson(kubeDump.toSnippet()));
+        writer.write(ProbeJS.GSON.toJson(kubeDump.toSnippet(event)));
         writer.close();
     }
 

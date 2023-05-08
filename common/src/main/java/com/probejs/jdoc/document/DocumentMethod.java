@@ -19,7 +19,9 @@ public class DocumentMethod extends AbstractDocument<DocumentMethod> {
     public String name;
     public boolean isStatic;
     public boolean isAbstract;
+
     public PropertyType<?> returns;
+
     public final List<PropertyParam> params = new ArrayList<>();
     public final List<PropertyType<?>> variables = new ArrayList<>();
 
@@ -133,5 +135,17 @@ public class DocumentMethod extends AbstractDocument<DocumentMethod> {
 
     public boolean isAbstract() {
         return isAbstract;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setStatic(boolean aStatic) {
+        isStatic = aStatic;
+    }
+
+    public void setAbstract(boolean anAbstract) {
+        isAbstract = anAbstract;
     }
 }

@@ -158,4 +158,20 @@ public class DocumentClass extends AbstractDocument<DocumentClass> {
     public boolean isInterface() {
         return isInterface;
     }
+
+    public void setAbstract(boolean anAbstract) {
+        isAbstract = anAbstract;
+    }
+
+    public void setInterface(boolean anInterface) {
+        isInterface = anInterface;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+    
+    public void setParent(PropertyType<?> parent) {
+        this.parent = parent;
+    }
 }

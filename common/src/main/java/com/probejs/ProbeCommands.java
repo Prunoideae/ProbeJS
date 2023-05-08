@@ -8,11 +8,14 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.probejs.compiler.DocCompiler;
 import com.probejs.compiler.SnippetCompiler;
+import com.probejs.compiler.SpecialCompiler;
 import com.probejs.formatter.ClassResolver;
 import com.probejs.formatter.NameResolver;
 import com.probejs.formatter.formatter.jdoc.FormatterClass;
 import com.probejs.info.ClassInfo;
 import com.probejs.jdoc.document.DocumentClass;
+import com.probejs.jsgen.DocGenerationEventJS;
+import com.probejs.jsgen.ProbeJSEvents;
 import dev.latvian.mods.kubejs.KubeJSPaths;
 import dev.latvian.mods.kubejs.item.ingredient.IngredientJS;
 import net.minecraft.commands.CommandSourceStack;
@@ -63,12 +66,16 @@ public class ProbeCommands {
                                     };
                                     runningThread = new Thread(() -> {
                                         try {
+                                            SpecialCompiler.specialCompilers.clear();
+                                            // Send out js generation event, this should happen before class crawling so probe can resolve everything later
+                                            DocGenerationEventJS event = new DocGenerationEventJS();
+                                            ProbeJSEvents.DOC_GEN.post(event);
                                             sendMessage.accept("Started generating type files...");
-                                            SnippetCompiler.compile();
+                                            SnippetCompiler.compile(event);
                                             sendMessage.accept("Snippets generated.");
                                             ClassResolver.init();
                                             NameResolver.init();
-                                            DocCompiler.compile(sendMessage);
+                                            DocCompiler.compile(sendMessage, event);
                                         } catch (Exception e) {
                                             ProbeJS.LOGGER.error(e);
                                             for (StackTraceElement stackTraceElement : e.getStackTrace()) {

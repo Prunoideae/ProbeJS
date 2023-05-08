@@ -114,4 +114,16 @@ public class DocumentField extends AbstractDocument<DocumentField> {
     public boolean isShouldGSON() {
         return shouldGSON;
     }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setStatic(boolean aStatic) {
+        isStatic = aStatic;
+    }
+
+    public void setFinal(boolean aFinal) {
+        isFinal = aFinal;
+    }
 }

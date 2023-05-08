@@ -4,7 +4,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.probejs.ProbeJS;
 import com.probejs.formatter.NameResolver;
 import com.probejs.info.type.*;
 import com.probejs.jdoc.Serde;

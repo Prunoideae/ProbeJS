@@ -9,6 +9,7 @@ import com.probejs.jdoc.Serde;
 import com.probejs.jdoc.property.AbstractProperty;
 import com.probejs.jdoc.property.PropertyComment;
 import com.probejs.jdoc.property.PropertyHide;
+import dev.latvian.mods.rhino.util.HideFromJS;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -101,8 +102,14 @@ public abstract class AbstractDocument<T extends AbstractDocument<T>> implements
         return this.properties.stream().filter(prop -> property.isAssignableFrom(prop.getClass())).map(prop -> (E) prop).collect(Collectors.toList());
     }
 
+    @HideFromJS
     public final void addProperty(AbstractProperty<?> property) {
         this.properties.add(property);
+    }
+
+    public final AbstractDocument<T> addPropertyJson(JsonObject json) {
+        addProperty(Serde.deserializeProperty(json));
+        return this;
     }
 
     public final boolean fulfillsConditions() {

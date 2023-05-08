@@ -18,9 +18,10 @@ import com.probejs.jdoc.Manager;
 import com.probejs.jdoc.Serde;
 import com.probejs.jdoc.document.DocumentClass;
 import com.probejs.jdoc.property.PropertyComment;
+import com.probejs.jsgen.DocGenerationEventJS;
+import com.probejs.jsgen.ProbeJSEvents;
 import com.probejs.plugin.CapturedClasses;
 import com.probejs.util.PlatformSpecial;
-import dev.architectury.platform.Platform;
 import dev.latvian.mods.kubejs.KubeJS;
 import dev.latvian.mods.kubejs.KubeJSPaths;
 import dev.latvian.mods.kubejs.event.EventGroupWrapper;
@@ -277,7 +278,7 @@ public class DocCompiler {
         return bindingEvent;
     }
 
-    public static void compile(Consumer<String> sendMessage) throws IOException {
+    public static void compile(Consumer<String> sendMessage, DocGenerationEventJS event) throws IOException {
         DummyBindingEvent bindingEvent = fetchBindings(ServerScriptManager.getScriptManager())
                 .merge(fetchBindings(KubeJS.getClientScriptManager()))
                 .merge(fetchBindings(KubeJS.getStartupScriptManager()));
@@ -327,10 +328,23 @@ public class DocCompiler {
         } catch (Exception e) {
             ProbeJS.LOGGER.error("Error loading User-defined docs!");
         }
-        Map<String, DocumentClass> mergedDocsMap = Manager.mergeDocuments(javaDocs, fetchedDocs, modDocs, userDocs);
+        Map<String, DocumentClass> mergedDocsMap = Manager.mergeDocuments(javaDocs,
+                fetchedDocs,
+                modDocs, userDocs
+        );
+
+        event.getTransformers().forEach((key, transformer) -> {
+            if (mergedDocsMap.containsKey(key)) {
+                transformer.forEach(t -> t.accept(mergedDocsMap.get(key)));
+            }
+        });
+
         List<DocumentClass> mergedDocs = mergedDocsMap.values().stream().toList();
         sendMessage.accept("Docs merged. Started compiling...");
         NameResolver.priorSortClasses(mergedDocs).forEach(NameResolver::resolveName);
+
+        //Add specials
+        SpecialCompiler.specialCompilers.addAll(event.getSpecialFormatters());
 
         //Compile things
         exportSerializedClasses(javaDocs, mergedDocs);

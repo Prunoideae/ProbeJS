@@ -70,6 +70,16 @@ public class NameResolver {
     public static final Set<String> keywords = new HashSet<>();
     public static final Set<String> resolvedPrimitives = new HashSet<>();
 
+    public static void clear() {
+        resolvedNames.clear();
+        specialTypeFormatters.clear();
+        specialTypeGuards.clear();
+        specialClassAssigner.clear();
+        nameResolveSpecials.clear();
+        keywords.clear();
+        resolvedPrimitives.clear();
+    }
+
     public static void putResolvedName(String className, String resolvedName) {
         putResolvedName(className, new ResolvedName(Arrays.stream(resolvedName.split("\\.")).toList()));
     }
@@ -183,16 +193,9 @@ public class NameResolver {
         return result;
     }
 
-    private static boolean initialized = false;
-
     @SuppressWarnings("unchecked")
     public static void init() {
-        if (initialized)
-            return;
-        initialized = true;
-
-        resolvedNames.clear();
-
+        NameResolver.clear();
         putResolvedPrimitive(Object.class, "any");
         putResolvedPrimitive(String.class, "string");
         putResolvedPrimitive(Character.class, "string");
