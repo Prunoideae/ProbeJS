@@ -56,6 +56,7 @@ public class ProbeCommands {
                                         context.getSource().sendFailure(Component.literal("ProbeJS dumping thread is dead! Please check out latest.log and submit an error report."));
                                         runningThread = null;
                                     }
+                                    context.getSource().getServer().kjs$runCommandSilent("reload");
                                     COMMAND_LEVEL = context.getSource().getLevel();
                                     Instant start = Instant.now();
                                     Consumer<String> sendMessage = s -> {

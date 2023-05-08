@@ -26,14 +26,13 @@ public class DocGenerationEventJS extends EventJS {
     private final List<IFormatter> specialFormatters = new ArrayList<>();
 
     private final List<Consumer<JsonObject>> snippets = new ArrayList<>();
-
-
+    
     public DocGenerationEventJS specialType(String typeName, List<Object> elements) {
         specialFormatters.add((indent, stepIndent) -> List.of(
                 "%stype %s = %s;".formatted(
                         " ".repeat(indent), typeName,
                         elements.stream()
-                                .map(ProbeJS.GSON::toJson)
+                                .map(Object::toString)
                                 .collect(Collectors.joining(" | "))
                 )));
         return this;
@@ -76,15 +75,15 @@ public class DocGenerationEventJS extends EventJS {
         return this;
     }
 
-    public DocGenerationEventJS customSnippet(String type, List<String> prefixes, String body) {
+    public DocGenerationEventJS customSnippet(String type, List<String> prefixes, List<Object> body) {
         return customSnippet(type, prefixes, body, null);
     }
 
-    public DocGenerationEventJS customSnippet(String type, List<String> prefixes, String body, String desc) {
+    public DocGenerationEventJS customSnippet(String type, List<String> prefixes, List<Object> body, String desc) {
         snippets.add(resultJson -> {
                     var obj = new JObject()
                             .add("prefix", new JArray().addAll(prefixes.stream().map(JPrimitive::new)))
-                            .add("body", new JPrimitive(body));
+                            .add("body", new JArray().addAll(body.stream().map(Object::toString).map(JPrimitive::new)));
                     if (desc != null)
                         obj.add("description", new JPrimitive(desc));
                     resultJson.add(type, obj.serialize());
