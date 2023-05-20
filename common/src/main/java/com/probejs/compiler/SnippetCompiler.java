@@ -13,6 +13,7 @@ import com.probejs.util.json.JObject;
 import com.probejs.util.json.JPrimitive;
 import dev.architectury.platform.Platform;
 import dev.latvian.mods.kubejs.KubeJSRegistries;
+import dev.latvian.mods.kubejs.bindings.ItemWrapper;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
@@ -107,6 +108,10 @@ public class SnippetCompiler {
                     .map(Advancement::getId)
                     .map(ResourceLocation::toString).collect(Collectors.toList()));
             addSnippets(resultJson, "mod", Platform.getModIds());
+            resultJson.add("itemstack", new JObject()
+                    .add("prefix", new JArray().add(new JPrimitive("@itemstack")))
+                    .add("body", new JPrimitive("\"${1}x ${2|%s|}\"".formatted(String.join(",", ItemWrapper.getTypeList()))))
+                    .serialize());
             addRecipeSnippets(resultJson);
 
             event.getSnippets().forEach(consumer -> consumer.accept(resultJson));

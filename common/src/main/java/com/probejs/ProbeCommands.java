@@ -3,6 +3,7 @@ package com.probejs;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonWriter;
+import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -16,14 +17,19 @@ import com.probejs.info.ClassInfo;
 import com.probejs.jdoc.document.DocumentClass;
 import com.probejs.jsgen.DocGenerationEventJS;
 import com.probejs.jsgen.ProbeJSEvents;
+import com.probejs.rich.image.ImageHelper;
+import com.probejs.rich.item.RichItemCompiler;
 import dev.latvian.mods.kubejs.KubeJSPaths;
 import dev.latvian.mods.kubejs.item.ingredient.IngredientJS;
+import net.minecraft.client.Minecraft;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -73,6 +79,7 @@ public class ProbeCommands {
                                             ProbeJSEvents.DOC_GEN.post(event);
                                             sendMessage.accept("Started generating type files...");
                                             SnippetCompiler.compile(event);
+                                            RichItemCompiler.compile();
                                             sendMessage.accept("Snippets generated.");
                                             ClassResolver.init();
                                             NameResolver.init();
@@ -96,6 +103,15 @@ public class ProbeCommands {
                                     });
                                     runningThread.setDaemon(true);
                                     runningThread.start();
+                                    Minecraft.getInstance().execute(() -> {
+                                        try {
+                                            sendMessage.accept("Rendering images for ProbeJS rich display...");
+                                            RichItemCompiler.render();
+                                            sendMessage.accept("Images rendered.");
+                                        } catch (IOException e) {
+                                            throw new RuntimeException(e);
+                                        }
+                                    });
                                     return Command.SINGLE_SUCCESS;
                                 }))
                         .then(Commands.literal("clear_cache")

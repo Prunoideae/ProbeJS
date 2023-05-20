@@ -15,6 +15,7 @@ public class ProbePaths {
     public static Path USER_DEFINED = PROBE.resolve("user");
     public static Path WORKSPACE_SETTINGS = Platform.getGameFolder().resolve(".vscode");
     public static Path CACHE = PROBE.resolve("cache");
+    public static Path RICH = CACHE.resolve("rich");
 
     public static void init() {
         if (Files.notExists(PROBE)) {
@@ -34,6 +35,9 @@ public class ProbePaths {
         }
         if (Files.notExists(CACHE)) {
             UtilsJS.tryIO(() -> Files.createDirectories(CACHE));
+        }
+        if (Files.notExists(RICH)) {
+            UtilsJS.tryIO(() -> Files.createDirectories(RICH));
         }
     }
 
