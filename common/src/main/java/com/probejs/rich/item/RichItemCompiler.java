@@ -15,7 +15,7 @@ import java.nio.file.Path;
 
 public class RichItemCompiler {
     public static void compile() throws IOException {
-        JArray array = new JArray()
+        JArray array = JArray.create()
                 .addAll(ItemWrapper.getList()
                         .stream().map(ItemAttribute::new)
                         .map(ItemAttribute::serialize));

@@ -68,8 +68,8 @@ public class SnippetCompiler {
 
         private static void addSnippets(JsonObject resultJson, String type, Collection<String> members) {
             if (!members.isEmpty()) {
-                resultJson.add(type, new JObject()
-                        .add("prefix", new JArray().add(new JPrimitive("@" + type)))
+                resultJson.add(type, JObject.create()
+                        .add("prefix", JArray.create().add(new JPrimitive("@" + type)))
                         .add("body", new JPrimitive("\"${1|%s|}\"".formatted(String.join(",", members))))
                         .serialize()
                 );
@@ -77,12 +77,11 @@ public class SnippetCompiler {
         }
 
         private static void addRecipeSnippets(JsonObject resultJson) {
-            FormatterRecipeId.ORIGINAL_RECIPES.forEach((rl, json) -> {
-                resultJson.add(rl.toString(), new JObject()
-                        .add("prefix", new JArray().add(new JPrimitive("#" + rl)))
-                        .add("body", new JPrimitive(ProbeJS.GSON_WRITER.toJson(json)))
-                        .serialize());
-            });
+            FormatterRecipeId.ORIGINAL_RECIPES.forEach((rl, json) ->
+                    resultJson.add(rl.toString(), JObject.create()
+                            .add("prefix", JArray.create().add(new JPrimitive("#" + rl)))
+                            .add("body", new JPrimitive(ProbeJS.GSON_WRITER.toJson(json)))
+                            .serialize()));
         }
 
         public JsonObject toSnippet(DocGenerationEventJS event) {
@@ -108,8 +107,8 @@ public class SnippetCompiler {
                     .map(Advancement::getId)
                     .map(ResourceLocation::toString).collect(Collectors.toList()));
             addSnippets(resultJson, "mod", Platform.getModIds());
-            resultJson.add("itemstack", new JObject()
-                    .add("prefix", new JArray().add(new JPrimitive("@itemstack")))
+            resultJson.add("itemstack", JObject.create()
+                    .add("prefix", JArray.create().add(new JPrimitive("@itemstack")))
                     .add("body", new JPrimitive("\"${1}x ${2|%s|}\"".formatted(String.join(",", ItemWrapper.getTypeList()))))
                     .serialize());
             addRecipeSnippets(resultJson);

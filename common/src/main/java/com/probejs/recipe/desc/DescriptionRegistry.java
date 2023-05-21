@@ -2,6 +2,8 @@ package com.probejs.recipe.desc;
 
 import com.google.gson.JsonObject;
 import com.probejs.recipe.desc.impl.*;
+import com.probejs.recipe.desc.impl.simple.DescriptionItemInput;
+import com.probejs.recipe.desc.impl.simple.DescriptionItemOutput;
 import com.probejs.recipe.desc.impl.simple.DescriptionString;
 
 import java.util.HashMap;
@@ -32,5 +34,8 @@ public class DescriptionRegistry {
         register("array", DescriptionArray::new);
         register("optional", DescriptionOptional::new);
         register("pattern_key", DescriptionPatternKey::new);
+        register("input_item", DescriptionItemInput::new);
+        register("output_item", DescriptionItemOutput::new);
+
     }
 }

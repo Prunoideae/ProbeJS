@@ -6,11 +6,6 @@ import net.minecraft.world.item.ItemStack;
 
 public class DescriptionItemOutput extends DescriptionTyped<ItemStack> {
     @Override
-    public void deserialize(JsonObject json) {
-
-    }
-
-    @Override
     public Class<ItemStack> getType() {
         return ItemStack.class;
     }

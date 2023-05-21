@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 public class JArray implements IJsonBuilder<JsonArray> {
@@ -12,7 +13,17 @@ public class JArray implements IJsonBuilder<JsonArray> {
         return new JArray();
     }
 
+    private JArray() {
+    }
+
     private final List<IJsonBuilder<?>> members = new ArrayList<>();
+
+    public JArray ifThen(boolean condition, Consumer<JArray> action) {
+        if (condition) {
+            action.accept(this);
+        }
+        return this;
+    }
 
     public JArray add(IJsonBuilder<?> member) {
         members.add(member);

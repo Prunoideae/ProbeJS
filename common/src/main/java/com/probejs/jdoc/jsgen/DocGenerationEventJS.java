@@ -26,7 +26,7 @@ public class DocGenerationEventJS extends EventJS {
     private final List<IFormatter> specialFormatters = new ArrayList<>();
 
     private final List<Consumer<JsonObject>> snippets = new ArrayList<>();
-    
+
     public DocGenerationEventJS specialType(String typeName, List<Object> elements) {
         specialFormatters.add((indent, stepIndent) -> List.of(
                 "%stype %s = %s;".formatted(
@@ -60,17 +60,15 @@ public class DocGenerationEventJS extends EventJS {
     }
 
     public DocGenerationEventJS addSnippet(String name, List<Object> items, String desc) {
-        snippets.add(resultJson -> {
-                    var obj = new JObject()
-                            .add("prefix", new JArray().add(new JPrimitive("@" + name)))
-                            .add("body", new JPrimitive("${1|%s|}".formatted(items.stream()
-                                    .map(ProbeJS.GSON::toJson)
-                                    .collect(Collectors.joining(","))
-                            )));
-                    if (desc != null)
-                        obj.add("description", new JPrimitive(desc));
-                    resultJson.add(name, obj.serialize());
-                }
+        snippets.add(resultJson -> resultJson.add(name, JObject.create()
+                        .add("prefix", JArray.create().add(new JPrimitive("@" + name)))
+                        .add("body", new JPrimitive("${1|%s|}".formatted(items.stream()
+                                .map(ProbeJS.GSON::toJson)
+                                .collect(Collectors.joining(","))
+                        )))
+                        .ifThen(desc != null, o -> o.add("description", new JPrimitive(desc)))
+                        .serialize()
+                )
         );
         return this;
     }
@@ -80,14 +78,13 @@ public class DocGenerationEventJS extends EventJS {
     }
 
     public DocGenerationEventJS customSnippet(String type, List<String> prefixes, List<Object> body, String desc) {
-        snippets.add(resultJson -> {
-                    var obj = new JObject()
-                            .add("prefix", new JArray().addAll(prefixes.stream().map(JPrimitive::new)))
-                            .add("body", new JArray().addAll(body.stream().map(Object::toString).map(JPrimitive::new)));
-                    if (desc != null)
-                        obj.add("description", new JPrimitive(desc));
-                    resultJson.add(type, obj.serialize());
-                }
+        snippets.add(resultJson ->
+                resultJson.add(type, JObject.create()
+                        .add("prefix", JArray.create().addAll(prefixes.stream().map(JPrimitive::new)))
+                        .add("body", JArray.create().addAll(body.stream().map(Object::toString).map(JPrimitive::new)))
+                        .ifThen(desc != null, o -> o.add("description", new JPrimitive(desc)))
+                        .serialize()
+                )
         );
         return this;
     }

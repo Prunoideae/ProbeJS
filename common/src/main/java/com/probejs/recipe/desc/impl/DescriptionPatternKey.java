@@ -16,7 +16,6 @@ public class DescriptionPatternKey extends Description {
     @Override
     public PropertyType<?> describeType() {
         return new PropertyType.JSObject()
-                .add(new PropertyType.JSObjectKey().withType(new PropertyType.Native("string")),
-                        component.describeType());
+                .add(new PropertyType.JSObjectKey().withType(new PropertyType.Native("string")), component.describeType());
     }
 }

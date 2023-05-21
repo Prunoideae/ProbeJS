@@ -1,6 +1,5 @@
 package com.probejs.rich.item;
 
-import com.google.gson.JsonObject;
 import com.probejs.util.json.JObject;
 import com.probejs.util.json.JPrimitive;
 import net.minecraft.world.item.*;
@@ -42,7 +41,7 @@ public class ItemAttribute {
     }
 
     public JObject serialize() {
-        JObject object = new JObject()
+        JObject object = JObject.create()
                 .add("id", new JPrimitive(item.kjs$getId()))
                 .add("localized", new JPrimitive(item.getHoverName().getString()))
                 .add("maxDamage", new JPrimitive(item.getMaxDamage()))
@@ -54,13 +53,13 @@ public class ItemAttribute {
         var itemRepr = item.getItem();
         var food = itemRepr.getFoodProperties();
         if (food != null) {
-            object.add("food", new JObject()
+            object.add("food", JObject.create()
                     .add("nutrition", new JPrimitive(food.getNutrition()))
                     .add("saturation", new JPrimitive(food.getSaturationModifier()))
                     .add("alwaysEdible", new JPrimitive(food.canAlwaysEat())));
         }
         if (itemRepr instanceof BlockItem blockItem) {
-            object.add("block", new JObject()
+            object.add("block", JObject.create()
                     .add("crop", new JPrimitive(blockItem.getBlock() instanceof CropBlock)));
         }
         return object;

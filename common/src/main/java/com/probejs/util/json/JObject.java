@@ -5,15 +5,46 @@ import com.mojang.datafixers.util.Pair;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
+/**
+ * NOTE: it mutates the base object.
+ */
 public class JObject implements IJsonBuilder<JsonObject> {
+    private final JsonObject base;
 
+    private JObject(JsonObject base) {
+        this.base = base;
+    }
+
+    /**
+     * Creates a JObject from a JsonObject. Note that the JObject will mutate the base object.
+     *
+     * @param base the base object
+     * @return the JObject
+     */
+    public static JObject create(JsonObject base) {
+        return new JObject(base);
+    }
+
+    /**
+     * Creates a JObject from a new JsonObject.
+     *
+     * @return the JObject
+     */
     public static JObject create() {
-        return new JObject();
+        return create(new JsonObject());
     }
 
     private final Map<String, IJsonBuilder<?>> members = new HashMap<>();
+
+    public JObject ifThen(boolean condition, Consumer<JObject> action) {
+        if (condition) {
+            action.accept(this);
+        }
+        return this;
+    }
 
     public JObject add(String key, IJsonBuilder<?> value) {
         members.put(key, value);
@@ -39,8 +70,7 @@ public class JObject implements IJsonBuilder<JsonObject> {
 
     @Override
     public JsonObject serialize() {
-
-        JsonObject object = new JsonObject();
+        JsonObject object = base;
         for (Map.Entry<String, IJsonBuilder<?>> entry : members.entrySet()) {
             String key = entry.getKey();
             IJsonBuilder<?> value = entry.getValue();
