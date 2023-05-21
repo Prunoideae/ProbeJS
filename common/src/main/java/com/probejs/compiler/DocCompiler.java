@@ -351,7 +351,8 @@ public class DocCompiler {
         //Compile things
         exportSerializedClasses(javaDocs, mergedDocs);
         compileGlobal(mergedDocs);
-        RegistryCompiler.compileRegistries();
+        RegistryCompiler.compileRegistryEvents();
+        TagEventCompiler.compileTagEvents();
         EventCompiler.initSpecialEvents();
         EventCompiler.compileEvents(mergedDocsMap);
         compileConstants(bindingEvent);

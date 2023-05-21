@@ -11,6 +11,7 @@ import com.probejs.jdoc.java.ClassInfo;
 import com.probejs.jdoc.java.MethodInfo;
 import com.probejs.jdoc.Serde;
 import com.probejs.jdoc.document.DocumentMethod;
+import com.probejs.util.RLHelper;
 import dev.latvian.mods.rhino.util.EnumTypeWrapper;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
@@ -71,9 +72,8 @@ public class SpecialTypes {
     }
 
     public static <T> void assignRegistry(Class<T> clazz, ResourceKey<Registry<T>> registry) {
-        SpecialCompiler.specialCompilers.add(new FormatterRegistry<>(registry, clazz));
-        List<String> remappedName = Arrays.stream(MethodInfo.getRemappedOrOriginalClass(clazz).split("\\.")).toList();
-        NameResolver.putSpecialAssignments(clazz, () -> List.of("Special.%s".formatted(remappedName.get(remappedName.size() - 1))));
+        SpecialCompiler.specialCompilers.add(new FormatterRegistry<>(registry));
+        NameResolver.putSpecialAssignments(clazz, () -> List.of("Special.%s".formatted(RLHelper.finalComponentToCamel(registry.location().getPath()))));
     }
 
     private static List<Class<?>> getParentInterfaces(List<Class<?>> putative, Class<?> o) {

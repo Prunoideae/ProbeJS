@@ -9,6 +9,7 @@ import com.probejs.jdoc.property.AbstractProperty;
 import com.probejs.jdoc.property.PropertyComment;
 import com.probejs.jdoc.property.PropertyExtra;
 import com.probejs.jdoc.property.PropertyType;
+import com.probejs.util.Util;
 import dev.latvian.mods.kubejs.event.EventGroup;
 import dev.latvian.mods.kubejs.event.EventHandler;
 
@@ -23,9 +24,8 @@ public class EventCompiler {
     public static Map<Pair<String, String>, Function<EventHandler, List<String>>> SPECIAL_EVENT_OVERRIDE = new HashMap<>();
 
     public static void initSpecialEvents() {
-        SPECIAL_EVENT_OVERRIDE.put(new Pair<>("StartupEvents", "registry"), handler -> RegistryCompiler.compileRegistryEvents());
-        //TODO: Get this done
-        //SPECIAL_EVENT_OVERRIDE.put(new Pair<>("ServerEvents", "tags"), handler -> SpecialCompiler.compileTagEvents());
+        SPECIAL_EVENT_OVERRIDE.put(new Pair<>("StartupEvents", "registry"), handler -> RegistryCompiler.getRegistryEventOverrides());
+        SPECIAL_EVENT_OVERRIDE.put(new Pair<>("ServerEvents", "tags"), handler -> TagEventCompiler.getTagEventOverrides());
     }
 
     public static List<Class<?>> fetchEventClasses() {
@@ -85,11 +85,11 @@ public class EventCompiler {
                             eventName,
                             findProperty(globalClasses, document, PropertyExtra.class)
                                     .map(extra -> Serde.getTypeFormatter(extra.getType()).formatFirst())
-                                    .orElse("string"), RegistryCompiler.formatMaybeParameterized(event)
+                                    .orElse("string"), Util.formatMaybeParameterized(event)
                     ));
                 }
                 if (handler.extra == null || !handler.extra.required) {
-                    elements.add("%s(handler: (event: %s) => void):void,".formatted(eventName, RegistryCompiler.formatMaybeParameterized(event)));
+                    elements.add("%s(handler: (event: %s) => void):void,".formatted(eventName, Util.formatMaybeParameterized(event)));
                 }
             }
             elements.add("};\n");

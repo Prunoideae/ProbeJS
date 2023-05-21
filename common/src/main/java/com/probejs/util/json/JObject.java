@@ -1,7 +1,7 @@
 package com.probejs.util.json;
 
 import com.google.gson.JsonObject;
-import com.probejs.util.Pair;
+import com.mojang.datafixers.util.Pair;
 
 import java.util.HashMap;
 import java.util.Map;

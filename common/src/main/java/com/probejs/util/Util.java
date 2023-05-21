@@ -1,11 +1,10 @@
 package com.probejs.util;
 
 import com.probejs.ProbeJS;
+import com.probejs.compiler.formatter.formatter.jdoc.FormatterType;
+import com.probejs.jdoc.property.PropertyType;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Util {
@@ -27,11 +26,7 @@ public class Util {
     public static String snakeToCapitalized(String s) {
         return Arrays.stream(s.split("_")).map(Util::getCapitalized).collect(Collectors.joining());
     }
-
-    public static String rlToCapitalized(String s) {
-        return Arrays.stream(s.split("/")).map(Util::snakeToCapitalized).collect(Collectors.joining());
-    }
-
+    
     /**
      * Guards the method/field name by a matching regex and a list of keywords
      *
@@ -43,6 +38,19 @@ public class Util {
                 s.toUpperCase().matches("^[$A-Z_][0-9A-Z_$]*$") |
                         (s.startsWith("[") && s.endsWith("]"))
         ) ? s : ProbeJS.GSON.toJson(s);
+    }
+
+    public static String formatMaybeParameterized(Class<?> clazz) {
+        if (clazz.getTypeParameters().length == 0) {
+            return new FormatterType.Clazz(new PropertyType.Clazz(clazz.getName())).formatFirst();
+        } else {
+            return new FormatterType.Parameterized(
+                    new PropertyType.Parameterized(
+                            new PropertyType.Clazz(clazz.getName()),
+                            Collections.nCopies(clazz.getTypeParameters().length, new PropertyType.Clazz(Object.class.getName()))
+                    )
+            ).formatFirst();
+        }
     }
 
     public interface TrySupplier<T> {

@@ -71,6 +71,6 @@ public abstract class PlatformSpecial {
     protected static <T> IFormatter assignRegistry(Class<T> clazz, ResourceKey<Registry<T>> registry) {
         List<String> remappedName = Arrays.stream(MethodInfo.getRemappedOrOriginalClass(clazz).split("\\.")).toList();
         NameResolver.putSpecialAssignments(clazz, () -> List.of("Special.%s".formatted(remappedName.get(remappedName.size() - 1))));
-        return new FormatterRegistry<>(registry, clazz);
+        return new FormatterRegistry<>(registry);
     }
 }

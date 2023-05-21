@@ -1,13 +1,13 @@
 package com.probejs.compiler;
 
 import com.google.gson.JsonObject;
+import com.mojang.datafixers.util.Pair;
 import com.probejs.ProbeCommands;
 import com.probejs.ProbeJS;
 import com.probejs.ProbePaths;
 import com.probejs.compiler.formatter.NameResolver;
 import com.probejs.jdoc.document.DocumentClass;
-import com.probejs.util.Pair;
-import com.probejs.util.Util;
+import com.probejs.util.RLHelper;
 import com.probejs.util.json.JArray;
 import com.probejs.util.json.JObject;
 import com.probejs.util.json.JPrimitive;
@@ -104,7 +104,7 @@ public class SchemaCompiler {
         JObject definitions = JObject.create();
         ProbeCommands.COMMAND_LEVEL.registryAccess().registries().forEach(entry -> {
             JObject schema = toRegistryDefinition((ResourceKey<Registry<T>>) entry.key());
-            definitions.add("type%s".formatted(Util.rlToCapitalized(entry.key().location().getPath())), schema);
+            definitions.add("type%s".formatted(RLHelper.rlToCamel(entry.key().location().getPath())), schema);
         });
         compileSchema("probe.registry-definitions.json", definitions.serialize());
     }

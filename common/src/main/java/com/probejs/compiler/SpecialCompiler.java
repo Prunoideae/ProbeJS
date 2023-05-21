@@ -4,6 +4,7 @@ import com.probejs.ProbeCommands;
 import com.probejs.compiler.formatter.formatter.IFormatter;
 import com.probejs.compiler.formatter.formatter.special.*;
 import com.probejs.util.PlatformSpecial;
+import com.probejs.util.RLHelper;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -16,19 +17,12 @@ import java.util.stream.Collectors;
 public class SpecialCompiler {
     public static final List<IFormatter> specialCompilers = new ArrayList<>();
 
-    public static String rl2Cap(ResourceLocation location) {
-        String[] elements = location.getPath().split("/");
-        return Arrays.stream(elements[elements.length - 1].split("_"))
-                .map(s -> s.substring(0, 1).toUpperCase() + s.substring(1))
-                .collect(Collectors.joining(""));
-    }
-
     private static List<FormatterTag> getTagFormatters() {
         List<FormatterTag> formatters = new ArrayList<>();
         ProbeCommands.COMMAND_LEVEL.registryAccess().registries().forEach(entry -> {
             ResourceKey<?> key = entry.key();
             Registry<?> registry = entry.value();
-            formatters.add(new FormatterTag(rl2Cap(key.location()) + "Tag", registry));
+            formatters.add(new FormatterTag(RLHelper.finalComponentToCamel(key.location().getPath()) + "Tag", registry));
         });
         return formatters;
     }
