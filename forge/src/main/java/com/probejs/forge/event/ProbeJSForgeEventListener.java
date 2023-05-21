@@ -1,12 +1,12 @@
 package com.probejs.forge.event;
 
-import com.probejs.plugin.CapturedClasses;
+import com.probejs.compiler.DocCompiler;
 import net.minecraftforge.eventbus.api.Event;
 
 
 public class ProbeJSForgeEventListener {
 
     public static void onEvent(Event event) {
-        CapturedClasses.capturedRawEvents.put(event.getClass().getName(), event.getClass());
+        DocCompiler.CapturedClasses.capturedRawEvents.put(event.getClass().getName(), event.getClass());
     }
 }

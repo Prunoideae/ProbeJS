@@ -4,7 +4,7 @@ import com.google.gson.JsonObject;
 import com.probejs.ProbeCommands;
 import com.probejs.ProbeJS;
 import com.probejs.ProbePaths;
-import com.probejs.formatter.NameResolver;
+import com.probejs.compiler.formatter.NameResolver;
 import com.probejs.jdoc.document.DocumentClass;
 import com.probejs.util.Pair;
 import com.probejs.util.Util;

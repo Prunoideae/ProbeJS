@@ -3,11 +3,11 @@ package com.probejs.util;
 
 import com.google.common.base.Suppliers;
 import com.probejs.ProbeJS;
-import com.probejs.formatter.NameResolver;
-import com.probejs.formatter.formatter.IFormatter;
-import com.probejs.formatter.formatter.special.FormatterRegistry;
-import com.probejs.info.ClassInfo;
-import com.probejs.info.MethodInfo;
+import com.probejs.compiler.formatter.NameResolver;
+import com.probejs.compiler.formatter.formatter.IFormatter;
+import com.probejs.compiler.formatter.formatter.special.FormatterRegistry;
+import com.probejs.jdoc.java.ClassInfo;
+import com.probejs.jdoc.java.MethodInfo;
 import com.probejs.jdoc.document.DocumentClass;
 import com.probejs.jdoc.document.DocumentMethod;
 import com.probejs.jdoc.property.PropertyParam;

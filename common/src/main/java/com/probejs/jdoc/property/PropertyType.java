@@ -4,9 +4,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.probejs.formatter.NameResolver;
-import com.probejs.info.type.*;
+import com.probejs.compiler.formatter.NameResolver;
 import com.probejs.jdoc.Serde;
+import com.probejs.jdoc.java.type.*;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -84,6 +84,10 @@ public abstract class PropertyType<T extends PropertyType<T>> extends AbstractPr
     public static class Clazz extends Named<Clazz> {
         public Clazz(String name) {
             super(name);
+        }
+
+        public Clazz(Class<?> clazz) {
+            this(clazz.getName());
         }
 
         public Clazz() {
@@ -453,6 +457,16 @@ public abstract class PropertyType<T extends PropertyType<T>> extends AbstractPr
 
         }
 
+        public JSObjectKey withName(String name) {
+            this.nameKey = name;
+            return this;
+        }
+
+        public JSObjectKey withType(PropertyType<?> type) {
+            this.typeKey = type;
+            return this;
+        }
+
         public void deserialize(JsonElement element) {
             if (element.isJsonPrimitive()) {
                 nameKey = element.getAsString();
@@ -521,6 +535,11 @@ public abstract class PropertyType<T extends PropertyType<T>> extends AbstractPr
         @Override
         public JSObject copy() {
             return new JSObject(keyValues);
+        }
+
+        public JSObject add(JSObjectKey key, PropertyType<?> value) {
+            keyValues.put(key, value);
+            return this;
         }
 
         @Override

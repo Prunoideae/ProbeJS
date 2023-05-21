@@ -5,14 +5,13 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.probejs.ProbeJS;
-import com.probejs.formatter.formatter.jdoc.FormatterType;
-import com.probejs.formatter.formatter.jdoc.FormatterValue;
-import com.probejs.info.type.*;
+import com.probejs.compiler.formatter.formatter.jdoc.FormatterType;
+import com.probejs.compiler.formatter.formatter.jdoc.FormatterValue;
 import com.probejs.jdoc.document.*;
+import com.probejs.jdoc.java.type.*;
 import com.probejs.jdoc.property.*;
 import com.probejs.jdoc.property.condition.PropertyMod;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.function.Function;

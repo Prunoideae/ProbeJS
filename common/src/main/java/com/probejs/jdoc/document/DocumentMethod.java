@@ -1,16 +1,13 @@
 package com.probejs.jdoc.document;
 
 import com.google.gson.JsonObject;
-import com.probejs.ProbeJS;
-import com.probejs.info.MethodInfo;
+import com.probejs.jdoc.java.MethodInfo;
 import com.probejs.jdoc.Serde;
 import com.probejs.jdoc.property.PropertyModify;
 import com.probejs.jdoc.property.PropertyParam;
 import com.probejs.jdoc.property.PropertyReturns;
 import com.probejs.jdoc.property.PropertyType;
-import dev.latvian.mods.rhino.util.RemapForJS;
 
-import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;

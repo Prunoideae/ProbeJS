@@ -1,7 +1,7 @@
 package com.probejs.jdoc.document;
 
 import com.google.gson.JsonObject;
-import com.probejs.info.ConstructorInfo;
+import com.probejs.jdoc.java.ConstructorInfo;
 import com.probejs.jdoc.Serde;
 import com.probejs.jdoc.property.PropertyModify;
 import com.probejs.jdoc.property.PropertyParam;

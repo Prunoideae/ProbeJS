@@ -1,13 +1,11 @@
 package com.probejs.jdoc.document;
 
 import com.google.gson.JsonObject;
-import com.probejs.info.FieldInfo;
+import com.probejs.jdoc.java.FieldInfo;
 import com.probejs.jdoc.Serde;
 import com.probejs.jdoc.property.PropertyType;
 import com.probejs.jdoc.property.PropertyValue;
-import dev.latvian.mods.rhino.util.RemapForJS;
 
-import java.lang.annotation.Annotation;
 import java.util.Objects;
 
 public class DocumentField extends AbstractDocument<DocumentField> {

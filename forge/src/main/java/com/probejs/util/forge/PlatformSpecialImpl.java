@@ -1,7 +1,7 @@
 package com.probejs.util.forge;
 
 import com.google.common.collect.BiMap;
-import com.probejs.formatter.formatter.IFormatter;
+import com.probejs.compiler.formatter.formatter.IFormatter;
 import com.probejs.jdoc.document.DocumentClass;
 import com.probejs.util.PlatformSpecial;
 import net.minecraft.resources.ResourceLocation;

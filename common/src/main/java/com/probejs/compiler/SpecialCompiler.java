@@ -1,8 +1,8 @@
 package com.probejs.compiler;
 
 import com.probejs.ProbeCommands;
-import com.probejs.formatter.formatter.*;
-import com.probejs.formatter.formatter.special.*;
+import com.probejs.compiler.formatter.formatter.IFormatter;
+import com.probejs.compiler.formatter.formatter.special.*;
 import com.probejs.util.PlatformSpecial;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;

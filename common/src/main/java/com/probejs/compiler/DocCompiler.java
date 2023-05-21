@@ -1,29 +1,30 @@
 package com.probejs.compiler;
 
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
 import com.google.gson.*;
 import com.google.gson.stream.JsonWriter;
 import com.probejs.ProbeConfig;
 import com.probejs.ProbeJS;
 import com.probejs.ProbePaths;
-import com.probejs.formatter.ClassResolver;
-import com.probejs.formatter.NameResolver;
-import com.probejs.formatter.SpecialTypes;
-import com.probejs.formatter.formatter.FormatterNamespace;
-import com.probejs.formatter.formatter.IFormatter;
-import com.probejs.formatter.formatter.jdoc.FormatterClass;
-import com.probejs.info.Walker;
+import com.probejs.compiler.formatter.ClassResolver;
+import com.probejs.compiler.formatter.NameResolver;
+import com.probejs.compiler.formatter.SpecialTypes;
+import com.probejs.compiler.formatter.formatter.FormatterNamespace;
+import com.probejs.compiler.formatter.formatter.IFormatter;
+import com.probejs.compiler.formatter.formatter.jdoc.FormatterClass;
+import com.probejs.jdoc.java.Walker;
 import com.probejs.jdoc.Manager;
 import com.probejs.jdoc.Serde;
 import com.probejs.jdoc.document.DocumentClass;
 import com.probejs.jdoc.property.PropertyComment;
-import com.probejs.jsgen.DocGenerationEventJS;
-import com.probejs.jsgen.ProbeJSEvents;
-import com.probejs.plugin.CapturedClasses;
+import com.probejs.jdoc.jsgen.DocGenerationEventJS;
 import com.probejs.util.PlatformSpecial;
 import dev.latvian.mods.kubejs.KubeJS;
 import dev.latvian.mods.kubejs.KubeJSPaths;
+import dev.latvian.mods.kubejs.RegistryObjectBuilderTypes;
 import dev.latvian.mods.kubejs.event.EventGroupWrapper;
 import dev.latvian.mods.kubejs.event.EventJS;
 import dev.latvian.mods.kubejs.recipe.RecipeTypeJS;
@@ -38,6 +39,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 public class DocCompiler {
@@ -387,5 +389,24 @@ public class DocCompiler {
             }
         }
         writer.close();
+    }
+
+    public static class CapturedClasses {
+
+        public static Map<String, Class<?>> capturedRawEvents = new ConcurrentHashMap<>();
+        public static Set<Class<?>> capturedJavaClasses = new HashSet<>();
+        public static Set<Class<?>> ignoredEvents = new HashSet<>();
+
+        static {
+            ignoredEvents.add(RegistryObjectBuilderTypes.RegistryEventJS.class);
+        }
+
+        public static Map<String, Class<?>> getCapturedRawEvents() {
+            return ImmutableMap.copyOf(capturedRawEvents);
+        }
+
+        public static Set<Class<?>> getCapturedJavaClasses() {
+            return ImmutableSet.copyOf(capturedJavaClasses);
+        }
     }
 }

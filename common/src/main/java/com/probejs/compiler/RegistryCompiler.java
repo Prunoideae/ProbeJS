@@ -2,9 +2,9 @@ package com.probejs.compiler;
 
 import com.probejs.ProbeJS;
 import com.probejs.ProbePaths;
-import com.probejs.formatter.formatter.FormatterNamespace;
-import com.probejs.formatter.formatter.IFormatter;
-import com.probejs.formatter.formatter.jdoc.FormatterType;
+import com.probejs.compiler.formatter.formatter.FormatterNamespace;
+import com.probejs.compiler.formatter.formatter.IFormatter;
+import com.probejs.compiler.formatter.formatter.jdoc.FormatterType;
 import com.probejs.jdoc.property.PropertyType;
 import com.probejs.util.Util;
 import dev.latvian.mods.kubejs.RegistryObjectBuilderTypes;

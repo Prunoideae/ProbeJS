@@ -1,1 +1,1 @@
-com.probejs.plugin.ProbeJSPlugin
+com.probejs.ProbeJSPlugin

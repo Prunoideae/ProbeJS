@@ -1,12 +1,10 @@
 package com.probejs.jdoc.document;
 
 import com.google.gson.JsonObject;
-import com.probejs.info.ClassInfo;
+import com.probejs.jdoc.java.ClassInfo;
 import com.probejs.jdoc.Serde;
-import com.probejs.jdoc.property.PropertyComment;
 import com.probejs.jdoc.property.PropertyType;
 
-import java.lang.annotation.Annotation;
 import java.util.*;
 
 /**

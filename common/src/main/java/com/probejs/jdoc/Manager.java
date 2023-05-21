@@ -6,7 +6,7 @@ import com.google.gson.JsonObject;
 import com.probejs.ProbeConfig;
 import com.probejs.ProbeJS;
 import com.probejs.ProbePaths;
-import com.probejs.info.ClassInfo;
+import com.probejs.jdoc.java.ClassInfo;
 import com.probejs.jdoc.document.DocumentClass;
 import com.probejs.jdoc.property.AbstractProperty;
 import dev.architectury.platform.Mod;

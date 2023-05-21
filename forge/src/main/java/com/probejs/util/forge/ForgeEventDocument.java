@@ -1,23 +1,21 @@
 package com.probejs.util.forge;
 
 import com.probejs.ProbeJS;
-import com.probejs.info.ClassInfo;
-import com.probejs.info.MethodInfo;
-import com.probejs.info.type.TypeInfoClass;
+import com.probejs.compiler.DocCompiler;
+import com.probejs.jdoc.java.ClassInfo;
+import com.probejs.jdoc.java.MethodInfo;
+import com.probejs.jdoc.java.type.TypeInfoClass;
 import com.probejs.jdoc.document.DocumentClass;
 import com.probejs.jdoc.document.DocumentMethod;
 import com.probejs.jdoc.property.PropertyComment;
 import com.probejs.jdoc.property.PropertyParam;
 import com.probejs.jdoc.property.PropertyType;
-import com.probejs.plugin.CapturedClasses;
 import dev.latvian.mods.kubejs.forge.ForgeEventConsumer;
 import dev.latvian.mods.kubejs.forge.ForgeEventWrapper;
 import dev.latvian.mods.kubejs.forge.GenericForgeEventConsumer;
-import dev.latvian.mods.rhino.JavaMembers;
 import net.minecraftforge.eventbus.api.Cancelable;
 import net.minecraftforge.eventbus.api.Event;
 
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -28,7 +26,7 @@ public class ForgeEventDocument {
         DocumentMethod onGenericEvent = DocumentMethod.fromJava(new MethodInfo(MethodInfo.getMethodInfo(ForgeEventWrapper.class.getMethod("onGenericEvent", Object.class, Object.class, GenericForgeEventConsumer.class), ForgeEventWrapper.class).get(), ForgeEventWrapper.class));
         var consumer = new PropertyType.Clazz();
         consumer.fromJava(new TypeInfoClass(Consumer.class));
-        for (Class<?> clazz : CapturedClasses.capturedRawEvents.values()) {
+        for (Class<?> clazz : DocCompiler.CapturedClasses.capturedRawEvents.values()) {
             ClassInfo info = ClassInfo.getOrCache(clazz);
             DocumentMethod method = (info.getParameters().isEmpty() ? onEvent : onGenericEvent).copy();
             PropertyComment comment = new PropertyComment(

@@ -1,7 +1,7 @@
 package com.probejs.mixins;
 
 import com.google.gson.JsonObject;
-import com.probejs.formatter.formatter.special.FormatterRecipeId;
+import com.probejs.compiler.formatter.formatter.special.FormatterRecipeId;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
