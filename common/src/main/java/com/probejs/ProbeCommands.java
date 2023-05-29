@@ -17,6 +17,7 @@ import com.probejs.jdoc.jsgen.DocGenerationEventJS;
 import com.probejs.jdoc.jsgen.ProbeJSEvents;
 import com.probejs.rich.item.RichItemCompiler;
 import dev.latvian.mods.kubejs.KubeJSPaths;
+import dev.latvian.mods.kubejs.script.ScriptType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -68,7 +69,7 @@ public class ProbeCommands {
                                             SpecialCompiler.specialCompilers.clear();
                                             // Send out js generation event, this should happen before class crawling so probe can resolve everything later
                                             DocGenerationEventJS event = new DocGenerationEventJS();
-                                            ProbeJSEvents.DOC_GEN.post(event);
+                                            ProbeJSEvents.DOC_GEN.post(ScriptType.SERVER, event);
                                             sendMessage.accept("Started generating type files...");
                                             SnippetCompiler.compile(event);
                                             RichItemCompiler.compile();

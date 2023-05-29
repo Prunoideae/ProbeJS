@@ -27,8 +27,9 @@ import dev.latvian.mods.kubejs.KubeJSPaths;
 import dev.latvian.mods.kubejs.RegistryObjectBuilderTypes;
 import dev.latvian.mods.kubejs.event.EventGroupWrapper;
 import dev.latvian.mods.kubejs.event.EventJS;
-import dev.latvian.mods.kubejs.recipe.RecipeTypeJS;
-import dev.latvian.mods.kubejs.recipe.RegisterRecipeTypesEvent;
+import dev.latvian.mods.kubejs.recipe.RecipeJS;
+import dev.latvian.mods.kubejs.recipe.schema.RecipeNamespace;
+import dev.latvian.mods.kubejs.recipe.schema.RecipeSchema;
 import dev.latvian.mods.kubejs.script.ScriptManager;
 import dev.latvian.mods.kubejs.server.ServerScriptManager;
 import dev.latvian.mods.kubejs.util.KubeJSPlugins;
@@ -41,6 +42,7 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class DocCompiler {
 
@@ -138,10 +140,10 @@ public class DocCompiler {
         cacheWriter.close();
     }
 
-    public static Set<Class<?>> fetchClasses(Map<ResourceLocation, RecipeTypeJS> typeMap, DummyBindingEvent bindingEvent, Set<Class<?>> cachedClasses) {
+    public static Set<Class<?>> fetchClasses(Set<Class<?>> typeMap, DummyBindingEvent bindingEvent, Set<Class<?>> cachedClasses) {
         Set<Class<?>> touchableClasses = new HashSet<>(bindingEvent.getClassDumpMap().values());
         touchableClasses.addAll(cachedClasses);
-        touchableClasses.addAll(typeMap.values().stream().map(recipeTypeJS -> recipeTypeJS.factory.get().getClass()).toList());
+        touchableClasses.addAll(typeMap);
         bindingEvent.getConstantDumpMap().values().stream().map(DummyBindingEvent::getConstantClassRecursive).forEach(touchableClasses::addAll);
         touchableClasses.addAll(CapturedClasses.getCapturedRawEvents().values());
         touchableClasses.addAll(CapturedClasses.getCapturedJavaClasses());
@@ -284,10 +286,6 @@ public class DocCompiler {
         DummyBindingEvent bindingEvent = fetchBindings(ServerScriptManager.getScriptManager())
                 .merge(fetchBindings(KubeJS.getClientScriptManager()))
                 .merge(fetchBindings(KubeJS.getStartupScriptManager()));
-        Map<ResourceLocation, RecipeTypeJS> typeMap = new HashMap<>();
-        RegisterRecipeTypesEvent recipeEvent = new RegisterRecipeTypesEvent(typeMap);
-
-        KubeJSPlugins.forEachPlugin(plugin -> plugin.registerRecipeTypes(recipeEvent));
         KubeJSPlugins.forEachPlugin(plugin -> plugin.registerBindings(bindingEvent));
 
         sendMessage.accept("KubeJS plugins reloaded.");
@@ -302,6 +300,13 @@ public class DocCompiler {
         cachedClasses.addAll(RegistryCompiler.getKJSRegistryClasses());
         if (ProbeConfig.INSTANCE.allowRegistryObjectDumps)
             cachedClasses.addAll(SpecialTypes.collectRegistryClasses());
+        Set<Class<?>> typeMap = RecipeNamespace.getAll()
+                .values()
+                .stream()
+                .flatMap(namespace -> namespace.values().stream())
+                // TODO: add type -> recipe mapping once Lat got the new recipe system in
+                .map(type -> RecipeJS.class)
+                .collect(Collectors.toSet());
 
         //Fetch all classes
         sendMessage.accept("Start fetching classes...");
@@ -378,7 +383,6 @@ public class DocCompiler {
             List<NameResolver.ResolvedName> exportedNames = entry.getValue();
             if (exportedNames.size() > 1) {
                 for (int i = 1; i < exportedNames.size(); i++) {
-                    //FIXME: I don't know what went wrong in name resolving but I don't want to fix it later
                     if (NameResolver.resolvedPrimitives.contains(exportedNames.get(i).getLastName()))
                         continue;
                     if (exportedNames.get(0).getLastName().equals("any"))

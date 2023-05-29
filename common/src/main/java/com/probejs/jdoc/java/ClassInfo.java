@@ -49,8 +49,6 @@ public class ClassInfo {
     private final List<ClassInfo> interfaces;
     private final List<Annotation> annotations;
 
-    //TODO: Use JavaMembers
-    //Use Context.getCurrent() to get a context, then JavaMembers.lookupClass to get JavaMembers, then getAccessibleMethods/Fields/Constructors
     private ClassInfo(Class<?> clazz) {
         clazzRaw = clazz;
         name = MethodInfo.getRemappedOrOriginalClass(clazzRaw);

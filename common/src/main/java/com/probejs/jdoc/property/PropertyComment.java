@@ -65,6 +65,11 @@ public class PropertyComment extends AbstractProperty<PropertyComment> {
         return comment;
     }
 
+    public PropertyComment add(String line) {
+        lines.add(line);
+        return this;
+    }
+
     public boolean isEmpty() {
         return lines.isEmpty();
     }

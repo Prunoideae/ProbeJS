@@ -36,6 +36,5 @@ public class DescriptionRegistry {
         register("pattern_key", DescriptionPatternKey::new);
         register("input_item", DescriptionItemInput::new);
         register("output_item", DescriptionItemOutput::new);
-
     }
 }

@@ -3,6 +3,7 @@ package com.probejs.compiler;
 import com.probejs.ProbeCommands;
 import com.probejs.compiler.formatter.formatter.IFormatter;
 import com.probejs.compiler.formatter.formatter.special.*;
+import com.probejs.recipe.FormatterRecipe;
 import com.probejs.util.PlatformSpecial;
 import com.probejs.util.RLHelper;
 import net.minecraft.core.Registry;
@@ -38,6 +39,7 @@ public class SpecialCompiler {
         formatters.add(new FormatterTexture());
         formatters.add(new FormatterModel());
         formatters.addAll(getTagFormatters());
+        formatters.add(FormatterRecipe.formatRecipeNamespaces());
         formatters.addAll(PlatformSpecial.INSTANCE.get().getPlatformFormatters());
         formatters.addAll(specialCompilers);
         return formatters;
