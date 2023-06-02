@@ -56,8 +56,6 @@ public class PropertyComment extends AbstractProperty<PropertyComment> {
 
     @Override
     public PropertyComment merge(PropertyComment other) {
-        if (this == other)
-            return this;
         PropertyComment comment = copy();
         if (!isEmpty())
             comment.lines.add("");

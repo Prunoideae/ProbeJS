@@ -211,6 +211,7 @@ public class NameResolver {
         putResolvedPrimitive(Short.TYPE, "number");
         putResolvedPrimitive(Byte.class, "number");
         putResolvedPrimitive(Byte.TYPE, "number");
+        putResolvedPrimitive(Number.class, "number");
 
         putResolvedPrimitive(Double.class, "number");
         putResolvedPrimitive(Double.TYPE, "number");

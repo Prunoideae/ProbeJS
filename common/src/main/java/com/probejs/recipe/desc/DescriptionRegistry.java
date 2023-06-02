@@ -1,5 +1,6 @@
 package com.probejs.recipe.desc;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.probejs.recipe.desc.impl.*;
 import com.probejs.recipe.desc.impl.simple.DescriptionItemInput;
@@ -17,14 +18,22 @@ public class DescriptionRegistry {
         REGISTRY.put(name, description);
     }
 
-    public static Description getDescription(JsonObject json) {
-        String type = json.get("type").getAsString();
+    public static Description getDescription(JsonElement json) {
+        String type;
+
+        if (json.isJsonPrimitive()) {
+            type = json.getAsString();
+        } else {
+            type = json.getAsJsonObject().get("type").getAsString();
+        }
+
         Supplier<Description> description = REGISTRY.get(type);
         if (description == null) {
             return Description.FALLBACK;
         }
         Description desc = description.get();
-        desc.deserialize(json);
+        if (json.isJsonObject())
+            desc.deserialize(json.getAsJsonObject());
         return desc;
     }
 

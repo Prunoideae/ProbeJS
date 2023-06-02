@@ -3,7 +3,7 @@ package com.probejs.recipe.desc;
 import com.google.gson.JsonObject;
 import com.probejs.jdoc.property.PropertyType;
 
-public abstract class DescriptionTyped<T> extends Description {
+public abstract class SimpleDescription<T> extends Description {
 
     public abstract Class<T> getType();
 

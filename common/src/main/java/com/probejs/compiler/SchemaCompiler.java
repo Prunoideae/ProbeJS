@@ -12,7 +12,7 @@ import com.probejs.util.json.JArray;
 import com.probejs.util.json.JObject;
 import com.probejs.util.json.JPrimitive;
 import dev.architectury.platform.Platform;
-import dev.latvian.mods.kubejs.KubeJSRegistries;
+import dev.latvian.mods.kubejs.registry.KubeJSRegistries;
 import net.minecraft.client.resources.language.ClientLanguage;
 import net.minecraft.core.Registry;
 import net.minecraft.locale.Language;
@@ -104,7 +104,7 @@ public class SchemaCompiler {
         JObject definitions = JObject.create();
         ProbeCommands.COMMAND_LEVEL.registryAccess().registries().forEach(entry -> {
             JObject schema = toRegistryDefinition((ResourceKey<Registry<T>>) entry.key());
-            definitions.add("type%s".formatted(RLHelper.rlToCamel(entry.key().location().getPath())), schema);
+            definitions.add("type%s".formatted(RLHelper.rlToTitle(entry.key().location().getPath())), schema);
         });
         compileSchema("probe.registry-definitions.json", definitions.serialize());
     }

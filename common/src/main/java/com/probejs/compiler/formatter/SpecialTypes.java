@@ -73,7 +73,7 @@ public class SpecialTypes {
 
     public static <T> void assignRegistry(Class<T> clazz, ResourceKey<Registry<T>> registry) {
         SpecialCompiler.specialCompilers.add(new FormatterRegistry<>(registry));
-        NameResolver.putSpecialAssignments(clazz, () -> List.of("Special.%s".formatted(RLHelper.finalComponentToCamel(registry.location().getPath()))));
+        NameResolver.putSpecialAssignments(clazz, () -> List.of("Special.%s".formatted(RLHelper.finalComponentToTitle(registry.location().getPath()))));
     }
 
     private static List<Class<?>> getParentInterfaces(List<Class<?>> putative, Class<?> o) {

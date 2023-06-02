@@ -11,6 +11,7 @@ import com.probejs.jdoc.java.type.*;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public abstract class PropertyType<T extends PropertyType<T>> extends AbstractProperty<T> {
 
@@ -354,7 +355,9 @@ public abstract class PropertyType<T extends PropertyType<T>> extends AbstractPr
         }
 
         public Intersection(List<PropertyType<?>> types) {
-            super(types);
+            super(types.stream()
+                    .flatMap(prop -> prop instanceof Intersection intersection ? intersection.types.stream() : Stream.of(prop))
+                    .collect(Collectors.toList()));
         }
 
         @Override
@@ -373,7 +376,9 @@ public abstract class PropertyType<T extends PropertyType<T>> extends AbstractPr
         }
 
         public Union(List<PropertyType<?>> types) {
-            super(types);
+            super(types.stream()
+                    .flatMap(prop -> prop instanceof Union union ? union.types.stream() : Stream.of(prop))
+                    .collect(Collectors.toList()));
         }
 
         @Override
@@ -611,7 +616,11 @@ public abstract class PropertyType<T extends PropertyType<T>> extends AbstractPr
         }
 
         public JSArray(List<PropertyType<?>> types) {
-            this.types.addAll(types);
+            this.types.addAll(types
+                    .stream()
+                    .flatMap(type -> type instanceof JSArray array ? array.getTypes().stream() : Stream.of(type))
+                    .toList()
+            );
         }
 
         @Override

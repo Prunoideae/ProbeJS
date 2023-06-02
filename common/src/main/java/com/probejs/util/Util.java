@@ -23,7 +23,7 @@ public class Util {
         return s.substring(0, 1).toUpperCase() + s.substring(1);
     }
 
-    public static String snakeToCapitalized(String s) {
+    public static String snakeToTitle(String s) {
         return Arrays.stream(s.split("_")).map(Util::getCapitalized).collect(Collectors.joining());
     }
     

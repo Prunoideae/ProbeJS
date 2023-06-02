@@ -1,19 +1,14 @@
 package com.probejs.recipe.desc.impl.simple;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.probejs.ProbeJS;
 import com.probejs.compiler.formatter.formatter.IFormatter;
-import com.probejs.recipe.desc.DescriptionTyped;
+import com.probejs.recipe.desc.SimpleDescription;
 
 import java.util.List;
+import java.util.stream.Stream;
 
-public class DescriptionString extends DescriptionTyped<String> {
-    @Override
-    public void deserialize(JsonObject json) {
-
-    }
-
+public class DescriptionString extends SimpleDescription<String> {
     @Override
     public Class<String> getType() {
         return String.class;

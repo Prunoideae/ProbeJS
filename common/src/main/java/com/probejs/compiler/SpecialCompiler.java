@@ -4,16 +4,14 @@ import com.probejs.ProbeCommands;
 import com.probejs.compiler.formatter.formatter.IFormatter;
 import com.probejs.compiler.formatter.formatter.special.*;
 import com.probejs.recipe.FormatterRecipe;
+import com.probejs.recipe.component.FormatterRecipeSchema;
 import com.probejs.util.PlatformSpecial;
 import com.probejs.util.RLHelper;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class SpecialCompiler {
     public static final List<IFormatter> specialCompilers = new ArrayList<>();
@@ -23,7 +21,7 @@ public class SpecialCompiler {
         ProbeCommands.COMMAND_LEVEL.registryAccess().registries().forEach(entry -> {
             ResourceKey<?> key = entry.key();
             Registry<?> registry = entry.value();
-            formatters.add(new FormatterTag(RLHelper.finalComponentToCamel(key.location().getPath()) + "Tag", registry));
+            formatters.add(new FormatterTag(RLHelper.finalComponentToTitle(key.location().getPath()) + "Tag", registry));
         });
         return formatters;
     }
@@ -40,6 +38,7 @@ public class SpecialCompiler {
         formatters.add(new FormatterModel());
         formatters.addAll(getTagFormatters());
         formatters.add(FormatterRecipe.formatRecipeNamespaces());
+        formatters.add(FormatterRecipeSchema.formatRecipeClasses());
         formatters.addAll(PlatformSpecial.INSTANCE.get().getPlatformFormatters());
         formatters.addAll(specialCompilers);
         return formatters;

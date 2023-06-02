@@ -45,12 +45,12 @@ public class TagEventCompiler {
             if (registry.location().getNamespace().equals("minecraft")) {
                 lines.add("tags(type: %s, handler: (event: TagEvent.%s) => void): void".formatted(
                         ProbeJS.GSON.toJson(registry.location().getPath()),
-                        RLHelper.finalComponentToCamel(registry.location().getPath())
+                        RLHelper.finalComponentToTitle(registry.location().getPath())
                 ));
             }
             lines.add("tags(type: %s, handler: (event: TagEvent.%s) => void): void".formatted(
                     ProbeJS.GSON.toJson(registry.location().toString()),
-                    RLHelper.finalComponentToCamel(registry.location().getPath())
+                    RLHelper.finalComponentToTitle(registry.location().getPath())
             ));
         });
         return lines;
@@ -66,7 +66,7 @@ public class TagEventCompiler {
         @Override
         public List<String> format(Integer indent, Integer stepIndent) {
             ArrayList<String> formatted = new ArrayList<>();
-            String capitalized = RLHelper.finalComponentToCamel(registry.location().getPath());
+            String capitalized = RLHelper.finalComponentToTitle(registry.location().getPath());
             String specialType = "Special.%s".formatted(capitalized);
             String tagType = specialType + "Tag";
             String wrapperType = Util.formatMaybeParameterized(TagEventJS.TagWrapper.class);

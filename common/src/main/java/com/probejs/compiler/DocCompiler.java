@@ -15,25 +15,24 @@ import com.probejs.compiler.formatter.SpecialTypes;
 import com.probejs.compiler.formatter.formatter.FormatterNamespace;
 import com.probejs.compiler.formatter.formatter.IFormatter;
 import com.probejs.compiler.formatter.formatter.jdoc.FormatterClass;
-import com.probejs.jdoc.java.Walker;
 import com.probejs.jdoc.Manager;
 import com.probejs.jdoc.Serde;
 import com.probejs.jdoc.document.DocumentClass;
-import com.probejs.jdoc.property.PropertyComment;
+import com.probejs.jdoc.java.Walker;
 import com.probejs.jdoc.jsgen.DocGenerationEventJS;
+import com.probejs.jdoc.property.PropertyComment;
+import com.probejs.recipe.component.FormatterRecipeSchema;
 import com.probejs.util.PlatformSpecial;
 import dev.latvian.mods.kubejs.KubeJS;
 import dev.latvian.mods.kubejs.KubeJSPaths;
-import dev.latvian.mods.kubejs.RegistryObjectBuilderTypes;
 import dev.latvian.mods.kubejs.event.EventGroupWrapper;
 import dev.latvian.mods.kubejs.event.EventJS;
 import dev.latvian.mods.kubejs.recipe.RecipeJS;
 import dev.latvian.mods.kubejs.recipe.schema.RecipeNamespace;
-import dev.latvian.mods.kubejs.recipe.schema.RecipeSchema;
+import dev.latvian.mods.kubejs.registry.RegistryEventJS;
 import dev.latvian.mods.kubejs.script.ScriptManager;
 import dev.latvian.mods.kubejs.server.ServerScriptManager;
 import dev.latvian.mods.kubejs.util.KubeJSPlugins;
-import net.minecraft.resources.ResourceLocation;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -400,11 +399,6 @@ public class DocCompiler {
 
         public static Map<String, Class<?>> capturedRawEvents = new ConcurrentHashMap<>();
         public static Set<Class<?>> capturedJavaClasses = new HashSet<>();
-        public static Set<Class<?>> ignoredEvents = new HashSet<>();
-
-        static {
-            ignoredEvents.add(RegistryObjectBuilderTypes.RegistryEventJS.class);
-        }
 
         public static Map<String, Class<?>> getCapturedRawEvents() {
             return ImmutableMap.copyOf(capturedRawEvents);

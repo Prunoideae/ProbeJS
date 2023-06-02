@@ -3,13 +3,11 @@ package com.probejs.recipe.desc.impl.simple;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.probejs.compiler.formatter.formatter.IFormatter;
-import com.probejs.jdoc.property.PropertyType;
-import com.probejs.recipe.desc.Description;
-import com.probejs.recipe.desc.DescriptionTyped;
+import com.probejs.recipe.desc.SimpleDescription;
 
 import java.util.List;
 
-public class DescriptionBoolean extends DescriptionTyped<Boolean> {
+public class DescriptionBoolean extends SimpleDescription<Boolean> {
     @Override
     public Class<Boolean> getType() {
         return Boolean.class;

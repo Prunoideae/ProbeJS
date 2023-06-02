@@ -9,6 +9,7 @@ import com.probejs.jdoc.property.PropertyType;
 import com.probejs.recipe.desc.Description;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 public class DescriptionNumber extends Description {
     String numberType = "int";
