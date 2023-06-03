@@ -39,6 +39,7 @@ public class SpecialCompiler {
         formatters.addAll(getTagFormatters());
         formatters.add(FormatterRecipe.formatRecipeNamespaces());
         formatters.add(FormatterRecipeSchema.formatRecipeClasses());
+        formatters.add((i, d) -> List.of("%stype ArrayOrSelf<T> = T[] | T".formatted(" ".repeat(i))));
         formatters.addAll(PlatformSpecial.INSTANCE.get().getPlatformFormatters());
         formatters.addAll(specialCompilers);
         return formatters;

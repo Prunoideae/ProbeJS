@@ -192,6 +192,8 @@ public abstract class FormatterType<T extends PropertyType<T>> extends DocumentF
                 return formatterMethod.apply(params.get(0));
             }
             String baseString = formatterMethod.apply(base);
+            if (base instanceof FormatterType.Joint<?>)
+                baseString = "(%s)".formatted(baseString);
             return !baseString.equals("any") ? "%s<%s>".formatted(
                     baseString,
                     params.stream().map(formatterMethod).collect(Collectors.joining(", "))

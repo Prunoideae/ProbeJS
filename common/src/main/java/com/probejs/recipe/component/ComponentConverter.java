@@ -1,47 +1,46 @@
 package com.probejs.recipe.component;
 
 import com.probejs.jdoc.property.PropertyType;
-import dev.latvian.mods.kubejs.recipe.component.*;
+import dev.latvian.mods.kubejs.typings.desc.*;
+import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.List;
-import java.util.Map;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 public class ComponentConverter {
-    public static PropertyType<?> fromComponent(RecipeComponent<?> component) {
-        if (component instanceof ArrayRecipeComponent<?> array) {
-            if (array.canWriteSelf())
-                return new PropertyType.Union(List.of(
-                        new PropertyType.Array(fromComponent(array.component())),
-                        fromComponent(array.component())
-                ));
-            else {
-                return new PropertyType.Array(fromComponent(array.component()));
-            }
-        }
-
-        if (component instanceof OrRecipeComponent<?, ?> or) {
-            return new PropertyType.Union(List.of(
-                    fromComponent(or.high()),
-                    fromComponent(or.low()))
-            );
-        } else if (component instanceof AndRecipeComponent<?, ?> and) {
-            return new PropertyType.JSArray(List.of(
-                    fromComponent(and.a()),
-                    fromComponent(and.b()))
-            );
-        }
-
-        if (component instanceof MapRecipeComponent<?, ?> map) {
+    public static PropertyType<?> fromDescription(TypeDescJS description) {
+        if (description instanceof ArrayDescJS array) {
+            return new PropertyType.Array(fromDescription(array.type()));
+        } else if (description instanceof FixedArrayDescJS fixedArray) {
+            return new PropertyType.JSArray(Arrays.stream(fixedArray.types()).map(ComponentConverter::fromDescription).collect(Collectors.toList()));
+        } else if (description instanceof GenericDescJS parameterized) {
             return new PropertyType.Parameterized(
-                    new PropertyType.Clazz(Map.class),
-                    List.of(
-                            fromComponent(map.key()),
-                            fromComponent(map.component())
-                    )
+                    fromDescription(parameterized.type()),
+                    Arrays.stream(parameterized.types())
+                            .map(ComponentConverter::fromDescription)
+                            .collect(Collectors.toList())
             );
+        } else if (description instanceof ObjectDescJS object) {
+            return new PropertyType.JSObject(
+                    object.types().stream()
+                            .map(pair -> Pair.of(
+                                    new PropertyType.JSObjectKey().withName(pair.getLeft()),
+                                    fromDescription(pair.getRight())
+                            ))
+                            .collect(Collectors.toMap(Pair::getLeft, Pair::getRight))
+            );
+        } else if (description instanceof OrDescJS or) {
+            return new PropertyType.Union(
+                    Arrays.stream(or.types())
+                            .map(ComponentConverter::fromDescription)
+                            .collect(Collectors.toList())
+            );
+        } else if (description instanceof PrimitiveDescJS primitive) {
+            String name = primitive.type();
+            return name.contains(".") ? new PropertyType.Clazz(name) : new PropertyType.Native(name);
+        } else {
+            return new PropertyType.Clazz(Object.class);
         }
-
-        return new PropertyType.Clazz(component.componentClass());
     }
 
 }
