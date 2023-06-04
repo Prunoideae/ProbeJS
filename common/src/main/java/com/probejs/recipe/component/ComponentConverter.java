@@ -37,6 +37,8 @@ public class ComponentConverter {
             );
         } else if (description instanceof PrimitiveDescJS primitive) {
             String name = primitive.type();
+            if (name.equals("null")) // return any here because we don't know what to do with null
+                return new PropertyType.Clazz(Object.class);
             return name.contains(".") ? new PropertyType.Clazz(name) : new PropertyType.Native(name);
         } else {
             return new PropertyType.Clazz(Object.class);
