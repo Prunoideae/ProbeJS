@@ -90,7 +90,7 @@ public class FormatterClass extends DocumentFormatter<DocumentClass> {
         document.getConstructors().stream().map(DocumentConstructor::applyProperties).forEach(constructor -> lines.addAll(new FormatterConstructor(constructor).format(indent + stepIndent, stepIndent)));
         document.getMethods().stream().map(DocumentMethod::applyProperties).forEach(method -> lines.addAll(new FormatterMethod(method, document).format(indent + stepIndent, stepIndent)));
         document.getMethods().stream().map(DocumentMethod::applyProperties).map(method -> new FormatterMethod(method, document)).map(FormatterMethod::getBeanFormatter).filter(Optional::isPresent).map(Optional::get).forEach(formatter -> lines.addAll(formatter.format(indent + stepIndent, stepIndent)));
-        document.getFields().stream().map(DocumentField::applyProperties).forEach(field -> lines.addAll(new FormatterField(field).format(indent + stepIndent, stepIndent)));
+        document.getFields().stream().map(DocumentField::applyProperties).forEach(field -> lines.addAll(new FormatterField(field).setInterface(document.isInterface()).format(indent + stepIndent, stepIndent)));
         lines.add(Util.indent(indent) + "}");
         Set<String> typesAssignable = new HashSet<>();
         String typeName = NameResolver.getResolvedName(document.getName()).getLastName();

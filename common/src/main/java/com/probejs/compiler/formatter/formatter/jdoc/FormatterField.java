@@ -11,8 +11,15 @@ import java.util.List;
 
 public class FormatterField extends DocumentFormatter<DocumentField> {
 
+    private boolean isInterface = false;
+
     public FormatterField(DocumentField document) {
         super(document);
+    }
+
+    public FormatterField setInterface(boolean anInterface) {
+        isInterface = anInterface;
+        return this;
     }
 
     public boolean shouldFormatValue() {
@@ -30,7 +37,7 @@ public class FormatterField extends DocumentFormatter<DocumentField> {
         List<String> modifiers = new ArrayList<>();
         if (document.isFinal())
             modifiers.add("readonly");
-        if (document.isStatic())
+        if (document.isStatic() && !this.isInterface) // TS interfaces don't support static fields
             modifiers.add("static");
         return List.of(Util.indent(indent) + "%s%s: %s;".formatted(
                 modifiers.isEmpty() ? "" : String.join(" ", modifiers) + " ",
