@@ -313,7 +313,8 @@ public class DocCompiler {
         sendMessage.accept("Classes fetched.");
         globalClasses.removeIf(c -> ClassResolver.skipped.contains(c));
         bindingEvent.getClassDumpMap().forEach((s, c) -> NameResolver.putResolvedName(c, s));
-        SpecialTypes.processFunctionalInterfaces(globalClasses);
+        // Deprecated since hybrid type is a thing in TypeScript
+        // SpecialTypes.processFunctionalInterfaces(globalClasses);
         SpecialTypes.processEnums(globalClasses);
         sendMessage.accept("Special types processed.");
 

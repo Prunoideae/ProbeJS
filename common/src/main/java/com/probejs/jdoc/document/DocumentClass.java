@@ -23,6 +23,7 @@ public class DocumentClass extends AbstractDocument<DocumentClass> {
 
     protected boolean isAbstract = false;
     protected boolean isInterface = false;
+    protected boolean isFunctionalInterface = false;
 
     @Override
     public JsonObject serialize() {
@@ -56,6 +57,7 @@ public class DocumentClass extends AbstractDocument<DocumentClass> {
         document.name = info.getName();
         document.isAbstract = info.isAbstract();
         document.isInterface = info.isInterface();
+        document.isFunctionalInterface = document.isInterface && info.getAnnotations().stream().anyMatch(ann -> ann instanceof FunctionalInterface);
         document.parent = info.getSuperClass() != null ? Serde.deserializeFromJavaType(info.getSuperClassType()) : null;
         document.interfaces.addAll(info.getInterfaceTypes().stream().map(Serde::deserializeFromJavaType).toList());
         document.generics.addAll(info.getParameters().stream().map(Serde::deserializeFromJavaType).toList());
@@ -160,6 +162,10 @@ public class DocumentClass extends AbstractDocument<DocumentClass> {
 
     public boolean isInterface() {
         return isInterface;
+    }
+
+    public boolean isFunctionalInterface() {
+        return isFunctionalInterface;
     }
 
     public void setAbstract(boolean anAbstract) {

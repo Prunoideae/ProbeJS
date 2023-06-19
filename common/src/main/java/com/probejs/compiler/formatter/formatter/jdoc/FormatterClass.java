@@ -9,6 +9,7 @@ import com.probejs.jdoc.document.DocumentClass;
 import com.probejs.jdoc.document.DocumentConstructor;
 import com.probejs.jdoc.document.DocumentField;
 import com.probejs.jdoc.document.DocumentMethod;
+import com.probejs.jdoc.java.ClassInfo;
 import com.probejs.jdoc.property.PropertyAssign;
 import com.probejs.jdoc.property.PropertyType;
 import com.probejs.util.Util;
@@ -90,6 +91,29 @@ public class FormatterClass extends DocumentFormatter<DocumentClass> {
         document.getConstructors().stream().map(DocumentConstructor::applyProperties).forEach(constructor -> lines.addAll(new FormatterConstructor(constructor).format(indent + stepIndent, stepIndent)));
         document.getMethods().stream().map(DocumentMethod::applyProperties).forEach(method -> lines.addAll(new FormatterMethod(method, document).format(indent + stepIndent, stepIndent)));
         document.getMethods().stream().map(DocumentMethod::applyProperties).map(method -> new FormatterMethod(method, document)).map(FormatterMethod::getBeanFormatter).filter(Optional::isPresent).map(Optional::get).forEach(formatter -> lines.addAll(formatter.format(indent + stepIndent, stepIndent)));
+
+        /* hybrid type only accepts one abstract method on top of the interface
+         * we assume that any sub interface will not break the abstract method of parent interface
+         * meaning that following interface is not allowed:
+         *
+         * @FunctionalInterface
+         * interface Sus extends Function<DocumentClass, IFormatter> {
+         *     @Override
+         *     default IFormatter apply(DocumentClass documentClass) {
+         *       return foo() ? null : (foo, bar) -> List.of();
+         *     }
+         *
+         *     boolean foo();
+         * }
+         */
+        if (document.isFunctionalInterface()) {
+            // Still need to check if there is only one abstract method in case of people going insane
+            if (document.methods.stream().filter(method -> method.isAbstract).count() == 1) {
+                FormatterMethod hybridFormatter = new FormatterMethod(document.methods.stream().filter(method -> method.isAbstract).findFirst().get(), document);
+                lines.add("%s%s;".formatted(" ".repeat(indent + stepIndent), hybridFormatter.formatMethodParts()));
+            }
+        }
+
         document.getFields().stream().map(DocumentField::applyProperties).forEach(field -> lines.addAll(new FormatterField(field).setInterface(document.isInterface()).format(indent + stepIndent, stepIndent)));
         lines.add(Util.indent(indent) + "}");
         Set<String> typesAssignable = new HashSet<>();

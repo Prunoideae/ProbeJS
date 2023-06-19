@@ -46,16 +46,23 @@ public class FormatterMethod extends DocumentFormatter<DocumentMethod> {
 
     @Override
     public List<String> formatDocument(Integer indent, Integer stepIndent) {
-        return List.of(Util.indent(indent) + "%s%s%s(%s): %s;".formatted(
+        return List.of(Util.indent(indent) + "%s%s%s%s;".formatted(
                 document.isStatic() ? "static " : "",
                 Util.getSafeName(document.getName()),
-                document.getVariables().isEmpty()?"":"<%s>".formatted(document.getVariables().stream().map(Serde::getTypeFormatter).map(IFormatter::formatMethodVariable).collect(Collectors.joining(", "))),
+                document.getVariables().isEmpty() ? "" : "<%s>".formatted(document.getVariables().stream().map(Serde::getTypeFormatter).map(IFormatter::formatMethodVariable).collect(Collectors.joining(", "))),
+                formatMethodParts()
+        ));
+    }
+
+    public String formatMethodParts() {
+        return "(%s): %s".formatted(
                 document.getParams().stream()
                         .map(FormatterParam::new)
                         .map(FormatterParam::underscored)
                         .map(IFormatter::formatParamVariable)
                         .collect(Collectors.joining(", ")),
-                isReturningThis() ? "this" : Serde.getTypeFormatter(document.getReturns()).formatParamVariable()));
+                isReturningThis() ? "this" : Serde.getTypeFormatter(document.getReturns()).formatParamVariable()
+        );
     }
 
     public Optional<FormatterBean> getBeanFormatter() {
