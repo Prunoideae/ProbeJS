@@ -1,10 +1,12 @@
 package com.probejs.jdoc.document;
 
 import com.google.gson.JsonObject;
+import com.probejs.jdoc.JsAnnotations;
 import com.probejs.jdoc.java.FieldInfo;
 import com.probejs.jdoc.Serde;
 import com.probejs.jdoc.property.PropertyType;
 import com.probejs.jdoc.property.PropertyValue;
+import dev.latvian.mods.kubejs.typings.JsInfo;
 
 import java.util.Objects;
 
@@ -56,6 +58,11 @@ public class DocumentField extends AbstractDocument<DocumentField> {
                 document.builtinComments.add("This field is marked to be removed in future!");
             }
         });
+
+        info.getAnnotations().stream().filter(annotation -> annotation instanceof JsInfo).findFirst().ifPresent(annotation -> {
+            document.builtinComments.merge(JsAnnotations.fromAnnotation((JsInfo) annotation));
+        });
+
         return document;
     }
 

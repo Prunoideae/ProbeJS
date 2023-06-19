@@ -42,7 +42,7 @@ public abstract class AbstractDocument<T extends AbstractDocument<T>> implements
      * <p>
      * Built-in comments will always appear at the end of the comment.
      */
-    protected List<String> builtinComments = new ArrayList<>();
+    protected PropertyComment builtinComments = new PropertyComment();
 
     /**
      * Apply properties modification to current document.
@@ -125,7 +125,7 @@ public abstract class AbstractDocument<T extends AbstractDocument<T>> implements
         for (PropertyComment partialComment : findPropertiesOf(PropertyComment.class)) {
             comment = comment.merge(partialComment);
         }
-        comment = comment.merge(new PropertyComment(builtinComments.toArray(String[]::new)));
+        comment = comment.merge(builtinComments);
         return comment;
     }
 }

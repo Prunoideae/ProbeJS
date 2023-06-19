@@ -7,7 +7,6 @@ import com.probejs.jdoc.property.PropertyType;
 import com.probejs.jdoc.property.PropertyValue;
 import dev.latvian.mods.kubejs.recipe.RecipeKey;
 import dev.latvian.mods.kubejs.recipe.schema.RecipeSchemaType;
-import dev.latvian.mods.kubejs.typings.desc.DescriptionContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +23,7 @@ public class FormatterRecipeKey implements IFormatter {
     public List<IFormatter> getBuilders() {
         return key.names.stream().map(
                 name -> (IFormatter) (indent, stepIndent) -> List.of(
-                        "%s(%s: %s): this".formatted(name, name, Serde.getTypeFormatter(ComponentConverter.fromDescription(key.component.constructorDescription(DescriptionContext.DEFAULT)))
+                        "%s(%s: %s): this".formatted(name, name, Serde.getTypeFormatter(ComponentConverter.fromDescription(key.component.constructorDescription(ComponentConverter.PROBEJS_CONTEXT)))
                                 .formatFirst())
                 )
         ).collect(Collectors.toList());
@@ -48,7 +47,7 @@ public class FormatterRecipeKey implements IFormatter {
     @Override
     public List<String> format(Integer indent, Integer stepIndent) {
         String name = key.preferred;
-        PropertyType<?> type = ComponentConverter.fromDescription(key.component.constructorDescription(DescriptionContext.DEFAULT));
+        PropertyType<?> type = ComponentConverter.fromDescription(key.component.constructorDescription(ComponentConverter.PROBEJS_CONTEXT));
 
         if (key.optional != null)
             name += "?";

@@ -1,9 +1,11 @@
 package com.probejs.jdoc.document;
 
 import com.google.gson.JsonObject;
+import com.probejs.jdoc.JsAnnotations;
 import com.probejs.jdoc.java.ClassInfo;
 import com.probejs.jdoc.Serde;
 import com.probejs.jdoc.property.PropertyType;
+import dev.latvian.mods.kubejs.typings.JsInfo;
 
 import java.util.*;
 
@@ -66,6 +68,9 @@ public class DocumentClass extends AbstractDocument<DocumentClass> {
                 document.builtinComments.add("This class is marked to be removed in future!");
             }
         });
+        info.getAnnotations().stream().filter(annotation -> annotation instanceof JsInfo).findFirst().ifPresent(annotation -> {
+            document.builtinComments.merge(JsAnnotations.fromAnnotation((JsInfo) annotation));
+        });
         return document;
     }
 
@@ -89,7 +94,7 @@ public class DocumentClass extends AbstractDocument<DocumentClass> {
         document.generics.addAll(generics);
         document.isInterface = isInterface;
         document.isAbstract = isAbstract;
-        document.builtinComments.addAll(builtinComments);
+        document.builtinComments.merge(builtinComments);
         return document;
     }
 
@@ -104,7 +109,7 @@ public class DocumentClass extends AbstractDocument<DocumentClass> {
         document.properties.addAll(properties);
         document.methods.addAll(methods);
         document.fields.addAll(fields);
-        document.builtinComments.addAll(builtinComments);
+        document.builtinComments.merge(builtinComments);
         return document;
     }
 
@@ -168,7 +173,7 @@ public class DocumentClass extends AbstractDocument<DocumentClass> {
     public void setName(String name) {
         this.name = name;
     }
-    
+
     public void setParent(PropertyType<?> parent) {
         this.parent = parent;
     }

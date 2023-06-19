@@ -39,10 +39,22 @@ public class ComponentConverter {
             String name = primitive.type();
             if (name.equals("null")) // return any here because we don't know what to do with null
                 return new PropertyType.Clazz(Object.class);
-            return name.contains(".") ? new PropertyType.Clazz(name) : new PropertyType.Native(name);
+            if (name.startsWith("$probejs$")) {
+                name = name.substring(9);
+                return new PropertyType.Clazz(name);
+            } else {
+                return new PropertyType.Native(name);
+            }
         } else {
             return new PropertyType.Clazz(Object.class);
         }
     }
 
+    // Prefixes the class name with "$probejs$" to avoid conflicts with other types
+    public static DescriptionContext PROBEJS_CONTEXT = new DescriptionContext() {
+        @Override
+        public String typeName(Class<?> type) {
+            return "$probejs$%s".formatted(type.getName());
+        }
+    };
 }

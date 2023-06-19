@@ -1,12 +1,14 @@
 package com.probejs.jdoc.document;
 
 import com.google.gson.JsonObject;
+import com.probejs.jdoc.JsAnnotations;
 import com.probejs.jdoc.java.MethodInfo;
 import com.probejs.jdoc.Serde;
 import com.probejs.jdoc.property.PropertyModify;
 import com.probejs.jdoc.property.PropertyParam;
 import com.probejs.jdoc.property.PropertyReturns;
 import com.probejs.jdoc.property.PropertyType;
+import dev.latvian.mods.kubejs.typings.JsInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,6 +63,10 @@ public class DocumentMethod extends AbstractDocument<DocumentMethod> {
             if (((Deprecated) annotation).forRemoval()) {
                 document.builtinComments.add("This method is marked to be removed in future!");
             }
+        });
+
+        info.getAnnotations().stream().filter(annotation -> annotation instanceof JsInfo).findFirst().ifPresent(annotation -> {
+            document.builtinComments.merge(JsAnnotations.fromAnnotation((JsInfo) annotation, true));
         });
 
         info.getTypeVariables().stream()
