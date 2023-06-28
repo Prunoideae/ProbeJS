@@ -38,7 +38,7 @@ public class FormatterRecipe implements IFormatter {
 
         ArrayList<String> lines = new ArrayList<>();
 
-        lines.add("%s %s: {".formatted(" ".repeat(indent), name));
+        lines.add("%s%s: {".formatted(" ".repeat(indent), name));
         for (Map.Entry<String, RecipeSchemaType> entry : namespace.entrySet()) {
             String recipeName = entry.getKey();
             RecipeSchemaType recipe = entry.getValue();
