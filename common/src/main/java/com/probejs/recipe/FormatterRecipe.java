@@ -67,7 +67,7 @@ public class FormatterRecipe implements IFormatter {
     public static IFormatter formatRecipeNamespaces() {
         return (indent, stepIndent) -> {
             ArrayList<String> lines = new ArrayList<>();
-            lines.add("%s class DocumentedRecipes {".formatted(" ".repeat(indent)));
+            lines.add("%sclass DocumentedRecipes {".formatted(" ".repeat(indent)));
             for (Map.Entry<String, RecipeNamespace> entry : RecipeNamespace.getAll().entrySet()) {
                 String name = entry.getKey();
                 RecipeNamespace namespace = entry.getValue();
