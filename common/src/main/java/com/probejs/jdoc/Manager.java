@@ -26,8 +26,8 @@ import java.util.zip.ZipInputStream;
 public class Manager {
     private static boolean docsDownloaded = false;
 
-    private static final String TIMESTAMP_API = "https://static.wolfgirl.moe/api/timestamp?path=probejs/docs-1.19.2.zip";
-    private static final String DOWNLOAD_API = "https://static.wolfgirl.moe/object-service/checked/probejs/docs-1.19.2.zip?timestamp=%s";
+    private static final String TIMESTAMP_API = "https://static.wolfgirl.moe/api/timestamp?path=probejs/docs-1.19.2-6.1.zip";
+    private static final String DOWNLOAD_API = "https://static.wolfgirl.moe/object-service/checked/probejs/docs-1.19.2-6.1.zip?timestamp=%s";
 
     public static void downloadDocs() throws IOException {
         if (docsDownloaded) return;

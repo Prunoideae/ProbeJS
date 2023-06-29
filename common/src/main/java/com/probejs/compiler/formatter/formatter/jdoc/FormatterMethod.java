@@ -54,6 +54,11 @@ public class FormatterMethod extends DocumentFormatter<DocumentMethod> {
         ));
     }
 
+    /**
+     * Format only the parameters and return type of the method, without the name and generics.
+     *
+     * @return the formatted string
+     */
     public String formatMethodParts() {
         return "(%s): %s".formatted(
                 document.getParams().stream()

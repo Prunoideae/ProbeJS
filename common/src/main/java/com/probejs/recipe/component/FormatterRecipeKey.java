@@ -1,5 +1,6 @@
 package com.probejs.recipe.component;
 
+import com.probejs.compiler.formatter.SpecialTypes;
 import com.probejs.compiler.formatter.formatter.IFormatter;
 import com.probejs.jdoc.Serde;
 import com.probejs.jdoc.property.PropertyComment;
@@ -33,9 +34,9 @@ public class FormatterRecipeKey implements IFormatter {
         PropertyComment comment = new PropertyComment();
         List<String> hints = new ArrayList<>();
         if (key.optional != null) {
-            PropertyValue<?, ?> defaultValue = Serde.getValueProperty(key.optional.getDefaultValue(type));
-            if (!(defaultValue instanceof PropertyValue.FallbackValue)) {
-                hints.add("default: %s".formatted(Objects.requireNonNull(Serde.getValueFormatter(defaultValue)).formatFirst()));
+            PropertyValue<?, ?> formatter = Serde.getValueProperty(key.optional.getDefaultValue(type));
+            if (!(formatter instanceof PropertyValue.FallbackValue)) {
+                hints.add("defaults to `%s`".formatted(Objects.requireNonNull(Serde.getValueFormatter(formatter)).formatFirst()));
             }
         }
 

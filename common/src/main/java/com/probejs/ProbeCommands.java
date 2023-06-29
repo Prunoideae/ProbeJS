@@ -37,7 +37,6 @@ import java.util.function.Consumer;
 
 public class ProbeCommands {
     public static ServerLevel COMMAND_LEVEL = null;
-    public static boolean isRunning = false;
     public static Thread runningThread = null;
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
