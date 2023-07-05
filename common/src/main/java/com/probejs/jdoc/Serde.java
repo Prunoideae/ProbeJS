@@ -44,10 +44,10 @@ public class Serde {
         AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyUnderscored.class, "property:underscored");
 
         //Documents
-        AbstractDocument.DOCUMENT_TYPE_REGISTRY.put(DocumentClass.class, "document:class");
-        AbstractDocument.DOCUMENT_TYPE_REGISTRY.put(DocumentMethod.class, "document:method");
-        AbstractDocument.DOCUMENT_TYPE_REGISTRY.put(DocumentField.class, "document:field");
-        AbstractDocument.DOCUMENT_TYPE_REGISTRY.put(DocumentConstructor.class, "document:constructor");
+        AbstractDocumentBase.DOCUMENT_TYPE_REGISTRY.put(DocumentClass.class, "document:class");
+        AbstractDocumentBase.DOCUMENT_TYPE_REGISTRY.put(DocumentMethod.class, "document:method");
+        AbstractDocumentBase.DOCUMENT_TYPE_REGISTRY.put(DocumentField.class, "document:field");
+        AbstractDocumentBase.DOCUMENT_TYPE_REGISTRY.put(DocumentConstructor.class, "document:constructor");
 
         //Values
         AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyValue.NumberValue.class, "value:number");
@@ -65,10 +65,10 @@ public class Serde {
         FormatterType.init();
     }
 
-    public static AbstractDocument<?> deserializeDocument(JsonObject obj) {
+    public static AbstractDocumentBase<?> deserializeDocument(JsonObject obj) {
         String type = obj.get("type").getAsString();
         try {
-            AbstractDocument<?> doc = AbstractDocument.DOCUMENT_TYPE_REGISTRY.inverse().get(type).getDeclaredConstructor().newInstance();
+            AbstractDocumentBase<?> doc = AbstractDocumentBase.DOCUMENT_TYPE_REGISTRY.inverse().get(type).getDeclaredConstructor().newInstance();
             doc.deserialize(obj);
             return doc;
         } catch (Exception e) {
@@ -137,7 +137,7 @@ public class Serde {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends AbstractDocument<?>> void deserializeDocuments(Collection<T> serdes, JsonElement jsonArray) {
+    public static <T extends AbstractDocumentBase<?>> void deserializeDocuments(Collection<T> serdes, JsonElement jsonArray) {
         if (jsonArray == null || serdes == null)
             return;
         for (JsonElement element : jsonArray.getAsJsonArray()) {

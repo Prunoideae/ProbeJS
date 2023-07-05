@@ -1,12 +1,13 @@
 package com.probejs.recipe;
 
+import com.probejs.ProbeJS;
 import com.probejs.compiler.formatter.formatter.IFormatter;
 import com.probejs.jdoc.property.PropertyComment;
 import com.probejs.recipe.component.FormatterRecipeKey;
 import com.probejs.util.Util;
-import dev.latvian.mods.kubejs.recipe.schema.RecipeConstructor;
-import dev.latvian.mods.kubejs.recipe.schema.RecipeNamespace;
-import dev.latvian.mods.kubejs.recipe.schema.RecipeSchemaType;
+import dev.latvian.mods.kubejs.recipe.RecipeJS;
+import dev.latvian.mods.kubejs.recipe.schema.*;
+import dev.latvian.mods.kubejs.recipe.schema.minecraft.SpecialRecipeSchema;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -42,21 +43,31 @@ public class FormatterRecipe implements IFormatter {
         for (Map.Entry<String, RecipeSchemaType> entry : namespace.entrySet()) {
             String recipeName = entry.getKey();
             RecipeSchemaType recipe = entry.getValue();
+            if (recipe.schema == SpecialRecipeSchema.SCHEMA)
+                continue;
+            if (recipe.schema == JsonRecipeSchema.SCHEMA)
+                continue;
             for (RecipeConstructor recipeConstructor : recipe.schema.constructors().values()) {
-                PropertyComment comments = new PropertyComment();
+                List<PropertyComment> comments = new ArrayList<>();
                 String method = "%s%s(%s):%s".formatted(
                         " ".repeat(indent + stepIndent),
                         recipeName,
                         Arrays.stream(recipeConstructor.keys())
                                 .filter(key -> !key.excluded)
                                 .map(FormatterRecipeKey::new)
-                                .peek(key -> comments.merge(key.getComments(recipe)))
+                                .peek(key -> comments.add(key.getComments(recipe)))
                                 .map(IFormatter::formatFirst)
                                 .collect(Collectors.joining(", ")),
                         "Special.Recipes.%s".formatted(Util.snakeToTitle(recipeName))
                 );
-                if (!comments.isEmpty())
-                    lines.addAll(comments.formatLines(indent + stepIndent));
+                List<String> paramLines = new ArrayList<>();
+                for (PropertyComment comment : comments) {
+                    paramLines.addAll(comment.getLines());
+                }
+                if (!paramLines.isEmpty()) {
+                    PropertyComment params = new PropertyComment(paramLines.toArray(new String[0]));
+                    lines.addAll(params.formatLines(indent + stepIndent));
+                }
                 lines.add(method);
             }
         }

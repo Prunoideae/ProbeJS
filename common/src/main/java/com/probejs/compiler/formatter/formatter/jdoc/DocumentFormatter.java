@@ -2,12 +2,13 @@ package com.probejs.compiler.formatter.formatter.jdoc;
 
 import com.probejs.compiler.formatter.formatter.IFormatter;
 import com.probejs.jdoc.document.AbstractDocument;
+import com.probejs.jdoc.document.AbstractDocumentBase;
 import com.probejs.jdoc.property.PropertyComment;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class DocumentFormatter<T extends AbstractDocument<T>> implements IFormatter {
+public abstract class DocumentFormatter<T extends AbstractDocumentBase<T>> implements IFormatter {
     protected final T document;
 
     public DocumentFormatter(T document) {
@@ -30,7 +31,8 @@ public abstract class DocumentFormatter<T extends AbstractDocument<T>> implement
         if (document.isHidden() && canHide())
             return List.of();
         List<String> lines = new ArrayList<>();
-        PropertyComment comments = document.getMergedComment();
+
+        PropertyComment comments = (document instanceof AbstractDocument<?> doc) ? doc.getMergedComment() : new PropertyComment();
         if (!comments.isEmpty() && hasComment()) {
             lines.addAll(comments.formatLines(indent));
         }

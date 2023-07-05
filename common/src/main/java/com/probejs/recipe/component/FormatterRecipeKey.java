@@ -1,5 +1,6 @@
 package com.probejs.recipe.component;
 
+import com.probejs.ProbeJS;
 import com.probejs.compiler.formatter.SpecialTypes;
 import com.probejs.compiler.formatter.formatter.IFormatter;
 import com.probejs.jdoc.Serde;
@@ -24,8 +25,10 @@ public class FormatterRecipeKey implements IFormatter {
     public List<IFormatter> getBuilders() {
         return key.names.stream().map(
                 name -> (IFormatter) (indent, stepIndent) -> List.of(
-                        "%s(%s: %s): this".formatted(name, name, Serde.getTypeFormatter(ComponentConverter.fromDescription(key.component.constructorDescription(ComponentConverter.PROBEJS_CONTEXT)))
-                                .formatFirst())
+                        "%s(%s: %s): this".formatted(name, name,
+                                Serde.getTypeFormatter(ComponentConverter.fromDescription(key.component.constructorDescription(ComponentConverter.PROBEJS_CONTEXT)))
+                                        .underscored()
+                                        .formatFirst())
                 )
         ).collect(Collectors.toList());
     }
@@ -40,8 +43,9 @@ public class FormatterRecipeKey implements IFormatter {
             }
         }
 
-        if (!hints.isEmpty())
+        if (!hints.isEmpty()) {
             comment.add("@param %s %s".formatted(key.preferred, String.join(", ", hints)));
+        }
         return comment;
     }
 
@@ -53,6 +57,6 @@ public class FormatterRecipeKey implements IFormatter {
         if (key.optional != null)
             name += "?";
 
-        return List.of("%s: %s".formatted(name, Serde.getTypeFormatter(type).formatFirst()));
+        return List.of("%s: %s".formatted(name, Serde.getTypeFormatter(type).underscored().formatFirst()));
     }
 }

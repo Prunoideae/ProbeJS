@@ -139,6 +139,15 @@ public class DocCompiler {
         cacheWriter.close();
     }
 
+    private static Set<Class<?>> fetchRecipeClasses() {
+        return RecipeNamespace.getAll()
+                .values()
+                .stream()
+                .flatMap(namespace -> namespace.values().stream())
+                .map(type -> type.schema.recipeType)
+                .collect(Collectors.toSet());
+    }
+
     public static Set<Class<?>> fetchClasses(Set<Class<?>> typeMap, DummyBindingEvent bindingEvent, Set<Class<?>> cachedClasses) {
         Set<Class<?>> touchableClasses = new HashSet<>(bindingEvent.getClassDumpMap().values());
         touchableClasses.addAll(cachedClasses);
@@ -146,7 +155,7 @@ public class DocCompiler {
         bindingEvent.getConstantDumpMap().values().stream().map(DummyBindingEvent::getConstantClassRecursive).forEach(touchableClasses::addAll);
         touchableClasses.addAll(CapturedClasses.getCapturedRawEvents().values());
         touchableClasses.addAll(CapturedClasses.getCapturedJavaClasses());
-
+        touchableClasses.addAll(fetchRecipeClasses());
         Walker walker = new Walker(touchableClasses);
         return walker.walk();
     }
