@@ -1,12 +1,11 @@
 package com.probejs.recipe.component;
 
-import com.probejs.ProbeJS;
-import com.probejs.compiler.formatter.SpecialTypes;
 import com.probejs.compiler.formatter.formatter.IFormatter;
 import com.probejs.jdoc.Serde;
 import com.probejs.jdoc.property.PropertyComment;
 import com.probejs.jdoc.property.PropertyType;
 import com.probejs.jdoc.property.PropertyValue;
+import com.probejs.util.Util;
 import dev.latvian.mods.kubejs.recipe.RecipeKey;
 import dev.latvian.mods.kubejs.recipe.schema.RecipeSchemaType;
 
@@ -14,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class FormatterRecipeKey implements IFormatter {
     private final RecipeKey<?> key;
@@ -22,10 +22,14 @@ public class FormatterRecipeKey implements IFormatter {
         this.key = key;
     }
 
+    private Stream<String> getNames() {
+        return key.names.stream().map(Util::getSafeName);
+    }
+
     public List<IFormatter> getBuilders() {
-        return key.names.stream().map(
+        return getNames().map(
                 name -> (IFormatter) (indent, stepIndent) -> List.of(
-                        "%s(%s: %s): this".formatted(name, name,
+                        "%s(%s: %s): this".formatted(name, name.contains("\"") ? "arg" : name,
                                 Serde.getTypeFormatter(ComponentConverter.fromDescription(key.component.constructorDescription(ComponentConverter.PROBEJS_CONTEXT)))
                                         .underscored()
                                         .formatFirst())
@@ -44,14 +48,14 @@ public class FormatterRecipeKey implements IFormatter {
         }
 
         if (!hints.isEmpty()) {
-            comment.add("@param %s %s".formatted(key.preferred, String.join(", ", hints)));
+            comment.add("@param %s %s".formatted(Util.getSafeName(key.preferred), String.join(", ", hints)));
         }
         return comment;
     }
 
     @Override
     public List<String> format(Integer indent, Integer stepIndent) {
-        String name = key.preferred;
+        String name = Util.getSafeName(key.preferred);
         PropertyType<?> type = ComponentConverter.fromDescription(key.component.constructorDescription(ComponentConverter.PROBEJS_CONTEXT));
 
         if (key.optional != null)

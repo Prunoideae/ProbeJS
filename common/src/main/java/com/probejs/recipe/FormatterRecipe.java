@@ -8,6 +8,8 @@ import com.probejs.util.Util;
 import dev.latvian.mods.kubejs.recipe.RecipeJS;
 import dev.latvian.mods.kubejs.recipe.schema.*;
 import dev.latvian.mods.kubejs.recipe.schema.minecraft.SpecialRecipeSchema;
+import dev.latvian.mods.kubejs.registry.KubeJSRegistries;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -58,7 +60,7 @@ public class FormatterRecipe implements IFormatter {
                                 .peek(key -> comments.add(key.getComments(recipe)))
                                 .map(IFormatter::formatFirst)
                                 .collect(Collectors.joining(", ")),
-                        "Special.Recipes.%s".formatted(Util.snakeToTitle(recipeName))
+                        "Special.Recipes.%s%s".formatted(Util.snakeToTitle(recipeName), Util.snakeToTitle(namespace.name))
                 );
                 List<String> paramLines = new ArrayList<>();
                 for (PropertyComment comment : comments) {
@@ -77,13 +79,22 @@ public class FormatterRecipe implements IFormatter {
 
     public static IFormatter formatRecipeNamespaces() {
         return (indent, stepIndent) -> {
+            //Collect all recipe serializers' ids so they're a set of all available mods
+            Set<String> serializerIds = KubeJSRegistries.recipeSerializers().getIds().stream().map(ResourceLocation::getNamespace).collect(Collectors.toSet());
+
             ArrayList<String> lines = new ArrayList<>();
             lines.add("%sclass DocumentedRecipes {".formatted(" ".repeat(indent)));
             for (Map.Entry<String, RecipeNamespace> entry : RecipeNamespace.getAll().entrySet()) {
                 String name = entry.getKey();
+                // Skip all namespaces that are not from mods as registration of recipe is decoupled from the mod
+                if (!serializerIds.contains(name))
+                    continue;
                 RecipeNamespace namespace = entry.getValue();
                 FormatterRecipe formatter = new FormatterRecipe(name, namespace);
-                lines.addAll(formatter.format(indent + stepIndent, stepIndent));
+                var formattedRecipes = formatter.format(indent + stepIndent, stepIndent);
+                // Also skip all namespaces that have no recipes
+                if (formattedRecipes.size() > 2)
+                    lines.addAll(formattedRecipes);
             }
             lines.add("%s}".formatted(" ".repeat(indent)));
             return lines;
