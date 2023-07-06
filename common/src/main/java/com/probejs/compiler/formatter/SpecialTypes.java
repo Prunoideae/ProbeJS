@@ -13,6 +13,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class SpecialTypes {
+    public static Map<Class<?>, ResourceKey<?>> registryAssignments = new HashMap<>();
 
     public static void processEnums(Set<Class<?>> globalClasses) {
         for (Class<?> clazz : globalClasses) {
@@ -30,6 +31,14 @@ public class SpecialTypes {
     public static <T> void assignRegistry(Class<T> clazz, ResourceKey<Registry<T>> resourceKey) {
         SpecialCompiler.specialCompilers.add(new FormatterRegistry<>(resourceKey));
         NameResolver.putSpecialAssignments(clazz, () -> List.of("Special.%s".formatted(RLHelper.finalComponentToTitle(resourceKey.location().getPath()))));
+        registryAssignments.put(clazz, resourceKey);
+    }
+
+    public static String getRegistryTagName(Class<?> clazz) {
+        var key = registryAssignments.get(clazz);
+        if (key == null)
+            return null;
+        return "Special.%sTag".formatted(RLHelper.finalComponentToTitle(key.location().getPath()));
     }
 
     private static List<Class<?>> getParentInterfaces(List<Class<?>> putative, Class<?> o) {
