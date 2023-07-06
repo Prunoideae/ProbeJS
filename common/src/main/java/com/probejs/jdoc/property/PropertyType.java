@@ -379,6 +379,13 @@ public abstract class PropertyType<T extends PropertyType<T>> extends AbstractPr
             super(types.stream()
                     .flatMap(prop -> prop instanceof Union union ? union.types.stream() : Stream.of(prop))
                     .collect(Collectors.toList()));
+
+            // Remove string if a Special.XXX is present
+            // This is because string is the super type of all Special.XXX literals
+            if (types.stream().anyMatch(prop -> prop instanceof Native n && n.name.startsWith("Special."))) {
+                this.types.removeIf(prop -> (prop instanceof Clazz clazz && clazz.getName().equals("java.lang.String")) ||
+                        (prop instanceof Native nat && nat.name.equals("string")));
+            }
         }
 
         @Override
