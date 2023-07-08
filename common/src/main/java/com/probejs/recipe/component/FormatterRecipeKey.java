@@ -12,8 +12,6 @@ import dev.latvian.mods.kubejs.recipe.schema.RecipeSchemaType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class FormatterRecipeKey implements IFormatter {
     private final RecipeKey<?> key;
@@ -22,19 +20,16 @@ public class FormatterRecipeKey implements IFormatter {
         this.key = key;
     }
 
-    private Stream<String> getNames() {
-        return key.names.stream().map(Util::getSafeName);
-    }
+    public IFormatter getBuilder() {
+        String methodName = Util.getSafeName(key.preferred);
+        String paramName = Util.snakeToCamelCase(methodName);
 
-    public List<IFormatter> getBuilders() {
-        return getNames().map(
-                name -> (IFormatter) (indent, stepIndent) -> List.of(
-                        "%s(%s: %s): this".formatted(name, name.contains("\"") ? "arg" : name,
-                                Serde.getTypeFormatter(ComponentConverter.fromDescription(key.component.constructorDescription(ComponentConverter.PROBEJS_CONTEXT)))
-                                        .underscored()
-                                        .formatFirst())
-                )
-        ).collect(Collectors.toList());
+        return (indent, stepIndent) -> List.of(
+                "%s%s(%s: %s): this".formatted(" ".repeat(indent), methodName, paramName.contains("\"") ? "arg" : paramName,
+                        Serde.getTypeFormatter(ComponentConverter.fromDescription(key.component.constructorDescription(ComponentConverter.PROBEJS_CONTEXT)))
+                                .underscored()
+                                .formatFirst())
+        );
     }
 
     public PropertyComment getComments(RecipeSchemaType type) {

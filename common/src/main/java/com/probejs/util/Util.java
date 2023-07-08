@@ -3,8 +3,10 @@ package com.probejs.util;
 import com.probejs.ProbeJS;
 import com.probejs.compiler.formatter.formatter.jdoc.FormatterType;
 import com.probejs.jdoc.property.PropertyType;
+import org.checkerframework.checker.regex.qual.Regex;
 
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class Util {
@@ -26,16 +28,39 @@ public class Util {
     public static String snakeToTitle(String s) {
         return Arrays.stream(s.split("_")).map(Util::getCapitalized).collect(Collectors.joining());
     }
-    
+
+    private static final Pattern CAMEL_CASE_MATCH = Pattern.compile("[A-Z][a-z0-9]*");
+
+    public static String camelCaseToSnake(String s) {
+        // example: "camelCase" -> "camel_case"
+        return CAMEL_CASE_MATCH.matcher(s).replaceAll("_$0").toLowerCase();
+    }
+
+    public static String snakeToCamelCase(String s) {
+        // example: "snake_case" -> "snakeCase"
+        var parts = s.split("_");
+        var sb = new StringBuilder();
+        for (int i = 0; i < parts.length; i++) {
+            if (i == 0) {
+                sb.append(parts[i]);
+            } else {
+                sb.append(getCapitalized(parts[i]));
+            }
+        }
+        return sb.toString();
+    }
+
+    private static final Pattern JS_IDENTIFIER_MATCH = Pattern.compile("[A-Za-z_$][A-Za-z0-9_$]*");
+
     /**
      * Guards the method/field name by a matching regex and a list of keywords
      *
      * @param s string input
-     * @return the original string if valid, otherwise it will be jsonify.
+     * @return the original string if valid, otherwise it will be jsonified.
      */
     public static String getSafeName(String s) {
         return !KEYWORDS.contains(s) && (
-                s.toUpperCase().matches("^[$A-Z_][0-9A-Z_$]*$") |
+                JS_IDENTIFIER_MATCH.matcher(s).matches() ||
                         (s.startsWith("[") && s.endsWith("]"))
         ) ? s : ProbeJS.GSON.toJson(s);
     }
