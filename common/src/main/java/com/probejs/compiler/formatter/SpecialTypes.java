@@ -35,10 +35,11 @@ public class SpecialTypes {
     }
 
     public static String getRegistryTagName(Class<?> clazz) {
+        // We here assume that people use the TagKeyComponent, thus adding # to the beginning of the Special.XXXTag by default
         var key = registryAssignments.get(clazz);
         if (key == null)
             return null;
-        return "Special.%sTag".formatted(RLHelper.finalComponentToTitle(key.location().getPath()));
+        return "`#${Special.%sTag}`".formatted(RLHelper.finalComponentToTitle(key.location().getPath()));
     }
 
     private static List<Class<?>> getParentInterfaces(List<Class<?>> putative, Class<?> o) {
