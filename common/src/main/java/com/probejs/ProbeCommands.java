@@ -24,6 +24,7 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -39,6 +40,67 @@ public class ProbeCommands {
     public static ServerLevel COMMAND_LEVEL = null;
     public static Thread runningThread = null;
 
+    public static void triggerDump(ServerPlayer player) {
+        if (runningThread != null && runningThread.isAlive()) {
+            player.sendSystemMessage(Component.literal("ProbeJS is running! Please wait for current dump to finish."), false);
+            return;
+        } else if (runningThread != null) {
+            player.sendSystemMessage(Component.literal("ProbeJS dumping thread is dead! Please check out latest.log and submit an error report."), false);
+            runningThread = null;
+        }
+
+        player.server.kjs$runCommandSilent("reload");
+        COMMAND_LEVEL = player.getLevel();
+        Instant start = Instant.now();
+        Consumer<String> sendMessage = s -> {
+            Instant end = Instant.now();
+            Duration duration = Duration.between(start, end);
+            long sub = TimeUnit.MILLISECONDS.convert(duration.getNano(), TimeUnit.NANOSECONDS);
+            player.sendSystemMessage(Component.literal(s + " [%s.%03ds]".formatted(duration.getSeconds(), sub)), false);
+        };
+        runningThread = new Thread(() -> {
+            try {
+                SpecialCompiler.specialCompilers.clear();
+                // Send out js generation event, this should happen before class crawling so probe can resolve everything later
+                DocGenerationEventJS event = new DocGenerationEventJS();
+                ProbeJSEvents.DOC_GEN.post(ScriptType.SERVER, event);
+                sendMessage.accept("Started generating type files...");
+                SnippetCompiler.compile(event);
+                RichItemCompiler.compile();
+                sendMessage.accept("Snippets generated.");
+                ClassResolver.init();
+                NameResolver.init();
+                DocCompiler.compile(sendMessage, event);
+            } catch (Exception e) {
+                ProbeJS.LOGGER.error(e);
+                for (StackTraceElement stackTraceElement : e.getStackTrace()) {
+                    ProbeJS.LOGGER.error(stackTraceElement);
+                }
+                player.sendSystemMessage(Component.literal("Uncaught exception happened in wrapper, please report to the Github issue with complete latest.log."), false);
+            }
+            sendMessage.accept("ProbeJS typing generation finished.");
+            runningThread = null;
+        });
+        runningThread.setUncaughtExceptionHandler((t, e) -> {
+            ProbeJS.LOGGER.error(e);
+            for (StackTraceElement stackTraceElement : e.getStackTrace()) {
+                ProbeJS.LOGGER.error(stackTraceElement.toString());
+            }
+            sendMessage.accept("ProbeJS has run into an error! Please check out latest.log and report to GitHub!");
+        });
+        runningThread.setDaemon(true);
+        runningThread.start();
+        Minecraft.getInstance().execute(() -> {
+            try {
+                sendMessage.accept("Rendering images for ProbeJS rich display...");
+                RichItemCompiler.render();
+                sendMessage.accept("Images rendered.");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
 
         dispatcher.register(
@@ -47,63 +109,9 @@ public class ProbeCommands {
                                 //SINGLE PLAYER IS NEEDED
                                 .requires(source -> ProbeConfig.INSTANCE.requireSingleAndPerm && (source.getServer().isSingleplayer() && source.hasPermission(2)))
                                 .executes(context -> {
-                                    if (runningThread != null && runningThread.isAlive()) {
-                                        context.getSource().sendSuccess(Component.literal("ProbeJS is running! Please wait for current dump to finish."), false);
-                                        return Command.SINGLE_SUCCESS;
-                                    } else if (runningThread != null) {
-                                        context.getSource().sendFailure(Component.literal("ProbeJS dumping thread is dead! Please check out latest.log and submit an error report."));
-                                        runningThread = null;
-                                    }
-                                    context.getSource().getServer().kjs$runCommandSilent("reload");
-                                    COMMAND_LEVEL = context.getSource().getLevel();
-                                    Instant start = Instant.now();
-                                    Consumer<String> sendMessage = s -> {
-                                        Instant end = Instant.now();
-                                        Duration duration = Duration.between(start, end);
-                                        long sub = TimeUnit.MILLISECONDS.convert(duration.getNano(), TimeUnit.NANOSECONDS);
-                                        context.getSource().sendSuccess(Component.literal(s + " [%s.%03ds]".formatted(duration.getSeconds(), sub)), false);
-                                    };
-                                    runningThread = new Thread(() -> {
-                                        try {
-                                            SpecialCompiler.specialCompilers.clear();
-                                            // Send out js generation event, this should happen before class crawling so probe can resolve everything later
-                                            DocGenerationEventJS event = new DocGenerationEventJS();
-                                            ProbeJSEvents.DOC_GEN.post(ScriptType.SERVER, event);
-                                            sendMessage.accept("Started generating type files...");
-                                            SnippetCompiler.compile(event);
-                                            RichItemCompiler.compile();
-                                            sendMessage.accept("Snippets generated.");
-                                            ClassResolver.init();
-                                            NameResolver.init();
-                                            DocCompiler.compile(sendMessage, event);
-                                        } catch (Exception e) {
-                                            ProbeJS.LOGGER.error(e);
-                                            for (StackTraceElement stackTraceElement : e.getStackTrace()) {
-                                                ProbeJS.LOGGER.error(stackTraceElement);
-                                            }
-                                            context.getSource().sendSuccess(Component.literal("Uncaught exception happened in wrapper, please report to the Github issue with complete latest.log."), false);
-                                        }
-                                        sendMessage.accept("ProbeJS typing generation finished.");
-                                        runningThread = null;
-                                    });
-                                    runningThread.setUncaughtExceptionHandler((t, e) -> {
-                                        ProbeJS.LOGGER.error(e);
-                                        for (StackTraceElement stackTraceElement : e.getStackTrace()) {
-                                            ProbeJS.LOGGER.error(stackTraceElement.toString());
-                                        }
-                                        sendMessage.accept("ProbeJS has run into an error! Please check out latest.log and report to GitHub!");
-                                    });
-                                    runningThread.setDaemon(true);
-                                    runningThread.start();
-                                    Minecraft.getInstance().execute(() -> {
-                                        try {
-                                            sendMessage.accept("Rendering images for ProbeJS rich display...");
-                                            RichItemCompiler.render();
-                                            sendMessage.accept("Images rendered.");
-                                        } catch (IOException e) {
-                                            throw new RuntimeException(e);
-                                        }
-                                    });
+                                    var player = context.getSource().getPlayer();
+                                    if (player != null)
+                                        triggerDump(player);
                                     return Command.SINGLE_SUCCESS;
                                 }))
                         .then(Commands.literal("clear_cache")
