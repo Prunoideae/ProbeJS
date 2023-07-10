@@ -1,0 +1,37 @@
+package com.probejs.rich.item;
+
+import com.probejs.util.json.JArray;
+import com.probejs.util.json.JObject;
+import com.probejs.util.json.JPrimitive;
+import dev.latvian.mods.kubejs.core.ItemKJS;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class ItemTagAttribute {
+    private final String id;
+    private final List<Item> itemsOfTag;
+
+
+    public ItemTagAttribute(TagKey<Item> itemTag) {
+        this.id = itemTag.location().toString();
+        this.itemsOfTag = new ArrayList<>();
+        for (Holder<Item> holder : Registry.ITEM.getTagOrEmpty(itemTag)) {
+            itemsOfTag.add(holder.value());
+        }
+    }
+
+    public JObject serialize() {
+        return JObject.create()
+                .add("id", new JPrimitive(id))
+                .add("items", JArray.create()
+                        .addAll(itemsOfTag.stream()
+                                .map(ItemKJS::kjs$getId)
+                                .map(JPrimitive::new))
+                );
+    }
+}

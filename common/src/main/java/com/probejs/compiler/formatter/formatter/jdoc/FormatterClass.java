@@ -110,6 +110,7 @@ public class FormatterClass extends DocumentFormatter<DocumentClass> {
             // Still need to check if there is only one abstract method in case of people going insane
             if (document.methods.stream().filter(method -> method.isAbstract).count() == 1) {
                 FormatterMethod hybridFormatter = new FormatterMethod(document.methods.stream().filter(method -> method.isAbstract).findFirst().get(), document);
+                hybridFormatter.setFunctionalInterface(true);
                 lines.add("%s%s;".formatted(" ".repeat(indent + stepIndent), hybridFormatter.formatMethodParts()));
             }
         }

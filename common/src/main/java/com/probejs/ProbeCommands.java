@@ -25,6 +25,7 @@ import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import org.apache.commons.io.FileUtils;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -118,12 +119,19 @@ public class ProbeCommands {
                                 .requires(source -> source.getServer().isSingleplayer())
                                 .executes(context -> {
                                     for (File file : Objects.requireNonNull(ProbePaths.CACHE.toFile().listFiles())) {
-                                        if (file.isFile()) {
-                                            if (file.delete()) {
-                                                ProbeJS.LOGGER.info("Removed %s".formatted(file.getName()));
+                                        // delete everything, including folders, folders might not be empty
+                                        try {
+                                            if (file.isFile()) {
+                                                if (file.delete()) {
+                                                    ProbeJS.LOGGER.info("Deleted file: " + file.getName());
+                                                } else {
+                                                    ProbeJS.LOGGER.warn("Failed to delete file: " + file.getName());
+                                                }
                                             } else {
-                                                ProbeJS.LOGGER.info("Failed to remove %s".formatted(file.getName()));
+                                                FileUtils.deleteDirectory(file);
                                             }
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
                                         }
                                     }
                                     return Command.SINGLE_SUCCESS;

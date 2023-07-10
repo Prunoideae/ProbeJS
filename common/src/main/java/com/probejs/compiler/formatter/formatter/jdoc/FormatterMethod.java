@@ -15,10 +15,15 @@ import java.util.stream.Collectors;
 
 public class FormatterMethod extends DocumentFormatter<DocumentMethod> {
     private final DocumentClass classDocument;
+    private boolean functionalInterface = false;
 
     public FormatterMethod(DocumentMethod document, DocumentClass declaringClass) {
         super(document);
         classDocument = declaringClass;
+    }
+
+    public void setFunctionalInterface(boolean functionalInterface) {
+        this.functionalInterface = functionalInterface;
     }
 
     private boolean isReturningThis() {
@@ -66,7 +71,7 @@ public class FormatterMethod extends DocumentFormatter<DocumentMethod> {
                         .map(FormatterParam::underscored)
                         .map(IFormatter::formatParamVariable)
                         .collect(Collectors.joining(", ")),
-                isReturningThis() ? "this" : Serde.getTypeFormatter(document.getReturns()).formatParamVariable()
+                isReturningThis() ? "this" : Serde.getTypeFormatter(document.getReturns()).underscored(functionalInterface).formatParamVariable()
         );
     }
 

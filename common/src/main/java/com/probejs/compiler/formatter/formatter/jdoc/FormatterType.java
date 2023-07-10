@@ -173,13 +173,13 @@ public abstract class FormatterType<T extends PropertyType<T>> extends DocumentF
         public Parameterized(PropertyType.Parameterized type) {
             super(type);
             base = Serde.getTypeFormatter(type.getBase());
-            params = type.getParams().stream().map(Serde::getTypeFormatter).collect(Collectors.toList());
+            params = type.getParams().stream().map(Serde::getTypeFormatter).map(formatter -> formatter.underscored(false)).collect(Collectors.toList());
         }
 
         @Override
         public Parameterized underscored(boolean underscored) {
             base.underscored(underscored);
-            params.forEach(param -> param.underscored(underscored));
+            params.forEach(param -> param.underscored(false));
             return this;
         }
 

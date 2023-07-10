@@ -4,7 +4,6 @@ import dev.architectury.platform.Mod;
 import dev.architectury.platform.Platform;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import org.apache.commons.codec.digest.DigestUtils;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
