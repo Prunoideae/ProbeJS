@@ -37,7 +37,7 @@ public class ProbeJSEvents {
                     ProbeConfig.INSTANCE.modHash = hash;
                     ProbeConfig.INSTANCE.save();
                     player.sendSystemMessage(Component.literal("Mod list has changed, dumping new docs..."));
-                    ProbeCommands.triggerDump(player);
+                    ProbeCommands.triggerDump(player, true);
                 }
             } catch (NoSuchAlgorithmException ignored) {
 

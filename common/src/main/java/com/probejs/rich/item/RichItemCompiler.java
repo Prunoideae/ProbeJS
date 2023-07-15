@@ -40,14 +40,14 @@ public class RichItemCompiler {
 
     }
 
-    public static void render() throws IOException {
+    public static void render(boolean force) throws IOException {
         for (ItemStack itemStack : ItemWrapper.getList()) {
             Path path = ProbePaths.RICH.resolve(itemStack.kjs$getIdLocation().getNamespace());
             if (!Files.exists(path)) {
                 Files.createDirectories(path);
             }
             String name = itemStack.kjs$getIdLocation().getPath().replace("/", "_");
-            if (path.resolve(name + ".png").toFile().exists()) {
+            if (path.resolve(name + ".png").toFile().exists() && !force) {
                 continue;
             }
             NativeImage image = ImageHelper.getFromItem(itemStack, ImageHelper.init());

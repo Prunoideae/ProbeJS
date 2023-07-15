@@ -41,7 +41,7 @@ public class ProbeCommands {
     public static ServerLevel COMMAND_LEVEL = null;
     public static Thread runningThread = null;
 
-    public static void triggerDump(ServerPlayer player) {
+    public static void triggerDump(ServerPlayer player, boolean force) {
         if (runningThread != null && runningThread.isAlive()) {
             player.sendSystemMessage(Component.literal("ProbeJS is running! Please wait for current dump to finish."), false);
             return;
@@ -94,7 +94,7 @@ public class ProbeCommands {
         Minecraft.getInstance().execute(() -> {
             try {
                 sendMessage.accept("Rendering images for ProbeJS rich display...");
-                RichItemCompiler.render();
+                RichItemCompiler.render(force);
                 sendMessage.accept("Images rendered.");
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -112,7 +112,7 @@ public class ProbeCommands {
                                 .executes(context -> {
                                     var player = context.getSource().getPlayer();
                                     if (player != null)
-                                        triggerDump(player);
+                                        triggerDump(player, false);
                                     return Command.SINGLE_SUCCESS;
                                 }))
                         .then(Commands.literal("clear_cache")
