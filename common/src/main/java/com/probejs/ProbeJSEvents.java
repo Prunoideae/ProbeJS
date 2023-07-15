@@ -2,7 +2,9 @@ package com.probejs;
 
 import dev.architectury.platform.Mod;
 import dev.architectury.platform.Platform;
+import dev.latvian.mods.kubejs.registry.RegistryInfo;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.security.MessageDigest;
@@ -10,7 +12,21 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Comparator;
 
 public class ProbeJSEvents {
-    private static void computeHash(Mod mod, MessageDigest digest) {
+
+    private static void computeKubeJSObjectHash(MessageDigest digest) {
+        RegistryInfo.MAP
+                .values()
+                .stream()
+                .flatMap(info -> info.objects.keySet()
+                        .stream()
+                        .map(ResourceLocation::toString)
+                        .map(s -> info.key.location() + "/" + s)
+                )
+                .sorted()
+                .forEach(key -> digest.update(key.getBytes()));
+    }
+
+    private static void computeModHash(Mod mod, MessageDigest digest) {
         String idVersion = mod.getModId() + mod.getVersion();
         digest.update(idVersion.getBytes());
     }
@@ -30,8 +46,9 @@ public class ProbeJSEvents {
             try {
                 MessageDigest digest = MessageDigest.getInstance("SHA-256");
                 for (Mod mod : Platform.getMods().stream().sorted(Comparator.comparing(Mod::getModId)).toList()) {
-                    computeHash(mod, digest);
+                    computeModHash(mod, digest);
                 }
+                computeKubeJSObjectHash(digest);
                 String hash = byte2Hex(digest.digest());
                 if (!hash.equals(ProbeConfig.INSTANCE.modHash)) {
                     ProbeConfig.INSTANCE.modHash = hash;
