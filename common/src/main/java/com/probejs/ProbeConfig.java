@@ -14,17 +14,12 @@ import java.util.Map;
 public class ProbeConfig {
     public static ProbeConfig INSTANCE = new ProbeConfig();
     private static final int CONFIG_VERSION = 1;
-    public boolean dumpMethod = true;
-    public boolean noAggressiveProbing = false;
-    public boolean vanillaOrder = true;
-    public boolean exportClassNames = false;
-
-    public boolean allowObfuscated = false;
+    private boolean noAggressiveProbing = false;
     public long docsTimestamp = 0;
     public String modHash = "0";
-
     public boolean allowRegistryObjectDumps = false;
     public boolean requireSingleAndPerm = true;
+    public boolean enabled = true;
 
     @SuppressWarnings("unchecked")
     private static <E> E fetchPropertyOrDefault(Object key, Map<?, ?> value, E defaultValue) {
@@ -41,15 +36,12 @@ public class ProbeConfig {
         if (Files.exists(cfg)) {
             try {
                 Map<?, ?> obj = ProbeJS.GSON.fromJson(Files.newBufferedReader(cfg), Map.class);
-                dumpMethod = fetchPropertyOrDefault("dumpMethod", obj, true);
                 noAggressiveProbing = fetchPropertyOrDefault("disabled", obj, false);
-                vanillaOrder = fetchPropertyOrDefault("vanillaOrder", obj, true);
-                exportClassNames = fetchPropertyOrDefault("exportClassNames", obj, false);
-                allowObfuscated = fetchPropertyOrDefault("allowObfuscated", obj, false);
                 docsTimestamp = fetchPropertyOrDefault("docsTimestamp", obj, 0D).longValue();
                 modHash = fetchPropertyOrDefault("modHash", obj, "0");
                 allowRegistryObjectDumps = fetchPropertyOrDefault("allowRegistryObjectDumps", obj, false);
                 requireSingleAndPerm = fetchPropertyOrDefault("requireSingleAndPerm", obj, true);
+                enabled = fetchPropertyOrDefault("enabled", obj, true);
             } catch (IOException e) {
                 ProbeJS.LOGGER.warn("Cannot read config properties, falling back to defaults.");
             }
@@ -67,5 +59,15 @@ public class ProbeConfig {
         } catch (IOException e) {
             ProbeJS.LOGGER.warn("Cannot write config, settings are not saved.");
         }
+    }
+
+    public boolean toggleAggressiveProbing() {
+        noAggressiveProbing = !noAggressiveProbing;
+        save();
+        return noAggressiveProbing;
+    }
+
+    public boolean shouldProbingAggressive() {
+        return !noAggressiveProbing && enabled;
     }
 }

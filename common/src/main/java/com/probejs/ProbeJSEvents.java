@@ -43,6 +43,7 @@ public class ProbeJSEvents {
 
     public static void playerJoined(ServerPlayer player) {
         if (player.server.isSingleplayer() && player.hasPermissions(2)) {
+            if (!ProbeConfig.INSTANCE.enabled) return;
             try {
                 MessageDigest digest = MessageDigest.getInstance("SHA-256");
                 for (Mod mod : Platform.getMods().stream().sorted(Comparator.comparing(Mod::getModId)).toList()) {

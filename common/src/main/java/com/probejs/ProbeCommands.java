@@ -108,7 +108,11 @@ public class ProbeCommands {
                 Commands.literal("probejs")
                         .then(Commands.literal("dump")
                                 //SINGLE PLAYER IS NEEDED
-                                .requires(source -> ProbeConfig.INSTANCE.requireSingleAndPerm && (source.getServer().isSingleplayer() && source.hasPermission(2)))
+                                .requires(source -> ProbeConfig.INSTANCE.requireSingleAndPerm
+                                        && (source.getServer().isSingleplayer()
+                                        && source.hasPermission(2))
+                                        && ProbeConfig.INSTANCE.enabled
+                                )
                                 .executes(context -> {
                                     var player = context.getSource().getPlayer();
                                     if (player != null)
@@ -138,33 +142,12 @@ public class ProbeCommands {
                                 }))
                         .then(Commands.literal("configure")
                                 .requires(source -> source.getServer().isSingleplayer())
-                                .then(Commands.literal("toggle_bean")
-                                        .executes(context -> {
-                                            ProbeConfig.INSTANCE.dumpMethod = !ProbeConfig.INSTANCE.dumpMethod;
-                                            context.getSource().sendSuccess(Component.literal("Keep method while beaning set to: %s".formatted(ProbeConfig.INSTANCE.dumpMethod)), false);
-                                            ProbeConfig.INSTANCE.save();
-                                            return Command.SINGLE_SUCCESS;
-                                        }))
                                 .then(Commands.literal("toggle_aggressive")
                                         .executes(context -> {
-                                            ProbeConfig.INSTANCE.noAggressiveProbing = !ProbeConfig.INSTANCE.noAggressiveProbing;
-                                            context.getSource().sendSuccess(Component.literal("Aggressive mode is now: %s".formatted(ProbeConfig.INSTANCE.noAggressiveProbing ? "disabled" : "enabled")), false);
+                                            boolean aggressive = ProbeConfig.INSTANCE.toggleAggressiveProbing();
+                                            context.getSource().sendSuccess(Component.literal("Aggressive mode is now: %s".formatted(aggressive ? "disabled" : "enabled")), false);
                                             ProbeConfig.INSTANCE.save();
                                             context.getSource().sendSuccess(Component.literal("Changes will be applied next time you start the game."), false);
-                                            return Command.SINGLE_SUCCESS;
-                                        }))
-                                .then(Commands.literal("toggle_snippet_order")
-                                        .executes(context -> {
-                                            ProbeConfig.INSTANCE.vanillaOrder = !ProbeConfig.INSTANCE.vanillaOrder;
-                                            context.getSource().sendSuccess(Component.literal("In snippets, which will appear first: %s".formatted(ProbeConfig.INSTANCE.vanillaOrder ? "mod_id" : "member_type")), false);
-                                            ProbeConfig.INSTANCE.save();
-                                            return Command.SINGLE_SUCCESS;
-                                        }))
-                                .then(Commands.literal("toggle_classname_snippets")
-                                        .executes(context -> {
-                                            ProbeConfig.INSTANCE.exportClassNames = !ProbeConfig.INSTANCE.exportClassNames;
-                                            context.getSource().sendSuccess(Component.literal("Export class name as snippets set to: %s".formatted(ProbeConfig.INSTANCE.exportClassNames)), false);
-                                            ProbeConfig.INSTANCE.save();
                                             return Command.SINGLE_SUCCESS;
                                         }))
                                 .then(Commands.literal("toggle_registry_dumps")
@@ -184,6 +167,14 @@ public class ProbeCommands {
                                             ProbeConfig.INSTANCE.save();
                                             return Command.SINGLE_SUCCESS;
                                         }))
+                                .then(Commands.literal("toggle_enable")
+                                        .executes(context -> {
+                                            ProbeConfig.INSTANCE.enabled = !ProbeConfig.INSTANCE.enabled;
+                                            context.getSource().sendSuccess(Component.literal("ProbeJS is now %s".formatted(ProbeConfig.INSTANCE.enabled ? "enabled" : "disabled")), false);
+                                            ProbeConfig.INSTANCE.save();
+                                            return Command.SINGLE_SUCCESS;
+                                        })
+                                )
 
                         )
                         .then(Commands.literal("export")
