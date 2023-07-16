@@ -29,6 +29,8 @@ public class DocumentClass extends AbstractDocument<DocumentClass> {
     public JsonObject serialize() {
         JsonObject object = super.serialize();
         object.addProperty("className", name);
+        object.addProperty("abstract", isAbstract);
+        object.addProperty("interface", isInterface);
         if (parent != null) object.add("parent", parent.serialize());
         Serde.serializeCollection(object, "fields", fields);
         Serde.serializeCollection(object, "methods", methods);
@@ -44,6 +46,10 @@ public class DocumentClass extends AbstractDocument<DocumentClass> {
         name = object.get("className").getAsString();
         if (object.has("parent"))
             parent = (PropertyType<?>) Serde.deserializeProperty(object.get("parent").getAsJsonObject());
+        if (object.has("abstract"))
+            isAbstract = object.get("abstract").getAsBoolean();
+        if (object.has("interface"))
+            isInterface = object.get("interface").getAsBoolean();
         Serde.deserializeDocuments(this.fields, object.get("fields"));
         Serde.deserializeDocuments(this.methods, object.get("methods"));
         Serde.deserializeDocuments(this.constructors, object.get("constructors"));
