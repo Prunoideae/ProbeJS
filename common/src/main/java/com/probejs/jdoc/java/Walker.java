@@ -101,6 +101,7 @@ public class Walker {
                     .filter(c -> !result.contains(c))
                     .collect(Collectors.toSet());
         }
+        result.removeIf(Class::isSynthetic);
         return result;
     }
 }

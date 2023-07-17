@@ -148,6 +148,18 @@ public class DocCompiler {
                 .collect(Collectors.toSet());
     }
 
+    private static Set<Class<?>> fetchComponentClasses() {
+        return RecipeNamespace.getAll()
+                .values()
+                .stream()
+                .flatMap(namespace -> namespace.values().stream())
+                .flatMap(type -> Arrays.stream(type.schema.keys))
+                .map(key -> key.component.componentClass())
+                .map(clazz -> clazz.isArray() ? clazz.getComponentType() : clazz)
+                .filter(clazz -> !NameResolver.resolvedPrimitives.contains(clazz.getName()))
+                .collect(Collectors.toSet());
+    }
+
     public static Set<Class<?>> fetchClasses(Set<Class<?>> typeMap, DummyBindingEvent bindingEvent, Set<Class<?>> cachedClasses) {
         Set<Class<?>> touchableClasses = new HashSet<>(bindingEvent.getClassDumpMap().values());
         touchableClasses.addAll(cachedClasses);
@@ -156,6 +168,7 @@ public class DocCompiler {
         touchableClasses.addAll(CapturedClasses.getCapturedRawEvents().values());
         touchableClasses.addAll(CapturedClasses.getCapturedJavaClasses());
         touchableClasses.addAll(fetchRecipeClasses());
+        touchableClasses.addAll(fetchComponentClasses());
         Walker walker = new Walker(touchableClasses);
         return walker.walk();
     }

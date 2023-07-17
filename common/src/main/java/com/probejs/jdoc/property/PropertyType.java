@@ -479,6 +479,11 @@ public abstract class PropertyType<T extends PropertyType<T>> extends AbstractPr
             return this;
         }
 
+        public JSObjectKey optional(boolean optional) {
+            isOptional = optional;
+            return this;
+        }
+
         public void deserialize(JsonElement element) {
             if (element.isJsonPrimitive()) {
                 nameKey = element.getAsString();

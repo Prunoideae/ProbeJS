@@ -45,7 +45,9 @@ public class ComponentConverter {
             return new PropertyType.JSObject(
                     object.types().stream()
                             .map(pair -> Pair.of(
-                                    new PropertyType.JSObjectKey().withName(Util.getSafeName(pair.key()) + (pair.optional() ? "?" : "")),
+                                    new PropertyType.JSObjectKey()
+                                            .withName(Util.getSafeName(pair.key()))
+                                            .optional(pair.optional()),
                                     fromDescription(pair.value())
                             ))
                             .collect(Collectors.toMap(Pair::getLeft, Pair::getRight))
