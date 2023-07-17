@@ -2,6 +2,7 @@ package com.probejs.recipe.component;
 
 import com.probejs.compiler.formatter.SpecialTypes;
 import com.probejs.jdoc.property.PropertyType;
+import com.probejs.util.Util;
 import dev.latvian.mods.kubejs.typings.desc.*;
 import net.minecraft.tags.TagKey;
 import org.apache.commons.lang3.tuple.Pair;
@@ -44,7 +45,7 @@ public class ComponentConverter {
             return new PropertyType.JSObject(
                     object.types().stream()
                             .map(pair -> Pair.of(
-                                    new PropertyType.JSObjectKey().withName(pair.key()),
+                                    new PropertyType.JSObjectKey().withName(Util.getSafeName(pair.key()) + (pair.optional() ? "?" : "")),
                                     fromDescription(pair.value())
                             ))
                             .collect(Collectors.toMap(Pair::getLeft, Pair::getRight))
