@@ -66,7 +66,7 @@ public class DocumentMethod extends AbstractDocument<DocumentMethod> {
         });
 
         info.getAnnotations().stream().filter(annotation -> annotation instanceof JsInfo).findFirst().ifPresent(annotation -> {
-            document.builtinComments.merge(JsAnnotations.fromAnnotation((JsInfo) annotation, true));
+            document.builtinComments = document.builtinComments.merge(JsAnnotations.fromAnnotation((JsInfo) annotation, true));
         });
 
         info.getTypeVariables().stream()
@@ -100,7 +100,15 @@ public class DocumentMethod extends AbstractDocument<DocumentMethod> {
         document.variables.addAll(variables);
         document.isStatic = isStatic;
         document.isAbstract = isAbstract;
+        document.builtinComments = builtinComments.copy();
         return document;
+    }
+
+    @Override
+    public DocumentMethod merge(DocumentMethod other) {
+        DocumentMethod merged = super.merge(other);
+        merged.builtinComments = builtinComments.merge(other.builtinComments);
+        return merged;
     }
 
     @Override

@@ -77,7 +77,7 @@ public class DocumentClass extends AbstractDocument<DocumentClass> {
             }
         });
         info.getAnnotations().stream().filter(annotation -> annotation instanceof JsInfo).findFirst().ifPresent(annotation -> {
-            document.builtinComments = document.builtinComments.merge(JsAnnotations.fromAnnotation((JsInfo) annotation));
+            document.builtinComments = document.builtinComments.merge(JsAnnotations.fromAnnotation((JsInfo) annotation, true));
         });
         return document;
     }

@@ -77,15 +77,16 @@ public class EventCompiler {
                 }
                 DocumentClass document = globalClasses.get(eventType.getName());
                 PropertyComment comment = document.getMergedComment()
-                        .merge(new PropertyComment("This event does %s have results.".formatted(handler.getHasResult() ? "" : "**not** ")))
-                        .merge(new PropertyComment("This event fires on **%s**.".formatted(
+                        .merge(new PropertyComment("@at *%s*".formatted(
                                 handler.scriptTypePredicate
                                         .getValidTypes()
                                         .stream()
                                         .map(type -> type.name)
                                         .collect(Collectors.joining(", "))
                         )));
-                
+                if (handler.getHasResult())
+                    comment = comment.merge(new PropertyComment("@cancellable"));
+
                 elements.addAll(comment.formatLines(4));
                 if (handler.extra != null) {
                     elements.add("%s(extra: %s, handler: (event: %s) => void):void,".formatted(

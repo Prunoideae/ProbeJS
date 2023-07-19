@@ -60,7 +60,7 @@ public class DocumentField extends AbstractDocument<DocumentField> {
         });
 
         info.getAnnotations().stream().filter(annotation -> annotation instanceof JsInfo).findFirst().ifPresent(annotation -> {
-            document.builtinComments.merge(JsAnnotations.fromAnnotation((JsInfo) annotation));
+            document.builtinComments = document.builtinComments.merge(JsAnnotations.fromAnnotation((JsInfo) annotation));
         });
 
         return document;
@@ -80,7 +80,15 @@ public class DocumentField extends AbstractDocument<DocumentField> {
         document.shouldGSON = shouldGSON;
         document.type = type;
         document.properties.addAll(properties);
+        document.builtinComments = builtinComments.copy();
         return document;
+    }
+
+    @Override
+    public DocumentField merge(DocumentField other) {
+        DocumentField merged = super.merge(other);
+        merged.builtinComments = builtinComments.merge(other.builtinComments);
+        return merged;
     }
 
     @Override
