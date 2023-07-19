@@ -77,7 +77,7 @@ public class DocumentClass extends AbstractDocument<DocumentClass> {
             }
         });
         info.getAnnotations().stream().filter(annotation -> annotation instanceof JsInfo).findFirst().ifPresent(annotation -> {
-            document.builtinComments.merge(JsAnnotations.fromAnnotation((JsInfo) annotation));
+            document.builtinComments = document.builtinComments.merge(JsAnnotations.fromAnnotation((JsInfo) annotation));
         });
         return document;
     }
@@ -102,7 +102,7 @@ public class DocumentClass extends AbstractDocument<DocumentClass> {
         document.generics.addAll(generics);
         document.isInterface = isInterface;
         document.isAbstract = isAbstract;
-        document.builtinComments.merge(builtinComments);
+        document.builtinComments = document.builtinComments.merge(builtinComments);
         return document;
     }
 
