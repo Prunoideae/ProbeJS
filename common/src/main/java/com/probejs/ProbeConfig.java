@@ -14,9 +14,9 @@ import java.util.Map;
 public class ProbeConfig {
     public static ProbeConfig INSTANCE = new ProbeConfig();
     private static final int CONFIG_VERSION = 1;
-    private boolean noAggressiveProbing = false;
+    public boolean firstLoad = true;
+    public boolean noAggressiveProbing = false;
     public long docsTimestamp = 0;
-    public String modHash = "0";
     public boolean allowRegistryObjectDumps = false;
     public boolean requireSingleAndPerm = true;
     public boolean enabled = true;
@@ -36,9 +36,9 @@ public class ProbeConfig {
         if (Files.exists(cfg)) {
             try {
                 Map<?, ?> obj = ProbeJS.GSON.fromJson(Files.newBufferedReader(cfg), Map.class);
-                noAggressiveProbing = fetchPropertyOrDefault("disabled", obj, false);
+                firstLoad = fetchPropertyOrDefault("firstLoad", obj, true);
+                noAggressiveProbing = fetchPropertyOrDefault("noAggressiveProbing", obj, false);
                 docsTimestamp = fetchPropertyOrDefault("docsTimestamp", obj, 0D).longValue();
-                modHash = fetchPropertyOrDefault("modHash", obj, "0");
                 allowRegistryObjectDumps = fetchPropertyOrDefault("allowRegistryObjectDumps", obj, false);
                 requireSingleAndPerm = fetchPropertyOrDefault("requireSingleAndPerm", obj, true);
                 enabled = fetchPropertyOrDefault("enabled", obj, true);
@@ -63,11 +63,31 @@ public class ProbeConfig {
 
     public boolean toggleAggressiveProbing() {
         noAggressiveProbing = !noAggressiveProbing;
-        save();
         return noAggressiveProbing;
     }
 
     public boolean shouldProbingAggressive() {
         return !noAggressiveProbing && enabled;
+    }
+
+    public static String getModHash() {
+        Path hashFile = ProbePaths.CACHE.resolve("modHash.txt");
+        if (Files.exists(hashFile)) {
+            try {
+                return Files.readString(hashFile);
+            } catch (IOException e) {
+                ProbeJS.LOGGER.warn("Cannot read mod hash file, falling back to default.");
+            }
+        }
+        return "0";
+    }
+
+    public static void writeModHash(String hash) {
+        Path hashFile = ProbePaths.CACHE.resolve("modHash.txt");
+        try {
+            Files.writeString(hashFile, hash);
+        } catch (IOException e) {
+            ProbeJS.LOGGER.warn("Cannot write mod hash file, settings are not saved.");
+        }
     }
 }

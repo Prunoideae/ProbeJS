@@ -33,6 +33,7 @@ public class ImageHelper {
         frame.bindRead();
         img.downloadTexture(0, false);
         img.flipY();
+        frame.unbindRead();
         return img;
     }
 

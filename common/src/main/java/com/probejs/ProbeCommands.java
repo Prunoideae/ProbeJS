@@ -79,16 +79,17 @@ public class ProbeCommands {
                 try {
                     RichItemCompiler.render(items);
                     sendMessage.accept("Images rendered.");
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+                } catch (Throwable e) {
+                    sendMessage.accept("Error occurred while rendering images! Please check out latest.log and submit an error report.");
+                    ProbeJS.LOGGER.error("Error:", e);
                 }
             });
             resolveRenderThread = null;
         });
 
         resolveRenderThread.setUncaughtExceptionHandler((t, e) -> {
-            e.printStackTrace();
             sendMessage.accept("Error occurred while rendering images! Please check out latest.log and submit an error report.");
+            ProbeJS.LOGGER.error("Error:", e);
             resolveRenderThread = null;
         });
         resolveRenderThread.setDaemon(true);

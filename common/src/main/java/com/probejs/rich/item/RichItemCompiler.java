@@ -50,5 +50,6 @@ public class RichItemCompiler {
             image.close();
             frameBuffer.clear(false);
         }
+        frameBuffer.destroyBuffers();
     }
 }

@@ -51,20 +51,29 @@ public class ProbeJSEvents {
                 }
                 computeKubeJSObjectHash(digest);
                 String hash = byte2Hex(digest.digest());
-                if (!hash.equals(ProbeConfig.INSTANCE.modHash)) {
-                    ProbeConfig.INSTANCE.modHash = hash;
-                    ProbeConfig.INSTANCE.save();
+                if (!hash.equals(ProbeConfig.getModHash())) {
+                    ProbeConfig.writeModHash(hash);
                     player.sendSystemMessage(Component.literal("Mod list has changed, dumping new docs..."));
                     ProbeCommands.triggerDump(player);
                 }
             } catch (NoSuchAlgorithmException ignored) {
 
             }
-            player.sendSystemMessage(Component.literal("Aggressive probing is on. Remember to disable it in production!").kjs$red().kjs$underlined());
-            player.sendSystemMessage(Component.literal("Use ")
-                    .append(Component.literal("/probejs configure toggle_aggressive").kjs$underlined().kjs$green().kjs$clickSuggestCommand("/probejs configure toggle_aggressive"))
-                    .append(Component.literal(" to disable.").kjs$white())
-            );
+            if (ProbeConfig.INSTANCE.firstLoad) {
+                player.sendSystemMessage(Component.literal("This is the first time you are running ProbeJS. An automatic dump will be triggered."));
+                player.sendSystemMessage(Component.literal("The aggressive mode will be turned off, you can still turn it on by ")
+                        .append(Component.literal("/probejs configure toggle_aggressive").kjs$underlined().kjs$green().kjs$clickSuggestCommand("/probejs configure toggle_aggressive"))
+                        .append(Component.literal(" later.").kjs$white()));
+                ProbeConfig.INSTANCE.noAggressiveProbing = true;
+                ProbeConfig.INSTANCE.firstLoad = false;
+                ProbeConfig.INSTANCE.save();
+            } else {
+                player.sendSystemMessage(Component.literal("Aggressive probing is on. Remember to disable it in release!").kjs$red().kjs$underlined());
+                player.sendSystemMessage(Component.literal("Use ")
+                        .append(Component.literal("/probejs configure toggle_aggressive").kjs$underlined().kjs$green().kjs$clickSuggestCommand("/probejs configure toggle_aggressive"))
+                        .append(Component.literal(" to disable.").kjs$white())
+                );
+            }
         }
     }
 }
