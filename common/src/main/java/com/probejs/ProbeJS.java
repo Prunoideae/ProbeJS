@@ -11,7 +11,10 @@ import org.apache.logging.log4j.Logger;
 public class ProbeJS {
     public static final String MOD_ID = "probejs";
     public static final Logger LOGGER = LogManager.getLogger("probejs");
-    public static final Gson GSON = new Gson();
+    public static final Gson GSON = new GsonBuilder()
+            .serializeSpecialFloatingPointValues()
+            .disableHtmlEscaping()
+            .create();
     public static final Gson GSON_WRITER = new GsonBuilder()
             .setPrettyPrinting()
             .disableHtmlEscaping()

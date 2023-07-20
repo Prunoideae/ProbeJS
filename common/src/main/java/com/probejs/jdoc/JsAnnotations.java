@@ -12,7 +12,9 @@ public class JsAnnotations {
 
     public static PropertyComment fromAnnotation(JsInfo info, boolean isMethod) {
         PropertyComment comment = new PropertyComment();
-        comment.add(info.value());
+        for (String l : info.value().split("\n")) {
+            comment.add(l);
+        }
         if (isMethod) {
             for (JsParam param : info.params()) {
                 comment.add("@param " + param.name() + " " + param.value());
