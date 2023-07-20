@@ -1,16 +1,25 @@
 package com.probejs.util.forge;
 
 import com.google.common.collect.BiMap;
+import com.probejs.ProbeJS;
+import com.probejs.compiler.DocCompiler;
 import com.probejs.compiler.formatter.formatter.IFormatter;
 import com.probejs.jdoc.document.DocumentClass;
 import com.probejs.util.PlatformSpecial;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.common.crafting.IIngredientSerializer;
+import net.minecraftforge.eventbus.ListenerList;
+import net.minecraftforge.eventbus.LockHelper;
+import net.minecraftforge.eventbus.api.EventListenerHelper;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class PlatformSpecialImpl extends PlatformSpecial {
     private static Field ingredientInst = null;
@@ -55,5 +64,38 @@ public class PlatformSpecialImpl extends PlatformSpecial {
             e.printStackTrace();
         }
         return superDocuments;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void preCompile() {
+        // Uses reflection to acquire current list of events
+        // God help us if this breaks
+        try {
+            Field listenersField = EventListenerHelper.class.getDeclaredField("listeners");
+            listenersField.setAccessible(true);
+            LockHelper<Class<?>, ListenerList> listeners = (LockHelper<Class<?>, ListenerList>) listenersField.get(null);
+
+            Field lockField = LockHelper.class.getDeclaredField("lock");
+            Field mapField = LockHelper.class.getDeclaredField("map");
+            lockField.setAccessible(true);
+            mapField.setAccessible(true);
+
+            ReadWriteLock lock = (ReadWriteLock) lockField.get(listeners);
+            Map<Class<?>, ListenerList> map = (Map<Class<?>, ListenerList>) mapField.get(listeners);
+
+            var readLock = lock.readLock();
+            readLock.lock();
+
+            Set<Class<?>> eventClasses = map.keySet();
+
+            readLock.unlock();
+
+            eventClasses.forEach(eventClass -> {
+                DocCompiler.CapturedClasses.capturedRawEvents.put(eventClass.getName(), eventClass);
+            });
+        } catch (Throwable e) {
+            ProbeJS.LOGGER.error("Failed to load events from Forge", e);
+        }
     }
 }

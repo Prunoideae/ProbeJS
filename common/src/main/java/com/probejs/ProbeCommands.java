@@ -6,6 +6,7 @@ import com.google.gson.stream.JsonWriter;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.datafixers.util.Pair;
 import com.probejs.compiler.DocCompiler;
 import com.probejs.compiler.SnippetCompiler;
 import com.probejs.compiler.SpecialCompiler;
@@ -17,6 +18,7 @@ import com.probejs.jdoc.jsgen.DocGenerationEventJS;
 import com.probejs.jdoc.jsgen.ProbeJSEvents;
 import com.probejs.rich.item.RichItemCompiler;
 import dev.latvian.mods.kubejs.KubeJSPaths;
+import dev.latvian.mods.kubejs.bindings.ItemWrapper;
 import dev.latvian.mods.kubejs.script.ScriptType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.CommandSourceStack;
@@ -25,29 +27,82 @@ import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
 import org.apache.commons.io.FileUtils;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 public class ProbeCommands {
     public static ServerLevel COMMAND_LEVEL = null;
-    public static Thread runningThread = null;
+    public static Thread compileThread = null;
+    public static Thread resolveRenderThread = null;
 
-    public static void triggerDump(ServerPlayer player, boolean force) {
-        if (runningThread != null && runningThread.isAlive()) {
+    public static void triggerRender(Consumer<String> sendMessage) {
+        if (resolveRenderThread != null && resolveRenderThread.isAlive()) {
+            sendMessage.accept("Skipping image rendering due to previous render thread still running.");
+        } else if (resolveRenderThread != null) {
+            sendMessage.accept("Previous render thread is dead! Please check out latest.log and submit an error report.");
+            resolveRenderThread = null;
+        }
+        resolveRenderThread = new Thread(() -> {
+
+            sendMessage.accept("Resolving items to render...");
+            List<Pair<ItemStack, Path>> items = new ArrayList<>();
+            for (ItemStack itemStack : ItemWrapper.getList()) {
+                Path path = ProbePaths.RICH.resolve(itemStack.kjs$getIdLocation().getNamespace());
+                if (!Files.exists(path)) {
+                    try {
+                        Files.createDirectories(path);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                String name = itemStack.kjs$getIdLocation().getPath().replace("/", "_");
+                if (path.resolve(name + ".png").toFile().exists()) {
+                    continue;
+                }
+                items.add(Pair.of(itemStack, path.resolve(name + ".png")));
+            }
+            sendMessage.accept("Items resolved, rendering " + items.size() + " items...");
+            Minecraft.getInstance().execute(() -> {
+                try {
+                    RichItemCompiler.render(items);
+                    sendMessage.accept("Images rendered.");
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+            resolveRenderThread = null;
+        });
+
+        resolveRenderThread.setUncaughtExceptionHandler((t, e) -> {
+            e.printStackTrace();
+            sendMessage.accept("Error occurred while rendering images! Please check out latest.log and submit an error report.");
+            resolveRenderThread = null;
+        });
+        resolveRenderThread.setDaemon(true);
+        resolveRenderThread.start();
+
+    }
+
+    public static void triggerDump(ServerPlayer player) {
+        if (compileThread != null && compileThread.isAlive()) {
             player.sendSystemMessage(Component.literal("ProbeJS is running! Please wait for current dump to finish."), false);
             return;
-        } else if (runningThread != null) {
+        } else if (compileThread != null) {
             player.sendSystemMessage(Component.literal("ProbeJS dumping thread is dead! Please check out latest.log and submit an error report."), false);
-            runningThread = null;
+            compileThread = null;
         }
 
         player.server.kjs$runCommandSilent("reload");
@@ -59,7 +114,7 @@ public class ProbeCommands {
             long sub = TimeUnit.MILLISECONDS.convert(duration.getNano(), TimeUnit.NANOSECONDS);
             player.sendSystemMessage(Component.literal(s + " [%s.%03ds]".formatted(duration.getSeconds(), sub)), false);
         };
-        runningThread = new Thread(() -> {
+        compileThread = new Thread(() -> {
             try {
                 SpecialCompiler.specialCompilers.clear();
                 // Send out js generation event, this should happen before class crawling so probe can resolve everything later
@@ -80,30 +135,22 @@ public class ProbeCommands {
                 player.sendSystemMessage(Component.literal("Uncaught exception happened in wrapper, please report to the Github issue with complete latest.log."), false);
             }
             sendMessage.accept("ProbeJS typing generation finished.");
-            runningThread = null;
+            compileThread = null;
         });
-        runningThread.setUncaughtExceptionHandler((t, e) -> {
+        compileThread.setUncaughtExceptionHandler((t, e) -> {
             ProbeJS.LOGGER.error(e);
             for (StackTraceElement stackTraceElement : e.getStackTrace()) {
                 ProbeJS.LOGGER.error(stackTraceElement.toString());
             }
             sendMessage.accept("ProbeJS has run into an error! Please check out latest.log and report to GitHub!");
         });
-        runningThread.setDaemon(true);
-        runningThread.start();
-        Minecraft.getInstance().execute(() -> {
-            try {
-                sendMessage.accept("Rendering images for ProbeJS rich display...");
-                RichItemCompiler.render(force);
-                sendMessage.accept("Images rendered.");
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        });
+        compileThread.setDaemon(true);
+        compileThread.start();
+
+        triggerRender(sendMessage);
     }
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
-
         dispatcher.register(
                 Commands.literal("probejs")
                         .then(Commands.literal("dump")
@@ -116,7 +163,7 @@ public class ProbeCommands {
                                 .executes(context -> {
                                     var player = context.getSource().getPlayer();
                                     if (player != null)
-                                        triggerDump(player, false);
+                                        triggerDump(player);
                                     return Command.SINGLE_SUCCESS;
                                 }))
                         .then(Commands.literal("clear_cache")

@@ -73,4 +73,8 @@ public abstract class PlatformSpecial {
         NameResolver.putSpecialAssignments(clazz, () -> List.of("Special.%s".formatted(remappedName.get(remappedName.size() - 1))));
         return new FormatterRegistry<>(registry);
     }
+
+    public void preCompile() {
+
+    }
 }

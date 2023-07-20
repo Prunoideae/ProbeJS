@@ -1,5 +1,6 @@
 package com.probejs.rich.item;
 
+import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.datafixers.util.Pair;
 import com.probejs.ProbeJS;
@@ -14,6 +15,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 public class RichItemCompiler {
     public static void compile() throws IOException {
@@ -40,19 +42,13 @@ public class RichItemCompiler {
 
     }
 
-    public static void render(boolean force) throws IOException {
-        for (ItemStack itemStack : ItemWrapper.getList()) {
-            Path path = ProbePaths.RICH.resolve(itemStack.kjs$getIdLocation().getNamespace());
-            if (!Files.exists(path)) {
-                Files.createDirectories(path);
-            }
-            String name = itemStack.kjs$getIdLocation().getPath().replace("/", "_");
-            if (path.resolve(name + ".png").toFile().exists() && !force) {
-                continue;
-            }
-            NativeImage image = ImageHelper.getFromItem(itemStack, ImageHelper.init());
-            image.writeToFile(path.resolve(name + ".png"));
+    public static void render(List<Pair<ItemStack, Path>> items) throws IOException {
+        RenderTarget frameBuffer = ImageHelper.init();
+        for (Pair<ItemStack, Path> pair : items) {
+            NativeImage image = ImageHelper.getFromItem(pair.getFirst(), frameBuffer);
+            image.writeToFile(pair.getSecond());
             image.close();
+            frameBuffer.clear(false);
         }
     }
 }

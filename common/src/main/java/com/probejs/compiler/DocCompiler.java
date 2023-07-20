@@ -304,6 +304,7 @@ public class DocCompiler {
     }
 
     public static void compile(Consumer<String> sendMessage, DocGenerationEventJS event) throws IOException {
+        PlatformSpecial.INSTANCE.get().preCompile();
         DummyBindingEvent bindingEvent = fetchBindings(ServerScriptManager.getScriptManager())
                 .merge(fetchBindings(KubeJS.getClientScriptManager()))
                 .merge(fetchBindings(KubeJS.getStartupScriptManager()));
@@ -330,7 +331,6 @@ public class DocCompiler {
                 .collect(Collectors.toSet());
 
         //Fetch all classes
-        sendMessage.accept("Start fetching classes...");
         Set<Class<?>> globalClasses = DocCompiler.fetchClasses(typeMap, bindingEvent, cachedClasses);
         sendMessage.accept("Classes fetched.");
         globalClasses.removeIf(c -> ClassResolver.skipped.contains(c));
@@ -338,17 +338,14 @@ public class DocCompiler {
         // Deprecated since hybrid type is a thing in TypeScript
         // SpecialTypes.processFunctionalInterfaces(globalClasses);
         SpecialTypes.processEnums(globalClasses);
-        sendMessage.accept("Special types processed.");
 
         //Load and merge documents
-        sendMessage.accept("Started translating Java classes to JSON intermediates...");
         List<DocumentClass> javaDocs = Manager.loadJavaClasses(globalClasses);
         //Insert some special documents to extend the function
         javaDocs.addAll(PlatformSpecial.INSTANCE.get().getPlatformDocuments(javaDocs));
 
-        sendMessage.accept("Translation completed, started downloading docs...");
+        sendMessage.accept("Started downloading and merging docs...");
         Manager.downloadDocs();
-        sendMessage.accept("Docs downloaded, started merging docs...");
         List<DocumentClass> fetchedDocs = Manager.loadFetchedClassDoc();
         List<DocumentClass> modDocs = Manager.loadModDocuments();
         List<DocumentClass> userDocs = new ArrayList<>();

@@ -43,7 +43,7 @@ public class ProbeJSEvents {
 
     public static void playerJoined(ServerPlayer player) {
         if (player.server.isSingleplayer() && player.hasPermissions(2)) {
-            if (!ProbeConfig.INSTANCE.enabled) return;
+            if (!ProbeConfig.INSTANCE.shouldProbingAggressive()) return;
             try {
                 MessageDigest digest = MessageDigest.getInstance("SHA-256");
                 for (Mod mod : Platform.getMods().stream().sorted(Comparator.comparing(Mod::getModId)).toList()) {
@@ -55,12 +55,16 @@ public class ProbeJSEvents {
                     ProbeConfig.INSTANCE.modHash = hash;
                     ProbeConfig.INSTANCE.save();
                     player.sendSystemMessage(Component.literal("Mod list has changed, dumping new docs..."));
-                    ProbeCommands.triggerDump(player, true);
+                    ProbeCommands.triggerDump(player);
                 }
             } catch (NoSuchAlgorithmException ignored) {
 
             }
-
+            player.sendSystemMessage(Component.literal("Aggressive probing is on. Remember to disable it in production!").kjs$red().kjs$underlined());
+            player.sendSystemMessage(Component.literal("Use ")
+                    .append(Component.literal("/probejs configure toggle_aggressive").kjs$underlined().kjs$green().kjs$clickSuggestCommand("/probejs configure toggle_aggressive"))
+                    .append(Component.literal(" to disable.").kjs$white())
+            );
         }
     }
 }
