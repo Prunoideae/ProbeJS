@@ -373,7 +373,8 @@ public class DocCompiler {
         SpecialCompiler.specialCompilers.addAll(event.getSpecialFormatters());
 
         //Compile things
-        exportSerializedClasses(javaDocs, mergedDocs);
+        if (ProbeConfig.INSTANCE.dumpJSONIntermediates)
+            exportSerializedClasses(javaDocs, mergedDocs);
         compileGlobal(mergedDocs);
         RegistryCompiler.compileRegistryEvents();
         TagEventCompiler.compileTagEvents();

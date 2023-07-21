@@ -16,6 +16,7 @@ import com.probejs.jdoc.java.ClassInfo;
 import com.probejs.jdoc.document.DocumentClass;
 import com.probejs.jdoc.jsgen.DocGenerationEventJS;
 import com.probejs.jdoc.jsgen.ProbeJSEvents;
+import com.probejs.rich.fluid.RichFluidCompiler;
 import com.probejs.rich.item.RichItemCompiler;
 import dev.latvian.mods.kubejs.KubeJSPaths;
 import dev.latvian.mods.kubejs.bindings.ItemWrapper;
@@ -57,27 +58,15 @@ public class ProbeCommands {
         }
         resolveRenderThread = new Thread(() -> {
 
-            sendMessage.accept("Resolving items to render...");
-            List<Pair<ItemStack, Path>> items = new ArrayList<>();
-            for (ItemStack itemStack : ItemWrapper.getList()) {
-                Path path = ProbePaths.RICH.resolve(itemStack.kjs$getIdLocation().getNamespace());
-                if (!Files.exists(path)) {
-                    try {
-                        Files.createDirectories(path);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-                String name = itemStack.kjs$getIdLocation().getPath().replace("/", "_");
-                if (path.resolve(name + ".png").toFile().exists()) {
-                    continue;
-                }
-                items.add(Pair.of(itemStack, path.resolve(name + ".png")));
-            }
-            sendMessage.accept("Items resolved, rendering " + items.size() + " items...");
+            sendMessage.accept("Resolving things to render...");
+            var items = RichItemCompiler.resolve();
+            sendMessage.accept("Items resolved, will render " + items.size() + " items.");
+            var fluids = RichFluidCompiler.resolve();
+            sendMessage.accept("Fluids resolved, will render " + fluids.size() + " fluids.");
             Minecraft.getInstance().execute(() -> {
                 try {
                     RichItemCompiler.render(items);
+                    RichFluidCompiler.render(fluids);
                     sendMessage.accept("Images rendered.");
                 } catch (Throwable e) {
                     sendMessage.accept("Error occurred while rendering images! Please check out latest.log and submit an error report.");
@@ -124,6 +113,7 @@ public class ProbeCommands {
                 sendMessage.accept("Started generating type files...");
                 SnippetCompiler.compile(event);
                 RichItemCompiler.compile();
+                RichFluidCompiler.compile();
                 sendMessage.accept("Snippets generated.");
                 ClassResolver.init();
                 NameResolver.init();
@@ -230,38 +220,15 @@ public class ProbeCommands {
                                             ProbeConfig.INSTANCE.save();
                                             return Command.SINGLE_SUCCESS;
                                         })
-                                )
-
-                        )
-                        .then(Commands.literal("export")
-                                .requires(source -> source.getServer().isSingleplayer())
-                                .then(Commands.argument("className", StringArgumentType.string())
-                                        .suggests((ctx, builder) -> SharedSuggestionProvider.suggest(
-                                                ClassInfo.CLASS_CACHE
-                                                        .values()
-                                                        .stream()
-                                                        .map(ClassInfo::getName),
-                                                builder)
-                                        )
-                                        .executes(ctx -> {
-                                            String className = StringArgumentType.getString(ctx, "className");
-                                            ClassInfo info = ClassInfo.CLASS_NAME_CACHE.get(className);
-                                            String[] nameParts = info.getName().split("\\.");
-                                            JsonObject document = DocumentClass.fromJava(info).serialize();
-                                            JsonArray outArray = new JsonArray();
-                                            outArray.add(document);
-                                            try {
-                                                BufferedWriter writer = Files.newBufferedWriter(KubeJSPaths.EXPORTED.resolve(nameParts[nameParts.length - 1] + ".json"));
-                                                JsonWriter jsonWriter = ProbeJS.GSON_WRITER.newJsonWriter(writer);
-                                                jsonWriter.setIndent("    ");
-                                                ProbeJS.GSON_WRITER.toJson(outArray, JsonArray.class, jsonWriter);
-                                                jsonWriter.close();
-                                            } catch (IOException e) {
-                                                throw new RuntimeException(e);
-                                            }
+                                ).then(Commands.literal("toggle_json_intermediates")
+                                        .executes(context -> {
+                                            ProbeConfig.INSTANCE.dumpJSONIntermediates = !ProbeConfig.INSTANCE.dumpJSONIntermediates;
+                                            context.getSource().sendSuccess(Component.literal("JSON intermediates dumping is now %s".formatted(ProbeConfig.INSTANCE.dumpJSONIntermediates ? "enabled" : "disabled")), false);
+                                            ProbeConfig.INSTANCE.save();
                                             return Command.SINGLE_SUCCESS;
                                         })
                                 )
+
                         )
                         .then(Commands.literal("test_availability")
                                 .executes(ctx -> {

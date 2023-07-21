@@ -14,15 +14,14 @@ import com.probejs.jdoc.property.PropertyParam;
 import com.probejs.jdoc.property.PropertyType;
 import dev.latvian.mods.kubejs.bindings.JavaWrapper;
 import dev.latvian.mods.kubejs.server.ServerScriptManager;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.material.Fluid;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.ServiceLoader;
+import java.util.*;
 import java.util.function.Supplier;
 
 public abstract class PlatformSpecial {
@@ -77,4 +76,6 @@ public abstract class PlatformSpecial {
     public void preCompile() {
 
     }
+
+    public abstract TextureAtlasSprite getFluidSprite(Fluid fluid);
 }

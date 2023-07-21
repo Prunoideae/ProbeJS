@@ -6,12 +6,18 @@ import com.probejs.compiler.DocCompiler;
 import com.probejs.compiler.formatter.formatter.IFormatter;
 import com.probejs.jdoc.document.DocumentClass;
 import com.probejs.util.PlatformSpecial;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.common.crafting.IIngredientSerializer;
 import net.minecraftforge.eventbus.ListenerList;
 import net.minecraftforge.eventbus.LockHelper;
 import net.minecraftforge.eventbus.api.EventListenerHelper;
+import net.minecraftforge.fluids.FluidStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
@@ -97,5 +103,12 @@ public class PlatformSpecialImpl extends PlatformSpecial {
         } catch (Throwable e) {
             ProbeJS.LOGGER.error("Failed to load events from Forge", e);
         }
+    }
+
+    @Override
+    public TextureAtlasSprite getFluidSprite(Fluid fluid) {
+        var properties = IClientFluidTypeExtensions.of(fluid);
+        return Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS)
+                .apply(properties.getStillTexture(new FluidStack(fluid, 1000)));
     }
 }

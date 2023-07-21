@@ -15,6 +15,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 public class RichItemCompiler {
@@ -51,5 +52,25 @@ public class RichItemCompiler {
             frameBuffer.clear(false);
         }
         frameBuffer.destroyBuffers();
+    }
+
+    public static List<Pair<ItemStack, Path>> resolve() {
+        ArrayList<Pair<ItemStack, Path>> items = new ArrayList<>();
+        for (ItemStack itemStack : ItemWrapper.getList()) {
+            Path path = ProbePaths.RICH_ITEM.resolve(itemStack.kjs$getIdLocation().getNamespace());
+            if (!Files.exists(path)) {
+                try {
+                    Files.createDirectories(path);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            String name = itemStack.kjs$getIdLocation().getPath().replace("/", "_");
+            if (path.resolve(name + ".png").toFile().exists()) {
+                continue;
+            }
+            items.add(Pair.of(itemStack, path.resolve(name + ".png")));
+        }
+        return items;
     }
 }

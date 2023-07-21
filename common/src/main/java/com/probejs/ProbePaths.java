@@ -17,6 +17,9 @@ public class ProbePaths {
     public static Path CACHE = PROBE.resolve("cache");
     public static Path RICH = CACHE.resolve("rich");
 
+    public static Path RICH_ITEM = RICH.resolve("item");
+    public static Path RICH_FLUID = RICH.resolve("fluid");
+
     public static void init() {
         if (Files.notExists(PROBE)) {
             UtilsJS.tryIO(() -> Files.createDirectories(PROBE));
