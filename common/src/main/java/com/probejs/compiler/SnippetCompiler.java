@@ -2,6 +2,7 @@ package com.probejs.compiler;
 
 import com.google.gson.JsonObject;
 import com.probejs.ProbeCommands;
+import com.probejs.ProbeConfig;
 import com.probejs.ProbeJS;
 import com.probejs.ProbePaths;
 import com.probejs.compiler.formatter.formatter.special.FormatterLootTable;
@@ -111,7 +112,8 @@ public class SnippetCompiler {
                     .add("prefix", JArray.create().add(new JPrimitive("@itemstack")))
                     .add("body", new JPrimitive("\"${1}x ${2|%s|}\"".formatted(String.join(",", ItemWrapper.getTypeList()))))
                     .serialize());
-            addRecipeSnippets(resultJson);
+            if (!ProbeConfig.INSTANCE.disableRecipeJsonDump)
+                addRecipeSnippets(resultJson);
 
             event.getSnippets().forEach(consumer -> consumer.accept(resultJson));
             return resultJson;

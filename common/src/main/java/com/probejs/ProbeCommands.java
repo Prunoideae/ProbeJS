@@ -223,6 +223,14 @@ public class ProbeCommands {
                                             return Command.SINGLE_SUCCESS;
                                         })
                                 )
+                                .then(Commands.literal("toggle_recipe_json")
+                                        .executes(context -> {
+                                            ProbeConfig.INSTANCE.disableRecipeJsonDump = !ProbeConfig.INSTANCE.disableRecipeJsonDump;
+                                            context.getSource().sendSuccess(Component.literal("Snippets of Recipe JSON is now %s".formatted(ProbeConfig.INSTANCE.disableRecipeJsonDump ? "disabled" : "enabled")), false);
+                                            ProbeConfig.INSTANCE.save();
+                                            return Command.SINGLE_SUCCESS;
+                                        })
+                                )
 
                         )
                         .then(Commands.literal("export")

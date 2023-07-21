@@ -21,6 +21,8 @@ public class ProbeConfig {
     public boolean requireSingleAndPerm = true;
     public boolean enabled = true;
 
+    public boolean disableRecipeJsonDump = false;
+
     @SuppressWarnings("unchecked")
     private static <E> E fetchPropertyOrDefault(Object key, Map<?, ?> value, E defaultValue) {
         if (value == null || !value.containsKey("version") || ((double) value.get("version")) < CONFIG_VERSION) {
@@ -42,6 +44,7 @@ public class ProbeConfig {
                 allowRegistryObjectDumps = fetchPropertyOrDefault("allowRegistryObjectDumps", obj, false);
                 requireSingleAndPerm = fetchPropertyOrDefault("requireSingleAndPerm", obj, true);
                 enabled = fetchPropertyOrDefault("enabled", obj, true);
+                disableRecipeJsonDump = fetchPropertyOrDefault("disableRecipeJsonDump", obj, false);
             } catch (IOException e) {
                 ProbeJS.LOGGER.warn("Cannot read config properties, falling back to defaults.");
             }
