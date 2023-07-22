@@ -9,6 +9,7 @@ import com.probejs.util.json.JObject;
 import com.probejs.util.json.JPrimitive;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.ClientLanguage;
+import net.minecraft.client.resources.language.LanguageInfo;
 import net.minecraft.client.resources.language.LanguageManager;
 import net.minecraft.locale.Language;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -18,6 +19,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class RichLangCompiler {
@@ -27,6 +29,12 @@ public class RichLangCompiler {
         LanguageManager languageManager = Minecraft.getInstance().getLanguageManager();
 
         var selected = languageManager.getSelected();
+        var code = selected.getCode();
+        var codeRegion = code.contains("_") ? selected.getCode().split("_")[0] : code.substring(0, 2);
+        List<LanguageInfo> sameRegionLang = languageManager.getLanguages().stream()
+                .filter(lang -> lang.getCode().startsWith(codeRegion))
+                .toList();
+
         Map<String, Map<String, String>> storage = new HashMap<>();
 
         FormatterLang.getLangKeys(LanguageManager.DEFAULT_LANGUAGE_CODE)
@@ -40,6 +48,14 @@ public class RichLangCompiler {
                     .forEach(entry ->
                             storage.computeIfAbsent(entry.getKey(), key -> new HashMap<>())
                                     .put(selected.getCode(), entry.getValue())
+                    );
+        }
+
+        for (LanguageInfo lang : sameRegionLang) {
+            FormatterLang.getLangKeys(lang)
+                    .forEach(entry ->
+                            storage.computeIfAbsent(entry.getKey(), key -> new HashMap<>())
+                                    .put(lang.getCode(), entry.getValue())
                     );
         }
 
