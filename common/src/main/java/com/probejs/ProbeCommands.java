@@ -18,6 +18,7 @@ import com.probejs.jdoc.jsgen.DocGenerationEventJS;
 import com.probejs.jdoc.jsgen.ProbeJSEvents;
 import com.probejs.rich.fluid.RichFluidCompiler;
 import com.probejs.rich.item.RichItemCompiler;
+import com.probejs.rich.lang.RichLangCompiler;
 import dev.latvian.mods.kubejs.KubeJSPaths;
 import dev.latvian.mods.kubejs.bindings.ItemWrapper;
 import dev.latvian.mods.kubejs.script.ScriptType;
@@ -114,22 +115,20 @@ public class ProbeCommands {
                 SnippetCompiler.compile(event);
                 RichItemCompiler.compile();
                 RichFluidCompiler.compile();
+                RichLangCompiler.compile();
                 sendMessage.accept("Snippets generated.");
                 ClassResolver.init();
                 NameResolver.init();
                 DocCompiler.compile(sendMessage, event);
             } catch (Exception e) {
-                ProbeJS.LOGGER.error(e);
-                for (StackTraceElement stackTraceElement : e.getStackTrace()) {
-                    ProbeJS.LOGGER.error(stackTraceElement);
-                }
+                ProbeJS.LOGGER.error("Uncaught exception has occurred!", e);
                 player.sendSystemMessage(Component.literal("Uncaught exception happened in wrapper, please report to the Github issue with complete latest.log."), false);
             }
             sendMessage.accept("ProbeJS typing generation finished.");
             compileThread = null;
         });
         compileThread.setUncaughtExceptionHandler((t, e) -> {
-            ProbeJS.LOGGER.error(e);
+            ProbeJS.LOGGER.error("Uncaught exception has occurred!", e);
             for (StackTraceElement stackTraceElement : e.getStackTrace()) {
                 ProbeJS.LOGGER.error(stackTraceElement.toString());
             }

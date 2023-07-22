@@ -33,6 +33,8 @@ import dev.latvian.mods.kubejs.registry.RegistryEventJS;
 import dev.latvian.mods.kubejs.script.ScriptManager;
 import dev.latvian.mods.kubejs.server.ServerScriptManager;
 import dev.latvian.mods.kubejs.util.KubeJSPlugins;
+import dev.latvian.mods.rhino.Context;
+import dev.latvian.mods.rhino.NativeJavaClass;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -298,17 +300,27 @@ public class DocCompiler {
     }
 
     private static DummyBindingEvent fetchBindings(ScriptManager manager) {
-        DummyBindingEvent bindingEvent = new DummyBindingEvent(manager);
-        KubeJSPlugins.forEachPlugin(plugin -> plugin.registerBindings(bindingEvent));
+        DummyBindingEvent bindingEvent = new DummyBindingEvent();
+        for (Object id : manager.topLevelScope.getIds(manager.context)) {
+            if (id instanceof String string) {
+                Object value = manager.topLevelScope.get(manager.context, string, manager.topLevelScope);
+                if (value instanceof NativeJavaClass clazz) {
+                    bindingEvent.add(string, clazz.getClassObject());
+                } else {
+                    bindingEvent.add(string, Context.jsToJava(manager.context, value, Object.class));
+                }
+            }
+        }
         return bindingEvent;
     }
 
     public static void compile(Consumer<String> sendMessage, DocGenerationEventJS event) throws IOException {
         PlatformSpecial.INSTANCE.get().preCompile();
+
+
         DummyBindingEvent bindingEvent = fetchBindings(ServerScriptManager.getScriptManager())
                 .merge(fetchBindings(KubeJS.getClientScriptManager()))
                 .merge(fetchBindings(KubeJS.getStartupScriptManager()));
-        KubeJSPlugins.forEachPlugin(plugin -> plugin.registerBindings(bindingEvent));
 
         sendMessage.accept("KubeJS plugins reloaded.");
 

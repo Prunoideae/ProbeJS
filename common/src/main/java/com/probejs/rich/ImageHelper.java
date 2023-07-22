@@ -1,4 +1,4 @@
-package com.probejs.rich.image;
+package com.probejs.rich;
 
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.pipeline.TextureTarget;

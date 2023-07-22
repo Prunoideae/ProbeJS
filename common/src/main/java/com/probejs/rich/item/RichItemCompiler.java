@@ -5,10 +5,12 @@ import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.datafixers.util.Pair;
 import com.probejs.ProbeJS;
 import com.probejs.ProbePaths;
-import com.probejs.rich.image.ImageHelper;
+import com.probejs.rich.ImageHelper;
 import com.probejs.util.json.JArray;
 import dev.latvian.mods.kubejs.bindings.ItemWrapper;
+import dev.latvian.mods.kubejs.registry.KubeJSRegistries;
 import net.minecraft.core.Registry;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 import java.io.BufferedWriter;
@@ -17,13 +19,18 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class RichItemCompiler {
     public static void compile() throws IOException {
         JArray itemArray = JArray.create()
-                .addAll(ItemWrapper.getList()
-                        .stream().map(ItemAttribute::new)
+                .addAll(KubeJSRegistries.items().entrySet()
+                        .stream()
+                        .map(Map.Entry::getValue)
+                        .map(Item::getDefaultInstance)
+                        .map(ItemAttribute::new)
                         .map(ItemAttribute::serialize));
+
         Path richFile = ProbePaths.WORKSPACE_SETTINGS.resolve("item-attributes.json");
         BufferedWriter writer = Files.newBufferedWriter(richFile);
         writer.write(ProbeJS.GSON.toJson(itemArray.serialize()));
@@ -56,7 +63,7 @@ public class RichItemCompiler {
 
     public static List<Pair<ItemStack, Path>> resolve() {
         ArrayList<Pair<ItemStack, Path>> items = new ArrayList<>();
-        for (ItemStack itemStack : ItemWrapper.getList()) {
+        for (ItemStack itemStack : KubeJSRegistries.items().entrySet().stream().map(Map.Entry::getValue).map(Item::getDefaultInstance).toList()) {
             Path path = ProbePaths.RICH_ITEM.resolve(itemStack.kjs$getIdLocation().getNamespace());
             if (!Files.exists(path)) {
                 try {

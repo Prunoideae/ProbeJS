@@ -7,16 +7,15 @@ import dev.latvian.mods.rhino.ScriptableObject;
 
 import java.util.*;
 
-public class DummyBindingEvent extends BindingsEvent {
+public class DummyBindingEvent {
     private final HashMap<String, Object> constantDumpMap = new HashMap<>();
     private final HashMap<String, Class<?>> classDumpMap = new HashMap<>();
     private final HashMap<String, BaseFunction> functionDump = new HashMap<>();
 
-    public DummyBindingEvent(ScriptManager manager) {
-        super(manager, null);
+    public DummyBindingEvent() {
+
     }
 
-    @Override
     public void add(String name, Object value) {
         if (value.getClass() == Class.class) {
             this.classDumpMap.put(name, (Class<?>) value);

@@ -97,9 +97,7 @@ public class PlatformSpecialImpl extends PlatformSpecial {
 
             readLock.unlock();
 
-            eventClasses.forEach(eventClass -> {
-                DocCompiler.CapturedClasses.capturedRawEvents.put(eventClass.getName(), eventClass);
-            });
+            eventClasses.forEach(eventClass -> DocCompiler.CapturedClasses.capturedRawEvents.put(eventClass.getName(), eventClass));
         } catch (Throwable e) {
             ProbeJS.LOGGER.error("Failed to load events from Forge", e);
         }

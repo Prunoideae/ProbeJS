@@ -20,6 +20,8 @@ public class ProbePaths {
     public static Path RICH_ITEM = RICH.resolve("item");
     public static Path RICH_FLUID = RICH.resolve("fluid");
 
+    public static Path KUBE_ASSETS = KubeJSPaths.DIRECTORY.resolve("assets");
+
     public static void init() {
         if (Files.notExists(PROBE)) {
             UtilsJS.tryIO(() -> Files.createDirectories(PROBE));

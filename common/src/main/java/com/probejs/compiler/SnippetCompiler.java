@@ -5,6 +5,7 @@ import com.probejs.ProbeCommands;
 import com.probejs.ProbeConfig;
 import com.probejs.ProbeJS;
 import com.probejs.ProbePaths;
+import com.probejs.compiler.formatter.formatter.special.FormatterLang;
 import com.probejs.compiler.formatter.formatter.special.FormatterLootTable;
 import com.probejs.compiler.formatter.formatter.special.FormatterRecipeId;
 import com.probejs.compiler.formatter.formatter.special.FormatterTag;
@@ -16,6 +17,8 @@ import dev.architectury.platform.Platform;
 import dev.latvian.mods.kubejs.bindings.ItemWrapper;
 import dev.latvian.mods.kubejs.registry.KubeJSRegistries;
 import net.minecraft.advancements.Advancement;
+import net.minecraft.client.resources.language.LanguageInfo;
+import net.minecraft.client.resources.language.LanguageManager;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -108,6 +111,7 @@ public class SnippetCompiler {
                     .map(Advancement::getId)
                     .map(ResourceLocation::toString).collect(Collectors.toList()));
             addSnippets(resultJson, "mod", Platform.getModIds());
+            addSnippets(resultJson, "lang_key", FormatterLang.getLangKeys(LanguageManager.DEFAULT_LANGUAGE_CODE).map(Map.Entry::getKey).toList());
             resultJson.add("itemstack", JObject.create()
                     .add("prefix", JArray.create().add(new JPrimitive("@itemstack")))
                     .add("body", new JPrimitive("\"${1}x ${2|%s|}\"".formatted(String.join(",", ItemWrapper.getTypeList()))))

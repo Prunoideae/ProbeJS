@@ -68,6 +68,11 @@ public class JObject implements IJsonBuilder<JsonObject> {
         return this;
     }
 
+    public JObject addAllEntry(Stream<Map.Entry<String, IJsonBuilder<?>>> members) {
+        members.forEach(entry -> this.members.put(entry.getKey(), entry.getValue()));
+        return this;
+    }
+
     @Override
     public JsonObject serialize() {
         JsonObject object = base;
