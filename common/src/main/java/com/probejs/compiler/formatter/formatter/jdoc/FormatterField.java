@@ -35,10 +35,10 @@ public class FormatterField extends DocumentFormatter<DocumentField> {
     @Override
     public List<String> formatDocument(Integer indent, Integer stepIndent) {
         List<String> modifiers = new ArrayList<>();
-        if (document.isFinal())
-            modifiers.add("readonly");
         if (document.isStatic() && !this.isInterface) // TS interfaces don't support static fields
             modifiers.add("static");
+        if (document.isFinal())
+            modifiers.add("readonly");
         return List.of(Util.indent(indent) + "%s%s: %s;".formatted(
                 modifiers.isEmpty() ? "" : String.join(" ", modifiers) + " ",
                 Util.getSafeName(document.getName()),

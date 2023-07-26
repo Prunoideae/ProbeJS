@@ -1,22 +1,22 @@
 package com.probejs.jdoc;
 
 import com.probejs.jdoc.property.PropertyComment;
-import dev.latvian.mods.kubejs.typings.JsInfo;
-import dev.latvian.mods.kubejs.typings.JsParam;
+import dev.latvian.mods.kubejs.typings.Info;
+import dev.latvian.mods.kubejs.typings.Param;
 
 public class JsAnnotations {
 
-    public static PropertyComment fromAnnotation(JsInfo info) {
+    public static PropertyComment fromAnnotation(Info info) {
         return fromAnnotation(info, false);
     }
 
-    public static PropertyComment fromAnnotation(JsInfo info, boolean isMethod) {
+    public static PropertyComment fromAnnotation(Info info, boolean isMethod) {
         PropertyComment comment = new PropertyComment();
         for (String l : info.value().split("\n")) {
             comment.add(l);
         }
         if (isMethod) {
-            for (JsParam param : info.params()) {
+            for (Param param : info.params()) {
                 comment.add("@param " + param.name() + " " + param.value());
             }
         }

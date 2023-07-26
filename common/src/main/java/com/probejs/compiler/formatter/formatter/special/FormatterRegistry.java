@@ -26,6 +26,8 @@ public class FormatterRegistry<T> implements IFormatter {
                 items.add(ProbeJS.GSON.toJson(rl.getPath()));
             items.add(ProbeJS.GSON.toJson(rl.toString()));
         });
+        if (items.isEmpty())
+            items.add("never");
         return List.of("%stype %s = %s;".formatted(" ".repeat(indent), typeName, String.join(" | ", items)));
     }
 }

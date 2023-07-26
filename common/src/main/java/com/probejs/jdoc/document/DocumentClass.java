@@ -5,7 +5,7 @@ import com.probejs.jdoc.JsAnnotations;
 import com.probejs.jdoc.java.ClassInfo;
 import com.probejs.jdoc.Serde;
 import com.probejs.jdoc.property.PropertyType;
-import dev.latvian.mods.kubejs.typings.JsInfo;
+import dev.latvian.mods.kubejs.typings.Info;
 
 import java.util.*;
 
@@ -76,8 +76,8 @@ public class DocumentClass extends AbstractDocument<DocumentClass> {
                 document.builtinComments.add("This class is marked to be removed in future!");
             }
         });
-        info.getAnnotations().stream().filter(annotation -> annotation instanceof JsInfo).findFirst().ifPresent(annotation -> {
-            document.builtinComments = document.builtinComments.merge(JsAnnotations.fromAnnotation((JsInfo) annotation, true));
+        info.getAnnotations().stream().filter(annotation -> annotation instanceof Info).findFirst().ifPresent(annotation -> {
+            document.builtinComments = document.builtinComments.merge(JsAnnotations.fromAnnotation((Info) annotation, true));
         });
         return document;
     }
