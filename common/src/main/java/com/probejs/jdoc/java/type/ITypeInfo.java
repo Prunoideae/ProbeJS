@@ -11,4 +11,6 @@ public interface ITypeInfo {
     ITypeInfo copy();
 
     boolean assignableFrom(ITypeInfo info);
+
+    boolean equalsTo(ITypeInfo info);
 }

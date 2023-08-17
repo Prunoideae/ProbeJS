@@ -10,12 +10,6 @@ public class RawCompiler {
     //To be honest, this sucks
     public static void compileRaw() throws IOException {
         BufferedWriter writer = Files.newBufferedWriter(ProbePaths.GENERATED.resolve("raw.d.ts"));
-        writer.write("""
-                interface String {
-                     readonly namespace: string,
-                     readonly path: string
-                }
-                """);
         writer.close();
     }
 }

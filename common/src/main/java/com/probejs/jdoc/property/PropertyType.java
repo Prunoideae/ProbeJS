@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.mojang.datafixers.util.Pair;
 import com.probejs.compiler.formatter.NameResolver;
 import com.probejs.jdoc.Serde;
 import com.probejs.jdoc.java.type.*;
@@ -734,6 +735,52 @@ public abstract class PropertyType<T extends PropertyType<T>> extends AbstractPr
 
         public PropertyType<?> getComponent() {
             return component;
+        }
+    }
+
+    public static class JSLambda extends PropertyType<JSLambda> {
+        private final List<Pair<String, PropertyType<?>>> params = new ArrayList<>();
+        private PropertyType<?> returns = new Native("any");
+
+        public JSLambda() {
+        }
+
+        public JSLambda(List<Pair<String, PropertyType<?>>> params, PropertyType<?> returns) {
+            this.params.addAll(params);
+            this.returns = returns;
+        }
+
+        @Override
+        public JSLambda copy() {
+            return new JSLambda(params, returns);
+        }
+
+        @Override
+        public String getTypeName() {
+            return "(%s) => %s".formatted(params.stream().map(pair -> "%s: %s".formatted(pair.getFirst(), pair.getSecond().getTypeName())).collect(Collectors.joining(", ")), returns.getTypeName());
+        }
+
+        @Override
+        public void fromJava(ITypeInfo type) {
+
+        }
+
+        @Override
+        public boolean equalsToJavaType(ITypeInfo type) {
+            return false;
+        }
+
+        @Override
+        public boolean typeEquals(JSLambda type) {
+            return params.equals(type.params) && returns.equals(type.returns);
+        }
+
+        public List<Pair<String, PropertyType<?>>> getParams() {
+            return params;
+        }
+
+        public PropertyType<?> getReturns() {
+            return returns;
         }
     }
 

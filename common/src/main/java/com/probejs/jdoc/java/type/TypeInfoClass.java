@@ -48,6 +48,11 @@ public class TypeInfoClass implements ITypeInfo {
         return info instanceof TypeInfoClass clazz && clazz.type.isAssignableFrom(type);
     }
 
+    @Override
+    public boolean equalsTo(ITypeInfo info) {
+        return info instanceof TypeInfoClass clazz && clazz.type.equals(type);
+    }
+
     public List<ITypeInfo> getTypeVariables() {
         return Arrays.stream(type.getTypeParameters()).map(InfoTypeResolver::resolveType).collect(Collectors.toList());
     }

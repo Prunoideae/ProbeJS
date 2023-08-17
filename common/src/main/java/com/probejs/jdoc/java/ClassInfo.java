@@ -12,6 +12,7 @@ import dev.latvian.mods.rhino.JavaMembers;
 import dev.latvian.mods.rhino.util.HideFromJS;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -72,7 +73,7 @@ public class ClassInfo {
             JavaMembers members = JavaMembers.lookupClass(manager.context, manager.topLevelScope, clazz, clazz, false);
             constructorInfo = members.getAccessibleConstructors().stream().map(ConstructorInfo::new).collect(Collectors.toList());
             methodInfo = members.getAccessibleMethods(manager.context, false).stream()
-                    .filter(m -> m.method.getDeclaringClass() == clazz || m.method.isDefault())
+                    .filter(m -> !hasIdenticalParentMethod(m.method, clazz))
                     .map(m -> new MethodInfo(m, clazz))
                     .collect(Collectors.toList());
             fieldInfo = members.getAccessibleFields(manager.context, false)
@@ -82,7 +83,7 @@ public class ClassInfo {
                     .collect(Collectors.toList());
         } catch (Throwable e) {
             e.printStackTrace();
-            ProbeJS.LOGGER.warn("Error occured when resolving class %s! Touching the class with KubeJS will likely to crash too!".formatted(clazz.getName()));
+            ProbeJS.LOGGER.warn("Error occurred when resolving class %s! Touching the class with KubeJS will likely to crash too!".formatted(clazz.getName()));
             constructorInfo = List.of();
             methodInfo = List.of();
             fieldInfo = List.of();
@@ -146,5 +147,24 @@ public class ClassInfo {
 
     public List<Annotation> getAnnotations() {
         return annotations;
+    }
+
+    private static boolean hasIdenticalParentMethod(Method method, Class<?> clazz) {
+        if (method.isDefault())
+            return false;
+
+        Class<?> parent = clazz.getSuperclass();
+        if (parent == null)
+            return false;
+        while (parent != null) {
+            try {
+                Method parentMethod = parent.getMethod(method.getName(), method.getParameterTypes());
+                // Check if the generic return type is the same
+                return parentMethod.getGenericReturnType().equals(method.getGenericReturnType());
+            } catch (NoSuchMethodException e) {
+                parent = parent.getSuperclass();
+            }
+        }
+        return false;
     }
 }

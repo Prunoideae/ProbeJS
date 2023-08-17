@@ -1,5 +1,6 @@
 package com.probejs.util.forge;
 
+import com.mojang.datafixers.util.Pair;
 import com.probejs.ProbeJS;
 import com.probejs.compiler.DocCompiler;
 import com.probejs.jdoc.java.ClassInfo;
@@ -28,6 +29,7 @@ public class ForgeEventDocument {
         consumer.fromJava(new TypeInfoClass(Consumer.class));
         for (Class<?> clazz : DocCompiler.CapturedClasses.capturedRawEvents.values()) {
             ClassInfo info = ClassInfo.getOrCache(clazz);
+
             DocumentMethod method = (info.getParameters().isEmpty() ? onEvent : onGenericEvent).copy();
             PropertyComment comment = new PropertyComment(
                     "This event is%s cancellable".formatted(clazz.isAnnotationPresent(Cancelable.class) ? "" : " **not**"),
@@ -38,7 +40,10 @@ public class ForgeEventDocument {
             method.params.set(0, new PropertyParam("eventClass", new PropertyType.Native(ProbeJS.GSON.toJson(info.getName())), false));
             var eventType = new PropertyType.Clazz();
             eventType.fromJava(new TypeInfoClass(clazz));
-            method.params.set(1, new PropertyParam("handler", new PropertyType.Parameterized(consumer, List.of(eventType)), false));
+            if (!info.getParameters().isEmpty()) {
+                method.params.set(1, new PropertyParam("generic", new PropertyType.Native("Special.JavaClass"), false));
+            }
+            method.params.set(info.getParameters().isEmpty() ? 1 : 2, new PropertyParam("handler", new PropertyType.JSLambda(List.of(new Pair<>("event", eventType)), new PropertyType.Native("void")), false));
             document.methods.add(method);
         }
         return document;

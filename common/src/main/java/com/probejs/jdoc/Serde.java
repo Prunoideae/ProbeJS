@@ -31,6 +31,7 @@ public class Serde {
         AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyType.JSObject.class, "type:object");
         AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyType.JSArray.class, "type:jsArray");
         AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyType.TypeOf.class, "type:typeof");
+        AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyType.JSLambda.class, "type:lambda");
 
         //Properties
         AbstractProperty.DOCUMENT_TYPE_REGISTRY.put(PropertyComment.class, "property:comment");

@@ -320,6 +320,29 @@ public abstract class FormatterType<T extends PropertyType<T>> extends DocumentF
         }
     }
 
+    public static class JSLambda extends FormatterType<PropertyType.JSLambda> {
+        private final List<IFormatter> params = new ArrayList<>();
+        private final FormatterType<?> returns;
+
+        public JSLambda(PropertyType.JSLambda document) {
+            super(document);
+            document.getParams().forEach(pair -> params.add(
+                    (indent, step) -> List.of("%s: %s".formatted(
+                            pair.getFirst(),
+                            Serde.getTypeFormatter(pair.getSecond()).formatFirst()
+                    ))));
+            returns = Serde.getTypeFormatter(document.getReturns());
+        }
+
+        @Override
+        protected List<String> formatDocument(Integer indent, Integer stepIndent) {
+            return List.of("(%s) => %s".formatted(
+                    params.stream().map(IFormatter::formatFirst).collect(Collectors.joining(", ")),
+                    returns.formatFirst()
+            ));
+        }
+    }
+
     @SuppressWarnings("unchecked")
     public static <T extends PropertyType<T>> void addFormatter(Class<T> clazz, Function<T, FormatterType<T>> constructor) {
         FORMATTER_REGISTRY.put(clazz, type -> constructor.apply((T) type));
@@ -336,5 +359,6 @@ public abstract class FormatterType<T extends PropertyType<T>> extends DocumentF
         addFormatter(PropertyType.JSObject.class, JSObject::new);
         addFormatter(PropertyType.JSArray.class, JSArray::new);
         addFormatter(PropertyType.TypeOf.class, TypeOf::new);
+        addFormatter(PropertyType.JSLambda.class, JSLambda::new);
     }
 }

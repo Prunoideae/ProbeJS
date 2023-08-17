@@ -1,8 +1,10 @@
 package com.probejs.compiler;
 
 import com.probejs.ProbeCommands;
+import com.probejs.ProbeJS;
 import com.probejs.compiler.formatter.formatter.IFormatter;
 import com.probejs.compiler.formatter.formatter.special.*;
+import com.probejs.jdoc.java.ClassInfo;
 import com.probejs.recipe.FormatterRecipe;
 import com.probejs.recipe.component.FormatterRecipeSchema;
 import com.probejs.util.PlatformSpecial;
@@ -12,6 +14,7 @@ import net.minecraft.resources.ResourceKey;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class SpecialCompiler {
     public static final List<IFormatter> specialCompilers = new ArrayList<>();
@@ -40,6 +43,18 @@ public class SpecialCompiler {
         formatters.add(FormatterRecipe.formatRecipeNamespaces());
         formatters.add(FormatterRecipeSchema.formatRecipeClasses());
         formatters.add((i, d) -> List.of("%stype ArrayOrSelf<T> = T[] | T".formatted(" ".repeat(i))));
+
+        formatters.add((i, d) -> List.of("%stype JavaClass = %s".formatted(
+                " ".repeat(i),
+                DocCompiler.CapturedClasses.capturedJavaClasses.isEmpty() ?
+                        "never" :
+                        DocCompiler.CapturedClasses.capturedJavaClasses
+                                .stream()
+                                .map(ClassInfo::getOrCache)
+                                .map(ClassInfo::getName)
+                                .map(ProbeJS.GSON::toJson)
+                                .collect(Collectors.joining(" | "))
+        )));
         formatters.addAll(PlatformSpecial.INSTANCE.get().getPlatformFormatters());
         formatters.addAll(specialCompilers);
         return formatters;

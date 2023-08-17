@@ -97,6 +97,7 @@ public class ProbeCommands {
         }
 
         player.server.kjs$runCommandSilent("reload");
+        player.server.kjs$runCommandSilent("kubejs dump_internals events");
         COMMAND_LEVEL = player.getLevel();
         Instant start = Instant.now();
         Consumer<String> sendMessage = s -> {

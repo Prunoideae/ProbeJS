@@ -62,4 +62,9 @@ public class TypeInfoArray implements ITypeInfo {
     public boolean assignableFrom(ITypeInfo info) {
         return info instanceof TypeInfoArray && info.getBaseType().assignableFrom(type);
     }
+
+    @Override
+    public boolean equalsTo(ITypeInfo info) {
+        return info instanceof TypeInfoArray && info.getBaseType().equalsTo(type);
+    }
 }

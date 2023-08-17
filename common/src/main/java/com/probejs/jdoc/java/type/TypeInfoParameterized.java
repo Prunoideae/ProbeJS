@@ -63,6 +63,19 @@ public class TypeInfoParameterized implements ITypeInfo {
         return false;
     }
 
+    @Override
+    public boolean equalsTo(ITypeInfo info) {
+        if (info instanceof TypeInfoParameterized parameterized) {
+            if (parameterized.rawType.equalsTo(rawType) && parameterized.paramTypes.size() == paramTypes.size()) {
+                for (int i = 0; i < paramTypes.size(); i++)
+                    if (!parameterized.paramTypes.get(i).equalsTo(paramTypes.get(i)))
+                        return false;
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void setParamTypes(List<ITypeInfo> paramTypes) {
         this.paramTypes = paramTypes;
     }

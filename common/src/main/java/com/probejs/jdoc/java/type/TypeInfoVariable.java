@@ -93,6 +93,11 @@ public class TypeInfoVariable implements ITypeInfo {
     }
 
     @Override
+    public boolean equalsTo(ITypeInfo info) {
+        return info instanceof TypeInfoVariable;
+    }
+
+    @Override
     public Class<?> getResolvedClass() {
         if (bounds.size() == 1)
             return bounds.get(0).getResolvedClass();

@@ -20,6 +20,7 @@ public class MethodInfo {
     private final boolean shouldHide;
     private final boolean defaultMethod;
     private final int modifiers;
+    private final Method method;
     private final Class<?> from;
     private ITypeInfo returnType;
     private List<ParamInfo> params;
@@ -50,6 +51,7 @@ public class MethodInfo {
         if (method.getDeclaringClass() != from) {
             typeGenericMap.putAll(rewindGenerics(method, from));
         }
+        this.method = method;
         this.name = methodInfo.name.isEmpty() ? method.getName() : methodInfo.name;
         this.shouldHide = false;
         this.from = from;
@@ -118,6 +120,10 @@ public class MethodInfo {
 
     public List<Annotation> getAnnotations() {
         return annotations;
+    }
+
+    public Method getMethod() {
+        return method;
     }
 
     public static class ParamInfo {

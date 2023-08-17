@@ -57,4 +57,9 @@ public class TypeInfoWildcard implements ITypeInfo {
     public boolean assignableFrom(ITypeInfo info) {
         return info.getBaseType().assignableFrom(type);
     }
+
+    @Override
+    public boolean equalsTo(ITypeInfo info) {
+        return info instanceof TypeInfoWildcard wildcard && wildcard.type.equalsTo(type);
+    }
 }
