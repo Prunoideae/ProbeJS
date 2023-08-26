@@ -83,7 +83,7 @@ allprojects {
         }
         maven {
             name = "Ladysnake Libs"
-            url = 'https://ladysnake.jfrog.io/artifactory/mods'
+            url = 'https://maven.ladysnake.org/releases'
         }
         maven {
             name = "BuildCraft" // for LBA
