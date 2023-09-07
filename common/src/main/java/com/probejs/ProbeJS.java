@@ -13,6 +13,7 @@ public class ProbeJS {
     public static final Logger LOGGER = LogManager.getLogger("probejs");
     public static final Gson GSON = new Gson();
     public static final Gson GSON_WRITER = new GsonBuilder()
+            .setLenient()
             .setPrettyPrinting()
             .disableHtmlEscaping()
             .create();
