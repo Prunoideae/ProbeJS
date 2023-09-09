@@ -7,7 +7,8 @@ import com.probejs.compiler.formatter.formatter.FormatterNamespace;
 import com.probejs.compiler.formatter.formatter.IFormatter;
 import com.probejs.util.RLHelper;
 import com.probejs.util.Util;
-import dev.latvian.mods.kubejs.server.TagEventJS;
+import dev.latvian.mods.kubejs.server.tag.TagEventJS;
+import dev.latvian.mods.kubejs.server.tag.TagWrapper;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
@@ -69,7 +70,7 @@ public class TagEventCompiler {
             String capitalized = RLHelper.finalComponentToTitle(registry.location().getPath());
             String specialType = "Special.%s".formatted(capitalized);
             String tagType = specialType + "Tag";
-            String wrapperType = Util.formatMaybeParameterized(TagEventJS.TagWrapper.class);
+            String wrapperType = Util.formatMaybeParameterized(TagWrapper.class);
 
             formatted.add("%sclass %s extends %s {".formatted(" ".repeat(indent), capitalized, Util.formatMaybeParameterized(TagEventJS.class)));
             formatted.add("%sget(id: %s): %s".formatted(" ".repeat(indent), tagType, wrapperType));
