@@ -12,9 +12,10 @@ import com.probejs.util.json.JArray;
 import com.probejs.util.json.JObject;
 import com.probejs.util.json.JPrimitive;
 import dev.architectury.platform.Platform;
-import dev.latvian.mods.kubejs.registry.KubeJSRegistries;
+import dev.latvian.mods.kubejs.registry.RegistryInfo;
 import net.minecraft.client.resources.language.ClientLanguage;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.locale.Language;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -90,8 +91,8 @@ public class SchemaCompiler {
                 .add("type", JPrimitive.create("string"))
                 .add("enum", JArray.create()
                         .addAll(
-                                KubeJSRegistries.genericRegistry(key)
-                                        .getIds()
+                                RegistryInfo.of(key).getVanillaRegistry()
+                                        .keySet()
                                         .stream()
                                         .map(ResourceLocation::toString)
                                         .map(JPrimitive::create)

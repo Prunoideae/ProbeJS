@@ -8,8 +8,8 @@ import com.mojang.datafixers.util.Pair;
 import com.probejs.compiler.formatter.NameResolver;
 import com.probejs.jdoc.Serde;
 import com.probejs.jdoc.java.type.*;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;

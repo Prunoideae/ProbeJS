@@ -11,8 +11,8 @@ import com.probejs.jdoc.document.*;
 import com.probejs.jdoc.java.type.*;
 import com.probejs.jdoc.property.*;
 import com.probejs.jdoc.property.condition.PropertyMod;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.Map;
 import java.util.function.Function;
@@ -148,7 +148,7 @@ public class Serde {
         }
     }
 
-    @Nonnull
+    @NotNull
     public static PropertyValue<?, ?> getValueProperty(Object o) {
         if (o == null)
             return new PropertyValue.NullValue();

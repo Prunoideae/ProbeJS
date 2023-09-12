@@ -7,9 +7,7 @@ import com.probejs.ProbeJS;
 import com.probejs.ProbePaths;
 import com.probejs.rich.ImageHelper;
 import com.probejs.util.json.JArray;
-import dev.latvian.mods.kubejs.bindings.ItemWrapper;
-import dev.latvian.mods.kubejs.registry.KubeJSRegistries;
-import net.minecraft.core.Registry;
+import dev.latvian.mods.kubejs.registry.RegistryInfo;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
@@ -24,7 +22,7 @@ import java.util.Map;
 public class RichItemCompiler {
     public static void compile() throws IOException {
         JArray itemArray = JArray.create()
-                .addAll(KubeJSRegistries.items().entrySet()
+                .addAll(RegistryInfo.ITEM.entrySet()
                         .stream()
                         .map(Map.Entry::getValue)
                         .map(Item::getDefaultInstance)
@@ -37,7 +35,8 @@ public class RichItemCompiler {
         writer.close();
 
         JArray tagArray = JArray.create()
-                .addAll(Registry.ITEM.getTags()
+                .addAll(RegistryInfo.ITEM.getVanillaRegistry()
+                        .getTags()
                         .map(Pair::getFirst)
                         .map(ItemTagAttribute::new)
                         .map(ItemTagAttribute::serialize)
@@ -63,7 +62,7 @@ public class RichItemCompiler {
 
     public static List<Pair<ItemStack, Path>> resolve() {
         ArrayList<Pair<ItemStack, Path>> items = new ArrayList<>();
-        for (ItemStack itemStack : KubeJSRegistries.items().entrySet().stream().map(Map.Entry::getValue).map(Item::getDefaultInstance).toList()) {
+        for (ItemStack itemStack : RegistryInfo.ITEM.entrySet().stream().map(Map.Entry::getValue).map(Item::getDefaultInstance).toList()) {
             Path path = ProbePaths.RICH_ITEM.resolve(itemStack.kjs$getIdLocation().getNamespace());
             if (!Files.exists(path)) {
                 try {

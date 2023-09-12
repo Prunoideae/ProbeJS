@@ -7,7 +7,7 @@ import com.probejs.ProbeJS;
 import com.probejs.ProbePaths;
 import com.probejs.rich.ImageHelper;
 import com.probejs.util.json.JArray;
-import dev.latvian.mods.kubejs.registry.KubeJSRegistries;
+import dev.latvian.mods.kubejs.registry.RegistryInfo;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.material.Fluid;
 
@@ -22,7 +22,7 @@ import java.util.Map;
 public class RichFluidCompiler {
     public static void compile() throws IOException {
         JArray fluidArray = JArray.create()
-                .addAll(KubeJSRegistries.fluids().entrySet().stream()
+                .addAll(RegistryInfo.FLUID.entrySet().stream()
                         .map(Map.Entry::getValue)
                         .map(FluidAttribute::new)
                         .map(FluidAttribute::serialize));
@@ -46,9 +46,9 @@ public class RichFluidCompiler {
 
     public static List<Pair<Fluid, Path>> resolve() {
         ArrayList<Pair<Fluid, Path>> fluids = new ArrayList<>();
-        var registry = KubeJSRegistries.fluids();
+        var registry = RegistryInfo.FLUID.getVanillaRegistry();
         for (Fluid fluid : registry) {
-            ResourceLocation id = registry.getId(fluid);
+            ResourceLocation id = registry.getKey(fluid);
             if (id == null) continue;
             Path path = ProbePaths.RICH_FLUID.resolve(id.getNamespace());
             if (!Files.exists(path)) {

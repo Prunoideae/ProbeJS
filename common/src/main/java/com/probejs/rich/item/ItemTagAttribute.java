@@ -4,6 +4,7 @@ import com.probejs.util.json.JArray;
 import com.probejs.util.json.JObject;
 import com.probejs.util.json.JPrimitive;
 import dev.latvian.mods.kubejs.core.ItemKJS;
+import dev.latvian.mods.kubejs.registry.RegistryInfo;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.tags.TagKey;
@@ -20,7 +21,7 @@ public class ItemTagAttribute {
     public ItemTagAttribute(TagKey<Item> itemTag) {
         this.id = itemTag.location().toString();
         this.itemsOfTag = new ArrayList<>();
-        for (Holder<Item> holder : Registry.ITEM.getTagOrEmpty(itemTag)) {
+        for (Holder<Item> holder : RegistryInfo.ITEM.getVanillaRegistry().getTagOrEmpty(itemTag)) {
             itemsOfTag.add(holder.value());
         }
     }

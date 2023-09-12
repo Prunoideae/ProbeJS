@@ -15,9 +15,8 @@ import com.probejs.util.json.JObject;
 import com.probejs.util.json.JPrimitive;
 import dev.architectury.platform.Platform;
 import dev.latvian.mods.kubejs.bindings.ItemWrapper;
-import dev.latvian.mods.kubejs.registry.KubeJSRegistries;
+import dev.latvian.mods.kubejs.registry.RegistryInfo;
 import net.minecraft.advancements.Advancement;
-import net.minecraft.client.resources.language.LanguageInfo;
 import net.minecraft.client.resources.language.LanguageManager;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
@@ -45,7 +44,7 @@ public class SnippetCompiler {
         }
 
         private static <T> void putRegistry(Map<String, List<String>> registries, String type, ResourceKey<Registry<T>> registry) {
-            registries.put(type, KubeJSRegistries.genericRegistry(registry).getIds().stream().map(ResourceLocation::toString).toList());
+            registries.put(type, RegistryInfo.of(registry).getVanillaRegistry().keySet().stream().map(ResourceLocation::toString).toList());
         }
 
         @SuppressWarnings("unchecked")

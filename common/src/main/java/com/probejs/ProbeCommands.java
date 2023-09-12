@@ -98,7 +98,7 @@ public class ProbeCommands {
 
         player.server.kjs$runCommandSilent("reload");
         player.server.kjs$runCommandSilent("kubejs dump_internals events");
-        COMMAND_LEVEL = player.getLevel();
+        COMMAND_LEVEL = (ServerLevel) player.level();
         Instant start = Instant.now();
         Consumer<String> sendMessage = s -> {
             Instant end = Instant.now();
@@ -183,22 +183,22 @@ public class ProbeCommands {
                                 .then(Commands.literal("toggle_aggressive")
                                         .executes(context -> {
                                             boolean aggressive = ProbeConfig.INSTANCE.toggleAggressiveProbing();
-                                            context.getSource().sendSuccess(Component.literal("Aggressive mode is now: %s".formatted(aggressive ? "disabled" : "enabled")), false);
+                                            context.getSource().sendSuccess(() -> Component.literal("Aggressive mode is now: %s".formatted(aggressive ? "disabled" : "enabled")), false);
                                             ProbeConfig.INSTANCE.save();
-                                            context.getSource().sendSuccess(Component.literal("Changes will be applied next time you start the game."), false);
+                                            context.getSource().sendSuccess(() -> Component.literal("Changes will be applied next time you start the game."), false);
                                             return Command.SINGLE_SUCCESS;
                                         }))
                                 .then(Commands.literal("toggle_registry_dumps")
                                         .executes(context -> {
                                             ProbeConfig.INSTANCE.allowRegistryObjectDumps = !ProbeConfig.INSTANCE.allowRegistryObjectDumps;
-                                            context.getSource().sendSuccess(Component.literal("Dump of object classes in registries: %s".formatted(ProbeConfig.INSTANCE.allowRegistryObjectDumps ? "enabled" : "disabled")), false);
+                                            context.getSource().sendSuccess(() -> Component.literal("Dump of object classes in registries: %s".formatted(ProbeConfig.INSTANCE.allowRegistryObjectDumps ? "enabled" : "disabled")), false);
                                             ProbeConfig.INSTANCE.save();
                                             return Command.SINGLE_SUCCESS;
                                         }))
                                 .then(Commands.literal("toggle_dump_req")
                                         .executes(context -> {
                                             ProbeConfig.INSTANCE.requireSingleAndPerm = !ProbeConfig.INSTANCE.requireSingleAndPerm;
-                                            context.getSource().sendSuccess(Component.literal("Dump command now %srequire%s single player and cheat enabled".formatted(
+                                            context.getSource().sendSuccess(() -> Component.literal("Dump command now %srequire%s single player and cheat enabled".formatted(
                                                     ProbeConfig.INSTANCE.requireSingleAndPerm ? "" : "does not ",
                                                     ProbeConfig.INSTANCE.requireSingleAndPerm ? "s" : ""
                                             )), false);
@@ -208,7 +208,7 @@ public class ProbeCommands {
                                 .then(Commands.literal("toggle_enable")
                                         .executes(context -> {
                                             ProbeConfig.INSTANCE.enabled = !ProbeConfig.INSTANCE.enabled;
-                                            context.getSource().sendSuccess(Component.literal("ProbeJS is now %s".formatted(ProbeConfig.INSTANCE.enabled ? "enabled" : "disabled")), false);
+                                            context.getSource().sendSuccess(() -> Component.literal("ProbeJS is now %s".formatted(ProbeConfig.INSTANCE.enabled ? "enabled" : "disabled")), false);
                                             ProbeConfig.INSTANCE.save();
                                             return Command.SINGLE_SUCCESS;
                                         })
@@ -216,14 +216,14 @@ public class ProbeCommands {
                                 .then(Commands.literal("toggle_recipe_json")
                                         .executes(context -> {
                                             ProbeConfig.INSTANCE.disableRecipeJsonDump = !ProbeConfig.INSTANCE.disableRecipeJsonDump;
-                                            context.getSource().sendSuccess(Component.literal("Snippets of Recipe JSON is now %s".formatted(ProbeConfig.INSTANCE.disableRecipeJsonDump ? "disabled" : "enabled")), false);
+                                            context.getSource().sendSuccess(() -> Component.literal("Snippets of Recipe JSON is now %s".formatted(ProbeConfig.INSTANCE.disableRecipeJsonDump ? "disabled" : "enabled")), false);
                                             ProbeConfig.INSTANCE.save();
                                             return Command.SINGLE_SUCCESS;
                                         })
                                 ).then(Commands.literal("toggle_json_intermediates")
                                         .executes(context -> {
                                             ProbeConfig.INSTANCE.dumpJSONIntermediates = !ProbeConfig.INSTANCE.dumpJSONIntermediates;
-                                            context.getSource().sendSuccess(Component.literal("JSON intermediates dumping is now %s".formatted(ProbeConfig.INSTANCE.dumpJSONIntermediates ? "enabled" : "disabled")), false);
+                                            context.getSource().sendSuccess(() -> Component.literal("JSON intermediates dumping is now %s".formatted(ProbeConfig.INSTANCE.dumpJSONIntermediates ? "enabled" : "disabled")), false);
                                             ProbeConfig.INSTANCE.save();
                                             return Command.SINGLE_SUCCESS;
                                         })
@@ -234,7 +234,7 @@ public class ProbeCommands {
                                 .executes(ctx -> {
                                     boolean local = ctx.getSource().getServer().isSingleplayer();
                                     boolean perm = ctx.getSource().hasPermission(2);
-                                    Consumer<String> sendMessage = s -> ctx.getSource().sendSuccess(Component.literal(s), false);
+                                    Consumer<String> sendMessage = s -> ctx.getSource().sendSuccess(() -> Component.literal(s), false);
                                     if (local && perm) {
                                         sendMessage.accept("You should can execute ProbeJS dump.");
                                     } else {

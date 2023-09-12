@@ -1,14 +1,15 @@
 package com.probejs.recipe;
 
-import com.probejs.ProbeJS;
 import com.probejs.compiler.formatter.formatter.IFormatter;
 import com.probejs.jdoc.property.PropertyComment;
 import com.probejs.recipe.component.FormatterRecipeKey;
 import com.probejs.util.Util;
-import dev.latvian.mods.kubejs.recipe.RecipeJS;
-import dev.latvian.mods.kubejs.recipe.schema.*;
+import dev.latvian.mods.kubejs.recipe.schema.JsonRecipeSchema;
+import dev.latvian.mods.kubejs.recipe.schema.RecipeConstructor;
+import dev.latvian.mods.kubejs.recipe.schema.RecipeNamespace;
+import dev.latvian.mods.kubejs.recipe.schema.RecipeSchemaType;
 import dev.latvian.mods.kubejs.recipe.schema.minecraft.SpecialRecipeSchema;
-import dev.latvian.mods.kubejs.registry.KubeJSRegistries;
+import dev.latvian.mods.kubejs.registry.RegistryInfo;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.*;
@@ -80,7 +81,11 @@ public class FormatterRecipe implements IFormatter {
     public static IFormatter formatRecipeNamespaces() {
         return (indent, stepIndent) -> {
             //Collect all recipe serializers' ids so they're a set of all available mods
-            Set<String> serializerIds = KubeJSRegistries.recipeSerializers().getIds().stream().map(ResourceLocation::getNamespace).collect(Collectors.toSet());
+            Set<String> serializerIds = RegistryInfo.RECIPE_SERIALIZER.getVanillaRegistry()
+                    .keySet()
+                    .stream()
+                    .map(ResourceLocation::getNamespace)
+                    .collect(Collectors.toSet());
 
             ArrayList<String> lines = new ArrayList<>();
             lines.add("%sclass DocumentedRecipes {".formatted(" ".repeat(indent)));

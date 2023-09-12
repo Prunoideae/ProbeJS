@@ -37,7 +37,7 @@ public class RegistryCompiler {
 
     public static List<String> getRegistryEventOverrides() {
         ArrayList<String> lines = new ArrayList<>();
-        for (RegistryInfo types : RegistryInfo.MAP.values()) {
+        for (RegistryInfo<?> types : RegistryInfo.MAP.values()) {
             ResourceLocation loc = types.key.location();
             String registryName = RegistryCompiler.FormatterRegistry.getFormattedRegistryName(types);
             lines.add("registry(type: %s, handler: (event: Registry.%s) => void):void,".formatted(ProbeJS.GSON.toJson(loc.toString()), registryName));
@@ -50,14 +50,14 @@ public class RegistryCompiler {
     }
 
     public static class FormatterRegistry implements IFormatter {
-        RegistryInfo types;
+        RegistryInfo<?> types;
         String name;
 
-        public static String getFormattedRegistryName(RegistryInfo types) {
+        public static String getFormattedRegistryName(RegistryInfo<?> types) {
             return RLHelper.rlToTitle(types.key.location().getPath());
         }
 
-        private FormatterRegistry(RegistryInfo types) {
+        private FormatterRegistry(RegistryInfo<?> types) {
             this.types = types;
             this.name = getFormattedRegistryName(types);
         }
@@ -67,7 +67,7 @@ public class RegistryCompiler {
             List<String> formatted = new ArrayList<>();
             int stepped = indent + stepIndent;
             formatted.add(" ".repeat(indent) + "class %s extends %s {".formatted(name, Util.formatMaybeParameterized(RegistryEventJS.class)));
-            for (BuilderType builder : types.types.values()) {
+            for (BuilderType<?> builder : types.types.values()) {
                 formatted.add(" ".repeat(stepped) + "create(id: string, type: %s): %s;".formatted(ProbeJS.GSON.toJson(builder.type()), Util.formatMaybeParameterized(builder.builderClass())));
             }
             if (types.getDefaultType() != null) {

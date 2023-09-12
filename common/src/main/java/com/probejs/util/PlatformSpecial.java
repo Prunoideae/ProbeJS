@@ -19,8 +19,8 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.material.Fluid;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.function.Supplier;
 
@@ -30,13 +30,13 @@ public abstract class PlatformSpecial {
         return serviceLoader.findFirst().orElseThrow(() -> new RuntimeException("Could not find platform implementation for PlatformSpecial!"));
     });
 
-    @Nonnull
+    @NotNull
     public abstract List<ResourceLocation> getIngredientTypes();
 
-    @Nonnull
+    @NotNull
     public abstract List<IFormatter> getPlatformFormatters();
 
-    @Nonnull
+    @NotNull
     public List<DocumentClass> getPlatformDocuments(List<DocumentClass> globalClasses) {
         ArrayList<DocumentClass> documents = new ArrayList<>();
         try {

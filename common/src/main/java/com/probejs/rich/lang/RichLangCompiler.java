@@ -29,10 +29,9 @@ public class RichLangCompiler {
         LanguageManager languageManager = Minecraft.getInstance().getLanguageManager();
 
         var selected = languageManager.getSelected();
-        var code = selected.getCode();
-        var codeRegion = code.contains("_") ? selected.getCode().split("_")[0] : code.substring(0, 2);
-        List<LanguageInfo> sameRegionLang = languageManager.getLanguages().stream()
-                .filter(lang -> lang.getCode().startsWith(codeRegion))
+        var codeRegion = selected.contains("_") ? selected.split("_")[0] : selected.substring(0, 2);
+        List<LanguageInfo> sameRegionLang = languageManager.getLanguages().values().stream()
+                .filter(lang -> lang.name().startsWith(codeRegion))
                 .toList();
 
         Map<String, Map<String, String>> storage = new HashMap<>();
@@ -43,11 +42,11 @@ public class RichLangCompiler {
                                 .put(LanguageManager.DEFAULT_LANGUAGE_CODE, entry.getValue())
                 );
 
-        if (!selected.getCode().equals(LanguageManager.DEFAULT_LANGUAGE_CODE)) {
+        if (!selected.equals(LanguageManager.DEFAULT_LANGUAGE_CODE)) {
             FormatterLang.getLangKeys(selected)
                     .forEach(entry ->
                             storage.computeIfAbsent(entry.getKey(), key -> new HashMap<>())
-                                    .put(selected.getCode(), entry.getValue())
+                                    .put(selected, entry.getValue())
                     );
         }
 
@@ -55,7 +54,7 @@ public class RichLangCompiler {
             FormatterLang.getLangKeys(lang)
                     .forEach(entry ->
                             storage.computeIfAbsent(entry.getKey(), key -> new HashMap<>())
-                                    .put(lang.getCode(), entry.getValue())
+                                    .put(lang.name(), entry.getValue())
                     );
         }
 
@@ -68,7 +67,7 @@ public class RichLangCompiler {
                                                 .entrySet()
                                                 .stream()
                                                 .map(e -> new Pair<>(e.getKey(), JPrimitive.create(e.getValue())))))
-                                .add("selected", JPrimitive.create(selected.getCode()))
+                                .add("selected", JPrimitive.create(selected))
                 )
         );
 

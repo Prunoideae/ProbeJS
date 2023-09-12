@@ -7,8 +7,6 @@ import com.probejs.jdoc.java.ClassInfo;
 import com.probejs.jdoc.java.MethodInfo;
 import com.probejs.jdoc.java.type.ITypeInfo;
 import com.probejs.jdoc.document.DocumentClass;
-import dev.latvian.mods.kubejs.block.MaterialJS;
-import dev.latvian.mods.kubejs.block.MaterialListJS;
 import dev.latvian.mods.rhino.util.RemapForJS;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.damagesource.DamageSource;
@@ -234,7 +232,6 @@ public class NameResolver {
             }
             return result;
         });
-        putSpecialAssignments(MaterialJS.class, () -> MaterialListJS.INSTANCE.map.keySet().stream().map(ProbeJS.GSON::toJson).collect(Collectors.toList()));
 
         SpecialTypes.assignRegistries();
 

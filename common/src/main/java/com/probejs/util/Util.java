@@ -3,7 +3,6 @@ package com.probejs.util;
 import com.probejs.ProbeJS;
 import com.probejs.compiler.formatter.formatter.jdoc.FormatterType;
 import com.probejs.jdoc.property.PropertyType;
-import org.checkerframework.checker.regex.qual.Regex;
 
 import java.util.*;
 import java.util.regex.Pattern;
