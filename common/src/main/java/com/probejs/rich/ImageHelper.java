@@ -2,19 +2,16 @@ package com.probejs.rich;
 
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.pipeline.TextureTarget;
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
-import com.probejs.ProbeJS;
 import com.probejs.util.PlatformSpecial;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -45,7 +42,7 @@ public class ImageHelper {
 
     public static NativeImage getFromItem(ItemStack stack, RenderTarget fbo) {
         fbo.bindWrite(true);
-        renderItem(stack, Minecraft.getInstance().getItemRenderer());
+        renderItem(stack);
         NativeImage image = fromRenderTarget(fbo);
         fbo.unbindWrite();
         return image;
@@ -60,33 +57,29 @@ public class ImageHelper {
     }
 
     public static NativeImage fromRenderTarget(RenderTarget frame) {
-        NativeImage img = new NativeImage(frame.width, frame.height, true);
-        frame.bindRead();
+        NativeImage img = new NativeImage(frame.width, frame.height, false);
+        RenderSystem.bindTexture(frame.getColorTextureId());
         img.downloadTexture(0, false);
         img.flipY();
-        frame.unbindRead();
         return img;
     }
 
-    public static void renderItem(ItemStack itemStack, ItemRenderer itemRenderer) {
-        Matrix4f backup;
-        VertexSorting sorting = RenderSystem.getVertexSorting();
-        try {
-            backup = (Matrix4f) (RenderSystem.getProjectionMatrix().clone());
-        } catch (CloneNotSupportedException e) {
-            throw new RuntimeException(e);
-        }
-        Matrix4f projection = new Matrix4f().setOrtho(0.0f, 16.0f, 0.0f, 16.0f, -150f, 150f);
-        Matrix4f modelView = createTranslateMatrix(1.0e-4f, 1.0e-4f, 0.0f);
-        projection.mul(modelView);
-        RenderSystem.setProjectionMatrix(projection, sorting);
-        renderGuiItem(Minecraft.getInstance(), itemRenderer, itemStack, 0, 0);
-        RenderSystem.setProjectionMatrix(backup, sorting);
+    public static GuiGraphics createGuiGraphics() {
+        Minecraft mc = Minecraft.getInstance();
+        return new GuiGraphics(mc, mc.renderBuffers().bufferSource());
+    }
+
+    public static void renderItem(ItemStack itemStack) {
+        GuiGraphics graphics = createGuiGraphics();
+        BakedModel model = Minecraft.getInstance().getItemRenderer().getModel(itemStack, null, null, 0);
+        renderGuiItem(graphics.pose(), itemStack, 0, 0, model);
     }
 
     public static void renderFluid(Fluid fluid) {
         TextureAtlasSprite sprite = PlatformSpecial.INSTANCE.get().getFluidSprite(fluid);
-        Matrix4f backup = null;
+        if (sprite == null)
+            return;
+        Matrix4f backup;
         VertexSorting sorting = RenderSystem.getVertexSorting();
         try {
             backup = (Matrix4f) RenderSystem.getProjectionMatrix().clone();
@@ -125,30 +118,33 @@ public class ImageHelper {
         tesselator.end();
     }
 
-    public static void renderGuiItem(Minecraft mc, ItemRenderer renderer, ItemStack stack, int i, int j) {
-        BakedModel bakedModel = renderer.getModel(stack, null, null, 0);
-        PoseStack poseStack = new PoseStack();
+    public static void renderGuiItem(PoseStack poseStack, ItemStack itemStack, int i, int j, BakedModel bakedModel) {
+        float scale = 1.0f;
         poseStack.pushPose();
-        poseStack.translate((float) i + 8, (float) j + 8, 150f);
-        try {
-            poseStack.mulPoseMatrix(new Matrix4f().scaling(1.0f, -1.0f, 1.0f));
-            poseStack.scale(16.0f, 16.0f, 16.0f);
-            boolean flag = !bakedModel.usesBlockLight();
-            if (flag) {
-                Lighting.setupForFlatItems();
-            }
-            renderer.render(
-                    stack, ItemDisplayContext.GUI,
-                    false, poseStack, mc.renderBuffers().bufferSource(),
-                    15728880, OverlayTexture.NO_OVERLAY,
-                    bakedModel
-            );
-            if (flag) {
-                Lighting.setupFor3DItems();
-            }
-        } catch (Throwable throwable) {
-            ProbeJS.LOGGER.error("Error rendering item:", throwable);
-        }
+        poseStack.scale(scale / 16, scale / 16, 1);
+        poseStack.translate(i, j, 100.0f);
+        poseStack.translate(8.0f, 8.0f, 0.0f);
+        poseStack.mulPoseMatrix(new Matrix4f().scaling(1.0f, -1.0f, 1.0f));
+        poseStack.scale(16.0f, 16.0f, 16.0f);
+        MultiBufferSource.BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
+        boolean flag = !bakedModel.usesBlockLight();
+        if (flag) Lighting.setupForFlatItems();
+
+        PoseStack poseStack1 = RenderSystem.getModelViewStack();
+        poseStack1.pushPose();
+        poseStack1.mulPoseMatrix(poseStack.last().pose());
+        RenderSystem.applyModelViewMatrix();
+        Minecraft.getInstance().getItemRenderer().render(
+                itemStack, ItemDisplayContext.GUI,
+                false, new PoseStack(), bufferSource,
+                15728880, OverlayTexture.NO_OVERLAY, bakedModel
+        );
+        bufferSource.endBatch();
+        RenderSystem.enableDepthTest();
+        if (flag) Lighting.setupFor3DItems();
         poseStack.popPose();
+        poseStack1.popPose();
+        RenderSystem.applyModelViewMatrix();
+        Lighting.setupFor3DItems();
     }
 }

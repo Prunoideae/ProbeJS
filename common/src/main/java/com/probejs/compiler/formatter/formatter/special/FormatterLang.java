@@ -11,6 +11,7 @@ import net.minecraft.locale.Language;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -30,28 +31,27 @@ public class FormatterLang implements IFormatter {
 
     public static Stream<Map.Entry<String, String>> getLangKeys(String language) {
         LanguageManager manager = Minecraft.getInstance().getLanguageManager();
-        return manager.getLanguages()
-                .values()
-                .stream()
-                // if language is not found, MC will throw an exception, so we check each language instead
-                // though I soon realized that I can just catch the exception, but I'm too lazy to change it
-                .filter(lang -> lang.region().equals(language))
-                .findFirst()
-                .map(FormatterLang::getLangKeys)
-                .orElse(Stream.empty());
+        return getLangKeys(manager.getLanguages().get(language));
     }
 
     public static Stream<Map.Entry<String, String>> getLangKeys(LanguageInfo language) {
         Minecraft mc = Minecraft.getInstance();
         LanguageManager manager = mc.getLanguageManager();
         LanguageInfo english = manager.getLanguage(LanguageManager.DEFAULT_LANGUAGE_CODE);
-        List<LanguageInfo> languages = language.region().equals(LanguageManager.DEFAULT_LANGUAGE_CODE)
+        List<LanguageInfo> languages = language.equals(english)
                 ? List.of(english)
                 : List.of(english, language);
 
+        HashMap<LanguageInfo, String> reversedMap = new HashMap<>();
+        manager.getLanguages().forEach((key, value) -> reversedMap.put(value, key));
+        List<String> langFiles = languages.stream()
+                .map(reversedMap::get)
+                .filter(Objects::nonNull)
+                .toList();
+
         ClientLanguage clientLanguage = ClientLanguage.loadFrom(
                 mc.getResourceManager(),
-                languages.stream().map(LanguageInfo::name).collect(Collectors.toList()),
+                langFiles,
                 english.bidirectional()
         );
         return clientLanguage.storage.entrySet().stream();

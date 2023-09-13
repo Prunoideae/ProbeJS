@@ -6,6 +6,8 @@ import com.probejs.compiler.DocCompiler;
 import com.probejs.compiler.formatter.formatter.IFormatter;
 import com.probejs.jdoc.document.DocumentClass;
 import com.probejs.util.PlatformSpecial;
+import dev.architectury.hooks.fluid.FluidStackHooks;
+import dev.architectury.hooks.fluid.forge.FluidStackHooksImpl;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
@@ -105,8 +107,6 @@ public class PlatformSpecialImpl extends PlatformSpecial {
 
     @Override
     public TextureAtlasSprite getFluidSprite(Fluid fluid) {
-        var properties = IClientFluidTypeExtensions.of(fluid);
-        return Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS)
-                .apply(properties.getStillTexture(new FluidStack(fluid, 1000)));
+        return FluidStackHooks.getStillTexture(fluid);
     }
 }

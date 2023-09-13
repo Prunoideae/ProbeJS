@@ -30,8 +30,9 @@ public class RichLangCompiler {
 
         var selected = languageManager.getSelected();
         var codeRegion = selected.contains("_") ? selected.split("_")[0] : selected.substring(0, 2);
-        List<LanguageInfo> sameRegionLang = languageManager.getLanguages().values().stream()
-                .filter(lang -> lang.name().startsWith(codeRegion))
+        List<LanguageInfo> sameRegionLang = languageManager.getLanguages().entrySet().stream()
+                .filter(entry -> entry.getKey().startsWith(codeRegion))
+                .map(Map.Entry::getValue)
                 .toList();
 
         Map<String, Map<String, String>> storage = new HashMap<>();
@@ -39,14 +40,14 @@ public class RichLangCompiler {
         FormatterLang.getLangKeys(LanguageManager.DEFAULT_LANGUAGE_CODE)
                 .forEach(entry ->
                         storage.computeIfAbsent(entry.getKey(), key -> new HashMap<>())
-                                .put(LanguageManager.DEFAULT_LANGUAGE_CODE, entry.getValue())
+                                .put(languageManager.getLanguage(LanguageManager.DEFAULT_LANGUAGE_CODE).name(), entry.getValue())
                 );
 
         if (!selected.equals(LanguageManager.DEFAULT_LANGUAGE_CODE)) {
             FormatterLang.getLangKeys(selected)
                     .forEach(entry ->
                             storage.computeIfAbsent(entry.getKey(), key -> new HashMap<>())
-                                    .put(selected, entry.getValue())
+                                    .put(languageManager.getLanguage(selected).name(), entry.getValue())
                     );
         }
 
@@ -67,7 +68,7 @@ public class RichLangCompiler {
                                                 .entrySet()
                                                 .stream()
                                                 .map(e -> new Pair<>(e.getKey(), JPrimitive.create(e.getValue())))))
-                                .add("selected", JPrimitive.create(selected))
+                                .add("selected", JPrimitive.create(languageManager.getLanguage(selected).name()))
                 )
         );
 

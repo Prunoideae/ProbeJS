@@ -21,12 +21,15 @@ import com.probejs.rich.item.RichItemCompiler;
 import com.probejs.rich.lang.RichLangCompiler;
 import dev.latvian.mods.kubejs.KubeJSPaths;
 import dev.latvian.mods.kubejs.bindings.ItemWrapper;
+import dev.latvian.mods.kubejs.registry.RegistryInfo;
 import dev.latvian.mods.kubejs.script.ScriptType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
@@ -50,6 +53,15 @@ public class ProbeCommands {
     public static Thread compileThread = null;
     public static Thread resolveRenderThread = null;
 
+    @SuppressWarnings("unchecked")
+    public static <T> Registry<T> getRegistry(ResourceKey<Registry<T>> registryKey) {
+        var builtinRegistry = RegistryInfo.of(registryKey).getVanillaRegistry();
+        if (builtinRegistry == null) {
+            builtinRegistry = COMMAND_LEVEL.registryAccess().registry(registryKey).get();
+        }
+        return (Registry<T>) builtinRegistry;
+    }
+
     public static void triggerRender(Consumer<String> sendMessage) {
         if (resolveRenderThread != null && resolveRenderThread.isAlive()) {
             sendMessage.accept("Skipping image rendering due to previous render thread still running.");
@@ -66,8 +78,8 @@ public class ProbeCommands {
             sendMessage.accept("Fluids resolved, will render " + fluids.size() + " fluids.");
             Minecraft.getInstance().execute(() -> {
                 try {
-                    RichItemCompiler.render(items);
-                    RichFluidCompiler.render(fluids);
+                    // RichItemCompiler.render(items);
+                    // RichFluidCompiler.render(fluids);
                     sendMessage.accept("Images rendered.");
                 } catch (Throwable e) {
                     sendMessage.accept("Error occurred while rendering images! Please check out latest.log and submit an error report.");
@@ -138,7 +150,7 @@ public class ProbeCommands {
         compileThread.setDaemon(true);
         compileThread.start();
 
-        triggerRender(sendMessage);
+        // triggerRender(sendMessage);
     }
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {

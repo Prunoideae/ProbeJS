@@ -1,5 +1,6 @@
 package com.probejs.compiler.formatter.formatter.special;
 
+import com.probejs.ProbeCommands;
 import com.probejs.ProbeJS;
 import com.probejs.compiler.formatter.formatter.IFormatter;
 import com.probejs.util.RLHelper;
@@ -21,7 +22,7 @@ public class FormatterRegistry<T> implements IFormatter {
     public List<String> format(Integer indent, Integer stepIndent) {
         List<String> items = new ArrayList<>();
         String typeName = RLHelper.finalComponentToTitle(registry.location().getPath());
-        RegistryInfo.of(registry).getVanillaRegistry().keySet().forEach(rl -> {
+        ProbeCommands.getRegistry(registry).keySet().forEach(rl -> {
             if (rl.getNamespace().equals("minecraft"))
                 items.add(ProbeJS.GSON.toJson(rl.getPath()));
             items.add(ProbeJS.GSON.toJson(rl.toString()));

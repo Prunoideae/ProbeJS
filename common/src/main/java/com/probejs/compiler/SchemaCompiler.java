@@ -91,7 +91,7 @@ public class SchemaCompiler {
                 .add("type", JPrimitive.create("string"))
                 .add("enum", JArray.create()
                         .addAll(
-                                RegistryInfo.of(key).getVanillaRegistry()
+                                ProbeCommands.getRegistry(key)
                                         .keySet()
                                         .stream()
                                         .map(ResourceLocation::toString)

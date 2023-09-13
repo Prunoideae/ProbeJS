@@ -39,6 +39,16 @@ public abstract class FormatterValue<T extends PropertyValue<T, J>, J> extends D
 
         @Override
         public List<String> formatDocument(Integer indent, Integer stepIndent) {
+            if (document.getValue() instanceof Float floatValue) {
+                // return number if it's NaN or Infinity
+                if (Float.isNaN(floatValue) || Float.isInfinite(floatValue))
+                    return List.of("number");
+            }
+            if (document.getValue() instanceof Double doubleValue) {
+                // return number if it's NaN or Infinity
+                if (Double.isNaN(doubleValue) || Double.isInfinite(doubleValue))
+                    return List.of("number");
+            }
             return List.of(ProbeJS.GSON.toJson(document.getValue()));
         }
     }
@@ -56,7 +66,7 @@ public abstract class FormatterValue<T extends PropertyValue<T, J>, J> extends D
             return List.of(typeFormatter.formatFirst());
         }
 
-        public PropertyType<?> getType(){
+        public PropertyType<?> getType() {
             return document.getType();
         }
     }

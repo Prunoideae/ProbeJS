@@ -3,6 +3,7 @@ package com.probejs.util.fabric;
 import com.probejs.compiler.formatter.formatter.IFormatter;
 import com.probejs.jdoc.document.DocumentClass;
 import com.probejs.util.PlatformSpecial;
+import dev.architectury.hooks.fluid.FluidStackHooks;
 import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.minecraft.client.Minecraft;
@@ -40,7 +41,6 @@ public class PlatformSpecialImpl extends PlatformSpecial {
 
     @Override
     public TextureAtlasSprite getFluidSprite(Fluid fluid) {
-        TextureAtlasSprite sprite = FluidVariantRendering.getSprite(FluidVariant.of(fluid));
-        return sprite == null ? Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(MissingTextureAtlasSprite.getLocation()) : sprite;
+        return FluidStackHooks.getStillTexture(fluid);
     }
 }

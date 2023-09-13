@@ -44,7 +44,7 @@ public class SnippetCompiler {
         }
 
         private static <T> void putRegistry(Map<String, List<String>> registries, String type, ResourceKey<Registry<T>> registry) {
-            registries.put(type, RegistryInfo.of(registry).getVanillaRegistry().keySet().stream().map(ResourceLocation::toString).toList());
+            registries.put(type, ProbeCommands.getRegistry(registry).keySet().stream().map(ResourceLocation::toString).toList());
         }
 
         @SuppressWarnings("unchecked")
