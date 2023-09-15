@@ -1,10 +1,12 @@
 package com.probejs.jdoc.java;
 
+import com.probejs.jdoc.JsAnnotations;
 import com.probejs.jdoc.java.type.ITypeInfo;
 import com.probejs.jdoc.java.type.InfoTypeResolver;
 import com.probejs.jdoc.java.type.TypeInfoClass;
 import dev.latvian.mods.kubejs.script.ScriptManager;
 import dev.latvian.mods.kubejs.server.ServerScriptManager;
+import dev.latvian.mods.kubejs.typings.Generics;
 import dev.latvian.mods.rhino.JavaMembers;
 import dev.latvian.mods.rhino.mod.util.RemappingHelper;
 import dev.latvian.mods.rhino.util.Remapper;
@@ -138,12 +140,18 @@ public class MethodInfo {
         public ParamInfo(Parameter parameter, Map<Type, Type> typeMap) {
             this.name = parameter.getName();
             this.isVararg = parameter.isVarArgs();
-            try {
-                this.type = InfoTypeResolver.resolveType(parameter.getParameterizedType(), t -> typeMap.getOrDefault(t, t));
-            } catch (Exception e) {
-                //#3, WTF???
-                e.printStackTrace();
-                this.type = new TypeInfoClass(Object.class);
+            var typeAnnotation = parameter.getAnnotation(Generics.class);
+
+            if (typeAnnotation != null) {
+                this.type = JsAnnotations.fromGenerics(typeAnnotation);
+            } else {
+                try {
+                    this.type = InfoTypeResolver.resolveType(parameter.getParameterizedType(), t -> typeMap.getOrDefault(t, t));
+                } catch (Exception e) {
+                    //#3, WTF???
+                    e.printStackTrace();
+                    this.type = new TypeInfoClass(Object.class);
+                }
             }
         }
 

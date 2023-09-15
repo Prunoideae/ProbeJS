@@ -1,8 +1,16 @@
 package com.probejs.jdoc;
 
+import com.probejs.jdoc.java.type.ITypeInfo;
+import com.probejs.jdoc.java.type.InfoTypeResolver;
+import com.probejs.jdoc.java.type.TypeInfoClass;
+import com.probejs.jdoc.java.type.TypeInfoParameterized;
 import com.probejs.jdoc.property.PropertyComment;
+import dev.latvian.mods.kubejs.typings.Generics;
 import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.kubejs.typings.Param;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class JsAnnotations {
 
@@ -22,4 +30,15 @@ public class JsAnnotations {
         }
         return comment;
     }
+
+    public static ITypeInfo fromGenerics(Generics generics) {
+        TypeInfoClass base = new TypeInfoClass(generics.base());
+        return generics.value().length == 0 ?
+                base :
+                new TypeInfoParameterized(
+                        base,
+                        Arrays.stream(generics.value()).map(clazz -> (ITypeInfo) new TypeInfoClass(clazz)).toList()
+                );
+    }
+
 }
