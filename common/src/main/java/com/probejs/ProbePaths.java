@@ -12,6 +12,7 @@ public class ProbePaths {
     public static Path PROBE = KubeJSPaths.DIRECTORY.resolve("probe");
     public static Path DOCS = PROBE.resolve("docs");
     public static Path GENERATED = PROBE.resolve("generated");
+    public static Path INTERNALS = GENERATED.resolve("internals");
     public static Path USER_DEFINED = PROBE.resolve("user");
     public static Path WORKSPACE_SETTINGS = Platform.getGameFolder().resolve(".vscode");
     public static Path CACHE = PROBE.resolve("cache");
@@ -31,6 +32,9 @@ public class ProbePaths {
         }
         if (Files.notExists(GENERATED)) {
             UtilsJS.tryIO(() -> Files.createDirectories(GENERATED));
+        }
+        if (Files.notExists(INTERNALS)) {
+            UtilsJS.tryIO(() -> Files.createDirectories(INTERNALS));
         }
         if (Files.notExists(USER_DEFINED)) {
             UtilsJS.tryIO(() -> Files.createDirectories(USER_DEFINED));

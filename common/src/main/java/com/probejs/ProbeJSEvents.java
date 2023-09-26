@@ -66,6 +66,10 @@ public class ProbeJSEvents {
                         .append(Component.literal(" later.").kjs$white()));
                 ProbeConfig.INSTANCE.noAggressiveProbing = true;
                 ProbeConfig.INSTANCE.firstLoad = false;
+                if (Platform.getMods().size() > ProbeConfig.MOD_COUNT) {
+                    player.sendSystemMessage(Component.literal("There are more than " + ProbeConfig.MOD_COUNT + " mods installed. Disabling literal dumps."));
+                    ProbeConfig.INSTANCE.allowRegistryLiteralDumps = false;
+                }
                 ProbeConfig.INSTANCE.save();
             } else {
                 player.sendSystemMessage(Component.literal("Aggressive probing is on. Remember to disable it in release!").kjs$red().kjs$underlined());

@@ -12,12 +12,15 @@ import java.nio.file.Path;
 import java.util.Map;
 
 public class ProbeConfig {
+    public static final int MOD_COUNT = 100;
+
     public static ProbeConfig INSTANCE = new ProbeConfig();
     private static final int CONFIG_VERSION = 1;
     public boolean firstLoad = true;
     public boolean noAggressiveProbing = false;
     public long docsTimestamp = 0;
     public boolean allowRegistryObjectDumps = false;
+    public boolean allowRegistryLiteralDumps = true;
     public boolean requireSingleAndPerm = true;
     public boolean enabled = true;
 
@@ -43,6 +46,7 @@ public class ProbeConfig {
                 noAggressiveProbing = fetchPropertyOrDefault("noAggressiveProbing", obj, false);
                 docsTimestamp = fetchPropertyOrDefault("docsTimestamp", obj, 0D).longValue();
                 allowRegistryObjectDumps = fetchPropertyOrDefault("allowRegistryObjectDumps", obj, false);
+                allowRegistryLiteralDumps = fetchPropertyOrDefault("allowRegistryLiteralDumps", obj, true);
                 requireSingleAndPerm = fetchPropertyOrDefault("requireSingleAndPerm", obj, true);
                 enabled = fetchPropertyOrDefault("enabled", obj, true);
                 disableRecipeJsonDump = fetchPropertyOrDefault("disableRecipeJsonDump", obj, false);

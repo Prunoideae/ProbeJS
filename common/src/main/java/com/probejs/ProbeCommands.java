@@ -207,6 +207,13 @@ public class ProbeCommands {
                                             ProbeConfig.INSTANCE.save();
                                             return Command.SINGLE_SUCCESS;
                                         }))
+                                .then(Commands.literal("toggle_registry_literals")
+                                        .executes(context -> {
+                                            ProbeConfig.INSTANCE.allowRegistryLiteralDumps = !ProbeConfig.INSTANCE.allowRegistryLiteralDumps;
+                                            context.getSource().sendSuccess(() -> Component.literal("Dump of literals in registries: %s".formatted(ProbeConfig.INSTANCE.allowRegistryLiteralDumps ? "enabled" : "disabled")), false);
+                                            return Command.SINGLE_SUCCESS;
+                                        })
+                                )
                                 .then(Commands.literal("toggle_dump_req")
                                         .executes(context -> {
                                             ProbeConfig.INSTANCE.requireSingleAndPerm = !ProbeConfig.INSTANCE.requireSingleAndPerm;

@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 public class Util {
 
-    public static final Set<String> KEYWORDS = new HashSet<>(Arrays.asList("abstract,arguments,boolean,break,byte,case,catch,char,const,continue,debugger,default,delete,do,double,else,eval,false,final,finally,float,for,function,goto,if,implements,in,instanceof,int,interface,let,long,native,new,null,package,private,protected,public,return,short,static,switch,synchronized,this,throw,throws,transient,true,try,typeof,var,void,volatile,while,with,yield".split(",")));
+    public static final Set<String> KEYWORDS = new HashSet<>(Arrays.asList("abstract,arguments,boolean,break,byte,case,catch,char,const,continue,constructor,debugger,default,delete,do,double,else,eval,false,final,finally,float,for,function,goto,if,implements,in,instanceof,int,interface,let,long,native,new,null,package,private,protected,public,return,short,static,switch,synchronized,this,throw,throws,transient,true,try,typeof,var,void,volatile,while,with,yield".split(",")));
 
     public static <T> T tryOrDefault(TrySupplier<T> toEval, T defaultValue) {
         try {
@@ -26,6 +26,10 @@ public class Util {
 
     public static String snakeToTitle(String s) {
         return Arrays.stream(s.split("_")).map(Util::getCapitalized).collect(Collectors.joining());
+    }
+
+    public static String pathToTitle(String s) {
+        return Arrays.stream(s.split("/")).map(Util::snakeToTitle).collect(Collectors.joining());
     }
 
     private static final Pattern CAMEL_CASE_MATCH = Pattern.compile("[A-Z][a-z0-9]*");

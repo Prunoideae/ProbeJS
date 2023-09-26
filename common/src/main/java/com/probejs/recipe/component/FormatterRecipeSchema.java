@@ -21,7 +21,7 @@ public class FormatterRecipeSchema implements IFormatter {
     public FormatterRecipeSchema(String mod, String loc, RecipeSchema schema) {
         this.schema = schema;
         this.mod = Util.snakeToTitle(mod);
-        this.className = Util.snakeToTitle(loc);
+        this.className = Util.pathToTitle(loc);
     }
 
     @Override

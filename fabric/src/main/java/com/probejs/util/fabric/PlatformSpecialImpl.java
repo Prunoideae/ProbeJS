@@ -30,7 +30,7 @@ public class PlatformSpecialImpl extends PlatformSpecial {
     @Override
     @SuppressWarnings("unchecked")
     public List<IFormatter> getPlatformFormatters() {
-        return List.of();
+        return platformFormatters;
     }
 
     @NotNull

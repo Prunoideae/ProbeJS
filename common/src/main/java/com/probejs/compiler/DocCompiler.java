@@ -46,10 +46,51 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class DocCompiler {
+    private static final int CHUNK_SIZE = 1024;
+
+    public static void compileInternal(Collection<DocumentClass> internalClasses, int index) throws IOException {
+        BufferedWriter writer = Files.newBufferedWriter(ProbePaths.INTERNALS.resolve("internal_" + index + ".d.ts"));
+        writer.write("/// <reference path=\"./internal_*.d.ts\" />\n");
+        Multimap<String, IFormatter> namespaces = ArrayListMultimap.create();
+        for (DocumentClass clazz : internalClasses) {
+            FormatterClass formatter = new FormatterClass(clazz);
+            NameResolver.ResolvedName resolvedName = NameResolver.getResolvedName(clazz.getName());
+            if (resolvedName.getNamespace().isEmpty()) {
+                throw new RuntimeException("Internal class %s cannot be in the root namespace!".formatted(resolvedName.getFullName()));
+            }
+            namespaces.put(resolvedName.getNamespace(), formatter.setInternal(true));
+        }
+
+        for (String key : namespaces.keySet()) {
+            Collection<IFormatter> formatters = namespaces.get(key);
+            FormatterNamespace namespace = new FormatterNamespace(key, formatters);
+            writer.write(namespace.formatString(0, 4) + "\n");
+        }
+        writer.close();
+    }
+
+    public static void compileInternals(Collection<DocumentClass> internalClasses) throws IOException {
+        BufferedWriter indexWriter = Files.newBufferedWriter(ProbePaths.INTERNALS.resolve("index.d.ts"));
+        indexWriter.close();
+
+        int index = 0;
+        List<DocumentClass> chunk = new ArrayList<>();
+        for (DocumentClass clazz : internalClasses) {
+            chunk.add(clazz);
+            if (chunk.size() >= CHUNK_SIZE) {
+                compileInternal(chunk, index++);
+                chunk.clear();
+            }
+        }
+        if (!chunk.isEmpty()) {
+            compileInternal(chunk, index);
+        }
+    }
 
     public static void compileGlobal(Collection<DocumentClass> globalClasses) throws IOException {
         BufferedWriter writer = Files.newBufferedWriter(ProbePaths.GENERATED.resolve("globals.d.ts"));
-        Multimap<String, IFormatter> namespaces = ArrayListMultimap.create();
+        writer.write("/// <reference path=\"./internals/internal_*.d.ts\" />\n");
+        List<DocumentClass> internalClasses = new ArrayList<>();
         for (DocumentClass clazz : globalClasses) {
             FormatterClass formatter = new FormatterClass(clazz);
             NameResolver.ResolvedName resolvedName = NameResolver.getResolvedName(clazz.getName());
@@ -58,20 +99,14 @@ public class DocCompiler {
                 if (clazz.isInterface())
                     writer.write("declare const %s: %s;\n".formatted(resolvedName.getFullName(), resolvedName.getFullName()));
             } else {
-                clazz.getConstructors().forEach(constructor -> constructor.addProperty(new PropertyComment(
-                        "Internal constructor, this means that it's not valid unless you use `java()`."
-                )));
-                namespaces.put(resolvedName.getNamespace(), formatter.setInternal(true));
+                clazz.getConstructors().forEach(constructor -> constructor.addProperty(new PropertyComment("Internal constructor, this means that it's not valid unless you use `java()`.")));
+                internalClasses.add(clazz);
             }
         }
-        namespaces.putAll("Special", SpecialCompiler.compileSpecial());
-
-        for (String key : namespaces.keySet()) {
-            Collection<IFormatter> formatters = namespaces.get(key);
-            FormatterNamespace namespace = new FormatterNamespace(key, formatters);
-            writer.write(namespace.formatString(0, 4) + "\n");
-        }
+        IFormatter specialNamespace = new FormatterNamespace("Special", SpecialCompiler.compileSpecial());
+        writer.write(specialNamespace.formatString(0, 4) + "\n");
         writer.close();
+        compileInternals(internalClasses);
     }
 
     public static Set<Class<?>> readCachedClasses(String fileName) throws IOException {
@@ -115,8 +150,7 @@ public class DocCompiler {
                     if (k instanceof String && v instanceof String) {
                         try {
                             Class<?> clazz = Class.forName((String) v);
-                            if (EventJS.class.isAssignableFrom(clazz))
-                                cachedEvents.put((String) k, clazz);
+                            if (EventJS.class.isAssignableFrom(clazz)) cachedEvents.put((String) k, clazz);
                         } catch (ClassNotFoundException e) {
                             ProbeJS.LOGGER.warn("Class %s was in the cache, but disappeared in packages now.".formatted(v));
                         }
@@ -142,24 +176,11 @@ public class DocCompiler {
     }
 
     private static Set<Class<?>> fetchRecipeClasses() {
-        return RecipeNamespace.getAll()
-                .values()
-                .stream()
-                .flatMap(namespace -> namespace.values().stream())
-                .map(type -> type.schema.recipeType)
-                .collect(Collectors.toSet());
+        return RecipeNamespace.getAll().values().stream().flatMap(namespace -> namespace.values().stream()).map(type -> type.schema.recipeType).collect(Collectors.toSet());
     }
 
     private static Set<Class<?>> fetchComponentClasses() {
-        return RecipeNamespace.getAll()
-                .values()
-                .stream()
-                .flatMap(namespace -> namespace.values().stream())
-                .flatMap(type -> Arrays.stream(type.schema.keys))
-                .map(key -> key.component.componentClass())
-                .map(clazz -> clazz.isArray() ? clazz.getComponentType() : clazz)
-                .filter(clazz -> !NameResolver.resolvedPrimitives.contains(clazz.getName()))
-                .collect(Collectors.toSet());
+        return RecipeNamespace.getAll().values().stream().flatMap(namespace -> namespace.values().stream()).flatMap(type -> Arrays.stream(type.schema.keys)).map(key -> key.component.componentClass()).map(clazz -> clazz.isArray() ? clazz.getComponentType() : clazz).filter(clazz -> !NameResolver.resolvedPrimitives.contains(clazz.getName())).collect(Collectors.toSet());
     }
 
     public static Set<Class<?>> fetchClasses(Set<Class<?>> typeMap, DummyBindingEvent bindingEvent, Set<Class<?>> cachedClasses) {
@@ -189,41 +210,35 @@ public class DocCompiler {
     }
 
     public static void compileJSConfig() throws IOException {
-        writeMergedConfig(
-                KubeJSPaths.DIRECTORY.resolve("jsconfig.json"),
-                """
-                        {
-                            "compilerOptions": {
-                                "lib": ["ES5", "ES2015"],
-                                "typeRoots": ["./probe/generated", "./probe/user"],
-                                "target": "ES2015"
-                            }
-                        }"""
-        );
+        writeMergedConfig(KubeJSPaths.DIRECTORY.resolve("jsconfig.json"), """
+                {
+                    "compilerOptions": {
+                        "lib": ["ES5", "ES2015"],
+                        "typeRoots": ["./probe/generated", "./probe/user"],
+                        "target": "ES2015"
+                    }
+                }""");
     }
 
     public static void compileVSCodeConfig() throws IOException {
-        writeMergedConfig(
-                ProbePaths.WORKSPACE_SETTINGS.resolve("settings.json"),
-                """
-                        {
-                            "json.schemas": [
-                                    {
-                                        "fileMatch": [
-                                            "/lang/*.json"
-                                        ],
-                                        "url": "./.vscode/probe.lang-schema.json"
-                                    },
-                                    {
-                                        "fileMatch": [
-                                            "/probe/docs/*.json"
-                                        ],
-                                        "url": "./.vscode/probe.doc-schema.json"
-                                    }
-                            ]
-                        }
-                        """
-        );
+        writeMergedConfig(ProbePaths.WORKSPACE_SETTINGS.resolve("settings.json"), """
+                {
+                    "json.schemas": [
+                            {
+                                "fileMatch": [
+                                    "/lang/*.json"
+                                ],
+                                "url": "./.vscode/probe.lang-schema.json"
+                            },
+                            {
+                                "fileMatch": [
+                                    "/probe/docs/*.json"
+                                ],
+                                "url": "./.vscode/probe.doc-schema.json"
+                            }
+                    ]
+                }
+                """);
 
     }
 
@@ -275,8 +290,7 @@ public class DocCompiler {
     private static void writeMergedConfig(Path path, String config) throws IOException {
         JsonObject updates = ProbeJS.GSON.fromJson(config, JsonObject.class);
         JsonObject read = Files.exists(path) ? ProbeJS.GSON.fromJson(Files.newBufferedReader(path), JsonObject.class) : new JsonObject();
-        if (read == null)
-            read = new JsonObject();
+        if (read == null) read = new JsonObject();
         JsonObject original = (JsonObject) mergeJsonRecursively(read, updates);
         JsonWriter jsonWriter = ProbeJS.GSON_WRITER.newJsonWriter(Files.newBufferedWriter(path));
         jsonWriter.setIndent("    ");
@@ -318,9 +332,7 @@ public class DocCompiler {
         PlatformSpecial.INSTANCE.get().preCompile();
 
 
-        DummyBindingEvent bindingEvent = fetchBindings(ServerScriptManager.getScriptManager())
-                .merge(fetchBindings(KubeJS.getClientScriptManager()))
-                .merge(fetchBindings(KubeJS.getStartupScriptManager()));
+        DummyBindingEvent bindingEvent = fetchBindings(ServerScriptManager.getScriptManager()).merge(fetchBindings(KubeJS.getClientScriptManager())).merge(fetchBindings(KubeJS.getStartupScriptManager()));
 
         sendMessage.accept("KubeJS plugins reloaded.");
 
@@ -332,15 +344,10 @@ public class DocCompiler {
         cachedClasses.addAll(CapturedClasses.capturedRawEvents.values());
         cachedClasses.addAll(CapturedClasses.capturedJavaClasses);
         cachedClasses.addAll(RegistryCompiler.getKJSRegistryClasses());
-        if (ProbeConfig.INSTANCE.allowRegistryObjectDumps)
-            cachedClasses.addAll(SpecialTypes.collectRegistryClasses());
-        Set<Class<?>> typeMap = RecipeNamespace.getAll()
-                .values()
-                .stream()
-                .flatMap(namespace -> namespace.values().stream())
+        if (ProbeConfig.INSTANCE.allowRegistryObjectDumps) cachedClasses.addAll(SpecialTypes.collectRegistryClasses());
+        Set<Class<?>> typeMap = RecipeNamespace.getAll().values().stream().flatMap(namespace -> namespace.values().stream())
                 // TODO: add type -> recipe mapping once Lat got the new recipe system in
-                .map(type -> RecipeJS.class)
-                .collect(Collectors.toSet());
+                .map(type -> RecipeJS.class).collect(Collectors.toSet());
 
         //Fetch all classes
         Set<Class<?>> globalClasses = DocCompiler.fetchClasses(typeMap, bindingEvent, cachedClasses);
@@ -366,10 +373,7 @@ public class DocCompiler {
         } catch (Exception e) {
             ProbeJS.LOGGER.error("Error loading User-defined docs!");
         }
-        Map<String, DocumentClass> mergedDocsMap = Manager.mergeDocuments(javaDocs,
-                fetchedDocs,
-                modDocs, userDocs
-        );
+        Map<String, DocumentClass> mergedDocsMap = Manager.mergeDocuments(javaDocs, fetchedDocs, modDocs, userDocs);
 
         event.getTransformers().forEach((key, transformer) -> {
             if (mergedDocsMap.containsKey(key)) {
@@ -385,8 +389,7 @@ public class DocCompiler {
         SpecialCompiler.specialCompilers.addAll(event.getSpecialFormatters());
 
         //Compile things
-        if (ProbeConfig.INSTANCE.dumpJSONIntermediates)
-            exportSerializedClasses(javaDocs, mergedDocs);
+        if (ProbeConfig.INSTANCE.dumpJSONIntermediates) exportSerializedClasses(javaDocs, mergedDocs);
         compileGlobal(mergedDocs);
         RegistryCompiler.compileRegistryEvents();
         TagEventCompiler.compileTagEvents();
@@ -407,20 +410,16 @@ public class DocCompiler {
 
     public static void compileAdditionalTypeNames() throws IOException {
         Path path = ProbePaths.GENERATED.resolve("names.d.ts");
-        if (Files.exists(path))
-            return;
+        if (Files.exists(path)) return;
         BufferedWriter writer = Files.newBufferedWriter(ProbePaths.GENERATED.resolve("names.d.ts"));
         writer.write("/// <reference path=\"./globals.d.ts\" />\n");
         for (Map.Entry<String, List<NameResolver.ResolvedName>> entry : NameResolver.resolvedNames.entrySet()) {
             List<NameResolver.ResolvedName> exportedNames = entry.getValue();
             if (exportedNames.size() > 1) {
                 for (int i = 1; i < exportedNames.size(); i++) {
-                    if (NameResolver.resolvedPrimitives.contains(exportedNames.get(i).getLastName()))
-                        continue;
-                    if (exportedNames.get(0).getLastName().equals("any"))
-                        continue;
-                    if (exportedNames.get(0).getLastName().equals(exportedNames.get(i).getLastName()))
-                        continue;
+                    if (NameResolver.resolvedPrimitives.contains(exportedNames.get(i).getLastName())) continue;
+                    if (exportedNames.get(0).getLastName().equals("any")) continue;
+                    if (exportedNames.get(0).getLastName().equals(exportedNames.get(i).getLastName())) continue;
                     writer.write("const %s: typeof %s\n".formatted(exportedNames.get(i).getLastName(), exportedNames.get(0).getLastName()));
                 }
             }

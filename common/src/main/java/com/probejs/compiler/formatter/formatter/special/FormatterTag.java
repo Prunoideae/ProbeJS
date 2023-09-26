@@ -1,5 +1,6 @@
 package com.probejs.compiler.formatter.formatter.special;
 
+import com.probejs.ProbeConfig;
 import com.probejs.ProbeJS;
 import com.probejs.compiler.formatter.formatter.IFormatter;
 import net.minecraft.core.Registry;
@@ -25,8 +26,9 @@ public class FormatterTag implements IFormatter {
                 .map(ResourceLocation::toString)
                 .map(ProbeJS.GSON::toJson)
                 .collect(Collectors.joining(" | "));
-        if (tags.isEmpty())
-            tags = "never";
+        // Disable literal dumps if there are too many mods.
+        if (tags.isEmpty() || !ProbeConfig.INSTANCE.allowRegistryLiteralDumps)
+            tags = "string";
         return List.of("%stype %s = %s;".formatted(
                 " ".repeat(indent),
                 this.name,
