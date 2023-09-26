@@ -19,6 +19,7 @@ import com.probejs.jdoc.jsgen.ProbeJSEvents;
 import com.probejs.rich.fluid.RichFluidCompiler;
 import com.probejs.rich.item.RichItemCompiler;
 import com.probejs.rich.lang.RichLangCompiler;
+import dev.architectury.platform.Platform;
 import dev.latvian.mods.kubejs.KubeJSPaths;
 import dev.latvian.mods.kubejs.bindings.ItemWrapper;
 import dev.latvian.mods.kubejs.registry.RegistryInfo;
@@ -165,8 +166,25 @@ public class ProbeCommands {
                                 )
                                 .executes(context -> {
                                     var player = context.getSource().getPlayer();
-                                    if (player != null)
+                                    if (player != null) {
+                                        // Before dump, notify player if there are too many mods
+                                        if (Platform.getMods().size() >= ProbeConfig.MOD_COUNT) {
+                                            player.sendSystemMessage(Component.literal("There are more than " + ProbeConfig.MOD_COUNT + " mods installed. You might want to disable some feature to prevent lag in VSCode."), false);
+                                            if (!ProbeConfig.INSTANCE.disableRecipeJsonDump) {
+                                                player.sendSystemMessage(Component.literal("Recipe JSON dump is enabled. You can disable it by ")
+                                                        .append(Component.literal("/probejs configure toggle_recipe_json").kjs$underlined()
+                                                                .kjs$green().kjs$clickSuggestCommand("/probejs configure toggle_recipe_json"))
+                                                        .append("."), false);
+                                            }
+                                            if (ProbeConfig.INSTANCE.allowRegistryLiteralDumps) {
+                                                player.sendSystemMessage(Component.literal("Registry literal dump is enabled. You can disable it by ")
+                                                        .append(Component.literal("/probejs configure toggle_registry_literals").kjs$underlined()
+                                                                .kjs$green().kjs$clickSuggestCommand("/probejs configure toggle_registry_literals"))
+                                                        .append("."), false);
+                                            }
+                                        }
                                         triggerDump(player);
+                                    }
                                     return Command.SINGLE_SUCCESS;
                                 }))
                         .then(Commands.literal("clear_cache")

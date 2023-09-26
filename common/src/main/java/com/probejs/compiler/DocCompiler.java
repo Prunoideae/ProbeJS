@@ -46,7 +46,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class DocCompiler {
-    private static final int CHUNK_SIZE = 1024;
+    private static final int CHUNK_SIZE = 128;
 
     public static void compileInternal(Collection<DocumentClass> internalClasses, int index) throws IOException {
         BufferedWriter writer = Files.newBufferedWriter(ProbePaths.INTERNALS.resolve("internal_" + index + ".d.ts"));

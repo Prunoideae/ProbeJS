@@ -67,8 +67,11 @@ public class ProbeJSEvents {
                 ProbeConfig.INSTANCE.noAggressiveProbing = true;
                 ProbeConfig.INSTANCE.firstLoad = false;
                 if (Platform.getMods().size() > ProbeConfig.MOD_COUNT) {
-                    player.sendSystemMessage(Component.literal("There are more than " + ProbeConfig.MOD_COUNT + " mods installed. Disabling literal dumps."));
+                    player.sendSystemMessage(Component.literal("There are more than " + ProbeConfig.MOD_COUNT + " mods installed. Disabling some features to prevent lag..."));
                     ProbeConfig.INSTANCE.allowRegistryLiteralDumps = false;
+                    player.sendSystemMessage(Component.literal("Registry literal dumps are disabled."));
+                    ProbeConfig.INSTANCE.disableRecipeJsonDump = true;
+                    player.sendSystemMessage(Component.literal("Recipe JSON dumps are disabled."));
                 }
                 ProbeConfig.INSTANCE.save();
             } else {
