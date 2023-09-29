@@ -37,4 +37,9 @@ public class PropertyAssign extends AbstractProperty<PropertyAssign> {
     public PropertyType<?> getType() {
         return type;
     }
+
+    public PropertyAssign type(PropertyType<?> type) {
+        this.type = type;
+        return this;
+    }
 }

@@ -1,0 +1,1 @@
+///<reference path="client/index.d.ts"/>

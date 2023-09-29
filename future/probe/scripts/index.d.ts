@@ -1,0 +1,1 @@
+///<reference path="foobar.d.ts"/>

@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.probejs.jdoc.JsAnnotations;
 import com.probejs.jdoc.java.ClassInfo;
 import com.probejs.jdoc.Serde;
+import com.probejs.jdoc.property.PropertyAssign;
 import com.probejs.jdoc.property.PropertyType;
 import dev.latvian.mods.kubejs.typings.Info;
 
@@ -79,6 +80,7 @@ public class DocumentClass extends AbstractDocument<DocumentClass> {
         info.getAnnotations().stream().filter(annotation -> annotation instanceof Info).findFirst().ifPresent(annotation -> {
             document.builtinComments = document.builtinComments.merge(JsAnnotations.fromAnnotation((Info) annotation, true));
         });
+        document.properties.addAll(JsAnnotations.getClassAssignments(info));
         return document;
     }
 
