@@ -1,6 +1,6 @@
 package com.probejs.recipe.component;
 
-import com.probejs.compiler.formatter.SpecialTypes;
+import com.probejs.docs.formatter.SpecialTypes;
 import com.probejs.jdoc.property.PropertyType;
 import com.probejs.util.Util;
 import dev.latvian.mods.kubejs.typings.desc.*;

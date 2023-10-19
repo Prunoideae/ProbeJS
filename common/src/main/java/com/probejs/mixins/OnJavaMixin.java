@@ -1,7 +1,6 @@
 package com.probejs.mixins;
 
-import com.probejs.ProbeConfig;
-import com.probejs.compiler.DocCompiler;
+import com.probejs.docs.DocCompiler;
 import dev.latvian.mods.kubejs.script.ScriptManager;
 import dev.latvian.mods.rhino.NativeJavaClass;
 import org.spongepowered.asm.mixin.Mixin;

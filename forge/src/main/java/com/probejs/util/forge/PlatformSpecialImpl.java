@@ -2,24 +2,19 @@ package com.probejs.util.forge;
 
 import com.google.common.collect.BiMap;
 import com.probejs.ProbeJS;
-import com.probejs.compiler.DocCompiler;
-import com.probejs.compiler.formatter.formatter.IFormatter;
+import com.probejs.docs.DocCompiler;
+import com.probejs.docs.formatter.formatter.IFormatter;
 import com.probejs.jdoc.document.DocumentClass;
 import com.probejs.util.PlatformSpecial;
 import dev.architectury.hooks.fluid.FluidStackHooks;
-import dev.architectury.hooks.fluid.forge.FluidStackHooksImpl;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.common.crafting.IIngredientSerializer;
 import net.minecraftforge.eventbus.ListenerList;
 import net.minecraftforge.eventbus.LockHelper;
 import net.minecraftforge.eventbus.api.EventListenerHelper;
-import net.minecraftforge.fluids.FluidStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
@@ -27,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class PlatformSpecialImpl extends PlatformSpecial {
     private static Field ingredientInst = null;

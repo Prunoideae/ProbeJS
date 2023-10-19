@@ -2,7 +2,7 @@ package com.probejs.jdoc.jsgen;
 
 import com.google.gson.JsonObject;
 import com.probejs.ProbeJS;
-import com.probejs.compiler.formatter.formatter.IFormatter;
+import com.probejs.docs.formatter.formatter.IFormatter;
 import com.probejs.jdoc.java.ClassInfo;
 import com.probejs.jdoc.java.MethodInfo;
 import com.probejs.jdoc.Serde;
@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class DocGenerationEventJS extends EventJS {

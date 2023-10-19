@@ -148,9 +148,11 @@ public class MethodInfo {
                 try {
                     this.type = InfoTypeResolver.resolveType(parameter.getParameterizedType(), t -> typeMap.getOrDefault(t, t));
                 } catch (Exception e) {
-                    //#3, WTF???
-                    e.printStackTrace();
-                    this.type = new TypeInfoClass(Object.class);
+                    try {
+                        this.type = new TypeInfoClass(parameter.getType());
+                    } catch (Exception ignored) {
+                        this.type = new TypeInfoClass(Object.class);
+                    }
                 }
             }
         }

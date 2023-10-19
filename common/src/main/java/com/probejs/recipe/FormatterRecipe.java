@@ -1,6 +1,6 @@
 package com.probejs.recipe;
 
-import com.probejs.compiler.formatter.formatter.IFormatter;
+import com.probejs.docs.formatter.formatter.IFormatter;
 import com.probejs.jdoc.property.PropertyComment;
 import com.probejs.recipe.component.FormatterRecipeKey;
 import com.probejs.util.Util;

@@ -1,9 +1,10 @@
 package com.probejs.util;
 
 import com.probejs.ProbeJS;
-import com.probejs.compiler.formatter.formatter.jdoc.FormatterType;
+import com.probejs.docs.formatter.formatter.jdoc.FormatterType;
 import com.probejs.jdoc.property.PropertyType;
 
+import java.lang.reflect.Type;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;

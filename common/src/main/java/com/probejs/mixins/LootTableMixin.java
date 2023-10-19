@@ -1,6 +1,6 @@
 package com.probejs.mixins;
 
-import com.probejs.compiler.formatter.formatter.special.FormatterLootTable;
+import com.probejs.specials.special.FormatterLootTable;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.storage.loot.LootDataManager;
 import net.minecraft.world.level.storage.loot.LootDataType;

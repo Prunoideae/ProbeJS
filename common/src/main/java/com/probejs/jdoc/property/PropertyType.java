@@ -5,7 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mojang.datafixers.util.Pair;
-import com.probejs.compiler.formatter.NameResolver;
+import com.probejs.docs.formatter.NameResolver;
 import com.probejs.jdoc.Serde;
 import com.probejs.jdoc.java.type.*;
 import org.jetbrains.annotations.Nullable;

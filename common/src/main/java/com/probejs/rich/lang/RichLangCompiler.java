@@ -3,16 +3,13 @@ package com.probejs.rich.lang;
 import com.mojang.datafixers.util.Pair;
 import com.probejs.ProbeJS;
 import com.probejs.ProbePaths;
-import com.probejs.compiler.formatter.formatter.special.FormatterLang;
+import com.probejs.specials.special.FormatterLang;
 import com.probejs.util.json.JArray;
 import com.probejs.util.json.JObject;
 import com.probejs.util.json.JPrimitive;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.language.ClientLanguage;
 import net.minecraft.client.resources.language.LanguageInfo;
 import net.minecraft.client.resources.language.LanguageManager;
-import net.minecraft.locale.Language;
-import net.minecraft.server.packs.resources.ResourceManager;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

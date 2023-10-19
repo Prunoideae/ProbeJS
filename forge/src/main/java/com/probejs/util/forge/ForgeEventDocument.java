@@ -2,7 +2,7 @@ package com.probejs.util.forge;
 
 import com.mojang.datafixers.util.Pair;
 import com.probejs.ProbeJS;
-import com.probejs.compiler.DocCompiler;
+import com.probejs.docs.DocCompiler;
 import com.probejs.jdoc.java.ClassInfo;
 import com.probejs.jdoc.java.MethodInfo;
 import com.probejs.jdoc.java.type.TypeInfoClass;

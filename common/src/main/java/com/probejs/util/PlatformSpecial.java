@@ -3,9 +3,9 @@ package com.probejs.util;
 
 import com.google.common.base.Suppliers;
 import com.probejs.ProbeJS;
-import com.probejs.compiler.formatter.NameResolver;
-import com.probejs.compiler.formatter.formatter.IFormatter;
-import com.probejs.compiler.formatter.formatter.special.FormatterRegistry;
+import com.probejs.docs.formatter.NameResolver;
+import com.probejs.docs.formatter.formatter.IFormatter;
+import com.probejs.specials.special.FormatterRegistry;
 import com.probejs.jdoc.document.DocumentClass;
 import com.probejs.jdoc.document.DocumentMethod;
 import com.probejs.jdoc.java.ClassInfo;

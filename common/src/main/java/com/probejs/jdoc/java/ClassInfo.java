@@ -2,8 +2,8 @@ package com.probejs.jdoc.java;
 
 
 import com.probejs.ProbeJS;
-import com.probejs.compiler.formatter.ClassResolver;
-import com.probejs.compiler.formatter.NameResolver;
+import com.probejs.docs.formatter.ClassResolver;
+import com.probejs.docs.formatter.NameResolver;
 import com.probejs.jdoc.java.type.ITypeInfo;
 import com.probejs.jdoc.java.type.InfoTypeResolver;
 import dev.latvian.mods.kubejs.script.ScriptManager;

@@ -1,7 +1,7 @@
 package com.probejs.recipe.component;
 
-import com.probejs.compiler.formatter.formatter.FormatterNamespace;
-import com.probejs.compiler.formatter.formatter.IFormatter;
+import com.probejs.docs.formatter.formatter.FormatterNamespace;
+import com.probejs.docs.formatter.formatter.IFormatter;
 import com.probejs.util.Util;
 import dev.latvian.mods.kubejs.recipe.RecipeKey;
 import dev.latvian.mods.kubejs.recipe.schema.RecipeNamespace;
