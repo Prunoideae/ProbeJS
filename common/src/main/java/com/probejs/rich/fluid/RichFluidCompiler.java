@@ -32,13 +32,17 @@ public class RichFluidCompiler {
         writer.close();
     }
 
-    public static void render(List<Pair<Fluid, Path>> fluids) throws IOException {
+    public static void render(List<Pair<Fluid, Path>> fluids) {
         RenderTarget frameBuffer = ImageHelper.init();
         for (Pair<Fluid, Path> pair : fluids) {
-            NativeImage image = ImageHelper.getFromFluid(pair.getFirst(), frameBuffer);
-            image.writeToFile(pair.getSecond());
-            image.close();
-            frameBuffer.clear(false);
+            try {
+                NativeImage image = ImageHelper.getFromFluid(pair.getFirst(), frameBuffer);
+                image.writeToFile(pair.getSecond());
+                image.close();
+                frameBuffer.clear(false);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         frameBuffer.destroyBuffers();
 

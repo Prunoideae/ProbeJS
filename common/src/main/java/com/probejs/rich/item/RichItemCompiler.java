@@ -7,7 +7,6 @@ import com.probejs.ProbeJS;
 import com.probejs.ProbePaths;
 import com.probejs.rich.ImageHelper;
 import com.probejs.util.json.JArray;
-import dev.latvian.mods.kubejs.bindings.ItemWrapper;
 import dev.latvian.mods.kubejs.registry.KubeJSRegistries;
 import net.minecraft.core.Registry;
 import net.minecraft.world.item.Item;

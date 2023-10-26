@@ -1,12 +1,13 @@
 package com.probejs.recipe;
 
-import com.probejs.ProbeJS;
 import com.probejs.compiler.formatter.formatter.IFormatter;
 import com.probejs.jdoc.property.PropertyComment;
 import com.probejs.recipe.component.FormatterRecipeKey;
 import com.probejs.util.Util;
-import dev.latvian.mods.kubejs.recipe.RecipeJS;
-import dev.latvian.mods.kubejs.recipe.schema.*;
+import dev.latvian.mods.kubejs.recipe.schema.JsonRecipeSchema;
+import dev.latvian.mods.kubejs.recipe.schema.RecipeConstructor;
+import dev.latvian.mods.kubejs.recipe.schema.RecipeNamespace;
+import dev.latvian.mods.kubejs.recipe.schema.RecipeSchemaType;
 import dev.latvian.mods.kubejs.recipe.schema.minecraft.SpecialRecipeSchema;
 import dev.latvian.mods.kubejs.registry.KubeJSRegistries;
 import net.minecraft.resources.ResourceLocation;
