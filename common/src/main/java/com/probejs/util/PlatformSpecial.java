@@ -12,6 +12,7 @@ import com.probejs.jdoc.document.DocumentClass;
 import com.probejs.jdoc.document.DocumentMethod;
 import com.probejs.jdoc.property.PropertyParam;
 import com.probejs.jdoc.property.PropertyType;
+import com.probejs.recipe.RecipeEventDocument;
 import dev.latvian.mods.kubejs.bindings.JavaWrapper;
 import dev.latvian.mods.kubejs.server.ServerScriptManager;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -19,8 +20,8 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.material.Fluid;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.function.Supplier;
 
@@ -30,13 +31,13 @@ public abstract class PlatformSpecial {
         return serviceLoader.findFirst().orElseThrow(() -> new RuntimeException("Could not find platform implementation for PlatformSpecial!"));
     });
 
-    @Nonnull
+    @NotNull
     public abstract List<ResourceLocation> getIngredientTypes();
 
-    @Nonnull
+    @NotNull
     public abstract List<IFormatter> getPlatformFormatters();
 
-    @Nonnull
+    @NotNull
     public List<DocumentClass> getPlatformDocuments(List<DocumentClass> globalClasses) {
         ArrayList<DocumentClass> documents = new ArrayList<>();
         try {
@@ -55,6 +56,7 @@ public abstract class PlatformSpecial {
                 }
             }
             documents.add(javaWrapper);
+            documents.add(RecipeEventDocument.loadRecipeEventDocument());
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }

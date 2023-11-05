@@ -4,6 +4,8 @@ package com.probejs.jdoc.java;
 import com.probejs.jdoc.java.type.ITypeInfo;
 import com.probejs.jdoc.java.type.InfoTypeResolver;
 import com.probejs.util.Util;
+import dev.latvian.mods.kubejs.script.ScriptManager;
+import dev.latvian.mods.kubejs.server.ServerScriptManager;
 import dev.latvian.mods.rhino.JavaMembers;
 import dev.latvian.mods.rhino.util.HideFromJS;
 
@@ -11,6 +13,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.List;
+import java.util.Optional;
 
 public class FieldInfo {
     private final String name;
@@ -64,6 +67,15 @@ public class FieldInfo {
 
     public void setTypeInfo(ITypeInfo info) {
         this.info = info;
+    }
+
+    public static Optional<JavaMembers.FieldInfo> getFieldInfo(Field field, Class<?> from) {
+        ScriptManager scriptManager = ServerScriptManager.getScriptManager();
+        JavaMembers members = JavaMembers.lookupClass(scriptManager.context, scriptManager.topLevelScope, from, from, false);
+        return members.getAccessibleFields(scriptManager.context, false)
+                .stream()
+                .filter(fieldInfo -> fieldInfo.field.equals(field))
+                .findFirst();
     }
 
 }
