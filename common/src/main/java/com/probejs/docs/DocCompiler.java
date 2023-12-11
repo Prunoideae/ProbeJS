@@ -212,7 +212,7 @@ public class DocCompiler {
                 {
                     "compilerOptions": {
                         "lib": ["ES5", "ES2015"],
-                        "typeRoots": ["./probe/generated", "./probe/user"],
+                        "rootDirs": ["probe/generated", "probe/user", "server_scripts", "startup_scripts", "client_scripts"],
                         "target": "ES2015"
                     }
                 }""");
