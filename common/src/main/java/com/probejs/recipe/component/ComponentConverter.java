@@ -17,7 +17,11 @@ public class ComponentConverter {
         } else if (description instanceof FixedArrayDescJS fixedArray) {
             return new PropertyType.JSArray(Arrays.stream(fixedArray.types()).map(ComponentConverter::fromDescription).collect(Collectors.toList()));
         } else if (description instanceof GenericDescJS parameterized) {
-            if (parameterized.type() instanceof PrimitiveDescJS primitive && primitive.type().equals("Map") && fromDescription(parameterized.types()[0]) instanceof PropertyType.Native keyType) {
+            if (parameterized.type() instanceof PrimitiveDescJS primitive &&
+                    primitive.type().equals("Map") &&
+                    fromDescription(parameterized.types()[0]) instanceof PropertyType.Native keyType &&
+                    parameterized.types().length == 2
+            ) {
                 // Map is not an object in JS, so we need to use a special type `{[key: keyType]: valueType}`
                 // In case of Special.XXXX or whatever, you can still have good mappings
                 return new PropertyType.JSObject()

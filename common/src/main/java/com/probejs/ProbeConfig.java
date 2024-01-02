@@ -19,12 +19,12 @@ public class ProbeConfig {
     public boolean firstLoad = true;
     public boolean noAggressiveProbing = false;
     public long docsTimestamp = 0;
-    public boolean allowRegistryObjectDumps = false;
+    public boolean allowRegistryObjectDumps = true;
     public boolean allowRegistryLiteralDumps = true;
     public boolean requireSingleAndPerm = true;
     public boolean enabled = true;
 
-    public boolean disableRecipeJsonDump = false;
+    public boolean disableRecipeJsonDump = true;
     public boolean dumpJSONIntermediates = false;
 
     @SuppressWarnings("unchecked")
@@ -45,11 +45,11 @@ public class ProbeConfig {
                 firstLoad = fetchPropertyOrDefault("firstLoad", obj, true);
                 noAggressiveProbing = fetchPropertyOrDefault("noAggressiveProbing", obj, false);
                 docsTimestamp = fetchPropertyOrDefault("docsTimestamp", obj, 0D).longValue();
-                allowRegistryObjectDumps = fetchPropertyOrDefault("allowRegistryObjectDumps", obj, false);
+                allowRegistryObjectDumps = fetchPropertyOrDefault("allowRegistryObjectDumps", obj, true);
                 allowRegistryLiteralDumps = fetchPropertyOrDefault("allowRegistryLiteralDumps", obj, true);
                 requireSingleAndPerm = fetchPropertyOrDefault("requireSingleAndPerm", obj, true);
                 enabled = fetchPropertyOrDefault("enabled", obj, true);
-                disableRecipeJsonDump = fetchPropertyOrDefault("disableRecipeJsonDump", obj, false);
+                disableRecipeJsonDump = fetchPropertyOrDefault("disableRecipeJsonDump", obj, true);
                 dumpJSONIntermediates = fetchPropertyOrDefault("dumpJSONIntermediates", obj, false);
             } catch (IOException e) {
                 ProbeJS.LOGGER.warn("Cannot read config properties, falling back to defaults.");

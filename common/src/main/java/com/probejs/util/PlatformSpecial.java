@@ -2,19 +2,15 @@ package com.probejs.util;
 
 
 import com.google.common.base.Suppliers;
-import com.probejs.ProbeJS;
 import com.probejs.docs.formatter.NameResolver;
 import com.probejs.docs.formatter.formatter.IFormatter;
-import com.probejs.specials.special.FormatterRegistry;
 import com.probejs.jdoc.document.DocumentClass;
 import com.probejs.jdoc.document.DocumentMethod;
-import com.probejs.jdoc.java.ClassInfo;
 import com.probejs.jdoc.java.MethodInfo;
-import com.probejs.jdoc.property.PropertyParam;
-import com.probejs.jdoc.property.PropertyType;
-import dev.latvian.mods.kubejs.bindings.JavaWrapper;
-import dev.latvian.mods.kubejs.recipe.RecipesEventJS;
-import dev.latvian.mods.kubejs.server.ServerScriptManager;
+import com.probejs.specials.special.FormatterRegistry;
+import com.probejs.util.special_docs.BlockEntityInfoDocument;
+import com.probejs.util.special_docs.JavaWrapperDocument;
+import com.probejs.util.special_docs.RecipeEventDocument;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
@@ -34,6 +30,11 @@ public abstract class PlatformSpecial {
         return serviceLoader.findFirst().orElseThrow(() -> new RuntimeException("Could not find platform implementation for PlatformSpecial!"));
     });
 
+    public static DocumentMethod getMethodDocument(Class<?> clazz, String name, Class<?>... paramTypes) throws NoSuchMethodException {
+        return DocumentMethod.fromJava(new MethodInfo(MethodInfo.getMethodInfo(clazz.getMethod(name, paramTypes), clazz).get(), clazz));
+    }
+
+
     @NotNull
     public abstract List<ResourceLocation> getIngredientTypes();
 
@@ -44,28 +45,11 @@ public abstract class PlatformSpecial {
     public List<DocumentClass> getPlatformDocuments(List<DocumentClass> globalClasses) {
         ArrayList<DocumentClass> documents = new ArrayList<>();
         try {
-            //Document for Java.loadClass
-            DocumentClass javaWrapper = DocumentClass.fromJava(ClassInfo.getOrCache(JavaWrapper.class));
-            DocumentMethod loadClass = DocumentMethod.fromJava(new MethodInfo(MethodInfo.getMethodInfo(JavaWrapper.class.getMethod("loadClass", String.class), JavaWrapper.class).get(), JavaWrapper.class));
-            for (DocumentClass globalClass : globalClasses) {
-                if (ServerScriptManager.getScriptManager().isClassAllowed(globalClass.getName())) {
-                    DocumentMethod method = loadClass.copy();
-                    method.params.set(0, new PropertyParam("className", new PropertyType.Native(ProbeJS.GSON.toJson(globalClass.getName())), false));
-                    //Return interface directly since typeof Interface = any in Typescript
-                    method.returns = globalClass.isInterface() ?
-                            new PropertyType.Clazz(globalClass.getName()) :
-                            new PropertyType.TypeOf(new PropertyType.Clazz(globalClass.getName()));
-                    javaWrapper.methods.add(method);
-                }
-            }
-            documents.add(javaWrapper);
-
-            //Document for blending recipe events
-            DocumentClass recipeEventJS = DocumentClass.fromJava(ClassInfo.getOrCache(RecipesEventJS.class));
-            DocumentMethod getRecipes = DocumentMethod.fromJava(new MethodInfo(MethodInfo.getMethodInfo(RecipesEventJS.class.getMethod("getRecipes"), RecipesEventJS.class).get(), RecipesEventJS.class));
-            getRecipes.returns = new PropertyType.Native("Special.DocumentedRecipes");
-            recipeEventJS.methods.add(getRecipes);
-            documents.add(recipeEventJS);
+            // TODO: Make it dynamic... But I wonder who will use them
+            // probably rewrite in 1.20.4 or higher
+            documents.add(JavaWrapperDocument.loadJavaWrapperDocument(globalClasses));
+            documents.add(RecipeEventDocument.loadRecipeEventDocument());
+            BlockEntityInfoDocument.loadBlockEntityInfoDocument(globalClasses);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }

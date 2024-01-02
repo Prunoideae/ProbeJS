@@ -6,6 +6,7 @@ import com.probejs.docs.DocCompiler;
 import com.probejs.docs.formatter.formatter.IFormatter;
 import com.probejs.jdoc.document.DocumentClass;
 import com.probejs.util.PlatformSpecial;
+import com.probejs.util.special_docs.forge.ForgeEventDocument;
 import dev.architectury.hooks.fluid.FluidStackHooks;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;

@@ -7,12 +7,14 @@ import com.probejs.ProbeJS;
 import com.probejs.ProbePaths;
 import com.probejs.docs.formatter.NameResolver;
 import com.probejs.jdoc.document.DocumentClass;
+import com.probejs.specials.special.FormatterLang;
 import com.probejs.util.RLHelper;
 import com.probejs.util.json.JArray;
 import com.probejs.util.json.JObject;
 import com.probejs.util.json.JPrimitive;
 import dev.architectury.platform.Platform;
 import net.minecraft.client.resources.language.ClientLanguage;
+import net.minecraft.client.resources.language.LanguageManager;
 import net.minecraft.core.Registry;
 import net.minecraft.locale.Language;
 import net.minecraft.resources.ResourceKey;
@@ -22,6 +24,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 public class SchemaCompiler {
@@ -29,20 +32,17 @@ public class SchemaCompiler {
     public static JsonObject toLangSchema() {
         return JObject.create()
                 .add("type", JPrimitive.create("object"))
-                .add("properties", Language.getInstance() instanceof ClientLanguage clientLanguage ?
+                .add("properties", Language.getInstance() instanceof ClientLanguage ?
                         JObject.create()
-                                .addAll(clientLanguage.storage.entrySet()
-                                        .stream()
+                                .addAll(FormatterLang.getLangKeys(LanguageManager.DEFAULT_LANGUAGE_CODE)
                                         .filter(e -> {
                                             var s = e.getKey();
                                             return !(s.startsWith("_") || s.startsWith("$"));
                                         })
-                                        .map(entry -> {
-                                            return new Pair<>(entry.getKey(),
-                                                    JObject.create()
-                                                            .add("type", JPrimitive.create("string"))
-                                                            .add("description", JPrimitive.create(entry.getValue())));
-                                        })
+                                        .map(entry -> new Pair<>(entry.getKey(),
+                                                JObject.create()
+                                                        .add("type", JPrimitive.create("string"))
+                                                        .add("description", JPrimitive.create(entry.getValue()))))
                                 )
                         : JObject.create()
                 )
@@ -72,10 +72,9 @@ public class SchemaCompiler {
                                 .add("type", JPrimitive.create("string"))
                                 .add("enum", JArray.create()
                                         .addAll(
-                                                Language.getInstance() instanceof ClientLanguage clientLanguage ?
-                                                        clientLanguage.storage
-                                                                .keySet()
-                                                                .stream()
+                                                Language.getInstance() instanceof ClientLanguage ?
+                                                        FormatterLang.getLangKeys(LanguageManager.DEFAULT_LANGUAGE_CODE)
+                                                                .map(Map.Entry::getKey)
                                                                 .map(JPrimitive::create)
                                                         : Stream.empty())
                                 )

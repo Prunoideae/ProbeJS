@@ -1,4 +1,4 @@
-package com.probejs.util.forge;
+package com.probejs.util.special_docs.forge;
 
 import com.mojang.datafixers.util.Pair;
 import com.probejs.ProbeJS;
