@@ -42,10 +42,10 @@ public class SpecialCompiler {
         formatters.add(new FormatterLootTable());
         formatters.add(new FormatterTexture());
         formatters.add(new FormatterModel());
+        formatters.add(new FormatterComponents());
         formatters.addAll(getTagFormatters());
         formatters.add(FormatterRecipe.formatRecipeNamespaces());
         formatters.add(FormatterRecipeSchema.formatRecipeClasses());
-        formatters.add((i, d) -> List.of("%stype ArrayOrSelf<T> = T[] | T".formatted(" ".repeat(i))));
 
         ClassFilter filter = KubeJSPlugins.createClassFilter(ScriptType.STARTUP);
         formatters.add((i, d) -> List.of("%stype JavaClass = %s".formatted(

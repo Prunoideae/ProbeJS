@@ -25,7 +25,6 @@ import java.util.zip.ZipInputStream;
 
 public class Manager {
     private static boolean docsDownloaded = false;
-
     private static final String TIMESTAMP_API = "https://static.wolfgirl.moe/api/timestamp?path=probejs/docs-1.19.2-6.1.zip";
     private static final String DOWNLOAD_API = "https://static.wolfgirl.moe/object-service/checked/probejs/docs-1.19.2-6.1.zip?timestamp=%s";
 
@@ -42,9 +41,9 @@ public class Manager {
             ProbeJS.LOGGER.warn("The server might come back online later, this is not an error.");
             return;
         }
-        if (ProbeConfig.INSTANCE.docsTimestamp != remoteTimestamp) {
+        Path docsPath = ProbePaths.CACHE.resolve("docs");
+        if (ProbeConfig.INSTANCE.docsTimestamp != remoteTimestamp || !Files.exists(docsPath)) {
             ProbeJS.LOGGER.info("Found timestamp mismatch (local=%s, remote=%s), downloading docs from remote.".formatted(ProbeConfig.INSTANCE.docsTimestamp, remoteTimestamp));
-            Path docsPath = ProbePaths.CACHE.resolve("docs");
             if (Files.exists(docsPath)) {
                 FileUtils.deleteDirectory(docsPath.toFile());
             }

@@ -9,10 +9,11 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 
 public class ProbeConfig {
-    public static final int MOD_COUNT = 100;
+    public static final int MOD_COUNT = 350;
 
     public static ProbeConfig INSTANCE = new ProbeConfig();
     private static final int CONFIG_VERSION = 1;
@@ -23,9 +24,11 @@ public class ProbeConfig {
     public boolean allowRegistryLiteralDumps = true;
     public boolean requireSingleAndPerm = true;
     public boolean enabled = true;
+    public boolean modChanged = false;
 
     public boolean disableRecipeJsonDump = true;
     public boolean dumpJSONIntermediates = false;
+    public boolean pullSchema = true;
 
     @SuppressWarnings("unchecked")
     private static <E> E fetchPropertyOrDefault(Object key, Map<?, ?> value, E defaultValue) {
@@ -51,6 +54,7 @@ public class ProbeConfig {
                 enabled = fetchPropertyOrDefault("enabled", obj, true);
                 disableRecipeJsonDump = fetchPropertyOrDefault("disableRecipeJsonDump", obj, true);
                 dumpJSONIntermediates = fetchPropertyOrDefault("dumpJSONIntermediates", obj, false);
+                pullSchema = fetchPropertyOrDefault("pullSchema", obj, true);
             } catch (IOException e) {
                 ProbeJS.LOGGER.warn("Cannot read config properties, falling back to defaults.");
             }

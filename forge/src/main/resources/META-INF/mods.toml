@@ -37,4 +37,4 @@ side = "BOTH"
 [[dependencies.probejs]]
 modId = "kubejs"
 mandatory = true
-versionRange = "[1902.6.1-build.277,)"
+versionRange = "[${kubejs_version},)"

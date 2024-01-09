@@ -60,7 +60,7 @@ public class SpecialTypes {
             //We know that, all objects in Registry<T> must extend or implement T
             //So T must be the superclass or superinterface of all object in Registry<T>
             //And it must not be synthetic class unless some people are really crazy
-            ResourceKey<?> key = entry.key();
+            ResourceKey<? extends Registry<?>> key = entry.key();
             Registry<?> registry = entry.value();
             Class<?> putativeParent = null;
             //We assume it's class based first

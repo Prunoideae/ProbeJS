@@ -5,8 +5,10 @@ import com.probejs.jdoc.Serde;
 import com.probejs.jdoc.property.PropertyComment;
 import com.probejs.jdoc.property.PropertyType;
 import com.probejs.jdoc.property.PropertyValue;
+import com.probejs.util.RLHelper;
 import com.probejs.util.Util;
 import dev.latvian.mods.kubejs.recipe.RecipeKey;
+import dev.latvian.mods.kubejs.recipe.component.TagKeyComponent;
 import dev.latvian.mods.kubejs.recipe.schema.RecipeSchemaType;
 
 import java.util.ArrayList;
@@ -52,7 +54,9 @@ public class FormatterRecipeKey implements IFormatter {
     public List<String> format(Integer indent, Integer stepIndent) {
         String name = Util.getSafeName(key.preferred);
         PropertyType<?> type = ComponentConverter.fromDescription(key.component.constructorDescription(ComponentConverter.PROBEJS_CONTEXT));
-
+        if (key.component instanceof TagKeyComponent<?> tagKey && type instanceof PropertyType.Parameterized) {
+            type = new PropertyType.Native("`#${Special.%sTag}`".formatted(RLHelper.finalComponentToTitle(tagKey.registry().location().getPath())));
+        }
         if (key.optional != null)
             name += "?";
 

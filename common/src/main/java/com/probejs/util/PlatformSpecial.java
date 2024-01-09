@@ -11,6 +11,7 @@ import com.probejs.specials.special.FormatterRegistry;
 import com.probejs.util.special_docs.BlockEntityInfoDocument;
 import com.probejs.util.special_docs.JavaWrapperDocument;
 import com.probejs.util.special_docs.RecipeEventDocument;
+import com.probejs.util.special_docs.SchemaRegistryEventJSDocument;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
@@ -50,6 +51,7 @@ public abstract class PlatformSpecial {
             documents.add(JavaWrapperDocument.loadJavaWrapperDocument(globalClasses));
             documents.add(RecipeEventDocument.loadRecipeEventDocument());
             BlockEntityInfoDocument.loadBlockEntityInfoDocument(globalClasses);
+            SchemaRegistryEventJSDocument.loadRecipeSchemaRegistryEvent(globalClasses);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }

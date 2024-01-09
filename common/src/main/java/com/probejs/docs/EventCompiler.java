@@ -2,18 +2,19 @@ package com.probejs.docs;
 
 import com.mojang.datafixers.util.Pair;
 import com.probejs.ProbePaths;
-import com.probejs.jdoc.java.ClassInfo;
 import com.probejs.jdoc.Serde;
 import com.probejs.jdoc.document.DocumentClass;
+import com.probejs.jdoc.java.ClassInfo;
 import com.probejs.jdoc.property.AbstractProperty;
 import com.probejs.jdoc.property.PropertyComment;
-import com.probejs.jdoc.property.PropertyExtra;
 import com.probejs.jdoc.property.PropertyType;
+import com.probejs.recipe.component.ComponentConverter;
 import com.probejs.specials.RegistryCompiler;
 import com.probejs.specials.TagEventCompiler;
 import com.probejs.util.Util;
 import dev.latvian.mods.kubejs.event.EventGroup;
 import dev.latvian.mods.kubejs.event.EventHandler;
+import dev.latvian.mods.kubejs.typings.desc.TypeDescJS;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -91,11 +92,12 @@ public class EventCompiler {
 
                 elements.addAll(comment.formatLines(4));
                 if (handler.extra != null) {
+                    TypeDescJS desc = handler.extra.describeType.apply(ComponentConverter.PROBEJS_CONTEXT);
+                    PropertyType<?> type = ComponentConverter.fromDescription(desc);
+
                     elements.add("%s(extra: %s, handler: (event: %s) => void):void,".formatted(
                             eventName,
-                            findProperty(globalClasses, document, PropertyExtra.class)
-                                    .map(extra -> Serde.getTypeFormatter(extra.getType()).formatFirst())
-                                    .orElse("string"), Util.formatMaybeParameterized(event)
+                            Serde.getTypeFormatter(type).formatFirst(), Util.formatMaybeParameterized(event)
                     ));
                 }
                 if (handler.extra == null || !handler.extra.required) {

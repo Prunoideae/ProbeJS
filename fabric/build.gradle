@@ -35,7 +35,11 @@ processResources {
     inputs.property "version", project.version
 
     filesMatching("fabric.mod.json") {
-        expand "version": project.version
+        def props = [
+                "version"       : project.version,
+                "kubejs_version": "${rootProject.kubejs_version}"
+        ]
+        expand(props)
     }
 }
 

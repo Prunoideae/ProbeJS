@@ -22,6 +22,8 @@ import com.probejs.jdoc.java.Walker;
 import com.probejs.jdoc.jsgen.DocGenerationEventJS;
 import com.probejs.jdoc.property.PropertyComment;
 import com.probejs.specials.*;
+import com.probejs.specials.assign.ClassAssignmentManager;
+import com.probejs.specials.special.FormatterComponents;
 import com.probejs.util.PlatformSpecial;
 import dev.latvian.mods.kubejs.KubeJS;
 import dev.latvian.mods.kubejs.KubeJSPaths;
@@ -190,6 +192,8 @@ public class DocCompiler {
         touchableClasses.addAll(CapturedClasses.getCapturedJavaClasses());
         touchableClasses.addAll(fetchRecipeClasses());
         touchableClasses.addAll(fetchComponentClasses());
+        touchableClasses.addAll(FormatterComponents.loadComponentsClasses());
+        touchableClasses.addAll(ClassAssignmentManager.ASSIGNMENTS.keys());
         Walker walker = new Walker(touchableClasses);
         return walker.walk();
     }
@@ -344,8 +348,7 @@ public class DocCompiler {
         cachedClasses.addAll(RegistryCompiler.getKJSRegistryClasses());
         if (ProbeConfig.INSTANCE.allowRegistryObjectDumps) cachedClasses.addAll(SpecialTypes.collectRegistryClasses());
         Set<Class<?>> typeMap = RecipeNamespace.getAll().values().stream().flatMap(namespace -> namespace.values().stream())
-                // TODO: add type -> recipe mapping once Lat got the new recipe system in
-                .map(type -> RecipeJS.class).collect(Collectors.toSet());
+                .map(type -> type.schema.recipeType).collect(Collectors.toSet());
 
         //Fetch all classes
         Set<Class<?>> globalClasses = DocCompiler.fetchClasses(typeMap, bindingEvent, cachedClasses);
@@ -362,16 +365,12 @@ public class DocCompiler {
         javaDocs.addAll(PlatformSpecial.INSTANCE.get().getPlatformDocuments(javaDocs));
 
         sendMessage.accept("Started downloading and merging docs...");
+
+        // Fuck IDEA
         Manager.downloadDocs();
         List<DocumentClass> fetchedDocs = Manager.loadFetchedClassDoc();
         List<DocumentClass> modDocs = Manager.loadModDocuments();
-        List<DocumentClass> userDocs = new ArrayList<>();
-        try {
-            userDocs = Manager.loadUserDocuments();
-        } catch (Exception e) {
-            ProbeJS.LOGGER.error("Error loading User-defined docs!");
-        }
-        Map<String, DocumentClass> mergedDocsMap = Manager.mergeDocuments(javaDocs, fetchedDocs, modDocs, userDocs);
+        Map<String, DocumentClass> mergedDocsMap = Manager.mergeDocuments(javaDocs, fetchedDocs, modDocs);
 
         event.getTransformers().forEach((key, transformer) -> {
             if (mergedDocsMap.containsKey(key)) {

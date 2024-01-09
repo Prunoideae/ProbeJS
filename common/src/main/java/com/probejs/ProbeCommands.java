@@ -3,6 +3,7 @@ package com.probejs;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.probejs.docs.DocCompiler;
+import com.probejs.jdoc.jsgen.RemoteSchema;
 import com.probejs.specials.SnippetCompiler;
 import com.probejs.specials.SpecialCompiler;
 import com.probejs.docs.formatter.ClassResolver;
@@ -118,6 +119,9 @@ public class ProbeCommands {
                 ClassResolver.init();
                 NameResolver.init();
                 DocCompiler.compile(sendMessage, event);
+                if (ProbeConfig.INSTANCE.pullSchema && ProbeConfig.INSTANCE.modChanged) {
+                    RemoteSchema.dumpSchemas(sendMessage);
+                }
             } catch (Exception e) {
                 ProbeJS.LOGGER.error("Uncaught exception has occurred!", e);
                 player.sendSystemMessage(Component.literal("Uncaught exception happened in wrapper, please report to the Github issue with complete latest.log."), false);
@@ -174,6 +178,7 @@ public class ProbeCommands {
                         .then(Commands.literal("clear_cache")
                                 .requires(source -> source.getServer().isSingleplayer())
                                 .executes(context -> {
+                                    ProbeConfig.INSTANCE.docsTimestamp = -1;
                                     for (File file : Objects.requireNonNull(ProbePaths.CACHE.toFile().listFiles())) {
                                         // delete everything, including folders, folders might not be empty
                                         try {

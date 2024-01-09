@@ -1,6 +1,7 @@
 package com.probejs;
 
 import dev.architectury.platform.Platform;
+import dev.latvian.mods.kubejs.KubeJS;
 import dev.latvian.mods.kubejs.KubeJSPaths;
 import dev.latvian.mods.kubejs.util.UtilsJS;
 
@@ -20,6 +21,8 @@ public class ProbePaths {
 
     public static Path RICH_ITEM = RICH.resolve("item");
     public static Path RICH_FLUID = RICH.resolve("fluid");
+
+    public static Path SCHEMA = KubeJSPaths.STARTUP_SCRIPTS.resolve("@recipes");
 
     public static Path KUBE_ASSETS = KubeJSPaths.DIRECTORY.resolve("assets");
 
@@ -47,6 +50,9 @@ public class ProbePaths {
         }
         if (Files.notExists(RICH)) {
             UtilsJS.tryIO(() -> Files.createDirectories(RICH));
+        }
+        if (Files.notExists(ProbePaths.SCHEMA)) {
+            UtilsJS.tryIO(() -> Files.createDirectories(ProbePaths.SCHEMA));
         }
     }
 

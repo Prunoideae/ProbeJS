@@ -80,7 +80,7 @@ public class FormatterRecipe implements IFormatter {
 
     public static IFormatter formatRecipeNamespaces() {
         return (indent, stepIndent) -> {
-            //Collect all recipe serializers' ids so they're a set of all available mods
+            //Collect all recipe serializers' ids, so they're a set of all available mods
             Set<String> serializerIds = RegistryInfo.RECIPE_SERIALIZER.getVanillaRegistry()
                     .keySet()
                     .stream()

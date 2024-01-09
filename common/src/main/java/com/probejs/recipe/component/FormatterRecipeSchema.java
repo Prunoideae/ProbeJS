@@ -31,7 +31,6 @@ public class FormatterRecipeSchema implements IFormatter {
         lines.add("class %s extends %s {".formatted(className + mod, Util.formatMaybeParameterized(schema.recipeType)));
         for (RecipeKey<?> key : schema.keys) {
             FormatterRecipeKey keyFormatter = new FormatterRecipeKey(key);
-
             lines.addAll(keyFormatter.getBuilder().format(indent + stepIndent, stepIndent));
         }
         lines.add("}");

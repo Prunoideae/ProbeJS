@@ -4,28 +4,6 @@ A data dumper and typing generator for the KubeJS functions, constants and class
 
 Great thanks to @DAmNRelentless, @LatvianModder and @yesterday17 for invaluable suggestions during the development!
 
-For things not dumped, or maybe if you want to add some more comments to class, methods or fields, you can add static
-documents to override auto-generated typing!
-
-ProbeJS also has builtin documents to support some other mods' recipes, but it's not completed, if you want to add
-something to the document, maybe you can send a PR too!
-
-Current progress of mod documents:
-
-- Minecraft (Completed)
-- Create (Completed)
-- Integrated Dynamics (Completed)
-- ArsNouveau (Completed)
-- ArtisanWorktables (Completed)
-- Botania (Builtin in KubeJS Botania)
-- Cucumber (Completed)
-- DankStorage (Completed)
-- ExtendedCrafting (Completed)
-- Mekanism (Completed)
-- Immersive Engineering (Completed)
-- Thermal Expansion (Completed)
-- Others (Please PR)
-
 For the detailed information about documents, please refer to the wiki page.
 
 ## 1. Installation

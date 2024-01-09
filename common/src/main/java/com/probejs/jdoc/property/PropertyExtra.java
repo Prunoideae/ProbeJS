@@ -3,6 +3,7 @@ package com.probejs.jdoc.property;
 import com.google.gson.JsonObject;
 import com.probejs.jdoc.Serde;
 
+@Deprecated(forRemoval = true)
 public class PropertyExtra extends AbstractProperty<PropertyExtra> {
 
     private PropertyType<?> type;

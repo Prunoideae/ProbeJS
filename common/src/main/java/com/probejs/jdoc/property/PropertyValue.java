@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.probejs.jdoc.java.type.TypeInfoClass;
 import com.probejs.jdoc.Serde;
+import dev.latvian.mods.kubejs.recipe.RecipeTypeFunction;
 import dev.latvian.mods.kubejs.script.ScriptManager;
 import dev.latvian.mods.kubejs.server.ServerScriptManager;
 import dev.latvian.mods.rhino.*;
