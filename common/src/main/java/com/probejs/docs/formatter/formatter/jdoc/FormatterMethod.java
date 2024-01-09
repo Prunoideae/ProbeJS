@@ -51,8 +51,9 @@ public class FormatterMethod extends DocumentFormatter<DocumentMethod> {
 
     @Override
     public List<String> formatDocument(Integer indent, Integer stepIndent) {
-        return List.of(Util.indent(indent) + "%s%s%s%s;".formatted(
+        return List.of(Util.indent(indent) + "%s%s%s%s%s;".formatted(
                 document.isStatic() ? "static " : "",
+                document.isAbstract() ? "abstract " : "",
                 Util.getSafeName(document.getName()),
                 document.getVariables().isEmpty() ? "" : "<%s>".formatted(document.getVariables().stream().map(Serde::getTypeFormatter).map(IFormatter::formatMethodVariable).collect(Collectors.joining(", "))),
                 formatMethodParts()

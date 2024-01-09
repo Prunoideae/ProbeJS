@@ -97,7 +97,10 @@ public class EventCompiler {
 
                     elements.add("%s(extra: %s, handler: (event: %s) => void):void,".formatted(
                             eventName,
-                            Serde.getTypeFormatter(type).formatFirst(), Util.formatMaybeParameterized(event)
+                            Serde.getTypeFormatter(type)
+                                    .underscored()
+                                    .formatFirst(),
+                            Util.formatMaybeParameterized(event)
                     ));
                 }
                 if (handler.extra == null || !handler.extra.required) {

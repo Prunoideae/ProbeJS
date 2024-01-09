@@ -8,6 +8,8 @@ import net.minecraft.tags.TagKey;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class ComponentConverter {
@@ -67,7 +69,19 @@ public class ComponentConverter {
             if (name.equals("null")) // return any here because we don't know what to do with null
                 return new PropertyType.Clazz(Object.class);
             if (name.startsWith("$probejs$")) {
-                return new PropertyType.Clazz(name.substring(9));
+                String clazzName = name.substring(9);
+                try {
+                    Class<?> clazz = Class.forName(clazzName);
+                    int variables = clazz.getTypeParameters().length;
+                    if (variables > 0) {
+                        return new PropertyType.Parameterized(
+                                new PropertyType.Clazz(clazzName),
+                                Collections.nCopies(variables, new PropertyType.Clazz(Object.class))
+                        );
+                    }
+                } catch (ClassNotFoundException ignored) {
+                }
+                return new PropertyType.Clazz(clazzName);
             } else {
                 return new PropertyType.Native(name);
             }

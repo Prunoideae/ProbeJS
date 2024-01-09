@@ -145,7 +145,7 @@ public class DocumentMethod extends AbstractDocument<DocumentMethod> {
     }
 
     public boolean isAbstract() {
-        return isAbstract;
+        return isAbstract && !isStatic;
     }
 
     public void setName(String name) {
