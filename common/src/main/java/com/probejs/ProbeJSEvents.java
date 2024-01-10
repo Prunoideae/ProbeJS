@@ -2,6 +2,7 @@ package com.probejs;
 
 import dev.architectury.platform.Mod;
 import dev.architectury.platform.Platform;
+import dev.latvian.mods.kubejs.KubeJSPaths;
 import dev.latvian.mods.kubejs.registry.RegistryInfo;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -62,16 +63,10 @@ public class ProbeJSEvents {
             }
             if (ProbeConfig.INSTANCE.firstLoad) {
                 player.sendSystemMessage(Component.literal("This is the first time you are running ProbeJS. An automatic dump will be triggered."));
-                player.sendSystemMessage(Component.literal("The aggressive mode will be turned off, you can still turn it on by ")
-                        .append(Component.literal("/probejs configure toggle_aggressive").kjs$underlined().kjs$green().kjs$clickSuggestCommand("/probejs configure toggle_aggressive"))
-                        .append(Component.literal(" later.").kjs$white()));
-                player.sendSystemMessage(Component.literal("ProbeJS now supports downloading of recipe schema scripts."));
-                player.sendSystemMessage(Component.literal("These scripts are for adding recipe support for mods that don't have recipe support yet."));
-                player.sendSystemMessage(Component.literal("If you don't want to download the scripts, you can turn it on by")
-                        .append(Component.literal("/probejs configure toggle_schema_download").kjs$underlined().kjs$green().kjs$clickSuggestCommand("/probejs configure toggle_schema_download"))
-                        .append(Component.literal(". The scripts are downloaded at "))
-                        .append(Component.literal("startup_scripts/@recipes").kjs$aqua())
-                        .append(Component.literal(" and will be effective upon game restarts."))
+                player.sendSystemMessage(Component.literal("ProbeJS now supports downloading of recipe schema scripts. These scripts are for adding recipe support for mods that don't have recipe support yet."));
+                player.sendSystemMessage(Component.literal("To configure ProbeJS, open ")
+                        .append(Component.literal("this file").kjs$underlined().kjs$aqua().kjs$clickOpenFile(KubeJSPaths.CONFIG.resolve("probejs.json").toString()))
+                        .append(Component.literal("."))
                 );
                 ProbeConfig.INSTANCE.noAggressiveProbing = true;
                 ProbeConfig.INSTANCE.firstLoad = false;
