@@ -105,13 +105,10 @@ public class FormatterClass extends DocumentFormatter<DocumentClass> {
          *     boolean foo();
          * }
          */
-        if (document.isFunctionalInterface()) {
-            // Still need to check if there is only one abstract method in case of people going insane
-            if (document.methods.stream().filter(method -> method.isAbstract).count() == 1) {
-                FormatterMethod hybridFormatter = new FormatterMethod(document.methods.stream().filter(method -> method.isAbstract).findFirst().get(), document);
-                hybridFormatter.setFunctionalInterface(true);
-                lines.add("%s%s;".formatted(" ".repeat(indent + stepIndent), hybridFormatter.formatMethodParts()));
-            }
+        if (document.isInterface() && document.methods.stream().filter(method -> method.isAbstract).count() == 1) {
+            FormatterMethod hybridFormatter = new FormatterMethod(document.methods.stream().filter(method -> method.isAbstract).findFirst().get(), document);
+            hybridFormatter.setFunctionalInterface(true);
+            lines.add("%s%s;".formatted(" ".repeat(indent + stepIndent), hybridFormatter.formatMethodParts(true)));
         }
 
         document.getFields().stream().map(DocumentField::applyProperties).forEach(field -> lines.addAll(new FormatterField(field).setInterface(document.isInterface()).format(indent + stepIndent, stepIndent)));

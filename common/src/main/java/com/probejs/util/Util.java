@@ -69,6 +69,10 @@ public class Util {
         ) ? s : ProbeJS.GSON.toJson(s);
     }
 
+    public static boolean isNameSafe(String s) {
+        return !KEYWORDS.contains(s);
+    }
+
     public static String formatMaybeParameterized(Class<?> clazz) {
         if (clazz.getTypeParameters().length == 0) {
             return new FormatterType.Clazz(new PropertyType.Clazz(clazz.getName())).formatFirst();

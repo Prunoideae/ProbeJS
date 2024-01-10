@@ -56,7 +56,7 @@ public class FormatterMethod extends DocumentFormatter<DocumentMethod> {
                 document.isAbstract() ? "abstract " : "",
                 Util.getSafeName(document.getName()),
                 document.getVariables().isEmpty() ? "" : "<%s>".formatted(document.getVariables().stream().map(Serde::getTypeFormatter).map(IFormatter::formatMethodVariable).collect(Collectors.joining(", "))),
-                formatMethodParts()
+                formatMethodParts(false)
         ));
     }
 
@@ -65,14 +65,14 @@ public class FormatterMethod extends DocumentFormatter<DocumentMethod> {
      *
      * @return the formatted string
      */
-    public String formatMethodParts() {
+    public String formatMethodParts(boolean formattingFunctionalInterface) {
         return "(%s): %s".formatted(
                 document.getParams().stream()
                         .map(FormatterParam::new)
-                        .map(FormatterParam::underscored)
+                        .map(formatterParam -> formatterParam.underscored(!formattingFunctionalInterface))
                         .map(IFormatter::formatParamVariable)
                         .collect(Collectors.joining(", ")),
-                isReturningThis() ? "this" : Serde.getTypeFormatter(document.getReturns()).underscored(functionalInterface).formatParamVariable()
+                isReturningThis() ? "this" : Serde.getTypeFormatter(document.getReturns()).underscored(formattingFunctionalInterface).formatParamVariable()
         );
     }
 
@@ -183,7 +183,7 @@ public class FormatterMethod extends DocumentFormatter<DocumentMethod> {
 
         @Override
         public List<String> formatDocument(Integer indent, Integer stepIndent) {
-            return List.of((document.isVarArg() ? "..." : "") + "%s: %s".formatted(NameResolver.getNameSafe(document.getName()), Serde.getTypeFormatter(document.getType()).underscored(underscored).formatParamVariable()));
+            return List.of((document.isVarArg() ? "..." : "") + "%s: %s".formatted(Util.isNameSafe(document.getName()) ? document.getName() : document.getName() + "_", Serde.getTypeFormatter(document.getType()).underscored(underscored).formatParamVariable()));
         }
 
         public FormatterParam underscored(boolean flag) {

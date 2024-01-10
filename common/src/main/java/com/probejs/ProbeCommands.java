@@ -120,7 +120,7 @@ public class ProbeCommands {
                 ClassResolver.init();
                 NameResolver.init();
                 DocCompiler.compile(sendMessage, event);
-                if (ProbeConfig.INSTANCE.pullSchema && ProbeConfig.INSTANCE.modChanged) {
+                if (ProbeConfig.INSTANCE.pullSchema) {
                     RemoteSchema.dumpSchemas(sendMessage);
                 }
             } catch (Exception e) {

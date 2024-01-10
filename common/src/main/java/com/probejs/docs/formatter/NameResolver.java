@@ -146,7 +146,7 @@ public class NameResolver {
     }
 
     public static String getNameSafe(String kw) {
-        return keywords.contains(kw) || Util.KEYWORDS.contains(kw) ? kw + "_" : kw;
+        return keywords.contains(kw) ? kw + "_" : kw;
     }
 
     public static void putResolvedPrimitive(Class<?> clazz, String resolvedName) {
