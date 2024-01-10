@@ -18,11 +18,11 @@ public class ProbeConfig {
     public static ProbeConfig INSTANCE = new ProbeConfig();
     private static final int CONFIG_VERSION = 2;
     public boolean firstLoad = true;
-    private static final String FIRST_LOAD_KEY = "Is ProbeJS Loaded for First Time in the Modpack? - Configured by ProbeJS Itself";
+    private static final String FIRST_LOAD_KEY = "Is ProbeJS Loaded for First Time in the Modpack - Configured by ProbeJS Itself";
     public boolean noAggressiveProbing = false;
     private static final String NO_AGGRESSIVE_PROBING_KEY = "Disable Aggressive Mode for ProbeJS Dumps";
     public long docsTimestamp = 0;
-    private static final String DOCS_TIMESTAMP_KEY = "The Timestamp of ProbeJS Remote Documents - Configured by Mod Itself";
+    private static final String DOCS_TIMESTAMP_KEY = "The Timestamp of ProbeJS Remote Documents - Configured by ProbeJS Itself";
     public boolean allowRegistryObjectDumps = true;
     private static final String ALLOW_REGISTRY_OBJECT_DUMPS_KEY = "Allow ProbeJS to Resolve Classes from Registries Like Item Classes or Block Classes";
     public boolean allowRegistryLiteralDumps = true;
@@ -38,7 +38,7 @@ public class ProbeConfig {
     public boolean dumpJSONIntermediates = false;
     private static final String DUMP_JSON_INTERMEDIATES_KEY = "Should ProbeJS Generate Intermediate JSON Representation of Documents - Mostly for Debugging";
     public boolean pullSchema = false;
-    private static final String PULL_SCHEMA_KEY = "Should ProbeJS Download Schema Scripts from Github";
+    private static final String PULL_SCHEMA_KEY = "Should ProbeJS Download Schema Scripts from Github for Mods without Addon Supports";
 
     @SuppressWarnings("unchecked")
     private static <E> E fetchPropertyOrDefault(Object key, Map<?, ?> value, E defaultValue) {
@@ -47,7 +47,11 @@ public class ProbeConfig {
             return defaultValue;
         }
         Object v = value.get(key);
-        return v == null ? defaultValue : (E) v;
+        try {
+            return v == null ? defaultValue : (E) v;
+        } catch (ClassCastException ignored) {
+            return defaultValue;
+        }
     }
 
     private ProbeConfig() {
@@ -86,8 +90,8 @@ public class ProbeConfig {
             jObj.addProperty(ALLOW_REGISTRY_LITERAL_DUMPS_KEY, allowRegistryLiteralDumps);
             jObj.addProperty(REQUIRE_SINGLE_AND_PERM_KEY, requireSingleAndPerm);
             jObj.addProperty(ENABLED_KEY, enabled);
-            jObj.addProperty(DISABLE_RECIPE_JSON_DUMP_KEY, DISABLE_RECIPE_JSON_DUMP_KEY);
-            jObj.addProperty(DUMP_JSON_INTERMEDIATES_KEY, DUMP_JSON_INTERMEDIATES_KEY);
+            jObj.addProperty(DISABLE_RECIPE_JSON_DUMP_KEY, disableRecipeJsonDump);
+            jObj.addProperty(DUMP_JSON_INTERMEDIATES_KEY, dumpJSONIntermediates);
             jObj.addProperty(PULL_SCHEMA_KEY, pullSchema);
 
             gson.toJson(jObj, writer);
@@ -124,5 +128,9 @@ public class ProbeConfig {
         } catch (IOException e) {
             ProbeJS.LOGGER.warn("Cannot write mod hash file, settings are not saved.");
         }
+    }
+
+    public static void reload() {
+        INSTANCE = new ProbeConfig();
     }
 }
