@@ -65,6 +65,14 @@ public class ProbeJSEvents {
                 player.sendSystemMessage(Component.literal("The aggressive mode will be turned off, you can still turn it on by ")
                         .append(Component.literal("/probejs configure toggle_aggressive").kjs$underlined().kjs$green().kjs$clickSuggestCommand("/probejs configure toggle_aggressive"))
                         .append(Component.literal(" later.").kjs$white()));
+                player.sendSystemMessage(Component.literal("ProbeJS now supports downloading of recipe schema scripts."));
+                player.sendSystemMessage(Component.literal("These scripts are for adding recipe support for mods that don't have recipe support yet."));
+                player.sendSystemMessage(Component.literal("If you don't want to download the scripts, you can turn it on by")
+                        .append(Component.literal("/probejs configure toggle_schema_download").kjs$underlined().kjs$green().kjs$clickSuggestCommand("/probejs configure toggle_schema_download"))
+                        .append(Component.literal(". The scripts are downloaded at "))
+                        .append(Component.literal("startup_scripts/@recipes").kjs$aqua())
+                        .append(Component.literal(" and will be effective upon game restarts."))
+                );
                 ProbeConfig.INSTANCE.noAggressiveProbing = true;
                 ProbeConfig.INSTANCE.firstLoad = false;
                 if (Platform.getMods().size() > ProbeConfig.MOD_COUNT) {

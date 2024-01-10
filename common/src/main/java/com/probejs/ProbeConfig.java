@@ -28,7 +28,7 @@ public class ProbeConfig {
 
     public boolean disableRecipeJsonDump = true;
     public boolean dumpJSONIntermediates = false;
-    public boolean pullSchema = true;
+    public boolean pullSchema = false;
 
     @SuppressWarnings("unchecked")
     private static <E> E fetchPropertyOrDefault(Object key, Map<?, ?> value, E defaultValue) {
@@ -54,7 +54,7 @@ public class ProbeConfig {
                 enabled = fetchPropertyOrDefault("enabled", obj, true);
                 disableRecipeJsonDump = fetchPropertyOrDefault("disableRecipeJsonDump", obj, true);
                 dumpJSONIntermediates = fetchPropertyOrDefault("dumpJSONIntermediates", obj, false);
-                pullSchema = fetchPropertyOrDefault("pullSchema", obj, true);
+                pullSchema = fetchPropertyOrDefault("pullSchema", obj, false);
             } catch (IOException e) {
                 ProbeJS.LOGGER.warn("Cannot read config properties, falling back to defaults.");
             }

@@ -7,6 +7,7 @@ import com.probejs.jdoc.java.ClassInfo;
 import com.probejs.jdoc.java.MethodInfo;
 import com.probejs.jdoc.java.type.ITypeInfo;
 import com.probejs.jdoc.document.DocumentClass;
+import com.probejs.util.Util;
 import dev.latvian.mods.rhino.util.RemapForJS;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.damagesource.DamageSource;
@@ -145,7 +146,7 @@ public class NameResolver {
     }
 
     public static String getNameSafe(String kw) {
-        return keywords.contains(kw) ? kw + "_" : kw;
+        return keywords.contains(kw) || Util.KEYWORDS.contains(kw) ? kw + "_" : kw;
     }
 
     public static void putResolvedPrimitive(Class<?> clazz, String resolvedName) {

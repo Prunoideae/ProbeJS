@@ -246,7 +246,8 @@ public class ProbeCommands {
                                             ProbeConfig.INSTANCE.save();
                                             return Command.SINGLE_SUCCESS;
                                         })
-                                ).then(Commands.literal("toggle_json_intermediates")
+                                )
+                                .then(Commands.literal("toggle_json_intermediates")
                                         .executes(context -> {
                                             ProbeConfig.INSTANCE.dumpJSONIntermediates = !ProbeConfig.INSTANCE.dumpJSONIntermediates;
                                             context.getSource().sendSuccess(() -> Component.literal("JSON intermediates dumping is now %s".formatted(ProbeConfig.INSTANCE.dumpJSONIntermediates ? "enabled" : "disabled")), false);
@@ -254,6 +255,15 @@ public class ProbeCommands {
                                             return Command.SINGLE_SUCCESS;
                                         })
                                 )
+                                .then(Commands.literal("toggle_schema_download")
+                                        .executes(context -> {
+                                            ProbeConfig.INSTANCE.pullSchema = !ProbeConfig.INSTANCE.pullSchema;
+                                            context.getSource().sendSuccess(() -> Component.literal("Schema downloading is now %s".formatted(ProbeConfig.INSTANCE.pullSchema ? "enabled" : "disabled")), false);
+                                            ProbeConfig.INSTANCE.save();
+                                            return Command.SINGLE_SUCCESS;
+                                        })
+                                )
+
 
                         )
                         .then(Commands.literal("test_availability")
