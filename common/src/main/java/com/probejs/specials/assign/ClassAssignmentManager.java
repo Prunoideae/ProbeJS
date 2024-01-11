@@ -219,7 +219,7 @@ public class ClassAssignmentManager {
                 .add("not", context.javaType(BiomeFilter.class), true)
                 .add("id", new PrimitiveDescJS("Special.Biome"), true)
                 .add("type", new PrimitiveDescJS("Special.Biome"), true)
-                .add("tag", new PrimitiveDescJS("#${Special.BiomeTag}"), true)
+                .add("tag", new PrimitiveDescJS("`#${Special.BiomeTag}`"), true)
         );
 
         // MobFilter
