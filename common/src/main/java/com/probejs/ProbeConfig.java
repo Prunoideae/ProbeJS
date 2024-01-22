@@ -9,7 +9,6 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Map;
 
 public class ProbeConfig {
@@ -49,7 +48,7 @@ public class ProbeConfig {
         Object v = value.get(key);
         try {
             return v == null ? defaultValue : (E) v;
-        } catch (ClassCastException ignored) {
+        } catch (Exception ignored) {
             return defaultValue;
         }
     }
@@ -69,7 +68,7 @@ public class ProbeConfig {
                 disableRecipeJsonDump = fetchPropertyOrDefault(DISABLE_RECIPE_JSON_DUMP_KEY, obj, true);
                 dumpJSONIntermediates = fetchPropertyOrDefault(DUMP_JSON_INTERMEDIATES_KEY, obj, false);
                 pullSchema = fetchPropertyOrDefault(PULL_SCHEMA_KEY, obj, false);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 ProbeJS.LOGGER.warn("Cannot read config properties, falling back to defaults.");
             }
         }

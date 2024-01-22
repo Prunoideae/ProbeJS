@@ -79,11 +79,14 @@ public class SnippetCompiler {
         }
 
         private static void addRecipeSnippets(JsonObject resultJson) {
-            FormatterRecipeId.ORIGINAL_RECIPES.forEach((rl, json) ->
+            FormatterRecipeId.ORIGINAL_RECIPES.forEach((rl, json) -> {
+                if (json instanceof JsonObject) {
                     resultJson.add(rl.toString(), JObject.create()
                             .add("prefix", JArray.create().add(new JPrimitive("#" + rl)))
                             .add("body", new JPrimitive(ProbeJS.GSON_WRITER.toJson(json)))
-                            .serialize()));
+                            .serialize());
+                }
+            });
         }
 
         public JsonObject toSnippet(DocGenerationEventJS event) {

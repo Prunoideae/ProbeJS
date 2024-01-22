@@ -167,7 +167,7 @@ public class ProbeCommands {
                         .then(Commands.literal("clear_cache")
                                 .requires(source -> source.getServer().isSingleplayer())
                                 .executes(context -> {
-                                    ProbeConfig.INSTANCE.docsTimestamp = -1;
+                                    ProbeConfig.INSTANCE.docsTimestamp = 0;
                                     for (File file : Objects.requireNonNull(ProbePaths.CACHE.toFile().listFiles())) {
                                         // delete everything, including folders, folders might not be empty
                                         try {
