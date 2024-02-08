@@ -148,10 +148,9 @@ public class ProbeCommands {
                 Commands.literal("probejs")
                         .then(Commands.literal("dump")
                                 //SINGLE PLAYER IS NEEDED
-                                .requires(source -> ProbeConfig.INSTANCE.requireSingleAndPerm
-                                        && (source.getServer().isSingleplayer()
-                                        && source.hasPermission(2))
-                                        && ProbeConfig.INSTANCE.enabled
+                                .requires(source -> (
+                                                (!ProbeConfig.INSTANCE.requireSingleAndPerm) || (source.getServer().isSingleplayer() && source.hasPermission(2))
+                                        ) && ProbeConfig.INSTANCE.enabled
                                 )
                                 .executes(context -> {
                                     var player = context.getSource().getPlayer();
