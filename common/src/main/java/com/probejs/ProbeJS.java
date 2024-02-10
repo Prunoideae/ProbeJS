@@ -4,9 +4,14 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.probejs.jdoc.Serde;
 import com.probejs.recipe.component.ComponentConverter;
+import com.probejs.repl.REPLServer;
 import com.probejs.specials.assign.ClassAssignmentManager;
 import dev.architectury.event.events.common.CommandRegistrationEvent;
+import dev.architectury.event.events.common.LifecycleEvent;
 import dev.architectury.event.events.common.PlayerEvent;
+import dev.architectury.platform.Platform;
+import dev.architectury.utils.Env;
+import dev.latvian.mods.kubejs.bindings.event.ServerEvents;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -29,6 +34,7 @@ public class ProbeJS {
     public static void init() {
         CommandRegistrationEvent.EVENT.register((dispatcher, registry, selection) -> ProbeCommands.register(dispatcher));
         PlayerEvent.PLAYER_JOIN.register(ProbeJSEvents::playerJoined);
+        LifecycleEvent.SERVER_STOPPED.register(ProbeJSEvents::worldCleanup);
         Serde.init();
         ClassAssignmentManager.init(ComponentConverter.PROBEJS_CONTEXT);
     }

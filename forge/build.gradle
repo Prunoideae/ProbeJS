@@ -33,11 +33,15 @@ dependencies {
     modImplementation "dev.latvian.mods:kubejs-forge:${rootProject.kubejs_version}"
     modImplementation "dev.latvian.mods:rhino-forge:${rootProject.rhino_version}"
 
+    include 'org.java-websocket:Java-WebSocket:1.5.6'
+
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive = false }
+
 }
 
 repositories {
+    mavenCentral()
     maven {
         name "ModMaven (JEI)"
         url "https://modmaven.dev/"

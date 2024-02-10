@@ -6,6 +6,8 @@ dependencies {
     modImplementation "dev.latvian.mods:rhino:${rootProject.rhino_version}"
     // Remove the next line if you don't want to depend on the API
     modApi "dev.architectury:architectury:${rootProject.architectury_version}"
+
+    compileOnly 'org.java-websocket:Java-WebSocket:1.5.6'
 }
 
 architectury {

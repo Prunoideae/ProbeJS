@@ -1,11 +1,15 @@
 package com.probejs;
 
+import com.probejs.repl.EvalManager;
+import com.probejs.repl.REPLServer;
 import dev.architectury.platform.Mod;
 import dev.architectury.platform.Platform;
+import dev.architectury.utils.Env;
 import dev.latvian.mods.kubejs.KubeJSPaths;
 import dev.latvian.mods.kubejs.registry.RegistryInfo;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.security.MessageDigest;
@@ -13,6 +17,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Comparator;
 
 public class ProbeJSEvents {
+    public static REPLServer SERVER;
+    public static MinecraftServer CURRENT_SERVER;
 
     private static void computeKubeJSObjectHash(MessageDigest digest) {
         RegistryInfo.MAP
@@ -42,8 +48,34 @@ public class ProbeJSEvents {
         return hexString.toString();
     }
 
+    public static void worldCleanup(MinecraftServer server) {
+        if (SERVER != null) {
+            try {
+                SERVER.stop();
+                EvalManager.SERVER_SCRIPTS.reset();
+                SERVER = null;
+                CURRENT_SERVER = null;
+            } catch (InterruptedException ignored) {
+            }
+        }
+    }
+
     public static void playerJoined(ServerPlayer player) {
         if (player.server.isSingleplayer() && player.hasPermissions(2)) {
+
+            if (ProbeConfig.INSTANCE.enabled && ProbeConfig.INSTANCE.interactive == 1) {
+                // So it's safe to open up the port
+                // Interactive mode is 0 by default, it will only be set once the ProbeJS extension does so.
+                try {
+                    SERVER = new REPLServer(ProbeConfig.INSTANCE.interactivePort);
+                    SERVER.start();
+                    player.sendSystemMessage(Component.literal("ProbeJS Websocket Server started."));
+                } catch (Exception e) {
+                    player.sendSystemMessage(Component.literal("Failed to start WebSocket server, probably the port is in use."));
+                }
+                CURRENT_SERVER = player.server;
+            }
+
             if (!ProbeConfig.INSTANCE.shouldProbingAggressive()) return;
             try {
                 MessageDigest digest = MessageDigest.getInstance("SHA-256");

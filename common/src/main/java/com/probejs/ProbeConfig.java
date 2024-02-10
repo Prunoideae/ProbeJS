@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.function.Function;
 
 public class ProbeConfig {
     public static final int MOD_COUNT = 350;
@@ -38,19 +39,29 @@ public class ProbeConfig {
     private static final String DUMP_JSON_INTERMEDIATES_KEY = "Should ProbeJS Generate Intermediate JSON Representation of Documents - Mostly for Debugging";
     public boolean pullSchema = false;
     private static final String PULL_SCHEMA_KEY = "Should ProbeJS Download Schema Scripts from Github for Mods without Addon Supports";
+    public int interactive = 0;
+    private static final String INTERACTIVE_KEY = "Should ProbeJS Open the Websocket for VSCode Evaluation? 1 - enabled, others - disabled.";
 
-    @SuppressWarnings("unchecked")
-    private static <E> E fetchPropertyOrDefault(Object key, Map<?, ?> value, E defaultValue) {
+    public int interactivePort = 7796;
+    private static final String INTERACTIVE_PORT_KEY = "Which port should ProbeJS listen on for VSCode Extension?";
+
+
+    private static <E> E fetchPropertyOrDefault(Object key, Map<?, ?> value, E defaultValue, Function<Object, E> transformer) {
         if (value == null || !value.containsKey("version") || ((double) value.get("version")) < CONFIG_VERSION) {
             ProbeJS.LOGGER.warn("Config version has changed! Config values are rolled back to default.");
             return defaultValue;
         }
         Object v = value.get(key);
         try {
-            return v == null ? defaultValue : (E) v;
+            return v == null ? defaultValue : transformer.apply(v);
         } catch (Exception ignored) {
             return defaultValue;
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <E> E fetchPropertyOrDefault(Object key, Map<?, ?> value, E defaultValue) {
+        return fetchPropertyOrDefault(key, value, defaultValue, e -> (E) e);
     }
 
     private ProbeConfig() {
@@ -68,8 +79,11 @@ public class ProbeConfig {
                 disableRecipeJsonDump = fetchPropertyOrDefault(DISABLE_RECIPE_JSON_DUMP_KEY, obj, true);
                 dumpJSONIntermediates = fetchPropertyOrDefault(DUMP_JSON_INTERMEDIATES_KEY, obj, false);
                 pullSchema = fetchPropertyOrDefault(PULL_SCHEMA_KEY, obj, false);
+                interactive = fetchPropertyOrDefault(INTERACTIVE_KEY, obj, 0D).intValue();
+                interactivePort = fetchPropertyOrDefault(INTERACTIVE_PORT_KEY, obj, 7796D).intValue();
             } catch (Exception e) {
                 ProbeJS.LOGGER.warn("Cannot read config properties, falling back to defaults.");
+                e.printStackTrace();
             }
         }
         save();
@@ -92,6 +106,8 @@ public class ProbeConfig {
             jObj.addProperty(DISABLE_RECIPE_JSON_DUMP_KEY, disableRecipeJsonDump);
             jObj.addProperty(DUMP_JSON_INTERMEDIATES_KEY, dumpJSONIntermediates);
             jObj.addProperty(PULL_SCHEMA_KEY, pullSchema);
+            jObj.addProperty(INTERACTIVE_KEY, interactive);
+            jObj.addProperty(INTERACTIVE_PORT_KEY, interactivePort);
 
             gson.toJson(jObj, writer);
         } catch (IOException e) {
