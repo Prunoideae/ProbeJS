@@ -4,6 +4,7 @@ import com.probejs.util.json.JObject;
 import com.probejs.util.json.JPrimitive;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.CropBlock;
+import org.jetbrains.annotations.Nullable;
 
 public class ItemAttribute {
     private final ItemStack item;
@@ -40,12 +41,19 @@ public class ItemAttribute {
         return null;
     }
 
+    @Nullable
     public JObject serialize() {
-        JObject object = JObject.create()
-                .add("id", new JPrimitive(item.kjs$getId()))
-                .add("localized", new JPrimitive(item.getHoverName().getString()))
-                .add("maxDamage", new JPrimitive(item.getMaxDamage()))
-                .add("maxStackSize", new JPrimitive(item.getMaxStackSize()));
+        JObject object;
+
+        try {
+            object = JObject.create()
+                    .add("id", new JPrimitive(item.kjs$getId()))
+                    .add("localized", new JPrimitive(item.getHoverName().getString()))
+                    .add("maxDamage", new JPrimitive(item.getMaxDamage()))
+                    .add("maxStackSize", new JPrimitive(item.getMaxStackSize()));
+        } catch (Throwable ignored) {
+            return null;
+        }
         var toolType = determineToolType();
         if (toolType != null) {
             object.add("toolType", new JPrimitive(toolType));

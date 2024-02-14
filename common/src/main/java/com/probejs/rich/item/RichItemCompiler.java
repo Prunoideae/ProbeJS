@@ -18,6 +18,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class RichItemCompiler {
     public static void compile() throws IOException {
@@ -27,7 +28,8 @@ public class RichItemCompiler {
                         .map(Map.Entry::getValue)
                         .map(Item::getDefaultInstance)
                         .map(ItemAttribute::new)
-                        .map(ItemAttribute::serialize));
+                        .map(ItemAttribute::serialize)
+                );
 
         Path richFile = ProbePaths.WORKSPACE_SETTINGS.resolve("item-attributes.json");
         BufferedWriter writer = Files.newBufferedWriter(richFile);

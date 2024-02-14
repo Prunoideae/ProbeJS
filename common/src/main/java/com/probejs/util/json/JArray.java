@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -32,13 +33,15 @@ public class JArray implements IJsonBuilder<JsonArray> {
 
     public JArray addAll(Iterable<IJsonBuilder<?>> members) {
         for (IJsonBuilder<?> member : members) {
-            this.members.add(member);
+            if (member != null)
+                this.members.add(member);
         }
         return this;
     }
 
     public JArray addAll(Stream<IJsonBuilder<?>> members) {
-        members.forEach(this.members::add);
+        members.filter(Objects::nonNull)
+                .forEach(this.members::add);
         return this;
     }
 
