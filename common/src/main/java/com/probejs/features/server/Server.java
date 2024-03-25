@@ -1,18 +1,19 @@
-package com.probejs.repl;
+package com.probejs.features.server;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.probejs.ProbeJS;
 import com.probejs.ProbeJSEvents;
+import net.minecraft.client.Minecraft;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
 import java.net.InetSocketAddress;
 
-public class REPLServer extends WebSocketServer {
+public class Server extends WebSocketServer {
 
-    public REPLServer(int port) {
+    public Server(int port) {
         super(new InetSocketAddress(port));
     }
 
@@ -28,11 +29,11 @@ public class REPLServer extends WebSocketServer {
 
     @Override
     public void onMessage(WebSocket conn, String message) {
-        REPLCommand.Payload payload = ProbeJS.GSON.fromJson(message, REPLCommand.Payload.class);
+        Commands.Payload payload = ProbeJS.GSON.fromJson(message, Commands.Payload.class);
         JsonObject response = new JsonObject();
         ProbeJSEvents.CURRENT_SERVER.execute(() -> {
             try {
-                JsonElement result = REPLCommand.process(payload);
+                JsonElement result = Commands.process(payload);
                 response.addProperty("flag", "success");
                 response.add("result", result);
             } catch (Throwable e) {

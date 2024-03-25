@@ -73,9 +73,31 @@ public class ClassInfo {
             JavaMembers members = JavaMembers.lookupClass(manager.context, manager.topLevelScope, clazz, clazz, false);
             constructorInfo = members.getAccessibleConstructors().stream().map(ConstructorInfo::new).collect(Collectors.toList());
             methodInfo = members.getAccessibleMethods(manager.context, false).stream()
-                    .filter(m -> !hasIdenticalParentMethod(m.method, clazz))
+                    //.filter(m -> !hasIdenticalParentMethod(m.method, clazz))
                     .map(m -> new MethodInfo(m, clazz))
                     .collect(Collectors.toList());
+            Set<String> occurred = new HashSet<>();
+            Set<String> duplicated = new HashSet<>();
+
+            for (MethodInfo info : methodInfo) {
+                String key = getOccurrenceKey(info);
+                if (!occurred.contains(key)) {
+                    occurred.add(key);
+                } else {
+                    duplicated.add(key);
+                }
+            }
+
+            Set<MethodInfo> needsExplicit = methodInfo.stream()
+                    .filter(info -> duplicated.contains(getOccurrenceKey(info)))
+                    .collect(Collectors.toSet());
+
+            for (MethodInfo info : needsExplicit) {
+                MethodInfo explicit = new MethodInfo(info.getMethod(), info.getName(), clazz);
+                explicit.setName(explicit.getExplicitName());
+                methodInfo.add(explicit);
+            }
+
             fieldInfo = members.getAccessibleFields(manager.context, false)
                     .stream()
                     .filter(f -> f.field.getDeclaringClass() == clazz)
@@ -91,6 +113,9 @@ public class ClassInfo {
         }
     }
 
+    private String getOccurrenceKey(MethodInfo info) {
+        return "%s(%s)".formatted(info.getName(), info.getParams().size());
+    }
 
     public boolean isInterface() {
         return isInterface;

@@ -39,11 +39,15 @@ public class FormatterField extends DocumentFormatter<DocumentField> {
             modifiers.add("static");
         if (document.isFinal())
             modifiers.add("readonly");
+
         return List.of(Util.indent(indent) + "%s%s: %s;".formatted(
                 modifiers.isEmpty() ? "" : String.join(" ", modifiers) + " ",
                 Util.getSafeName(document.getName()),
                 shouldFormatValue() && !Serde.getValueFormatter(document.getValue()).formatFirst().equals("any") ?
-                        Serde.getValueFormatter(document.getValue()).formatFirst() :
+                        "(%s) & (%s)".formatted(
+                                Serde.getValueFormatter(document.getValue()).formatFirst(),
+                                Serde.getTypeFormatter(document.getType()).formatFieldVariable()
+                        ) :
                         Serde.getTypeFormatter(document.getType()).formatFieldVariable()
         ));
     }

@@ -1,4 +1,4 @@
-package com.probejs.recipe.component;
+package com.probejs.specials.special.recipe.component;
 
 import com.probejs.docs.formatter.formatter.IFormatter;
 import com.probejs.jdoc.Serde;

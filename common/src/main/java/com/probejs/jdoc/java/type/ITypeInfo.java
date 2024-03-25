@@ -13,4 +13,8 @@ public interface ITypeInfo {
     boolean assignableFrom(ITypeInfo info);
 
     boolean equalsTo(ITypeInfo info);
+
+    default String getExplicitName(){
+        return getTypeName();
+    }
 }

@@ -9,7 +9,7 @@ import com.probejs.specials.special.FormatterLang;
 import com.probejs.specials.special.FormatterLootTable;
 import com.probejs.specials.special.FormatterRecipeId;
 import com.probejs.specials.special.FormatterTag;
-import com.probejs.jdoc.jsgen.DocGenerationEventJS;
+import com.probejs.features.plugin.DocGenerationEventJS;
 import com.probejs.util.json.JArray;
 import com.probejs.util.json.JObject;
 import com.probejs.util.json.JPrimitive;

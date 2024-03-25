@@ -1,6 +1,6 @@
 package com.probejs;
 
-import com.probejs.jdoc.jsgen.ProbeJSEvents;
+import com.probejs.features.plugin.ProbeJSEvents;
 import dev.latvian.mods.kubejs.KubeJSPlugin;
 
 public class ProbeJSPlugin extends KubeJSPlugin {

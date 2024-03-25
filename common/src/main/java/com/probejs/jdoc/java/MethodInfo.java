@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 public class MethodInfo {
 
-    private final String name;
+    private String name;
     private final boolean shouldHide;
     private final boolean defaultMethod;
     private final int modifiers;
@@ -48,13 +48,16 @@ public class MethodInfo {
     }
 
     public MethodInfo(JavaMembers.MethodInfo methodInfo, Class<?> from) {
-        Method method = methodInfo.method;
+        this(methodInfo.method, methodInfo.name, from);
+    }
+
+    public MethodInfo(Method method, String name, Class<?> from) {
         Map<Type, Type> typeGenericMap = new HashMap<>();
         if (method.getDeclaringClass() != from) {
             typeGenericMap.putAll(rewindGenerics(method, from));
         }
         this.method = method;
-        this.name = methodInfo.name.isEmpty() ? method.getName() : methodInfo.name;
+        this.name = name.isEmpty() ? method.getName() : name;
         this.shouldHide = false;
         this.from = from;
         this.modifiers = method.getModifiers();
@@ -74,6 +77,19 @@ public class MethodInfo {
 
     public String getName() {
         return name;
+    }
+
+    public String getExplicitName() {
+        return "%s(%s)".formatted(
+                name,
+                params.stream().map(paramInfo -> paramInfo.type)
+                        .map(ITypeInfo::getExplicitName)
+                        .collect(Collectors.joining(","))
+        );
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public boolean shouldHide() {

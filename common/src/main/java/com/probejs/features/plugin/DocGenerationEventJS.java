@@ -1,4 +1,4 @@
-package com.probejs.jdoc.jsgen;
+package com.probejs.features.plugin;
 
 import com.google.gson.JsonObject;
 import com.probejs.ProbeJS;

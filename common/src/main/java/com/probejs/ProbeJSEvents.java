@@ -1,10 +1,9 @@
 package com.probejs;
 
-import com.probejs.repl.EvalManager;
-import com.probejs.repl.REPLServer;
+import com.probejs.features.repl.EvalManager;
+import com.probejs.features.server.Server;
 import dev.architectury.platform.Mod;
 import dev.architectury.platform.Platform;
-import dev.architectury.utils.Env;
 import dev.latvian.mods.kubejs.KubeJSPaths;
 import dev.latvian.mods.kubejs.registry.RegistryInfo;
 import net.minecraft.network.chat.Component;
@@ -17,7 +16,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Comparator;
 
 public class ProbeJSEvents {
-    public static REPLServer SERVER;
+    public static Server SERVER;
     public static MinecraftServer CURRENT_SERVER;
 
     private static void computeKubeJSObjectHash(MessageDigest digest) {
@@ -67,7 +66,7 @@ public class ProbeJSEvents {
                 // So it's safe to open up the port
                 // Interactive mode is 0 by default, it will only be set once the ProbeJS extension does so.
                 try {
-                    SERVER = new REPLServer(ProbeConfig.INSTANCE.interactivePort);
+                    SERVER = new Server(ProbeConfig.INSTANCE.interactivePort);
                     SERVER.start();
                     player.sendSystemMessage(Component.literal("ProbeJS Websocket Server started."));
                 } catch (Exception e) {

@@ -34,6 +34,8 @@ dependencies {
     modImplementation "dev.latvian.mods:rhino-forge:${rootProject.rhino_version}"
 
     include 'org.java-websocket:Java-WebSocket:1.5.6'
+    include 'com.github.javaparser:javaparser-symbol-solver-core:3.25.8'
+    include "org.vineflower:vineflower:1.9.3"
 
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive = false }

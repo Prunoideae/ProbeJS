@@ -1,8 +1,8 @@
-package com.probejs.recipe;
+package com.probejs.specials.special.recipe;
 
 import com.probejs.docs.formatter.formatter.IFormatter;
 import com.probejs.jdoc.property.PropertyComment;
-import com.probejs.recipe.component.FormatterRecipeKey;
+import com.probejs.specials.special.recipe.component.FormatterRecipeKey;
 import com.probejs.util.Util;
 import dev.latvian.mods.kubejs.recipe.schema.JsonRecipeSchema;
 import dev.latvian.mods.kubejs.recipe.schema.RecipeConstructor;

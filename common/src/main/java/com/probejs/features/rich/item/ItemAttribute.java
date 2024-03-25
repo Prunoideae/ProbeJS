@@ -1,4 +1,4 @@
-package com.probejs.rich.item;
+package com.probejs.features.rich.item;
 
 import com.probejs.util.json.JObject;
 import com.probejs.util.json.JPrimitive;

@@ -7,7 +7,7 @@ import com.probejs.jdoc.java.ClassInfo;
 import com.probejs.jdoc.property.PropertyHide;
 import com.probejs.jdoc.property.PropertyParam;
 import com.probejs.jdoc.property.PropertyType;
-import com.probejs.recipe.component.ComponentConverter;
+import com.probejs.specials.special.recipe.component.ComponentConverter;
 import dev.latvian.mods.kubejs.block.entity.BlockEntityAttachmentType;
 import dev.latvian.mods.kubejs.block.entity.BlockEntityInfo;
 

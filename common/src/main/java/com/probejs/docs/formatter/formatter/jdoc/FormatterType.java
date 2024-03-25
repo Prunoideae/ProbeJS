@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public abstract class FormatterType<T extends PropertyType<T>> extends DocumentFormatter<T> {
     public static Map<Class<? extends PropertyType<?>>, Function<PropertyType<?>, FormatterType<?>>> FORMATTER_REGISTRY = new HashMap<>();
@@ -254,13 +255,17 @@ public abstract class FormatterType<T extends PropertyType<T>> extends DocumentF
 
         @Override
         public List<String> formatDocument(Integer indent, Integer stepIndent) {
-            return List.of("{%s}".formatted(keyValues.entrySet().stream().map(pair -> {
-                PropertyType.JSObjectKey key = pair.getKey();
-                FormatterType<?> value = pair.getValue();
-                return "%s: %s".formatted(
-                        key.format(),
-                        value.formatFirst());
-            }).collect(Collectors.joining(", "))));
+            return List.of("{%s}".formatted(keyValues.entrySet()
+                    .stream()
+                    .map(pair -> {
+                        PropertyType.JSObjectKey key = pair.getKey();
+                        FormatterType<?> value = pair.getValue();
+                        return "%s: %s".formatted(
+                                key.format(),
+                                value.formatFirst());
+                    })
+                    .collect(Collectors.joining(", ")))
+            );
         }
 
         @Override

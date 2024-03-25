@@ -67,4 +67,9 @@ public class TypeInfoArray implements ITypeInfo {
     public boolean equalsTo(ITypeInfo info) {
         return info instanceof TypeInfoArray && info.getBaseType().equalsTo(type);
     }
+
+    @Override
+    public String getExplicitName() {
+        return type.getExplicitName() + "[]";
+    }
 }

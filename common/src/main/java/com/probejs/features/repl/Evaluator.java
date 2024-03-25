@@ -1,4 +1,4 @@
-package com.probejs.repl;
+package com.probejs.features.repl;
 
 import dev.latvian.mods.kubejs.script.ScriptPack;
 import dev.latvian.mods.rhino.Context;

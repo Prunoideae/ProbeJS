@@ -107,4 +107,11 @@ public class TypeInfoVariable implements ITypeInfo {
     public List<ITypeInfo> getBounds() {
         return bounds;
     }
+
+    @Override
+    public String getExplicitName() {
+        if (bounds.size() == 1)
+            return bounds.get(0).getExplicitName();
+        return Object.class.getName();
+    }
 }

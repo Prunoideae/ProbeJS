@@ -6,7 +6,7 @@ import com.probejs.jdoc.java.type.TypeInfoClass;
 import com.probejs.jdoc.java.type.TypeInfoParameterized;
 import com.probejs.jdoc.property.PropertyAssign;
 import com.probejs.jdoc.property.PropertyComment;
-import com.probejs.recipe.component.ComponentConverter;
+import com.probejs.specials.special.recipe.component.ComponentConverter;
 import com.probejs.specials.assign.ClassAssignmentManager;
 import dev.latvian.mods.kubejs.typings.Generics;
 import dev.latvian.mods.kubejs.typings.Info;

@@ -1,4 +1,4 @@
-package com.probejs.rich.fluid;
+package com.probejs.features.rich.fluid;
 
 import com.probejs.util.json.JObject;
 import com.probejs.util.json.JPrimitive;

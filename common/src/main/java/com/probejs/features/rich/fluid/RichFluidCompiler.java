@@ -1,11 +1,11 @@
-package com.probejs.rich.fluid;
+package com.probejs.features.rich.fluid;
 
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.datafixers.util.Pair;
 import com.probejs.ProbeJS;
 import com.probejs.ProbePaths;
-import com.probejs.rich.ImageHelper;
+import com.probejs.features.rich.ImageHelper;
 import com.probejs.util.json.JArray;
 import dev.latvian.mods.kubejs.registry.RegistryInfo;
 import net.minecraft.resources.ResourceLocation;

@@ -1,4 +1,4 @@
-package com.probejs.repl;
+package com.probejs.features.repl;
 
 import com.google.gson.*;
 import dev.latvian.mods.kubejs.KubeJS;
@@ -30,6 +30,10 @@ public class EvalManager {
         if (obj instanceof String string) return new JsonPrimitive(string);
         if (obj instanceof Boolean bool) return new JsonPrimitive(bool);
         if (Undefined.isUndefined(obj)) return new JsonPrimitive("$$ProbeJS$$undefined$$ProbeJS$$");
+        if (obj.getClass().isArray()) {
+            Object[] arrayObject = (Object[]) obj;
+            obj = Arrays.asList(arrayObject);
+        }
         if (obj instanceof List<?> list) {
             JsonArray array = new JsonArray(list.size());
             for (Object o : list) {
@@ -81,6 +85,54 @@ public class EvalManager {
 
     private EvalManager(Supplier<ScriptManager> manager) {
         scriptManager = manager;
+    }
+
+    private static EvalManager getManager(String type) {
+        return switch (type) {
+            case "startup_scripts" -> STARTUP_SCRIPTS;
+            case "client_scripts" -> CLIENT_SCRIPTS;
+            case "server_scripts" -> SERVER_SCRIPTS;
+            default -> throw new RuntimeException("Unknown script manager %s.".formatted(type));
+        };
+    }
+
+    public static JsonElement evaluate(JsonObject payload) {
+        /*
+         * {
+         *  "type": "server_script", etc
+         *  "pack": "server_script", etc
+         *  "input": "1", etc
+         * }
+         */
+        String type = payload.get("type").getAsString();
+        String pack = payload.get("pack").getAsString();
+        String input = payload.get("input").getAsString();
+
+        EvalManager manager = getManager(type);
+        Evaluator evaluator = manager.getEvaluator(pack);
+        return jsToJson(evaluator.getContext(), evaluator.evaluate(input));
+    }
+
+    public static JsonElement getPacks(JsonObject payload) {
+        /*
+         * {
+         *  "type": "server_script", etc
+         * }
+         */
+        String type = payload.get("type").getAsString();
+        return jsToJson(null, getManager(type).getScriptPacks());
+    }
+
+    public static JsonElement getGlobals(JsonObject payload) {
+        /*
+         * {
+         *  "type": "server_script", etc
+         *  "pack": "server_script", etc
+         * }
+         */
+        String type = payload.get("type").getAsString();
+        String pack = payload.get("pack").getAsString();
+        return jsToJson(null, getManager(type).getEvaluator(pack).getTopLevelVariables());
     }
 
     private void tryLoad() {

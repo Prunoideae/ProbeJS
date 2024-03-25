@@ -1,11 +1,11 @@
-package com.probejs.rich.item;
+package com.probejs.features.rich.item;
 
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.datafixers.util.Pair;
 import com.probejs.ProbeJS;
 import com.probejs.ProbePaths;
-import com.probejs.rich.ImageHelper;
+import com.probejs.features.rich.ImageHelper;
 import com.probejs.util.json.JArray;
 import dev.latvian.mods.kubejs.registry.RegistryInfo;
 import net.minecraft.world.item.Item;
@@ -18,7 +18,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 public class RichItemCompiler {
     public static void compile() throws IOException {

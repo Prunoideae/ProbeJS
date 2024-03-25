@@ -1,4 +1,4 @@
-package com.probejs.rich.item;
+package com.probejs.features.rich.item;
 
 import com.probejs.util.json.JArray;
 import com.probejs.util.json.JObject;

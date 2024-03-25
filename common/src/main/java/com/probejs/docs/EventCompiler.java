@@ -8,7 +8,7 @@ import com.probejs.jdoc.java.ClassInfo;
 import com.probejs.jdoc.property.AbstractProperty;
 import com.probejs.jdoc.property.PropertyComment;
 import com.probejs.jdoc.property.PropertyType;
-import com.probejs.recipe.component.ComponentConverter;
+import com.probejs.specials.special.recipe.component.ComponentConverter;
 import com.probejs.specials.RegistryCompiler;
 import com.probejs.specials.TagEventCompiler;
 import com.probejs.util.Util;

@@ -90,6 +90,7 @@ public class FormatterClass extends DocumentFormatter<DocumentClass> {
         document.getConstructors().stream().map(DocumentConstructor::applyProperties).forEach(constructor -> lines.addAll(new FormatterConstructor(constructor).format(indent + stepIndent, stepIndent)));
         document.getMethods().stream().map(DocumentMethod::applyProperties).forEach(method -> lines.addAll(new FormatterMethod(method, document).format(indent + stepIndent, stepIndent)));
         document.getMethods().stream().map(DocumentMethod::applyProperties).map(method -> new FormatterMethod(method, document)).map(FormatterMethod::getBeanFormatter).filter(Optional::isPresent).map(Optional::get).forEach(formatter -> lines.addAll(formatter.format(indent + stepIndent, stepIndent)));
+        Set<String> typesAssignable = new HashSet<>();
 
         /* hybrid type only accepts one abstract method on top of the interface
          * we assume that any sub interface will not break the abstract method of parent interface
@@ -108,12 +109,12 @@ public class FormatterClass extends DocumentFormatter<DocumentClass> {
         if (document.isInterface() && document.methods.stream().filter(method -> method.isAbstract).count() == 1) {
             FormatterMethod hybridFormatter = new FormatterMethod(document.methods.stream().filter(method -> method.isAbstract).findFirst().get(), document);
             hybridFormatter.setFunctionalInterface(true);
-            lines.add("%s%s;".formatted(" ".repeat(indent + stepIndent), hybridFormatter.formatMethodParts(true)));
+            lines.add("%s%s;".formatted(" ".repeat(indent + stepIndent), hybridFormatter.formatMethodParts(true, false)));
+            typesAssignable.add("(%s)".formatted(hybridFormatter.formatMethodParts(true, true)));
         }
 
         document.getFields().stream().map(DocumentField::applyProperties).forEach(field -> lines.addAll(new FormatterField(field).setInterface(document.isInterface()).format(indent + stepIndent, stepIndent)));
         lines.add(Util.indent(indent) + "}");
-        Set<String> typesAssignable = new HashSet<>();
         String typeName = NameResolver.getResolvedName(document.getName()).getLastName();
         if (document.findPropertiesOf(PropertyAssign.class).stream().noneMatch(PropertyAssign::isShieldOriginal))
             typesAssignable.add(typeName + getClassGeneric());

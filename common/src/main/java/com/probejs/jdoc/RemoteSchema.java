@@ -1,4 +1,4 @@
-package com.probejs.jdoc.jsgen;
+package com.probejs.jdoc;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

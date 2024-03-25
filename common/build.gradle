@@ -8,6 +8,8 @@ dependencies {
     modApi "dev.architectury:architectury:${rootProject.architectury_version}"
 
     compileOnly 'org.java-websocket:Java-WebSocket:1.5.6'
+    compileOnly 'com.github.javaparser:javaparser-symbol-solver-core:3.25.8'
+    compileOnly "org.vineflower:vineflower:1.9.3"
 }
 
 architectury {

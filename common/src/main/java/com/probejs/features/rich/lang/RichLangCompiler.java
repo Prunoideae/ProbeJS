@@ -1,4 +1,4 @@
-package com.probejs.rich.lang;
+package com.probejs.features.rich.lang;
 
 import com.mojang.datafixers.util.Pair;
 import com.probejs.ProbeJS;

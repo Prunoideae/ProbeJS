@@ -56,7 +56,7 @@ public class FormatterMethod extends DocumentFormatter<DocumentMethod> {
                 document.isAbstract() ? "abstract " : "",
                 Util.getSafeName(document.getName()),
                 document.getVariables().isEmpty() ? "" : "<%s>".formatted(document.getVariables().stream().map(Serde::getTypeFormatter).map(IFormatter::formatMethodVariable).collect(Collectors.joining(", "))),
-                formatMethodParts(false)
+                formatMethodParts(false, false)
         ));
     }
 
@@ -65,13 +65,14 @@ public class FormatterMethod extends DocumentFormatter<DocumentMethod> {
      *
      * @return the formatted string
      */
-    public String formatMethodParts(boolean formattingFunctionalInterface) {
-        return "(%s): %s".formatted(
+    public String formatMethodParts(boolean formattingFunctionalInterface, boolean isAssign) {
+        return "(%s)%s %s".formatted(
                 document.getParams().stream()
                         .map(FormatterParam::new)
                         .map(formatterParam -> formatterParam.underscored(!formattingFunctionalInterface))
                         .map(IFormatter::formatParamVariable)
                         .collect(Collectors.joining(", ")),
+                isAssign ? "=>" : ":",
                 isReturningThis() ? "this" : Serde.getTypeFormatter(document.getReturns()).underscored(formattingFunctionalInterface).formatParamVariable()
         );
     }
