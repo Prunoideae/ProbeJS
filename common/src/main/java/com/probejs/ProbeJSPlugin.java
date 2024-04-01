@@ -15,5 +15,7 @@ public class ProbeJSPlugin extends KubeJSPlugin {
     public void registerClasses(ScriptType type, ClassFilter filter) {
         // lol
         filter.deny("com.probejs");
+        filter.deny("org.jetbrains.java.decompiler");
+        filter.deny("com.github.javaparser");
     }
 }
