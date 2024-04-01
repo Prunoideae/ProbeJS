@@ -17,5 +17,6 @@ public class ProbeJSPlugin extends KubeJSPlugin {
         filter.deny("com.probejs");
         filter.deny("org.jetbrains.java.decompiler");
         filter.deny("com.github.javaparser");
+        filter.deny("org.java_websocket");
     }
 }
