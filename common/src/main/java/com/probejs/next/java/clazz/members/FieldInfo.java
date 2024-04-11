@@ -1,14 +1,17 @@
 package com.probejs.next.java.clazz.members;
 
 import com.probejs.next.java.base.AnnotationHolder;
+import com.probejs.next.java.base.ClassPathProvider;
+import com.probejs.next.java.clazz.ClassPath;
 import com.probejs.next.java.type.TypeAdapter;
 import com.probejs.next.java.type.TypeDescriptor;
 import dev.latvian.mods.rhino.JavaMembers;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.Collection;
 
-public class FieldInfo extends AnnotationHolder {
+public class FieldInfo extends AnnotationHolder implements ClassPathProvider {
     public final String name;
     public final TypeDescriptor type;
     public final FieldAttributes attributes;
@@ -18,6 +21,11 @@ public class FieldInfo extends AnnotationHolder {
         this.name = field.name;
         this.type = TypeAdapter.getTypeDescription(field.field.getAnnotatedType());
         this.attributes = new FieldAttributes(field.field);
+    }
+
+    @Override
+    public Collection<ClassPath> getClassPaths() {
+        return type.getClassPaths();
     }
 
     public static class FieldAttributes {

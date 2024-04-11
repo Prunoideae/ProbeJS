@@ -1,21 +1,22 @@
 package com.probejs.next.java.clazz;
 
+import com.probejs.next.java.base.ClassPathProvider;
 import com.probejs.next.java.base.TypeVariableHolder;
 import com.probejs.next.java.clazz.members.ConstructorInfo;
 import com.probejs.next.java.clazz.members.FieldInfo;
 import com.probejs.next.java.clazz.members.MethodInfo;
+import com.probejs.next.java.clazz.members.ParamInfo;
 import com.probejs.next.java.type.TypeAdapter;
 import com.probejs.next.java.type.TypeDescriptor;
+import com.probejs.next.java.type.impl.VariableType;
 import com.probejs.next.utils.RemapperUtils;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
-public class Clazz extends TypeVariableHolder {
+public class Clazz extends TypeVariableHolder implements ClassPathProvider {
     public final ClassPath classPath;
     public final List<ConstructorInfo> constructors;
     public final List<FieldInfo> fields;
@@ -50,6 +51,28 @@ public class Clazz extends TypeVariableHolder {
     }
 
     @Override
+    public Collection<ClassPath> getClassPaths() {
+        Set<ClassPath> paths = new HashSet<>();
+        for (ConstructorInfo constructor : constructors) {
+            paths.addAll(constructor.getClassPaths());
+        }
+        for (FieldInfo field : fields) {
+            paths.addAll(field.getClassPaths());
+        }
+        for (MethodInfo method : methods) {
+            paths.addAll(method.getClassPaths());
+        }
+        paths.addAll(superClass.getClassPaths());
+        for (TypeDescriptor i : interfaces) {
+            paths.addAll(i.getClassPaths());
+        }
+        for (VariableType variableType : variableTypes) {
+            paths.addAll(variableType.getClassPaths());
+        }
+        return paths;
+    }
+
+    @Override
     public int hashCode() {
         return classPath.hashCode();
     }
@@ -60,6 +83,38 @@ public class Clazz extends TypeVariableHolder {
         if (o == null || getClass() != o.getClass()) return false;
         Clazz clazz = (Clazz) o;
         return Objects.equals(classPath, clazz.classPath);
+    }
+
+    public Set<ClassPath> getUsedClasses() {
+        Set<ClassPath> used = new HashSet<>();
+
+        for (MethodInfo method : methods) {
+            used.addAll(method.returnType.getClassPaths());
+            for (ParamInfo param : method.params) {
+                used.addAll(param.type.getClassPaths());
+            }
+        }
+
+        for (FieldInfo field : fields) {
+            used.addAll(field.type.getClassPaths());
+        }
+
+        for (ConstructorInfo constructor : constructors) {
+            for (ParamInfo param : constructor.params) {
+                used.addAll(param.type.getClassPaths());
+            }
+        }
+
+        used.addAll(superClass.getClassPaths());
+        for (TypeDescriptor i : interfaces) {
+            used.addAll(i.getClassPaths());
+        }
+
+        for (VariableType variableType : variableTypes) {
+            used.addAll(variableType.getClassPaths());
+        }
+
+        return used;
     }
 
     private static boolean hasIdenticalParentMethodAndEnsureNotDirectlyImplementsInterfaceSinceTypeScriptDoesNotHaveInterfaceAtRuntimeInTypeDeclarationFilesJustBecauseItSucks(Method method, Class<?> clazz) {
@@ -106,7 +161,7 @@ public class Clazz extends TypeVariableHolder {
             int modifiers = clazz.getModifiers();
             this.isAbstract = Modifier.isAbstract(modifiers);
             this.isFunctionalInterface = type == ClassType.INTERFACE &&
-                    Arrays.stream(clazz.getMethods()).filter(Method::isDefault).count() == 1;
+                    Arrays.stream(clazz.getMethods()).filter(m -> !m.isDefault()).count() == 1;
             this.raw = clazz;
         }
     }

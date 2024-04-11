@@ -1,6 +1,8 @@
 package com.probejs.next.java.type;
 
 import com.probejs.next.java.base.AnnotationHolder;
+import com.probejs.next.java.base.ClassPathProvider;
+import com.probejs.next.java.base.ClassProvider;
 import com.probejs.next.java.clazz.ClassPath;
 
 import java.lang.annotation.Annotation;
@@ -8,7 +10,7 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public abstract class TypeDescriptor extends AnnotationHolder {
+public abstract class TypeDescriptor extends AnnotationHolder implements ClassPathProvider, ClassProvider {
     public TypeDescriptor(Annotation[] annotations) {
         super(annotations);
     }
@@ -21,10 +23,10 @@ public abstract class TypeDescriptor extends AnnotationHolder {
     public abstract Stream<TypeDescriptor> stream();
 
     /**
-     * Gets the packages required to use the type.
+     * Gets the class paths required to use the type.
      */
-    public Collection<ClassPath> getPackages() {
-        return stream().flatMap(t -> t.getPackages().stream()).collect(Collectors.toSet());
+    public Collection<ClassPath> getClassPaths() {
+        return stream().flatMap(t -> t.getClassPaths().stream()).collect(Collectors.toSet());
     }
 
     /**

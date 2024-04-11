@@ -49,18 +49,18 @@ public class ClassRegistry {
 
         for (ConstructorInfo constructor : clazz.constructors) {
             for (ParamInfo param : constructor.params) {
-                classes.addAll(param.getType().getClasses());
+                classes.addAll(param.type.getClasses());
             }
-            for (VariableType variableType : constructor.getVariableTypes()) {
+            for (VariableType variableType : constructor.variableTypes) {
                 classes.addAll(variableType.getClasses());
             }
         }
 
         for (MethodInfo method : clazz.methods) {
             for (ParamInfo param : method.params) {
-                classes.addAll(param.getType().getClasses());
+                classes.addAll(param.type.getClasses());
             }
-            for (VariableType variableType : method.getVariableTypes()) {
+            for (VariableType variableType : method.variableTypes) {
                 classes.addAll(variableType.getClasses());
             }
             classes.addAll(method.returnType.getClasses());
@@ -70,7 +70,7 @@ public class ClassRegistry {
             classes.addAll(field.type.getClasses());
         }
 
-        for (VariableType variableType : clazz.getVariableTypes()) {
+        for (VariableType variableType : clazz.variableTypes) {
             classes.addAll(variableType.getClasses());
         }
 

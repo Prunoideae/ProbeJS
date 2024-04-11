@@ -1,15 +1,18 @@
 package com.probejs.next.java.clazz.members;
 
 import com.probejs.next.java.base.AnnotationHolder;
+import com.probejs.next.java.base.ClassPathProvider;
+import com.probejs.next.java.clazz.ClassPath;
 import com.probejs.next.java.type.TypeAdapter;
 import com.probejs.next.java.type.TypeDescriptor;
 
 import java.lang.reflect.Parameter;
+import java.util.Collection;
 
-public class ParamInfo extends AnnotationHolder {
-    private final String name;
-    private final TypeDescriptor type;
-    private final boolean varArgs;
+public class ParamInfo extends AnnotationHolder implements ClassPathProvider {
+    public final String name;
+    public final TypeDescriptor type;
+    public final boolean varArgs;
 
     public ParamInfo(Parameter parameter) {
         super(parameter.getAnnotations());
@@ -18,15 +21,8 @@ public class ParamInfo extends AnnotationHolder {
         this.varArgs = parameter.isVarArgs();
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public TypeDescriptor getType() {
-        return type;
-    }
-
-    public boolean isVarArgs() {
-        return varArgs;
+    @Override
+    public Collection<ClassPath> getClassPaths() {
+        return type.getClassPaths();
     }
 }

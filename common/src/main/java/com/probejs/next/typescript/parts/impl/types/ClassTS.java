@@ -2,8 +2,6 @@ package com.probejs.next.typescript.parts.impl.types;
 
 import com.probejs.next.java.clazz.ClassPath;
 
-import java.util.List;
-
 public class ClassTS extends TypeTS {
 
     private final ClassPath path;

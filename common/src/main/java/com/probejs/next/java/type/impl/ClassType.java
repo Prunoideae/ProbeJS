@@ -25,7 +25,7 @@ public class ClassType extends TypeDescriptor {
     }
 
     @Override
-    public Collection<ClassPath> getPackages() {
+    public Collection<ClassPath> getClassPaths() {
         return List.of(pack);
     }
 

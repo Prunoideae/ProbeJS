@@ -22,8 +22,8 @@ public class ArrayType extends TypeDescriptor {
     }
 
     @Override
-    public Collection<ClassPath> getPackages() {
-        return component.getPackages();
+    public Collection<ClassPath> getClassPaths() {
+        return component.getClassPaths();
     }
 
     @Override
