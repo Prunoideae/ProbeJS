@@ -5,7 +5,7 @@ import dev.latvian.mods.kubejs.KubeJSPlugin;
 import dev.latvian.mods.kubejs.script.ScriptType;
 import dev.latvian.mods.kubejs.util.ClassFilter;
 
-public class ProbeJSPlugin extends KubeJSPlugin {
+public class ProbeJSKJSPlugin extends KubeJSPlugin {
     @Override
     public void registerEvents() {
         ProbeJSEvents.GROUP.register();
