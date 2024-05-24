@@ -1,1 +1,1 @@
-com.probejs.ProbeJSKJSPlugin
+moe.wolfgirl.ProbeJSKJSPlugin

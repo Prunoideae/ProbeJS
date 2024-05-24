@@ -16,7 +16,7 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "com.probejs.fabric.ProbeJSFabric"
+        "moe.wolfgirl.fabric.ProbeJSFabric"
     ]
   },
   "mixins": [
