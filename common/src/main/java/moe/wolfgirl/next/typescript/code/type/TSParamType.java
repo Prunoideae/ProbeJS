@@ -28,10 +28,10 @@ public class TSParamType extends BaseType {
     }
 
     @Override
-    public List<String> format(Declaration declaration) {
+    public List<String> format(Declaration declaration, boolean input) {
         return List.of(
                 "%s<%s>".formatted(
-                        baseType.line(declaration),
+                        baseType.line(declaration, input),
                         params.stream()
                                 .map(type -> "(%s)".formatted(type.line(declaration)))
                                 .collect(Collectors.joining(", "))

@@ -22,10 +22,10 @@ public class TSVariableType extends BaseType {
     }
 
     @Override
-    public List<String> format(Declaration declaration) {
+    public List<String> format(Declaration declaration, boolean input) {
         return List.of(extendsType == null ?
                 symbol :
-                "%s extends %s".formatted(symbol, extendsType.line(declaration))
+                "%s extends %s".formatted(symbol, extendsType.line(declaration, input))
         );
     }
 }

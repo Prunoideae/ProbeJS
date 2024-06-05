@@ -13,12 +13,12 @@ import java.lang.reflect.Modifier;
 import java.util.List;
 
 public class FieldInfo {
-    private final String name;
-    private final int modifiers;
-    private final boolean shouldHide;
-    private final Object value;
-    private ITypeInfo info;
-    private final List<Annotation> annotations;
+    public final String name;
+    public final int modifiers;
+    public final boolean shouldHide;
+    public final Object value;
+    public ITypeInfo info;
+    public final List<Annotation> annotations;
 
     public FieldInfo(JavaMembers.FieldInfo fieldInfo) {
         Field field = fieldInfo.field;

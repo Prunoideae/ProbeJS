@@ -12,8 +12,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class VariableType extends TypeDescriptor {
-    private final String symbol;
-    private final List<TypeDescriptor> descriptors;
+    public final String symbol;
+    public final List<TypeDescriptor> descriptors;
 
     public VariableType(AnnotatedTypeVariable typeVariable) {
         super(typeVariable.getAnnotations());

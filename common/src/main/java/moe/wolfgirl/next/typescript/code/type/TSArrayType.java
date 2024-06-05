@@ -19,7 +19,7 @@ public class TSArrayType extends BaseType {
     }
 
     @Override
-    public List<String> format(Declaration declaration) {
-        return List.of("(%s)[]".formatted(component.line(declaration)));
+    public List<String> format(Declaration declaration, boolean input) {
+        return List.of("(%s)[]".formatted(component.line(declaration, input)));
     }
 }

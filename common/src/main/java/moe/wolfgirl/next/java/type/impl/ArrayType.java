@@ -9,7 +9,7 @@ import java.util.Collection;
 import java.util.stream.Stream;
 
 public class ArrayType extends TypeDescriptor {
-    private final TypeDescriptor component;
+    public final TypeDescriptor component;
 
     public ArrayType(AnnotatedArrayType arrayType) {
         super(arrayType.getAnnotations());

@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 public class MethodDecl extends CommentableCode {
     public String name;
+    public boolean isAbstract = false;
     public boolean isStatic = false;
     public final List<TSVariableType> variableTypes;
     public final List<ParamDecl> params;
@@ -55,14 +56,7 @@ public class MethodDecl extends CommentableCode {
         }
 
         // Format body - (a: type, ...)
-        List<String> formattedParams = new ArrayList<>();
-        ListIterator<ParamDecl> it = params.listIterator();
-        while (it.hasNext()) {
-            int index = it.nextIndex();
-            ParamDecl param = it.next();
-            formattedParams.add(param.format(index, declaration));
-        }
-        String body = "(%s)".formatted(String.join(", ", formattedParams));
+        String body = ParamDecl.formatParams(params, declaration);
 
         // Format tail - : returnType {/** content */}
         String tail = ": %s".formatted(returnType.line(declaration));

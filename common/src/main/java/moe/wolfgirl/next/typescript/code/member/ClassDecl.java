@@ -77,13 +77,24 @@ public class ClassDecl extends CommentableCode {
         for (FieldDecl field : fields) {
             body.addAll(field.format(declaration));
         }
-        body.add(" ");
+        body.add("");
         for (ConstructorDecl constructor : constructors) {
             body.addAll(constructor.format(declaration));
         }
-        body.add(" ");
+        body.add("");
         for (MethodDecl method : methods) {
             body.addAll(method.format(declaration));
+        }
+
+        // Use hybrid to represent functional interfaces
+        // (a: SomeClass<number>, b: SomeClass<string>): void;
+        if (isInterface && methods.stream().filter(method -> method.isAbstract).count() == 1) {
+            body.add("");
+            MethodDecl method = methods.get(0);
+            String hybridBody = ParamDecl.formatParams(method.params, declaration);
+            String returnType = method.returnType.line(declaration);
+
+            body.add("%s: %s".formatted(hybridBody, returnType));
         }
 
         // tail - }

@@ -41,14 +41,7 @@ public class ConstructorDecl extends CommentableCode {
         }
 
         // Format body - (a: type, ...)
-        List<String> formattedParams = new ArrayList<>();
-        ListIterator<ParamDecl> it = params.listIterator();
-        while (it.hasNext()) {
-            int index = it.nextIndex();
-            ParamDecl param = it.next();
-            formattedParams.add(param.format(index, declaration));
-        }
-        String body = "(%s)".formatted(String.join(", ", formattedParams));
+        String body = ParamDecl.formatParams(params, declaration);
 
         // Format tail - {/** content */}
         String tail = "";

@@ -47,11 +47,13 @@ public class MethodInfo extends TypeVariableHolder implements ClassPathProvider 
          * When this appears in a class, remember to translate its type variables because it is from an interface.
          */
         public final boolean isDefault;
+        public final boolean isAbstract;
 
         public MethodAttributes(Method method) {
             int modifiers = method.getModifiers();
             this.isStatic = Modifier.isStatic(modifiers);
             this.isDefault = method.isDefault();
+            this.isAbstract = Modifier.isAbstract(modifiers);
         }
     }
 }

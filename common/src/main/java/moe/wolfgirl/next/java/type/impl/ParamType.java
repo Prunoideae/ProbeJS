@@ -9,8 +9,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ParamType extends TypeDescriptor {
-    private final TypeDescriptor base;
-    private final List<TypeDescriptor> params;
+    public final TypeDescriptor base;
+    public final List<TypeDescriptor> params;
 
     public ParamType(AnnotatedParameterizedType annotatedType) {
         super(annotatedType.getAnnotations());
@@ -27,13 +27,5 @@ public class ParamType extends TypeDescriptor {
     @Override
     public int hashCode() {
         return base.hashCode() * 31 + params.hashCode();
-    }
-
-    public TypeDescriptor getBase() {
-        return base;
-    }
-
-    public List<TypeDescriptor> getParams() {
-        return params;
     }
 }

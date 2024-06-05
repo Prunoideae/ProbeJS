@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.stream.Stream;
 
 public class ClassType extends TypeDescriptor {
-    private final ClassPath classPath;
-    private final Class<?> clazz;
+    public final ClassPath classPath;
+    public final Class<?> clazz;
 
     public ClassType(AnnotatedType type) {
         super(type.getAnnotations());

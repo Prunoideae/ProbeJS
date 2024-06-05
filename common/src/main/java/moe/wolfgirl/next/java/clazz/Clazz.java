@@ -204,7 +204,7 @@ public class Clazz extends TypeVariableHolder implements ClassPathProvider {
 
         public final ClassType type;
         public final boolean isAbstract;
-        public final boolean isFunctionalInterface;
+        public final boolean isInterface;
         public final Class<?> raw;
 
 
@@ -221,8 +221,7 @@ public class Clazz extends TypeVariableHolder implements ClassPathProvider {
 
             int modifiers = clazz.getModifiers();
             this.isAbstract = Modifier.isAbstract(modifiers);
-            this.isFunctionalInterface = type == ClassType.INTERFACE &&
-                    Arrays.stream(clazz.getMethods()).filter(m -> !m.isDefault()).count() == 1;
+            this.isInterface = type == ClassType.INTERFACE;
             this.raw = clazz;
         }
     }

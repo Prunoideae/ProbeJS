@@ -26,10 +26,10 @@ public class JSArrayType extends BaseType {
     }
 
     @Override
-    public List<String> format(Declaration declaration) {
+    public List<String> format(Declaration declaration, boolean input) {
         return List.of(
                 "[%s]".formatted(components.stream()
-                        .map(type -> "(%s)".formatted(type.line(declaration)))
+                        .map(type -> "(%s)".formatted(type.line(declaration, input)))
                         .collect(Collectors.joining(", ")))
         );
     }

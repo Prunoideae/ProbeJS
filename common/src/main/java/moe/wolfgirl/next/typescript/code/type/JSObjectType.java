@@ -23,14 +23,14 @@ public class JSObjectType extends BaseType {
     }
 
     @Override
-    public List<String> format(Declaration declaration) {
+    public List<String> format(Declaration declaration, boolean input) {
         List<String> memberStrings = new ArrayList<>();
 
         for (Map.Entry<String, BaseType> entry : members.entrySet()) {
             String member = ProbeJS.GSON.toJson(entry.getKey());
             BaseType type = entry.getValue();
 
-            memberStrings.add("%s: %s".formatted(member, type.line(declaration)));
+            memberStrings.add("%s: %s".formatted(member, type.line(declaration, input)));
         }
         return List.of("{%s}".formatted(String.join(", ", memberStrings)));
     }
