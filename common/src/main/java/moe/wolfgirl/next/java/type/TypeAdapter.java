@@ -1,6 +1,5 @@
 package moe.wolfgirl.next.java.type;
 
-import com.probejs.next.java.type.impl.*;
 import moe.wolfgirl.next.java.type.impl.*;
 import moe.wolfgirl.next.java.type.impl.WildcardType;
 

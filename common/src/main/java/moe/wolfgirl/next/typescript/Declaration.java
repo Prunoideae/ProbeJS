@@ -2,28 +2,47 @@ package moe.wolfgirl.next.typescript;
 
 import moe.wolfgirl.next.java.clazz.ClassPath;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
-/**
- * Directly represents the content of a .d.ts file.
- * <br>
- */
 public class Declaration {
-    private final ClassPath path;
-    private final Map<ClassPath, Reference> symbols;
+    private static final String SYMBOL_TEMPLATE = "%s$%d";
 
-    public Declaration(ClassPath path, Set<ClassPath> symbols) {
-        this.path = path;
-        // Load symbols and resolve the names
-        // if the name conflicts, rename them into $0, $1, etc.
-        this.symbols = new HashMap<>();
+    public final Map<ClassPath, Reference> references;
+    private final Set<String> symbols;
+
+    public Declaration() {
+        this.references = new HashMap<>();
+        this.symbols = new HashSet<>();
     }
 
-    public List<String> compileImports() {
-        return symbols.values()
-                .stream()
-                .map(Reference::getImport)
-                .collect(Collectors.toList());
+    public void addClass(ClassPath path) {
+        // So we determine a unique symbol that is safe to use at startup
+        this.references.put(path, new Reference(path, getSymbolName(path)));
+    }
+
+    private String getSymbolName(ClassPath path) {
+        String name = path.getName();
+        if (!symbols.contains(name)) {
+            symbols.add(name);
+            return name;
+        }
+
+        int counter = 0;
+        while (symbols.contains(SYMBOL_TEMPLATE.formatted(name, counter))) {
+            counter++;
+        }
+        name = SYMBOL_TEMPLATE.formatted(name, counter);
+        symbols.add(name);
+        return name;
+    }
+
+    public String getSymbol(ClassPath path) {
+        if (!this.references.containsKey(path)) {
+            throw new RuntimeException("Trying to get a symbol of a classpath that is not resolved yet!");
+        }
+        return this.references.get(path).symbol();
     }
 }

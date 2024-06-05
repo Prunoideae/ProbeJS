@@ -21,7 +21,6 @@ import moe.wolfgirl.jdoc.document.DocumentClass;
 import moe.wolfgirl.jdoc.java.Walker;
 import moe.wolfgirl.features.plugin.DocGenerationEventJS;
 import moe.wolfgirl.jdoc.property.PropertyComment;
-import com.probejs.specials.*;
 import moe.wolfgirl.specials.assign.ClassAssignmentManager;
 import moe.wolfgirl.specials.special.FormatterComponents;
 import moe.wolfgirl.util.PlatformSpecial;

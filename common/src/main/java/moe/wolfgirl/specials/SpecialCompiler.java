@@ -7,7 +7,6 @@ import moe.wolfgirl.jdoc.java.ClassInfo;
 import moe.wolfgirl.specials.special.*;
 import moe.wolfgirl.specials.special.recipe.FormatterRecipe;
 import moe.wolfgirl.specials.special.recipe.component.FormatterRecipeSchema;
-import com.probejs.specials.special.*;
 import moe.wolfgirl.util.PlatformSpecial;
 import moe.wolfgirl.util.RLHelper;
 import dev.latvian.mods.kubejs.script.ScriptType;

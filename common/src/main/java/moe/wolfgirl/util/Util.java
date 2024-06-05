@@ -69,7 +69,7 @@ public class Util {
     }
 
     public static boolean isNameSafe(String s) {
-        return !KEYWORDS.contains(s);
+        return !KEYWORDS.contains(s) && JS_IDENTIFIER_MATCH.matcher(s).matches();
     }
 
     public static String formatMaybeParameterized(Class<?> clazz) {

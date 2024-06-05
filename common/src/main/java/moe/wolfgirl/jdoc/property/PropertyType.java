@@ -7,7 +7,6 @@ import com.google.gson.JsonPrimitive;
 import com.mojang.datafixers.util.Pair;
 import moe.wolfgirl.docs.formatter.NameResolver;
 import moe.wolfgirl.jdoc.Serde;
-import com.probejs.jdoc.java.type.*;
 import moe.wolfgirl.jdoc.java.type.*;
 import org.jetbrains.annotations.Nullable;
 
