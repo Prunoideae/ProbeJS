@@ -8,6 +8,8 @@ import moe.wolfgirl.next.transpiler.members.Converter;
 import moe.wolfgirl.next.transpiler.members.Field;
 import moe.wolfgirl.next.transpiler.members.Method;
 import moe.wolfgirl.next.typescript.code.member.ClassDecl;
+import moe.wolfgirl.next.typescript.code.type.BaseType;
+import moe.wolfgirl.next.typescript.code.type.TSPrimitiveType;
 import moe.wolfgirl.next.typescript.code.type.TSVariableType;
 
 import java.util.ArrayList;
@@ -32,9 +34,13 @@ public class ClassTranspiler extends Converter<Clazz, ClassDecl> {
         for (VariableType variableType : input.variableTypes) {
             variableTypes.add((TSVariableType) converter.convertType(variableType));
         }
+        BaseType superClass = input.superClass == null ? null : converter.convertType(input.superClass);
         ClassDecl decl = new ClassDecl(input.classPath.getName(),
-                input.superClass == null ? null : converter.convertType(input.superClass),
-                input.interfaces.stream().map(converter::convertType).toList(),
+                superClass == TSPrimitiveType.ANY ? null : superClass,
+                input.interfaces.stream()
+                        .map(converter::convertType)
+                        .filter(t -> t != TSPrimitiveType.ANY)
+                        .toList(),
                 variableTypes
         );
 

@@ -25,6 +25,9 @@ public class ProbePaths {
 
     public static Path KUBE_ASSETS = KubeJSPaths.DIRECTORY.resolve("assets");
 
+    public static Path TYPES = PROBE.resolve("probe-types");
+    public static Path PACKAGES = TYPES.resolve("packages");
+
     public static void init() {
         if (Files.notExists(PROBE)) {
             UtilsJS.tryIO(() -> Files.createDirectories(PROBE));
@@ -52,6 +55,12 @@ public class ProbePaths {
         }
         if (Files.notExists(ProbePaths.SCHEMA)) {
             UtilsJS.tryIO(() -> Files.createDirectories(ProbePaths.SCHEMA));
+        }
+        if (Files.notExists(ProbePaths.PACKAGES)) {
+            UtilsJS.tryIO(() -> Files.createDirectories(ProbePaths.PACKAGES));
+        }
+        if (Files.notExists(ProbePaths.TYPES)) {
+            UtilsJS.tryIO(() -> Files.createDirectories(ProbePaths.TYPES));
         }
     }
 

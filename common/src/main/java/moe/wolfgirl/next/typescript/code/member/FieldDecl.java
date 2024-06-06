@@ -33,7 +33,7 @@ public class FieldDecl extends CommentableCode {
         if (isStatic) modifiers.add("static");
 
         return List.of("%s %s: %s".formatted(
-                modifiers, ProbeJS.GSON.toJson(name), type.line(declaration)
+                String.join(" ", modifiers), ProbeJS.GSON.toJson(name), type.line(declaration, BaseType.FormatType.RETURN)
         ));
     }
 }

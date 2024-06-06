@@ -1,5 +1,7 @@
 package moe.wolfgirl.next.transpiler;
 
+import dev.latvian.mods.kubejs.KubeJS;
+import dev.latvian.mods.kubejs.script.ScriptManager;
 import moe.wolfgirl.next.java.clazz.ClassPath;
 import moe.wolfgirl.next.java.type.TypeDescriptor;
 import moe.wolfgirl.next.java.type.impl.*;
@@ -14,6 +16,7 @@ import java.util.Map;
  */
 public class TypeConverter {
     public final Map<ClassPath, BaseType> predefinedTypes = new HashMap<>();
+    public final ScriptManager scriptManager = KubeJS.getStartupScriptManager();
 
     public void addType(Class<?> clazz, BaseType type) {
         predefinedTypes.put(new ClassPath(clazz), type);
@@ -21,6 +24,8 @@ public class TypeConverter {
 
     public BaseType convertType(TypeDescriptor descriptor) {
         if (descriptor instanceof ClassType classType) {
+            if (!scriptManager.isClassAllowed(classType.classPath.getClassPath())) return TSPrimitiveType.ANY;
+
             return predefinedTypes.getOrDefault(
                     classType.classPath,
                     new TSClassType(classType.classPath)
@@ -29,6 +34,7 @@ public class TypeConverter {
             return new TSArrayType(convertType(arrayType.component));
         } else if (descriptor instanceof ParamType paramType) {
             BaseType base = convertType(paramType.base);
+            if (base == TSPrimitiveType.ANY) return TSPrimitiveType.ANY;
             List<BaseType> params = paramType.params.stream().map(this::convertType).toList();
             return new TSParamType(base, params);
         } else if (descriptor instanceof VariableType variableType) {

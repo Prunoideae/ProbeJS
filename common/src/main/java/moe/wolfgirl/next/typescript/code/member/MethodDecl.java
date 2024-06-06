@@ -59,7 +59,7 @@ public class MethodDecl extends CommentableCode {
         String body = ParamDecl.formatParams(params, declaration);
 
         // Format tail - : returnType {/** content */}
-        String tail = ": %s".formatted(returnType.line(declaration));
+        String tail = ": %s".formatted(returnType.line(declaration, BaseType.FormatType.RETURN));
         if (content != null) {
             tail = "%s {/** %s */}".formatted(tail, content);
         }

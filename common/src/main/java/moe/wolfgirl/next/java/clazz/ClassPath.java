@@ -1,7 +1,11 @@
 package moe.wolfgirl.next.java.clazz;
 
+import dev.latvian.mods.kubejs.util.UtilsJS;
 import moe.wolfgirl.next.utils.RemapperUtils;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -36,5 +40,26 @@ public record ClassPath(List<String> parts) {
 
     public Clazz toClazz() throws ClassNotFoundException {
         return new Clazz(forName());
+    }
+
+    public List<String> getPackage() {
+        List<String> classPath = new ArrayList<>(parts);
+        classPath.remove(classPath.size() - 1);
+        return classPath;
+    }
+
+    public String getConcatenatedPackage(String sep) {
+        return String.join(sep, getPackage());
+    }
+
+    public Path getDirPath(Path base) {
+        return base.resolve(getConcatenatedPackage("/"));
+    }
+
+    public void makePath(Path base) {
+        Path full = getDirPath(base);
+        if (Files.notExists(full)) {
+            UtilsJS.tryIO(() -> Files.createDirectories(full));
+        }
     }
 }

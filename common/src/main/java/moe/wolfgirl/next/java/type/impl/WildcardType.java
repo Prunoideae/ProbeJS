@@ -4,6 +4,7 @@ import com.mojang.datafixers.util.Either;
 import moe.wolfgirl.next.java.type.TypeAdapter;
 import moe.wolfgirl.next.java.type.TypeDescriptor;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedWildcardType;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -11,12 +12,31 @@ import java.util.stream.Stream;
 public class WildcardType extends TypeDescriptor {
     public final Optional<Either<TypeDescriptor, TypeDescriptor>> bound;
 
-    public WildcardType(AnnotatedWildcardType wildcardType) {
+    public WildcardType(AnnotatedWildcardType wildcardType, boolean checkBound) {
         super(wildcardType.getAnnotations());
+        if (!checkBound) {
+            bound = Optional.empty();
+            return;
+        }
         if (wildcardType.getAnnotatedLowerBounds().length != 0) {
             bound = Optional.of(Either.left(TypeAdapter.getTypeDescription(wildcardType.getAnnotatedLowerBounds()[0])));
         } else if (!wildcardType.getAnnotatedUpperBounds()[0].getType().equals(Object.class)) {
             bound = Optional.of(Either.right(TypeAdapter.getTypeDescription(wildcardType.getAnnotatedUpperBounds()[0])));
+        } else {
+            bound = Optional.empty();
+        }
+    }
+
+    public WildcardType(java.lang.reflect.WildcardType wildcardType, boolean checkBound) {
+        super(new Annotation[]{});
+        if (!checkBound) {
+            bound = Optional.empty();
+            return;
+        }
+        if (wildcardType.getLowerBounds().length != 0) {
+            bound = Optional.of(Either.left(TypeAdapter.getTypeDescription(wildcardType.getLowerBounds()[0])));
+        } else if (!wildcardType.getUpperBounds()[0].equals(Object.class)) {
+            bound = Optional.of(Either.right(TypeAdapter.getTypeDescription(wildcardType.getUpperBounds()[0])));
         } else {
             bound = Optional.empty();
         }

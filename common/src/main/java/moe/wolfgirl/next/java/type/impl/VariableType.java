@@ -6,6 +6,7 @@ import moe.wolfgirl.next.java.type.TypeDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedTypeVariable;
 import java.lang.reflect.TypeVariable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,23 +17,31 @@ public class VariableType extends TypeDescriptor {
     public final List<TypeDescriptor> descriptors;
 
     public VariableType(AnnotatedTypeVariable typeVariable) {
-        super(typeVariable.getAnnotations());
-        this.symbol = ((TypeVariable<?>) typeVariable.getType()).getName();
-        this.descriptors = Arrays.stream(typeVariable.getAnnotatedBounds())
-                // Filter out unannotated Object here
-                .filter(bound -> !bound.getType().equals(Object.class))
-                .map(TypeAdapter::getTypeDescription)
-                .collect(Collectors.toList());
+        this(typeVariable, true);
     }
 
     public VariableType(TypeVariable<?> typeVariable) {
-        super(new Annotation[0]);
-        this.symbol = typeVariable.getName();
-        this.descriptors = Arrays.stream(typeVariable.getAnnotatedBounds())
+        this(typeVariable, true);
+    }
+
+    public VariableType(AnnotatedTypeVariable typeVariable, boolean checkBounds) {
+        super(typeVariable.getAnnotations());
+        this.symbol = ((TypeVariable<?>) typeVariable.getType()).getName();
+        this.descriptors = checkBounds ? Arrays.stream(typeVariable.getAnnotatedBounds())
                 // Filter out unannotated Object here
                 .filter(bound -> !bound.getType().equals(Object.class))
                 .map(TypeAdapter::getTypeDescription)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()) : new ArrayList<>();
+    }
+
+    public VariableType(TypeVariable<?> typeVariable, boolean checkBounds) {
+        super(new Annotation[0]);
+        this.symbol = typeVariable.getName();
+        this.descriptors = checkBounds ? Arrays.stream(typeVariable.getAnnotatedBounds())
+                // Filter out unannotated Object here
+                .filter(bound -> !bound.getType().equals(Object.class))
+                .map(TypeAdapter::getTypeDescription)
+                .collect(Collectors.toList()) : new ArrayList<>();
     }
 
     @Override

@@ -13,7 +13,7 @@ public class TSVariableType extends BaseType {
 
     public TSVariableType(String symbol, @Nullable BaseType extendsType) {
         this.symbol = symbol;
-        this.extendsType = extendsType;
+        this.extendsType = extendsType == TSPrimitiveType.ANY ? null : extendsType;
     }
 
     @Override
@@ -22,10 +22,11 @@ public class TSVariableType extends BaseType {
     }
 
     @Override
-    public List<String> format(Declaration declaration, boolean input) {
-        return List.of(extendsType == null ?
-                symbol :
-                "%s extends %s".formatted(symbol, extendsType.line(declaration, input))
-        );
+    public List<String> format(Declaration declaration, FormatType input) {
+        return List.of(switch (input) {
+            case INPUT, RETURN -> symbol;
+            case VARIABLE -> extendsType == null ? symbol :
+                    "%s extends %s".formatted(symbol, extendsType.line(declaration, input));
+        });
     }
 }

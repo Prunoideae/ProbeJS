@@ -12,7 +12,7 @@ public record ParamDecl(String name, BaseType type, boolean varArg)  {
     public String format(int index, Declaration declaration) {
         String result = Util.isNameSafe(name) ? name : "arg%d".formatted(index);
         if (varArg) result = "...%s".formatted(result);
-        return "%s: %s".formatted(result, type.line(declaration, true));
+        return "%s: %s".formatted(result, type.line(declaration, BaseType.FormatType.INPUT));
     }
 
     public static String formatParams(List<ParamDecl> params, Declaration declaration) {

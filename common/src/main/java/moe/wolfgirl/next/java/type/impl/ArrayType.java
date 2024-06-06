@@ -4,7 +4,9 @@ import moe.wolfgirl.next.java.clazz.ClassPath;
 import moe.wolfgirl.next.java.type.TypeAdapter;
 import moe.wolfgirl.next.java.type.TypeDescriptor;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedArrayType;
+import java.lang.reflect.GenericArrayType;
 import java.util.Collection;
 import java.util.stream.Stream;
 
@@ -14,6 +16,11 @@ public class ArrayType extends TypeDescriptor {
     public ArrayType(AnnotatedArrayType arrayType) {
         super(arrayType.getAnnotations());
         this.component = TypeAdapter.getTypeDescription(arrayType.getAnnotatedGenericComponentType());
+    }
+
+    public ArrayType(GenericArrayType arrayType) {
+        super(new Annotation[]{});
+        this.component = TypeAdapter.getTypeDescription(arrayType.getGenericComponentType());
     }
 
     @Override

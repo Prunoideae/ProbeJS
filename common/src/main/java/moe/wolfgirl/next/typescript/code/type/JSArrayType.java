@@ -26,7 +26,7 @@ public class JSArrayType extends BaseType {
     }
 
     @Override
-    public List<String> format(Declaration declaration, boolean input) {
+    public List<String> format(Declaration declaration, FormatType input) {
         return List.of(
                 "[%s]".formatted(components.stream()
                         .map(type -> "(%s)".formatted(type.line(declaration, input)))

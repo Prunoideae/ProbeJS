@@ -7,12 +7,18 @@ import java.util.List;
 
 public abstract class BaseType extends Code {
     public final List<String> format(Declaration declaration) {
-        return format(declaration, false);
+        return format(declaration, FormatType.RETURN);
     }
 
-    public abstract List<String> format(Declaration declaration, boolean input);
+    public abstract List<String> format(Declaration declaration, FormatType input);
 
-    public String line(Declaration declaration, boolean input) {
+    public String line(Declaration declaration, FormatType input) {
         return format(declaration, input).get(0);
+    }
+
+    public enum FormatType {
+        INPUT,
+        RETURN,
+        VARIABLE
     }
 }

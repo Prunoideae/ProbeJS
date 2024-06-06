@@ -40,7 +40,7 @@ public class TSPrimitiveType extends BaseType {
     }
 
     @Override
-    public List<String> format(Declaration declaration, boolean input) {
-        return null;
+    public List<String> format(Declaration declaration, FormatType input) {
+        return List.of(content);
     }
 }

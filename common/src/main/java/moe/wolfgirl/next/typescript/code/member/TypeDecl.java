@@ -29,7 +29,7 @@ public class TypeDecl extends Code {
     @Override
     public List<String> format(Declaration declaration) {
         return List.of(
-                "export type %s = %s;".formatted(symbol, type.line(declaration))
+                "export type %s = %s;".formatted(symbol, type.line(declaration, BaseType.FormatType.INPUT))
         );
     }
 }

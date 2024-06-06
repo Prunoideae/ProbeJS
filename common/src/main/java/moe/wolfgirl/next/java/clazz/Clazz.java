@@ -10,6 +10,7 @@ import moe.wolfgirl.next.java.type.TypeAdapter;
 import moe.wolfgirl.next.java.type.TypeDescriptor;
 import moe.wolfgirl.next.java.type.impl.VariableType;
 import moe.wolfgirl.next.utils.RemapperUtils;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.*;
 import java.util.*;
@@ -20,6 +21,7 @@ public class Clazz extends TypeVariableHolder implements ClassPathProvider {
     public final List<ConstructorInfo> constructors;
     public final List<FieldInfo> fields;
     public final List<MethodInfo> methods;
+    @Nullable
     public final TypeDescriptor superClass;
     public final List<TypeDescriptor> interfaces;
     public final ClassAttribute attribute;
@@ -42,7 +44,12 @@ public class Clazz extends TypeVariableHolder implements ClassPathProvider {
                 .filter(m -> !hasIdenticalParentMethodAndEnsureNotDirectlyImplementsInterfaceSinceTypeScriptDoesNotHaveInterfaceAtRuntimeInTypeDeclarationFilesJustBecauseItSucks(m.method, clazz))
                 .map(MethodInfo::new)
                 .collect(Collectors.toList());
-        this.superClass = TypeAdapter.getTypeDescription(clazz.getAnnotatedSuperclass());
+
+        if (clazz.getSuperclass() != Object.class) {
+            this.superClass = TypeAdapter.getTypeDescription(clazz.getAnnotatedSuperclass());
+        } else {
+            this.superClass = null;
+        }
         this.interfaces = Arrays.stream(clazz.getAnnotatedInterfaces())
                 .map(TypeAdapter::getTypeDescription)
                 .collect(Collectors.toList());
@@ -61,7 +68,7 @@ public class Clazz extends TypeVariableHolder implements ClassPathProvider {
         for (MethodInfo method : methods) {
             paths.addAll(method.getClassPaths());
         }
-        paths.addAll(superClass.getClassPaths());
+        if (superClass != null) paths.addAll(superClass.getClassPaths());
         for (TypeDescriptor i : interfaces) {
             paths.addAll(i.getClassPaths());
         }

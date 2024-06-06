@@ -1,12 +1,12 @@
 {
     "required": true,
     "compatibilityLevel": "JAVA_17",
-    "package": "com.probejs.mixins",
+    "package": "moe.wolfgirl.mixins",
     "mixins": [
-        "moe.wolfgirl.mixins.LootTableMixin",
-        "moe.wolfgirl.mixins.OnJavaMixin",
-        "moe.wolfgirl.mixins.RecipeManagerMixin",
-        "moe.wolfgirl.mixins.TranslatableMixin"
+        "LootTableMixin",
+        "OnJavaMixin",
+        "RecipeManagerMixin",
+        "TranslatableMixin"
     ],
     "injectors": {
         "defaultRequire": 1

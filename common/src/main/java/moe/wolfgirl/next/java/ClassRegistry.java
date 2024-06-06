@@ -1,5 +1,8 @@
 package moe.wolfgirl.next.java;
 
+import dev.latvian.mods.kubejs.KubeJS;
+import dev.latvian.mods.kubejs.script.ScriptManager;
+import dev.latvian.mods.kubejs.util.ClassFilter;
 import moe.wolfgirl.ProbeJS;
 import moe.wolfgirl.next.java.clazz.Clazz;
 import moe.wolfgirl.next.java.clazz.ClassPath;
@@ -13,6 +16,8 @@ import moe.wolfgirl.next.java.type.impl.VariableType;
 import java.util.*;
 
 public class ClassRegistry {
+    public static final ClassRegistry REGISTRY = new ClassRegistry();
+
     public Map<ClassPath, Clazz> foundClasses = new HashMap<>();
 
     public void fromPackage(Collection<ClassPath> classPaths) {
@@ -74,7 +79,8 @@ public class ClassRegistry {
             classes.addAll(variableType.getClasses());
         }
 
-        classes.addAll(clazz.superClass.getClasses());
+        if (clazz.superClass != null)
+            classes.addAll(clazz.superClass.getClasses());
         for (TypeDescriptor i : clazz.interfaces) {
             classes.addAll(i.getClasses());
         }
@@ -84,7 +90,6 @@ public class ClassRegistry {
 
     public void discoverClasses() {
         Set<Clazz> currentClasses = new HashSet<>(foundClasses.values());
-
         while (!currentClasses.isEmpty()) {
             Set<Class<?>> fetchedClass = new HashSet<>();
             for (Clazz currentClass : currentClasses) {

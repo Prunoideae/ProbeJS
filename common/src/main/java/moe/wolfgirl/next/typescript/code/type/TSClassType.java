@@ -20,8 +20,8 @@ public class TSClassType extends BaseType {
     }
 
     @Override
-    public List<String> format(Declaration declaration, boolean input) {
+    public List<String> format(Declaration declaration, FormatType input) {
         String symbol = declaration.getSymbol(classPath);
-        return List.of(input ? symbol + "_" : symbol);
+        return List.of(input == FormatType.INPUT ? symbol + "_" : symbol);
     }
 }

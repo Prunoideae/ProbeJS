@@ -4,6 +4,7 @@ import moe.wolfgirl.next.java.clazz.ClassPath;
 import moe.wolfgirl.next.typescript.Declaration;
 import moe.wolfgirl.next.typescript.code.type.BaseType;
 import moe.wolfgirl.next.typescript.code.type.TSVariableType;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -13,6 +14,7 @@ import java.util.stream.Collectors;
  */
 public class ClassDecl extends CommentableCode {
     public final String name;
+    @Nullable
     public BaseType superClass;
     public final List<BaseType> interfaces;
     public final List<TSVariableType> variableTypes;
@@ -24,7 +26,7 @@ public class ClassDecl extends CommentableCode {
     public final List<ConstructorDecl> constructors = new ArrayList<>();
     public final List<MethodDecl> methods = new ArrayList<>();
 
-    public ClassDecl(String name, BaseType superClass, List<BaseType> interfaces, List<TSVariableType> variableTypes) {
+    public ClassDecl(String name, @Nullable BaseType superClass, List<BaseType> interfaces, List<TSVariableType> variableTypes) {
         this.name = name;
         this.superClass = superClass;
         this.interfaces = interfaces;
@@ -43,6 +45,14 @@ public class ClassDecl extends CommentableCode {
         for (MethodDecl method : methods) {
             paths.addAll(method.getUsedClassPaths());
         }
+        for (BaseType anInterface : interfaces) {
+            paths.addAll(anInterface.getUsedClassPaths());
+        }
+        for (TSVariableType variableType : variableTypes) {
+            paths.addAll(variableType.getUsedClassPaths());
+        }
+        if (superClass != null) paths.addAll(superClass.getUsedClassPaths());
+
         return paths;
     }
 
@@ -51,15 +61,15 @@ public class ClassDecl extends CommentableCode {
         // Format head - export abstract (class / interface) name<T> extends ... implements ... {
         List<String> modifiers = new ArrayList<>();
         modifiers.add("export");
-        if (isAbstract) modifiers.add("abstract");
+        if (isAbstract && !isInterface) modifiers.add("abstract");
         modifiers.add(isInterface ? "interface" : "class");
 
         String head = "%s %s".formatted(String.join(" ", modifiers), name);
         if (variableTypes.size() != 0) {
             String variables = variableTypes.stream()
-                    .map(type -> type.line(declaration))
+                    .map(type -> type.line(declaration, BaseType.FormatType.VARIABLE))
                     .collect(Collectors.joining(", "));
-            head = "%s<%s>".formatted(name, variables);
+            head = "%s<%s>".formatted(head, variables);
         }
 
         if (superClass != null) head = "%s extends %s".formatted(head, superClass.line(declaration));

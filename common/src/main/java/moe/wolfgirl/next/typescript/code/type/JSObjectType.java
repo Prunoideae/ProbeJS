@@ -23,7 +23,7 @@ public class JSObjectType extends BaseType {
     }
 
     @Override
-    public List<String> format(Declaration declaration, boolean input) {
+    public List<String> format(Declaration declaration, FormatType input) {
         List<String> memberStrings = new ArrayList<>();
 
         for (Map.Entry<String, BaseType> entry : members.entrySet()) {

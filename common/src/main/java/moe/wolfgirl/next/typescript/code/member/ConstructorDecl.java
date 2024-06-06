@@ -2,6 +2,7 @@ package moe.wolfgirl.next.typescript.code.member;
 
 import moe.wolfgirl.next.java.clazz.ClassPath;
 import moe.wolfgirl.next.typescript.Declaration;
+import moe.wolfgirl.next.typescript.code.type.BaseType;
 import moe.wolfgirl.next.typescript.code.type.TSVariableType;
 
 import java.util.*;
@@ -35,7 +36,7 @@ public class ConstructorDecl extends CommentableCode {
         String head = "constructor";
         if (variableTypes.size() != 0) {
             String variables = variableTypes.stream()
-                    .map(type -> type.line(declaration))
+                    .map(type -> type.line(declaration, BaseType.FormatType.VARIABLE))
                     .collect(Collectors.joining(", "));
             head = "%s<%s>".formatted(head, variables);
         }
