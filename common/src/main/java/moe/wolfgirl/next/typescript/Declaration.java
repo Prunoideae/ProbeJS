@@ -11,11 +11,11 @@ public class Declaration {
     private static final String SYMBOL_TEMPLATE = "%s$%d";
 
     public final Map<ClassPath, Reference> references;
-    private final Set<String> symbols;
+    private final Map<ClassPath, String> symbols;
 
     public Declaration() {
         this.references = new HashMap<>();
-        this.symbols = new HashSet<>();
+        this.symbols = new HashMap<>();
     }
 
     public void addClass(ClassPath path) {
@@ -24,19 +24,19 @@ public class Declaration {
     }
 
     private String getSymbolName(ClassPath path) {
-        String name = path.getName();
-        if (!symbols.contains(name)) {
-            symbols.add(name);
-            return name;
+        if (!symbols.containsKey(path)) {
+            String name = path.getName();
+            if (!symbols.containsValue(name)) symbols.put(path, name);
+            else {
+                int counter = 0;
+                while (symbols.containsValue(SYMBOL_TEMPLATE.formatted(name, counter))) {
+                    counter++;
+                }
+                symbols.put(path, SYMBOL_TEMPLATE.formatted(name, counter));
+            }
         }
 
-        int counter = 0;
-        while (symbols.contains(SYMBOL_TEMPLATE.formatted(name, counter))) {
-            counter++;
-        }
-        name = SYMBOL_TEMPLATE.formatted(name, counter);
-        symbols.add(name);
-        return name;
+        return symbols.get(path);
     }
 
     public String getSymbol(ClassPath path) {

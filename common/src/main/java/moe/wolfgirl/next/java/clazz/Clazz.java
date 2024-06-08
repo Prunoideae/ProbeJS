@@ -42,7 +42,10 @@ public class Clazz extends TypeVariableHolder implements ClassPathProvider {
                 .stream()
                 .filter(m -> !m.method.isSynthetic())
                 .filter(m -> !hasIdenticalParentMethodAndEnsureNotDirectlyImplementsInterfaceSinceTypeScriptDoesNotHaveInterfaceAtRuntimeInTypeDeclarationFilesJustBecauseItSucks(m.method, clazz))
-                .map(MethodInfo::new)
+                .map(method -> {
+                    Map<TypeVariable<?>, Type> replacement = getGenericTypeReplacementForParentInterfaceMethodsJustBecauseJavaDoNotKnowToReplaceThemWithGenericArgumentsOfThisClass(clazz, method.method);
+                    return new MethodInfo(method, replacement);
+                })
                 .collect(Collectors.toList());
 
         if (clazz.getSuperclass() != Object.class) {
@@ -111,7 +114,7 @@ public class Clazz extends TypeVariableHolder implements ClassPathProvider {
             }
         }
 
-        used.addAll(superClass.getClassPaths());
+        if (superClass != null) used.addAll(superClass.getClassPaths());
         for (TypeDescriptor i : interfaces) {
             used.addAll(i.getClassPaths());
         }
@@ -164,7 +167,7 @@ public class Clazz extends TypeVariableHolder implements ClassPathProvider {
      * 我不会干什么👁👁
      * 我只是喜欢看着你而已👁👁
      */
-    private static Map<TypeVariable<?>, Type> getGenericTypeReplacementForParentInterfaceMethodsJustBecauseJavaDoNotKnowToReplaceThemWithGenericArgumentsOfThisClass(Class<?> thisClass, Method thatMethod) {
+    private static Map<TypeVariable<?>, Type> getGenericTypeReplacementForParentInterfaceMethodsJustBecauseJavaDoNotKnowToReplaceThemWithGenericArgumentsOfThisClass(Class<?> thisClass, Executable thatMethod) {
         Class<?> targetClass = thatMethod.getDeclaringClass();
 
         if (!targetClass.isInterface()) // It's weird if it's not an interface since the remapping only happens for interfaces
@@ -187,7 +190,7 @@ public class Clazz extends TypeVariableHolder implements ClassPathProvider {
                     indexOfInterface = 0;
                     for (TypeVariable<?> typeVariable : targetClass.getTypeParameters()) {
                         // Raw use of parameterized type, so we fill with Object.class
-                        // Very bad programming practice, but we have to prepare for random people coding their stuffs
+                        // Very bad programming practice, but we have to prepare for random people coding their stuffs bad
                         replacement.put(typeVariable, Object.class);
                     }
                 }

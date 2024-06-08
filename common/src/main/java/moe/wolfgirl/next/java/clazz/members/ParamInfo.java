@@ -7,6 +7,7 @@ import moe.wolfgirl.next.java.type.TypeAdapter;
 import moe.wolfgirl.next.java.type.TypeDescriptor;
 
 import java.lang.reflect.Parameter;
+import java.lang.reflect.Type;
 import java.util.Collection;
 
 public class ParamInfo extends AnnotationHolder implements ClassPathProvider {
@@ -14,10 +15,12 @@ public class ParamInfo extends AnnotationHolder implements ClassPathProvider {
     public final TypeDescriptor type;
     public final boolean varArgs;
 
-    public ParamInfo(Parameter parameter) {
+    public ParamInfo(Parameter parameter, Type actual) {
         super(parameter.getAnnotations());
         this.name = parameter.getName();
-        this.type = TypeAdapter.getTypeDescription(parameter.getAnnotatedType());
+        this.type = actual == null ?
+                TypeAdapter.getTypeDescription(parameter.getAnnotatedType()) :
+                TypeAdapter.getTypeDescription(actual);
         this.varArgs = parameter.isVarArgs();
     }
 

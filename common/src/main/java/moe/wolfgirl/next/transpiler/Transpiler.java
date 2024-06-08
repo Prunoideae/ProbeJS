@@ -47,7 +47,7 @@ public class Transpiler {
             scriptFile.addCode(classDecl);
 
             // TODO: type-conversion stuffs
-            
+
             // TODO: Globally resolved underscored type
 
             /*

@@ -10,6 +10,8 @@ import dev.latvian.mods.rhino.JavaMembers;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -19,13 +21,21 @@ public class MethodInfo extends TypeVariableHolder implements ClassPathProvider 
     public final TypeDescriptor returnType;
     public final MethodAttributes attributes;
 
-    public MethodInfo(JavaMembers.MethodInfo methodInfo) {
+    public MethodInfo(JavaMembers.MethodInfo methodInfo, Map<TypeVariable<?>, Type> remapper) {
         super(methodInfo.method.getTypeParameters(), methodInfo.method.getAnnotations());
         Method method = methodInfo.method;
-        this.name = methodInfo.name;
-        this.params = Arrays.stream(method.getParameters()).map(ParamInfo::new).collect(Collectors.toList());
-        this.returnType = TypeAdapter.getTypeDescription(method.getAnnotatedReturnType());
         this.attributes = new MethodAttributes(method);
+        this.name = methodInfo.name;
+        this.params = Arrays.stream(method.getParameters())
+                .map(param -> {
+                    if (!attributes.isStatic && param.getParameterizedType() instanceof TypeVariable<?> typeVar) {
+                        return new ParamInfo(param, remapper.getOrDefault(typeVar, typeVar));
+                    } else {
+                        return new ParamInfo(param, null);
+                    }
+                })
+                .collect(Collectors.toList());
+        this.returnType = TypeAdapter.getTypeDescription(method.getAnnotatedReturnType());
     }
 
     @Override
