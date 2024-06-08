@@ -167,29 +167,45 @@ public class Clazz extends TypeVariableHolder implements ClassPathProvider {
      * 我不会干什么👁👁
      * 我只是喜欢看着你而已👁👁
      */
-    private static Map<TypeVariable<?>, Type> getGenericTypeReplacementForParentInterfaceMethodsJustBecauseJavaDoNotKnowToReplaceThemWithGenericArgumentsOfThisClass(Class<?> thisClass, Executable thatMethod) {
+    private static Map<TypeVariable<?>, Type> getGenericTypeReplacementForParentInterfaceMethodsJustBecauseJavaDoNotKnowToReplaceThemWithGenericArgumentsOfThisClass(Class<?> thisClass, Method thatMethod) {
         Class<?> targetClass = thatMethod.getDeclaringClass();
 
-        if (!targetClass.isInterface()) // It's weird if it's not an interface since the remapping only happens for interfaces
-            // Because TypeScript does not have interfaces at runtime, we need to remap the generic types of the parent interface to the current class
-            // throw new IllegalArgumentException("The target class must be an interface");
-            return Map.of();
+        Map<TypeVariable<?>, Type> replacement = new HashMap<>();
+        if (Arrays.stream(thisClass.getInterfaces()).noneMatch(c -> c.equals(targetClass))) {
+            Class<?> superInterface = Arrays.stream(thisClass.getInterfaces()).filter(targetClass::isAssignableFrom).findFirst().orElseThrow();
+            Map<TypeVariable<?>, Type> parentType = getGenericTypeReplacementForParentInterfaceMethodsJustBecauseJavaDoNotKnowToReplaceThemWithGenericArgumentsOfThisClass(superInterface, thatMethod);
+            Map<TypeVariable<?>, Type> parentReplacement = getInterfaceRemap(thisClass, superInterface);
 
+            for (Map.Entry<TypeVariable<?>, Type> entry : parentType.entrySet()) {
+                TypeVariable<?> variable = entry.getKey();
+                Type type = entry.getValue();
+
+                replacement.put(variable,
+                        type instanceof TypeVariable<?> typeVariable ? parentReplacement.getOrDefault(typeVariable, typeVariable) : type
+                );
+            }
+        } else {
+            return getInterfaceRemap(thisClass, targetClass);
+        }
+        return replacement;
+    }
+
+    private static Map<TypeVariable<?>, Type> getInterfaceRemap(Class<?> thisClass, Class<?> thatInterface) {
         Map<TypeVariable<?>, Type> replacement = new HashMap<>();
         int indexOfInterface = -1;
         for (Type type : thisClass.getGenericInterfaces()) {
             if (type instanceof ParameterizedType parameterizedType) {
-                if (parameterizedType.getRawType().equals(targetClass)) {
+                if (parameterizedType.getRawType().equals(thatInterface)) {
                     indexOfInterface = 0;
-                    for (TypeVariable<?> typeVariable : targetClass.getTypeParameters()) {
+                    for (TypeVariable<?> typeVariable : thatInterface.getTypeParameters()) {
                         replacement.put(typeVariable, parameterizedType.getActualTypeArguments()[indexOfInterface]);
                         indexOfInterface++;
                     }
                 }
             } else if (type instanceof Class<?> clazz) {
-                if (clazz.equals(targetClass)) {
+                if (clazz.equals(thatInterface)) {
                     indexOfInterface = 0;
-                    for (TypeVariable<?> typeVariable : targetClass.getTypeParameters()) {
+                    for (TypeVariable<?> typeVariable : thatInterface.getTypeParameters()) {
                         // Raw use of parameterized type, so we fill with Object.class
                         // Very bad programming practice, but we have to prepare for random people coding their stuffs bad
                         replacement.put(typeVariable, Object.class);
