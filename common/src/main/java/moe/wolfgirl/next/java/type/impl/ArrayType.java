@@ -11,7 +11,7 @@ import java.util.Collection;
 import java.util.stream.Stream;
 
 public class ArrayType extends TypeDescriptor {
-    public final TypeDescriptor component;
+    public TypeDescriptor component;
 
     public ArrayType(AnnotatedArrayType arrayType) {
         super(arrayType.getAnnotations());
@@ -21,6 +21,11 @@ public class ArrayType extends TypeDescriptor {
     public ArrayType(GenericArrayType arrayType) {
         super(new Annotation[]{});
         this.component = TypeAdapter.getTypeDescription(arrayType.getGenericComponentType());
+    }
+
+    public ArrayType(TypeDescriptor arrayType) {
+        super(new Annotation[]{});
+        this.component = arrayType;
     }
 
     @Override

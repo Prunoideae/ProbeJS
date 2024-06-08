@@ -172,7 +172,8 @@ public class Clazz extends TypeVariableHolder implements ClassPathProvider {
 
         if (!targetClass.isInterface()) // It's weird if it's not an interface since the remapping only happens for interfaces
             // Because TypeScript does not have interfaces at runtime, we need to remap the generic types of the parent interface to the current class
-            throw new IllegalArgumentException("The target class must be an interface");
+            // throw new IllegalArgumentException("The target class must be an interface");
+            return Map.of();
 
         Map<TypeVariable<?>, Type> replacement = new HashMap<>();
         int indexOfInterface = -1;
@@ -197,8 +198,10 @@ public class Clazz extends TypeVariableHolder implements ClassPathProvider {
             }
         }
 
-        if (indexOfInterface == -1)
-            throw new IllegalArgumentException("The class does not implement the target interface");
+        if (indexOfInterface == -1) {
+            // throw new IllegalArgumentException("The class does not implement the target interface");
+            return Map.of();
+        }
 
         return replacement;
     }

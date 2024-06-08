@@ -11,16 +11,14 @@ import java.lang.reflect.Type;
 import java.util.Collection;
 
 public class ParamInfo extends AnnotationHolder implements ClassPathProvider {
-    public final String name;
-    public final TypeDescriptor type;
+    public String name;
+    public TypeDescriptor type;
     public final boolean varArgs;
 
-    public ParamInfo(Parameter parameter, Type actual) {
+    public ParamInfo(Parameter parameter) {
         super(parameter.getAnnotations());
         this.name = parameter.getName();
-        this.type = actual == null ?
-                TypeAdapter.getTypeDescription(parameter.getAnnotatedType()) :
-                TypeAdapter.getTypeDescription(actual);
+        this.type = TypeAdapter.getTypeDescription(parameter.getAnnotatedType());
         this.varArgs = parameter.isVarArgs();
     }
 

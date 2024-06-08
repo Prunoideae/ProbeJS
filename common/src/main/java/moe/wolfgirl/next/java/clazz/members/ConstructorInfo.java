@@ -6,8 +6,6 @@ import moe.wolfgirl.next.java.clazz.ClassPath;
 import moe.wolfgirl.next.java.type.impl.VariableType;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -17,7 +15,7 @@ public class ConstructorInfo extends TypeVariableHolder implements ClassPathProv
 
     public ConstructorInfo(Constructor<?> constructor) {
         super(constructor.getTypeParameters(), constructor.getAnnotations());
-        this.params = Arrays.stream(constructor.getParameters()).map(param -> new ParamInfo(param, null)).collect(Collectors.toList());
+        this.params = Arrays.stream(constructor.getParameters()).map(ParamInfo::new).collect(Collectors.toList());
     }
 
     @Override

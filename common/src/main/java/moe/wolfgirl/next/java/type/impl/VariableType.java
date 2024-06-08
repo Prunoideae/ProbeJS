@@ -13,8 +13,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class VariableType extends TypeDescriptor {
-    public final String symbol;
-    public final List<TypeDescriptor> descriptors;
+    public String symbol;
+    public List<TypeDescriptor> descriptors;
 
     public VariableType(AnnotatedTypeVariable typeVariable) {
         this(typeVariable, true);
@@ -56,4 +56,6 @@ public class VariableType extends TypeDescriptor {
     public List<TypeDescriptor> getDescriptors() {
         return descriptors;
     }
+
+    
 }

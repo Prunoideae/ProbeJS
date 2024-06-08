@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ParamType extends TypeDescriptor {
-    public final TypeDescriptor base;
+    public TypeDescriptor base;
     public final List<TypeDescriptor> params;
 
     public ParamType(AnnotatedParameterizedType annotatedType) {

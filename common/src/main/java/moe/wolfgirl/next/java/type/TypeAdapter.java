@@ -73,4 +73,21 @@ public class TypeAdapter {
         }
         throw new RuntimeException("Unknown type to be resolved");
     }
+
+    public static TypeDescriptor consolidateType(TypeDescriptor in, String symbol, TypeDescriptor replacement) {
+        if (in instanceof VariableType variableType) {
+            if (variableType.symbol.equals(symbol)) return replacement;
+        }
+        if (in instanceof ArrayType arrayType) {
+            return new ArrayType(consolidateType(arrayType.component, symbol, replacement));
+        }
+        if (in instanceof ParamType paramType) {
+            return new ParamType(
+                    new Annotation[]{},
+                    consolidateType(paramType.base, symbol, replacement),
+                    paramType.params.stream().map(t -> consolidateType(t, symbol, replacement)).toList()
+            );
+        }
+        return in;
+    }
 }

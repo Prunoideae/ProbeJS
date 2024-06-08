@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 public class MethodInfo extends TypeVariableHolder implements ClassPathProvider {
     public final String name;
     public final List<ParamInfo> params;
-    public final TypeDescriptor returnType;
+    public TypeDescriptor returnType;
     public final MethodAttributes attributes;
 
     public MethodInfo(JavaMembers.MethodInfo methodInfo, Map<TypeVariable<?>, Type> remapper) {
@@ -27,15 +27,19 @@ public class MethodInfo extends TypeVariableHolder implements ClassPathProvider 
         this.attributes = new MethodAttributes(method);
         this.name = methodInfo.name;
         this.params = Arrays.stream(method.getParameters())
-                .map(param -> {
-                    if (!attributes.isStatic && param.getParameterizedType() instanceof TypeVariable<?> typeVar) {
-                        return new ParamInfo(param, remapper.getOrDefault(typeVar, typeVar));
-                    } else {
-                        return new ParamInfo(param, null);
-                    }
-                })
+                .map(ParamInfo::new)
                 .collect(Collectors.toList());
         this.returnType = TypeAdapter.getTypeDescription(method.getAnnotatedReturnType());
+
+        for (Map.Entry<TypeVariable<?>, Type> entry : remapper.entrySet()) {
+            TypeVariable<?> symbol = entry.getKey();
+            TypeDescriptor replacement = TypeAdapter.getTypeDescription(entry.getValue());
+
+            for (ParamInfo param : this.params) {
+                param.type = TypeAdapter.consolidateType(param.type, symbol.getName(), replacement);
+            }
+            this.returnType = TypeAdapter.consolidateType(this.returnType, symbol.getName(), replacement);
+        }
     }
 
     @Override

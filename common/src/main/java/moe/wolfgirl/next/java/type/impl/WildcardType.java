@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 public class WildcardType extends TypeDescriptor {
-    public final Optional<Either<TypeDescriptor, TypeDescriptor>> bound;
+    public Optional<Either<TypeDescriptor, TypeDescriptor>> bound;
 
     public WildcardType(AnnotatedWildcardType wildcardType, boolean checkBound) {
         super(wildcardType.getAnnotations());
