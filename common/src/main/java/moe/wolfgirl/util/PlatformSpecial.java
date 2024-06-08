@@ -19,6 +19,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.material.Fluid;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -75,4 +77,8 @@ public abstract class PlatformSpecial {
     }
 
     public abstract TextureAtlasSprite getFluidSprite(Fluid fluid);
+
+    public List<File> getModFiles(){
+        return null;
+    }
 }

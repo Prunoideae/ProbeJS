@@ -1,6 +1,5 @@
 package moe.wolfgirl.next.transpiler;
 
-import dev.latvian.mods.kubejs.KubeJS;
 import dev.latvian.mods.kubejs.script.ScriptManager;
 import dev.latvian.mods.rhino.util.HideFromJS;
 import moe.wolfgirl.next.java.clazz.ClassPath;
@@ -17,7 +16,11 @@ import java.util.*;
 public class Transpiler {
     public final TypeConverter typeConverter = new TypeConverter();
     public final Set<ClassPath> rejectedClasses = new HashSet<>();
-    private final ScriptManager scriptManager = KubeJS.getStartupScriptManager();
+    private final ScriptManager scriptManager;
+
+    public Transpiler(ScriptManager manager) {
+        this.scriptManager = manager;
+    }
 
     public void reject(Class<?> clazz) {
         rejectedClasses.add(new ClassPath(clazz));
@@ -44,16 +47,24 @@ public class Transpiler {
             scriptFile.addCode(classDecl);
 
             // TODO: type-conversion stuffs
-
-            // TODO: Tool interface detection, so if an interface
-            //       1. contains no abstract and non-static methods
-            //       2. is not implemented / extended by any class / interface
-            //       It will automatically be a class instead of interface
-            //       Low priority now as it's possible to merge namespaces
-
-            // TODO: different transpiler for Class / Interface
-
+            
             // TODO: Globally resolved underscored type
+
+            /*
+             * TODO:
+             *  ├── client_script
+             *  │   ├── src/
+             *  │   ├── jsconfig.json
+             *  │   └── probe-types/
+             *  ├── server_script
+             *  │   ├── src/
+             *  │   ├── jsconfig.json
+             *  │   └── probe-types/
+             *  └── startup_script
+             *      ├── src/
+             *      ├── jsconfig.json
+             *      └── probe-types/
+             */
 
             result.put(clazz.classPath, scriptFile);
         }

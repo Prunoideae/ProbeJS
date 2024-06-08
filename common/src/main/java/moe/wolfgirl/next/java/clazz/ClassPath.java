@@ -56,10 +56,11 @@ public record ClassPath(List<String> parts) {
         return base.resolve(getConcatenatedPackage("/"));
     }
 
-    public void makePath(Path base) {
+    public Path makePath(Path base) {
         Path full = getDirPath(base);
         if (Files.notExists(full)) {
             UtilsJS.tryIO(() -> Files.createDirectories(full));
         }
+        return full;
     }
 }

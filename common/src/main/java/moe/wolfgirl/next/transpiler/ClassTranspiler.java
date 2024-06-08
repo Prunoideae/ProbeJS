@@ -8,6 +8,7 @@ import moe.wolfgirl.next.transpiler.members.Converter;
 import moe.wolfgirl.next.transpiler.members.Field;
 import moe.wolfgirl.next.transpiler.members.Method;
 import moe.wolfgirl.next.typescript.code.member.ClassDecl;
+import moe.wolfgirl.next.typescript.code.member.InterfaceDecl;
 import moe.wolfgirl.next.typescript.code.type.BaseType;
 import moe.wolfgirl.next.typescript.code.type.TSPrimitiveType;
 import moe.wolfgirl.next.typescript.code.type.TSVariableType;
@@ -35,21 +36,28 @@ public class ClassTranspiler extends Converter<Clazz, ClassDecl> {
             variableTypes.add((TSVariableType) converter.convertType(variableType));
         }
         BaseType superClass = input.superClass == null ? null : converter.convertType(input.superClass);
-        ClassDecl decl = new ClassDecl(input.classPath.getName(),
-                superClass == TSPrimitiveType.ANY ? null : superClass,
-                input.interfaces.stream()
-                        .map(converter::convertType)
-                        .filter(t -> t != TSPrimitiveType.ANY)
-                        .toList(),
-                variableTypes
-        );
+        ClassDecl decl =
+                input.attribute.isInterface ?
+                        new InterfaceDecl(input.classPath.getName(),
+                                superClass == TSPrimitiveType.ANY ? null : superClass,
+                                input.interfaces.stream()
+                                        .map(converter::convertType)
+                                        .filter(t -> t != TSPrimitiveType.ANY)
+                                        .toList(),
+                                variableTypes) :
+                        new ClassDecl(input.classPath.getName(),
+                                superClass == TSPrimitiveType.ANY ? null : superClass,
+                                input.interfaces.stream()
+                                        .map(converter::convertType)
+                                        .filter(t -> t != TSPrimitiveType.ANY)
+                                        .toList(),
+                                variableTypes
+                        );
 
         decl.fields.addAll(input.fields.stream().map(field::transpile).toList());
         decl.methods.addAll(input.methods.stream().map(method::transpile).toList());
         decl.constructors.addAll(input.constructors.stream().map(constructor::transpile).toList());
-
         decl.isAbstract = input.attribute.isAbstract;
-        decl.isInterface = input.attribute.isInterface;
 
         return decl;
     }

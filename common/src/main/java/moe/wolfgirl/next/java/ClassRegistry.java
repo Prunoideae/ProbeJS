@@ -1,11 +1,8 @@
 package moe.wolfgirl.next.java;
 
-import dev.latvian.mods.kubejs.KubeJS;
-import dev.latvian.mods.kubejs.script.ScriptManager;
-import dev.latvian.mods.kubejs.util.ClassFilter;
 import moe.wolfgirl.ProbeJS;
-import moe.wolfgirl.next.java.clazz.Clazz;
 import moe.wolfgirl.next.java.clazz.ClassPath;
+import moe.wolfgirl.next.java.clazz.Clazz;
 import moe.wolfgirl.next.java.clazz.members.ConstructorInfo;
 import moe.wolfgirl.next.java.clazz.members.FieldInfo;
 import moe.wolfgirl.next.java.clazz.members.MethodInfo;

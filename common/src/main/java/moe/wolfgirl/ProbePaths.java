@@ -22,9 +22,7 @@ public class ProbePaths {
     public static Path RICH_FLUID = RICH.resolve("fluid");
 
     public static Path SCHEMA = KubeJSPaths.STARTUP_SCRIPTS.resolve("@recipes");
-
-    public static Path KUBE_ASSETS = KubeJSPaths.DIRECTORY.resolve("assets");
-
+    public static Path DECOMPILED = PROBE.resolve("decompiled");
     public static Path TYPES = PROBE.resolve("probe-types");
     public static Path PACKAGES = TYPES.resolve("packages");
 
@@ -61,6 +59,9 @@ public class ProbePaths {
         }
         if (Files.notExists(ProbePaths.TYPES)) {
             UtilsJS.tryIO(() -> Files.createDirectories(ProbePaths.TYPES));
+        }
+        if (Files.notExists(ProbePaths.DECOMPILED)) {
+            UtilsJS.tryIO(() -> Files.createDirectories(ProbePaths.DECOMPILED));
         }
     }
 

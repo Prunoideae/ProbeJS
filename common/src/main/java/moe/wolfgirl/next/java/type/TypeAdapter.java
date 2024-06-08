@@ -3,7 +3,11 @@ package moe.wolfgirl.next.java.type;
 import moe.wolfgirl.next.java.type.impl.*;
 import moe.wolfgirl.next.java.type.impl.WildcardType;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 public class TypeAdapter {
     public static TypeDescriptor getTypeDescription(AnnotatedType type) {
@@ -25,7 +29,17 @@ public class TypeAdapter {
         if (type instanceof AnnotatedWildcardType wildcardType) {
             return new WildcardType(wildcardType, recursive);
         }
-        return new ClassType(type);
+        if (type.getType() instanceof Class<?> clazz) {
+            TypeVariable<?>[] interfaces = clazz.getTypeParameters();
+            if (recursive && interfaces.length != 0)
+                return new ParamType(
+                        type.getAnnotations(),
+                        new ClassType(clazz),
+                        Collections.nCopies(interfaces.length, new ClassType(Object.class))
+                );
+            return new ClassType(type);
+        }
+        throw new RuntimeException("Unknown type to be resolved");
     }
 
     public static TypeDescriptor getTypeDescription(Type type) {
@@ -47,7 +61,16 @@ public class TypeAdapter {
         if (type instanceof java.lang.reflect.WildcardType wildcardType) {
             return new WildcardType(wildcardType, recursive);
         }
-
-        return new ClassType(type);
+        if (type instanceof Class<?> clazz) {
+            TypeVariable<?>[] interfaces = clazz.getTypeParameters();
+            if (recursive && interfaces.length != 0)
+                return new ParamType(
+                        new Annotation[]{},
+                        new ClassType(clazz),
+                        Collections.nCopies(interfaces.length, new ClassType(Object.class))
+                );
+            return new ClassType(clazz);
+        }
+        throw new RuntimeException("Unknown type to be resolved");
     }
 }

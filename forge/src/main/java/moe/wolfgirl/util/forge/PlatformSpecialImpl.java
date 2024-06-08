@@ -16,13 +16,17 @@ import net.minecraftforge.common.crafting.IIngredientSerializer;
 import net.minecraftforge.eventbus.ListenerList;
 import net.minecraftforge.eventbus.LockHelper;
 import net.minecraftforge.eventbus.api.EventListenerHelper;
+import net.minecraftforge.fml.ModList;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.lang.reflect.Field;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
+import java.util.stream.Collectors;
 
 public class PlatformSpecialImpl extends PlatformSpecial {
     private static Field ingredientInst = null;
@@ -103,5 +107,14 @@ public class PlatformSpecialImpl extends PlatformSpecial {
     @Override
     public TextureAtlasSprite getFluidSprite(Fluid fluid) {
         return FluidStackHooks.getStillTexture(fluid);
+    }
+
+    @Override
+    public List<File> getModFiles() {
+        ModList modList = ModList.get();
+        return modList.getModFiles().stream()
+                .map(fileInfo -> fileInfo.getFile().getFilePath())
+                .map(Path::toFile)
+                .collect(Collectors.toList());
     }
 }

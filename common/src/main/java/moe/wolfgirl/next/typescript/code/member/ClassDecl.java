@@ -20,7 +20,6 @@ public class ClassDecl extends CommentableCode {
     public final List<TSVariableType> variableTypes;
 
     public boolean isAbstract = false;
-    public boolean isInterface = false;
 
     public final List<FieldDecl> fields = new ArrayList<>();
     public final List<ConstructorDecl> constructors = new ArrayList<>();
@@ -61,8 +60,8 @@ public class ClassDecl extends CommentableCode {
         // Format head - export abstract (class / interface) name<T> extends ... implements ... {
         List<String> modifiers = new ArrayList<>();
         modifiers.add("export");
-        if (isAbstract && !isInterface) modifiers.add("abstract");
-        modifiers.add(isInterface ? "interface" : "class");
+        if (isAbstract) modifiers.add("abstract");
+        modifiers.add("class");
 
         String head = "%s %s".formatted(String.join(" ", modifiers), name);
         if (variableTypes.size() != 0) {
@@ -94,17 +93,6 @@ public class ClassDecl extends CommentableCode {
         body.add("");
         for (MethodDecl method : methods) {
             body.addAll(method.format(declaration));
-        }
-
-        // Use hybrid to represent functional interfaces
-        // (a: SomeClass<number>, b: SomeClass<string>): void;
-        if (isInterface && methods.stream().filter(method -> method.isAbstract).count() == 1) {
-            body.add("");
-            MethodDecl method = methods.get(0);
-            String hybridBody = ParamDecl.formatParams(method.params, declaration);
-            String returnType = method.returnType.line(declaration);
-
-            body.add("%s: %s".formatted(hybridBody, returnType));
         }
 
         // tail - }

@@ -6,6 +6,7 @@ import moe.wolfgirl.features.plugin.ProbeJSEvents;
 import dev.latvian.mods.kubejs.KubeJSPlugin;
 import dev.latvian.mods.kubejs.script.ScriptType;
 import dev.latvian.mods.kubejs.util.ClassFilter;
+import moe.wolfgirl.next.decompiler.ProbeDecompiler;
 import moe.wolfgirl.next.java.ClassRegistry;
 import moe.wolfgirl.next.plugin.ProbeJSPlugin;
 import moe.wolfgirl.next.transpiler.Transpiler;
@@ -25,6 +26,7 @@ public class ProbeJSKJSPlugin extends ProbeJSPlugin {
     public void registerBindings(BindingsEvent event) {
         event.add("Transpiler", Transpiler.class);
         event.add("ClassRegistry", ClassRegistry.class);
+        event.add("Decompiler", ProbeDecompiler.class);
         event.add("require", new Require(event.manager));
     }
 

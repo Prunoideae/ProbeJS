@@ -6,6 +6,7 @@ import moe.wolfgirl.next.java.type.TypeDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedParameterizedType;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -16,14 +17,20 @@ public class ParamType extends TypeDescriptor {
 
     public ParamType(AnnotatedParameterizedType annotatedType) {
         super(annotatedType.getAnnotations());
-        this.base = TypeAdapter.getTypeDescription(((ParameterizedType) annotatedType.getType()).getRawType());
+        this.base = TypeAdapter.getTypeDescription(((ParameterizedType) annotatedType.getType()).getRawType(), false);
         this.params = Arrays.stream(annotatedType.getAnnotatedActualTypeArguments()).map(t -> TypeAdapter.getTypeDescription(t, false)).collect(Collectors.toList());
     }
 
     public ParamType(ParameterizedType parameterizedType) {
         super(new Annotation[]{});
-        this.base = TypeAdapter.getTypeDescription(parameterizedType.getRawType());
+        this.base = TypeAdapter.getTypeDescription(parameterizedType.getRawType(), false);
         this.params = Arrays.stream(parameterizedType.getActualTypeArguments()).map(t -> TypeAdapter.getTypeDescription(t, false)).collect(Collectors.toList());
+    }
+
+    public ParamType(Annotation[] annotations, TypeDescriptor base, List<TypeDescriptor> params) {
+        super(annotations);
+        this.base = base;
+        this.params = params;
     }
 
     @Override
