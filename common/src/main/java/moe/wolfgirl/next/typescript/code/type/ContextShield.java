@@ -2,25 +2,26 @@ package moe.wolfgirl.next.typescript.code.type;
 
 import moe.wolfgirl.next.java.clazz.ClassPath;
 import moe.wolfgirl.next.typescript.Declaration;
-import moe.wolfgirl.next.typescript.Reference;
 
 import java.util.Collection;
 import java.util.List;
 
-public class TSClassType extends BaseType {
-    public ClassPath classPath;
+public class ContextShield extends BaseType {
+    private final BaseType inner;
+    private final FormatType formatType;
 
-    public TSClassType(ClassPath classPath) {
-        this.classPath = classPath;
+    public ContextShield(BaseType inner, FormatType formatType) {
+        this.inner = inner;
+        this.formatType = formatType;
     }
 
     @Override
     public Collection<ClassPath> getUsedClassPaths() {
-        return List.of(classPath);
+        return inner.getUsedClassPaths();
     }
 
     @Override
     public List<String> format(Declaration declaration, FormatType input) {
-        return List.of(declaration.getSymbol(classPath, input == FormatType.INPUT));
+        return inner.format(declaration, formatType);
     }
 }

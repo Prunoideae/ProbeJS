@@ -2,13 +2,15 @@ package moe.wolfgirl.next.typescript;
 
 import moe.wolfgirl.next.java.clazz.ClassPath;
 
-public record Reference(ClassPath classPath, String symbol) {
+public record Reference(ClassPath classPath, String original, String input) {
     public String getImport() {
+        String importOriginal = original.equals(classPath.getName()) ? original : "%s as %s".formatted(classPath.getName(), original);
+        String exportedInput = Declaration.INPUT_TEMPLATE.formatted(classPath.getName());
+        String importInput = input.equals(exportedInput) ? input : "%s as %s".formatted(exportedInput, input);
+
         // Underscores can be recognized by using a global export
-        return symbol.equals(classPath.getName()) ? "import {%s} from \"packages/%s\"".formatted(
-                symbol, classPath.getTypeScriptPath()
-        ) : "import {%s as %s} from \"packages/%s\"".formatted(
-                classPath.getName(), symbol, classPath.getTypeScriptPath()
+        return "import {%s, %s} from \"packages/%s\"".formatted(
+                importOriginal, importInput, classPath.getTypeScriptPath()
         );
     }
 }

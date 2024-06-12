@@ -8,11 +8,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
-public record ParamDecl(String name, BaseType type, boolean varArg)  {
+public record ParamDecl(String name, BaseType type, boolean varArg, boolean optional) {
     public String format(int index, Declaration declaration) {
         String result = Util.isNameSafe(name) ? name : "arg%d".formatted(index);
         if (varArg) result = "...%s".formatted(result);
-        return "%s: %s".formatted(result, type.line(declaration, BaseType.FormatType.INPUT));
+        return "%s%s: %s".formatted(
+                result,
+                optional ? "?" : "",
+                type.line(declaration, BaseType.FormatType.INPUT)
+        );
     }
 
     public static String formatParams(List<ParamDecl> params, Declaration declaration) {

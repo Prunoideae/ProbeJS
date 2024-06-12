@@ -17,6 +17,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Clazz extends TypeVariableHolder implements ClassPathProvider {
+    public final Class<?> original;
     public final ClassPath classPath;
     public final List<ConstructorInfo> constructors;
     public final List<FieldInfo> fields;
@@ -29,6 +30,7 @@ public class Clazz extends TypeVariableHolder implements ClassPathProvider {
     public Clazz(Class<?> clazz) {
         super(clazz.getTypeParameters(), clazz.getAnnotations());
 
+        this.original = clazz;
         this.classPath = new ClassPath(clazz);
         this.constructors = RemapperUtils.getConstructors(clazz)
                 .stream()
@@ -172,7 +174,8 @@ public class Clazz extends TypeVariableHolder implements ClassPathProvider {
 
         Map<TypeVariable<?>, Type> replacement = new HashMap<>();
         if (Arrays.stream(thisClass.getInterfaces()).noneMatch(c -> c.equals(targetClass))) {
-            Class<?> superInterface = Arrays.stream(thisClass.getInterfaces()).filter(targetClass::isAssignableFrom).findFirst().orElseThrow();
+            Class<?> superInterface = Arrays.stream(thisClass.getInterfaces()).filter(targetClass::isAssignableFrom).findFirst().orElse(null);
+            if (superInterface == null) return Map.of();
             Map<TypeVariable<?>, Type> parentType = getGenericTypeReplacementForParentInterfaceMethodsJustBecauseJavaDoNotKnowToReplaceThemWithGenericArgumentsOfThisClass(superInterface, thatMethod);
             Map<TypeVariable<?>, Type> parentReplacement = getInterfaceRemap(thisClass, superInterface);
 

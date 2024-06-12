@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Represents a type declaration. Standalone members are always exported.
  */
-public class TypeDecl extends Code {
+public class TypeDecl extends CommentableCode {
     public BaseType type;
     public final String symbol;
 
@@ -27,7 +27,7 @@ public class TypeDecl extends Code {
     }
 
     @Override
-    public List<String> format(Declaration declaration) {
+    public List<String> formatRaw(Declaration declaration) {
         return List.of(
                 "export type %s = %s;".formatted(symbol, type.line(declaration, BaseType.FormatType.INPUT))
         );

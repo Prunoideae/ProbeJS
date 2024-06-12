@@ -7,9 +7,7 @@ import org.jetbrains.java.decompiler.main.extern.IResultSaver;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.jar.Manifest;
 import java.util.stream.Collectors;
 
@@ -73,5 +71,20 @@ public class ProbeFileSaver implements IResultSaver {
                 );
             }
         }
+    }
+
+    public Set<Class<?>> getClasses() {
+        Set<Class<?>> classes = new HashSet<>();
+        for (Map.Entry<ClassPath, ParsedDocument> entry : result.entrySet()) {
+            ClassPath classPath = entry.getKey();
+            ParsedDocument parsedDocument = entry.getValue();
+
+            if (parsedDocument.isMixinClass()) continue;
+            try {
+                classes.add(classPath.forName());
+            } catch (Throwable ignored) {
+            }
+        }
+        return classes;
     }
 }

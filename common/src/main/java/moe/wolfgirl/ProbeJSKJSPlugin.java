@@ -1,25 +1,29 @@
 package moe.wolfgirl;
 
 import dev.latvian.mods.kubejs.script.BindingsEvent;
-import dev.latvian.mods.kubejs.util.ClassWrapper;
 import moe.wolfgirl.features.plugin.ProbeJSEvents;
-import dev.latvian.mods.kubejs.KubeJSPlugin;
 import dev.latvian.mods.kubejs.script.ScriptType;
 import dev.latvian.mods.kubejs.util.ClassFilter;
+import moe.wolfgirl.next.ScriptDump;
+import moe.wolfgirl.next.ProbeEvents;
 import moe.wolfgirl.next.decompiler.ProbeDecompiler;
+import moe.wolfgirl.next.docs.ProbeBuiltinDocs;
 import moe.wolfgirl.next.java.ClassRegistry;
+import moe.wolfgirl.next.java.clazz.ClassPath;
 import moe.wolfgirl.next.plugin.ProbeJSPlugin;
 import moe.wolfgirl.next.transpiler.Transpiler;
 import moe.wolfgirl.next.transpiler.TypeConverter;
-import moe.wolfgirl.next.typescript.code.type.TSPrimitiveType;
+import moe.wolfgirl.next.typescript.TypeScriptFile;
 import moe.wolfgirl.next.utils.Require;
 
-import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class ProbeJSKJSPlugin extends ProbeJSPlugin {
     @Override
     public void registerEvents() {
         ProbeJSEvents.GROUP.register();
+        ProbeEvents.GROUP.register();
     }
 
     @Override
@@ -40,37 +44,29 @@ public class ProbeJSKJSPlugin extends ProbeJSPlugin {
     }
 
     @Override
+    public void assignType(ScriptDump scriptDump) {
+        ProbeBuiltinDocs.INSTANCE.assignType(scriptDump);
+    }
+
+    @Override
+    public void modifyClasses(ScriptDump scriptDump, Map<ClassPath, TypeScriptFile> globalClasses) {
+        ProbeBuiltinDocs.INSTANCE.modifyClasses(scriptDump, globalClasses);
+    }
+
+    @Override
+    public void addGlobals(ScriptDump scriptDump) {
+        ProbeBuiltinDocs.INSTANCE.addGlobals(scriptDump);
+    }
+
+    @Override
     public void addPredefinedTypes(TypeConverter converter) {
-        converter.addType(Object.class, TSPrimitiveType.ANY);
-
-        converter.addType(String.class, TSPrimitiveType.STRING);
-        converter.addType(CharSequence.class, TSPrimitiveType.STRING);
-        converter.addType(Character.class, TSPrimitiveType.STRING);
-        converter.addType(Character.TYPE, TSPrimitiveType.STRING);
-
-        converter.addType(Void.class, TSPrimitiveType.VOID);
-        converter.addType(Void.TYPE, TSPrimitiveType.VOID);
-
-        converter.addType(Long.class, TSPrimitiveType.NUMBER);
-        converter.addType(Long.TYPE, TSPrimitiveType.NUMBER);
-        converter.addType(Integer.class, TSPrimitiveType.NUMBER);
-        converter.addType(Integer.TYPE, TSPrimitiveType.NUMBER);
-        converter.addType(Short.class, TSPrimitiveType.NUMBER);
-        converter.addType(Short.TYPE, TSPrimitiveType.NUMBER);
-        converter.addType(Byte.class, TSPrimitiveType.NUMBER);
-        converter.addType(Byte.TYPE, TSPrimitiveType.NUMBER);
-        converter.addType(Number.class, TSPrimitiveType.NUMBER);
-        converter.addType(Double.class, TSPrimitiveType.NUMBER);
-        converter.addType(Double.TYPE, TSPrimitiveType.NUMBER);
-        converter.addType(Float.class, TSPrimitiveType.NUMBER);
-        converter.addType(Float.TYPE, TSPrimitiveType.NUMBER);
-
-        converter.addType(Boolean.class, TSPrimitiveType.BOOLEAN);
-        converter.addType(Boolean.TYPE, TSPrimitiveType.BOOLEAN);
+        ProbeBuiltinDocs.INSTANCE.addPredefinedTypes(converter);
     }
 
     @Override
     public void denyTypes(Transpiler transpiler) {
+        ProbeBuiltinDocs.INSTANCE.denyTypes(transpiler);
+
         transpiler.reject(Object.class);
 
         transpiler.reject(String.class);
@@ -96,6 +92,10 @@ public class ProbeJSKJSPlugin extends ProbeJSPlugin {
 
         transpiler.reject(Boolean.class);
         transpiler.reject(Boolean.TYPE);
+    }
 
+    @Override
+    public Set<Class<?>> provideJavaClass(ScriptDump scriptDump) {
+        return ProbeBuiltinDocs.INSTANCE.provideJavaClass(scriptDump);
     }
 }

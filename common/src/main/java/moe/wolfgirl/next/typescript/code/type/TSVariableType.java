@@ -13,7 +13,7 @@ public class TSVariableType extends BaseType {
 
     public TSVariableType(String symbol, @Nullable BaseType extendsType) {
         this.symbol = symbol;
-        this.extendsType = extendsType == TSPrimitiveType.ANY ? null : extendsType;
+        this.extendsType = extendsType == Types.ANY ? null : extendsType;
     }
 
     @Override

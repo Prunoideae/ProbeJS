@@ -2,7 +2,6 @@ package moe.wolfgirl.next.transpiler;
 
 import moe.wolfgirl.next.java.clazz.Clazz;
 import moe.wolfgirl.next.java.type.impl.VariableType;
-import moe.wolfgirl.next.transpiler.TypeConverter;
 import moe.wolfgirl.next.transpiler.members.Constructor;
 import moe.wolfgirl.next.transpiler.members.Converter;
 import moe.wolfgirl.next.transpiler.members.Field;
@@ -10,8 +9,8 @@ import moe.wolfgirl.next.transpiler.members.Method;
 import moe.wolfgirl.next.typescript.code.member.ClassDecl;
 import moe.wolfgirl.next.typescript.code.member.InterfaceDecl;
 import moe.wolfgirl.next.typescript.code.type.BaseType;
-import moe.wolfgirl.next.typescript.code.type.TSPrimitiveType;
 import moe.wolfgirl.next.typescript.code.type.TSVariableType;
+import moe.wolfgirl.next.typescript.code.type.Types;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,17 +38,17 @@ public class ClassTranspiler extends Converter<Clazz, ClassDecl> {
         ClassDecl decl =
                 input.attribute.isInterface ?
                         new InterfaceDecl(input.classPath.getName(),
-                                superClass == TSPrimitiveType.ANY ? null : superClass,
+                                superClass == Types.ANY ? null : superClass,
                                 input.interfaces.stream()
                                         .map(converter::convertType)
-                                        .filter(t -> t != TSPrimitiveType.ANY)
+                                        .filter(t -> t != Types.ANY)
                                         .toList(),
                                 variableTypes) :
                         new ClassDecl(input.classPath.getName(),
-                                superClass == TSPrimitiveType.ANY ? null : superClass,
+                                superClass == Types.ANY ? null : superClass,
                                 input.interfaces.stream()
                                         .map(converter::convertType)
-                                        .filter(t -> t != TSPrimitiveType.ANY)
+                                        .filter(t -> t != Types.ANY)
                                         .toList(),
                                 variableTypes
                         );

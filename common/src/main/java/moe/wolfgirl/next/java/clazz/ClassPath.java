@@ -1,8 +1,10 @@
 package moe.wolfgirl.next.java.clazz;
 
 import dev.latvian.mods.kubejs.util.UtilsJS;
+import moe.wolfgirl.next.java.ClassRegistry;
 import moe.wolfgirl.next.utils.RemapperUtils;
 
+import java.lang.reflect.TypeVariable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -38,8 +40,13 @@ public record ClassPath(List<String> parts) {
         return Class.forName(getClassPath());
     }
 
-    public Clazz toClazz() throws ClassNotFoundException {
-        return new Clazz(forName());
+    public List<String> getGenerics() throws ClassNotFoundException {
+        TypeVariable<?>[] variables = forName().getTypeParameters();
+        return Arrays.stream(variables).map(TypeVariable::getName).toList();
+    }
+
+    public Clazz toClazz() {
+        return ClassRegistry.REGISTRY.foundClasses.get(this);
     }
 
     public List<String> getPackage() {

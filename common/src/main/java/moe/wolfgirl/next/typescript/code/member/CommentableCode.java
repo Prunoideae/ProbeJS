@@ -27,4 +27,10 @@ public abstract class CommentableCode extends Code {
         result.addAll(formatRaw(declaration));
         return result;
     }
+
+    public void addComment(String... comments) {
+        for (String comment : comments) {
+            this.comments.addAll(List.of(comment.split("\\n")));
+        }
+    }
 }

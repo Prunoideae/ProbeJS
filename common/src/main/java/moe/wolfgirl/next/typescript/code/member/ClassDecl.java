@@ -2,6 +2,7 @@ package moe.wolfgirl.next.typescript.code.member;
 
 import moe.wolfgirl.next.java.clazz.ClassPath;
 import moe.wolfgirl.next.typescript.Declaration;
+import moe.wolfgirl.next.typescript.code.Code;
 import moe.wolfgirl.next.typescript.code.type.BaseType;
 import moe.wolfgirl.next.typescript.code.type.TSVariableType;
 import org.jetbrains.annotations.Nullable;
@@ -24,6 +25,11 @@ public class ClassDecl extends CommentableCode {
     public final List<FieldDecl> fields = new ArrayList<>();
     public final List<ConstructorDecl> constructors = new ArrayList<>();
     public final List<MethodDecl> methods = new ArrayList<>();
+
+    /**
+     * Reserved field to inject custom code body
+     */
+    public final List<Code> bodyCode = new ArrayList<>();
 
     public ClassDecl(String name, @Nullable BaseType superClass, List<BaseType> interfaces, List<TSVariableType> variableTypes) {
         this.name = name;
@@ -49,6 +55,9 @@ public class ClassDecl extends CommentableCode {
         }
         for (TSVariableType variableType : variableTypes) {
             paths.addAll(variableType.getUsedClassPaths());
+        }
+        for (Code code : bodyCode) {
+            paths.addAll(code.getUsedClassPaths());
         }
         if (superClass != null) paths.addAll(superClass.getUsedClassPaths());
 
@@ -95,13 +104,18 @@ public class ClassDecl extends CommentableCode {
             body.addAll(method.format(declaration));
         }
 
-        // tail - }
+        // tail - custom code, }
+        List<String> tail = new ArrayList<>();
+        for (Code code : bodyCode) {
+            tail.addAll(code.format(declaration));
+        }
+        tail.add("}");
 
         // Concatenate them as a whole
         List<String> formatted = new ArrayList<>();
         formatted.add(head);
         formatted.addAll(body);
-        formatted.add("}");
+        formatted.addAll(tail);
         return formatted;
     }
 }

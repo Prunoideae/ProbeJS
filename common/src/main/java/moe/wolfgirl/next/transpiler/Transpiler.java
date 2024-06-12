@@ -5,6 +5,7 @@ import dev.latvian.mods.rhino.util.HideFromJS;
 import moe.wolfgirl.next.java.clazz.ClassPath;
 import moe.wolfgirl.next.java.clazz.Clazz;
 import moe.wolfgirl.next.plugin.ProbeJSPlugin;
+import moe.wolfgirl.next.transpiler.transformation.ClassTransformer;
 import moe.wolfgirl.next.typescript.TypeScriptFile;
 import moe.wolfgirl.next.typescript.code.member.ClassDecl;
 
@@ -14,12 +15,13 @@ import java.util.*;
  * Converts a Clazz into a TypeScriptFile ready for dump.
  */
 public class Transpiler {
-    public final TypeConverter typeConverter = new TypeConverter();
+    public final TypeConverter typeConverter;
     public final Set<ClassPath> rejectedClasses = new HashSet<>();
     private final ScriptManager scriptManager;
 
     public Transpiler(ScriptManager manager) {
         this.scriptManager = manager;
+        this.typeConverter = new TypeConverter(manager);
     }
 
     public void reject(Class<?> clazz) {
@@ -36,35 +38,14 @@ public class Transpiler {
         Map<ClassPath, TypeScriptFile> result = new HashMap<>();
 
         for (Clazz clazz : clazzes) {
-            if (rejectedClasses.contains(clazz.classPath)
-                    || !scriptManager.isClassAllowed(clazz.classPath.getClassPath())
-                    || clazz.hasAnnotation(HideFromJS.class)) {
+            if (rejectedClasses.contains(clazz.classPath) || clazz.hasAnnotation(HideFromJS.class)) {
                 continue;
             }
             ClassDecl classDecl = transpiler.transpile(clazz);
+            ClassTransformer.transformClass(clazz, classDecl);
 
             TypeScriptFile scriptFile = new TypeScriptFile(clazz.classPath);
             scriptFile.addCode(classDecl);
-
-            // TODO: type-conversion stuffs
-
-            // TODO: Globally resolved underscored type
-
-            /*
-             * TODO:
-             *  ├── client_script
-             *  │   ├── src/
-             *  │   ├── jsconfig.json
-             *  │   └── probe-types/
-             *  ├── server_script
-             *  │   ├── src/
-             *  │   ├── jsconfig.json
-             *  │   └── probe-types/
-             *  └── startup_script
-             *      ├── src/
-             *      ├── jsconfig.json
-             *      └── probe-types/
-             */
 
             result.put(clazz.classPath, scriptFile);
         }

@@ -3,6 +3,7 @@ package moe.wolfgirl.next.typescript.code.ts;
 import moe.wolfgirl.next.java.clazz.ClassPath;
 import moe.wolfgirl.next.typescript.Declaration;
 import moe.wolfgirl.next.typescript.code.Code;
+import moe.wolfgirl.next.typescript.code.member.CommentableCode;
 import moe.wolfgirl.next.typescript.code.member.ParamDecl;
 import moe.wolfgirl.next.typescript.code.type.BaseType;
 import moe.wolfgirl.next.typescript.code.type.TSVariableType;
@@ -13,7 +14,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class MethodDeclaration extends Code {
+public class MethodDeclaration extends CommentableCode {
     public String name;
     public final List<TSVariableType> variableTypes;
     public final List<ParamDecl> params;
@@ -39,7 +40,7 @@ public class MethodDeclaration extends Code {
     }
 
     @Override
-    public List<String> format(Declaration declaration) {
+    public List<String> formatRaw(Declaration declaration) {
         // Format head - function name<T, U extends A>
         String head = "function %s".formatted(name);
         if (variableTypes.size() != 0) {

@@ -16,6 +16,12 @@ public abstract class BaseType extends Code {
         return format(declaration, input).get(0);
     }
 
+    // Stuffs for convenience
+
+    public TSArrayType asArray() {
+        return new TSArrayType(this);
+    }
+
     public enum FormatType {
         INPUT,
         RETURN,

@@ -11,6 +11,6 @@ public class Param extends Converter<ParamInfo, ParamDecl> {
 
     @Override
     public ParamDecl transpile(ParamInfo input) {
-        return new ParamDecl(input.name, converter.convertType(input.type), input.varArgs);
+        return new ParamDecl(input.name, converter.convertType(input.type), input.varArgs, false);
     }
 }

@@ -9,6 +9,7 @@ import moe.wolfgirl.next.java.clazz.members.MethodInfo;
 import moe.wolfgirl.next.java.clazz.members.ParamInfo;
 import moe.wolfgirl.next.java.type.TypeDescriptor;
 import moe.wolfgirl.next.java.type.impl.VariableType;
+import moe.wolfgirl.next.plugin.ProbeJSPlugin;
 
 import java.util.*;
 
@@ -20,11 +21,7 @@ public class ClassRegistry {
     public void fromPackage(Collection<ClassPath> classPaths) {
         for (ClassPath pack : classPaths) {
             if (!foundClasses.containsKey(pack)) {
-                try {
-                    foundClasses.put(pack, pack.toClazz());
-                } catch (ClassNotFoundException e) {
-                    ProbeJS.LOGGER.warn("Failed to load classes %s!".formatted(pack.getClassPath()));
-                }
+                foundClasses.put(pack, pack.toClazz());
             }
         }
     }
@@ -39,9 +36,14 @@ public class ClassRegistry {
 
     public void fromClasses(Collection<Class<?>> classes) {
         for (Class<?> c : classes) {
+            if (c.isSynthetic()) continue;
+            if (c.isAnonymousClass()) continue;
             if (!foundClasses.containsKey(new ClassPath(c))) {
-                Clazz clazz = new Clazz(c);
-                foundClasses.put(clazz.classPath, clazz);
+                try {
+                    Clazz clazz = new Clazz(c);
+                    foundClasses.put(clazz.classPath, clazz);
+                } catch (Throwable ignored) {
+                }
             }
         }
     }

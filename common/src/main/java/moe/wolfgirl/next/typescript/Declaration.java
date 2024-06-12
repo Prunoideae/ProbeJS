@@ -1,5 +1,6 @@
 package moe.wolfgirl.next.typescript;
 
+import com.mojang.datafixers.util.Pair;
 import moe.wolfgirl.next.java.clazz.ClassPath;
 
 import java.util.HashMap;
@@ -9,30 +10,48 @@ import java.util.Set;
 
 public class Declaration {
     private static final String SYMBOL_TEMPLATE = "%s$%d";
+    public static final String INPUT_TEMPLATE = "%sType";
 
     public final Map<ClassPath, Reference> references;
-    private final Map<ClassPath, String> symbols;
+    private final Map<ClassPath, Pair<String, String>> symbols;
+
+    private final Set<String> excludedName;
 
     public Declaration() {
         this.references = new HashMap<>();
         this.symbols = new HashMap<>();
+        this.excludedName = new HashSet<>();
     }
 
     public void addClass(ClassPath path) {
-        // So we determine a unique symbol that is safe to use at startup
-        this.references.put(path, new Reference(path, getSymbolName(path)));
+        // So we determine a unique original that is safe to use at startup
+        var names = getSymbolName(path);
+        this.references.put(path, new Reference(path, names.getFirst(), names.getSecond()));
     }
 
-    private String getSymbolName(ClassPath path) {
+    public void exclude(String name) {
+        excludedName.add(name);
+    }
+
+    private void putSymbolName(ClassPath path, String name) {
+        symbols.put(path, new Pair<>(name, INPUT_TEMPLATE.formatted(name)));
+    }
+
+    private boolean containsSymbol(String name) {
+        return excludedName.contains(name) || symbols.containsValue(new Pair<>(name, INPUT_TEMPLATE.formatted(name)));
+    }
+
+
+    private Pair<String, String> getSymbolName(ClassPath path) {
         if (!symbols.containsKey(path)) {
             String name = path.getName();
-            if (!symbols.containsValue(name)) symbols.put(path, name);
+            if (!containsSymbol(name)) putSymbolName(path, name);
             else {
                 int counter = 0;
-                while (symbols.containsValue(SYMBOL_TEMPLATE.formatted(name, counter))) {
+                while (containsSymbol(SYMBOL_TEMPLATE.formatted(name, counter))) {
                     counter++;
                 }
-                symbols.put(path, SYMBOL_TEMPLATE.formatted(name, counter));
+                putSymbolName(path, SYMBOL_TEMPLATE.formatted(name, counter));
             }
         }
 
@@ -40,9 +59,14 @@ public class Declaration {
     }
 
     public String getSymbol(ClassPath path) {
+        return getSymbol(path, false);
+    }
+
+    public String getSymbol(ClassPath path, boolean input) {
         if (!this.references.containsKey(path)) {
             throw new RuntimeException("Trying to get a symbol of a classpath that is not resolved yet!");
         }
-        return this.references.get(path).symbol();
+        var reference = this.references.get(path);
+        return input ? reference.input() : reference.original();
     }
 }

@@ -6,11 +6,11 @@ import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.CallableDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.Parameter;
+import com.github.javaparser.ast.expr.AnnotationExpr;
 import moe.wolfgirl.next.utils.NameUtils;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 public class ParsedDocument {
 
@@ -48,5 +48,14 @@ public class ParsedDocument {
             content = content.replace(original, renamed);
         }
         return content;
+    }
+
+    public boolean isMixinClass() {
+        for (ClassOrInterfaceDeclaration classDecl : parsed.findAll(ClassOrInterfaceDeclaration.class)) {
+            for (AnnotationExpr annotation : classDecl.getAnnotations()) {
+                if (annotation.getNameAsString().equals("Mixin")) return true;
+            }
+        }
+        return false;
     }
 }

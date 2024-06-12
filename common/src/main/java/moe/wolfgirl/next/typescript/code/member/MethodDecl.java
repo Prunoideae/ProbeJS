@@ -52,7 +52,7 @@ public class MethodDecl extends CommentableCode {
             String variables = variableTypes.stream()
                     .map(type -> type.line(declaration))
                     .collect(Collectors.joining(", "));
-            head = "%s<%s>".formatted(name, variables);
+            head = "%s<%s>".formatted(head, variables);
         }
 
         // Format body - (a: type, ...)

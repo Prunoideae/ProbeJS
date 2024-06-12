@@ -1,11 +1,16 @@
 package moe.wolfgirl.next.plugin;
 
+import com.mojang.datafixers.util.Pair;
 import dev.latvian.mods.kubejs.KubeJSPlugin;
 import dev.latvian.mods.kubejs.util.KubeJSPlugins;
+import moe.wolfgirl.next.ScriptDump;
+import moe.wolfgirl.next.java.clazz.ClassPath;
 import moe.wolfgirl.next.transpiler.Transpiler;
 import moe.wolfgirl.next.transpiler.TypeConverter;
+import moe.wolfgirl.next.typescript.TypeScriptFile;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 
 /**
@@ -37,5 +42,49 @@ public class ProbeJSPlugin extends KubeJSPlugin {
      */
     public void denyTypes(Transpiler transpiler) {
 
+    }
+
+    /**
+     * Used to modify the classes that will be dumped to a certain script type.
+     * <br>
+     * Can add / remove dumps by mutating the globalClasses.
+     */
+    public void modifyClasses(ScriptDump scriptDump, Map<ClassPath, TypeScriptFile> globalClasses) {
+
+    }
+
+    /**
+     * Used to add code to global namespace.
+     * <br>
+     * Globals are available without any imports, so it must be ensured that the
+     * added code is either:
+     * 1. a type
+     * 2. a binding (though it's not very needed for most people)
+     */
+    public void addGlobals(ScriptDump scriptDump) {
+
+    }
+
+    /**
+     * Adds a convertible type to a classPath.
+     * <br>
+     * e.g. Item can be assigned with any item name string.
+     */
+    public void assignType(ScriptDump scriptDump) {
+
+    }
+
+    /**
+     * Provides Java classes for the class registry to discover.
+     */
+    public Set<Class<?>> provideJavaClass(ScriptDump scriptDump) {
+        return Set.of();
+    }
+
+    /**
+     * Provides events that should be disabled for custom support.
+     */
+    public Set<Pair<String, String>> disableEventDumps(ScriptDump dump) {
+        return Set.of();
     }
 }

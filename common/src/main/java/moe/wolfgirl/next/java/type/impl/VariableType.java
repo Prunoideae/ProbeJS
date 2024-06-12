@@ -44,6 +44,7 @@ public class VariableType extends TypeDescriptor {
                 .collect(Collectors.toList()) : new ArrayList<>();
     }
 
+
     @Override
     public Stream<TypeDescriptor> stream() {
         return descriptors.stream().flatMap(TypeDescriptor::stream);

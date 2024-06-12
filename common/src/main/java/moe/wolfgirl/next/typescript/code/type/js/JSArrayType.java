@@ -1,7 +1,8 @@
-package moe.wolfgirl.next.typescript.code.type;
+package moe.wolfgirl.next.typescript.code.type.js;
 
 import moe.wolfgirl.next.java.clazz.ClassPath;
 import moe.wolfgirl.next.typescript.Declaration;
+import moe.wolfgirl.next.typescript.code.type.BaseType;
 
 import java.util.Collection;
 import java.util.HashSet;
