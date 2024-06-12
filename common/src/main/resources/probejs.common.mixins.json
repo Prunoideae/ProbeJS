@@ -1,7 +1,7 @@
 {
     "required": true,
     "compatibilityLevel": "JAVA_17",
-    "package": "moe.wolfgirl.mixins",
+    "package": "moe.wolfgirl.probejs.mixins",
     "mixins": [
         "LootTableMixin",
         "OnJavaMixin",
