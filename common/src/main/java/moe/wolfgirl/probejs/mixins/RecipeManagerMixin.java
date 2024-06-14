@@ -1,6 +1,7 @@
 package moe.wolfgirl.probejs.mixins;
 
 import com.google.gson.JsonObject;
+import moe.wolfgirl.probejs.next.GlobalStates;
 import moe.wolfgirl.probejs.specials.special.FormatterRecipeId;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -18,6 +19,10 @@ import java.util.Map;
 public class RecipeManagerMixin {
     @Inject(method = "apply*", at = @At("HEAD"))
     private void apply(Map<ResourceLocation, JsonObject> map, ResourceManager resourceManager, ProfilerFiller profiler, CallbackInfo ci) {
-        FormatterRecipeId.ORIGINAL_RECIPES = new HashMap<>(map);
+        for (ResourceLocation resourceLocation : map.keySet()) {
+            if (!resourceLocation.getPath().startsWith("kjs_")) {
+                GlobalStates.RECIPE_IDS.add(resourceLocation.toString());
+            }
+        }
     }
 }

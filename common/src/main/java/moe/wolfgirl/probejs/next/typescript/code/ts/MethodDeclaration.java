@@ -31,7 +31,7 @@ public class MethodDeclaration extends CommentableCode {
             paths.addAll(variableType.getUsedClassPaths());
         }
         for (ParamDecl param : params) {
-            paths.addAll(param.type().getUsedClassPaths());
+            paths.addAll(param.type.getUsedClassPaths());
         }
         return paths;
     }

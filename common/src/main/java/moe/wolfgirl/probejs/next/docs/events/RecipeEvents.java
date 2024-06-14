@@ -6,9 +6,9 @@ import dev.latvian.mods.kubejs.recipe.schema.JsonRecipeSchemaType;
 import dev.latvian.mods.kubejs.recipe.schema.RecipeNamespace;
 import dev.latvian.mods.kubejs.recipe.schema.RecipeSchema;
 import dev.latvian.mods.kubejs.recipe.schema.RecipeSchemaType;
+import dev.latvian.mods.kubejs.recipe.schema.minecraft.SpecialRecipeSchema;
 import dev.latvian.mods.kubejs.script.ScriptType;
-import javassist.compiler.ast.Pair;
-import moe.wolfgirl.probejs.next.ScriptDump;
+import moe.wolfgirl.probejs.next.typescript.ScriptDump;
 import moe.wolfgirl.probejs.next.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.next.plugin.ProbeJSPlugin;
 import moe.wolfgirl.probejs.next.transpiler.TypeConverter;
@@ -66,6 +66,7 @@ public class RecipeEvents extends ProbeJSPlugin {
                 RecipeSchemaType schemaType = e.getValue();
                 if (schemaType instanceof JsonRecipeSchemaType) continue;
                 RecipeSchema schema = schemaType.schema;
+                if (schema == SpecialRecipeSchema.SCHEMA) continue;
 
                 ClassPath schemaPath = getSchemaClassPath(namespaceId, schemaId);
                 ClassDecl schemaDecl = generateSchemaClass(schemaId, schema, converter);

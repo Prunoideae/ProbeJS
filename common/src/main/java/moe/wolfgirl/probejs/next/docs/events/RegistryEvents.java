@@ -4,12 +4,11 @@ import dev.latvian.mods.kubejs.registry.BuilderType;
 import dev.latvian.mods.kubejs.registry.RegistryEventJS;
 import dev.latvian.mods.kubejs.registry.RegistryInfo;
 import dev.latvian.mods.kubejs.script.ScriptType;
-import moe.wolfgirl.probejs.next.ScriptDump;
+import moe.wolfgirl.probejs.next.typescript.ScriptDump;
 import moe.wolfgirl.probejs.next.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.next.plugin.ProbeJSPlugin;
 import moe.wolfgirl.probejs.next.typescript.TypeScriptFile;
 import moe.wolfgirl.probejs.next.typescript.code.member.ClassDecl;
-import moe.wolfgirl.probejs.next.typescript.code.member.ParamDecl;
 import moe.wolfgirl.probejs.next.typescript.code.ts.MethodDeclaration;
 import moe.wolfgirl.probejs.next.typescript.code.ts.Statements;
 import moe.wolfgirl.probejs.next.typescript.code.ts.Wrapped;
@@ -18,7 +17,6 @@ import moe.wolfgirl.probejs.next.utils.NameUtils;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -75,16 +73,7 @@ public class RegistryEvents extends ProbeJSPlugin {
         eventClass.methods.stream()
                 .filter(method -> method.name.equals("createCustom") && method.params.size() == 2)
                 .findAny()
-                .ifPresent(method -> {
-                    method.params = new ArrayList<>(method.params);
-                    method.params.set(1,
-                            new ParamDecl(
-                                    "object",
-                                    Types.lambda().returnType(Types.generic("T")).build(),
-                                    false,
-                                    false
-                            ));
-                });
+                .ifPresent(method -> method.params.get(1).type = Types.lambda().returnType(Types.generic("T")).build());
 
     }
 

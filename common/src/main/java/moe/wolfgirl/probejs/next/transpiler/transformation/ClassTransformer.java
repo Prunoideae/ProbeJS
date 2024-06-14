@@ -1,7 +1,13 @@
 package moe.wolfgirl.probejs.next.transpiler.transformation;
 
 import moe.wolfgirl.probejs.next.java.clazz.Clazz;
+import moe.wolfgirl.probejs.next.java.clazz.members.ConstructorInfo;
+import moe.wolfgirl.probejs.next.java.clazz.members.FieldInfo;
+import moe.wolfgirl.probejs.next.java.clazz.members.MethodInfo;
 import moe.wolfgirl.probejs.next.typescript.code.member.ClassDecl;
+import moe.wolfgirl.probejs.next.typescript.code.member.ConstructorDecl;
+import moe.wolfgirl.probejs.next.typescript.code.member.FieldDecl;
+import moe.wolfgirl.probejs.next.typescript.code.member.MethodDecl;
 
 /**
  * Accepts a Clazz and a transpiled TS file, modify the
@@ -9,7 +15,7 @@ import moe.wolfgirl.probejs.next.typescript.code.member.ClassDecl;
  */
 public interface ClassTransformer {
     ClassTransformer[] CLASS_TRANSFORMERS = new ClassTransformer[]{
-            new InjectInfo(),
+            new InjectAnnotation(),
             new InjectArray(),
             new InjectBeans(),
     };
@@ -20,5 +26,35 @@ public interface ClassTransformer {
         }
     }
 
+    static void transformMethods(MethodInfo methodInfo, MethodDecl methodDecl) {
+        for (ClassTransformer classTransformer : CLASS_TRANSFORMERS) {
+            classTransformer.transformMethod(methodInfo, methodDecl);
+        }
+    }
+
+    static void transformConstructors(ConstructorInfo constructorInfo, ConstructorDecl constructorDecl) {
+        for (ClassTransformer classTransformer : CLASS_TRANSFORMERS) {
+            classTransformer.transformConstructor(constructorInfo, constructorDecl);
+        }
+    }
+
+    static void transformFields(FieldInfo fieldInfo, FieldDecl fieldDecl) {
+        for (ClassTransformer classTransformer : CLASS_TRANSFORMERS) {
+            classTransformer.transformField(fieldInfo, fieldDecl);
+        }
+    }
+
     void transform(Clazz clazz, ClassDecl classDecl);
+
+    default void transformMethod(MethodInfo methodInfo, MethodDecl methodDecl) {
+
+    }
+
+    default void transformConstructor(ConstructorInfo constructorInfo, ConstructorDecl constructorDecl) {
+
+    }
+
+    default void transformField(FieldInfo fieldInfo, FieldDecl fieldDecl) {
+
+    }
 }

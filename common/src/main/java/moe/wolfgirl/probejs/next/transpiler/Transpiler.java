@@ -44,6 +44,14 @@ public class Transpiler {
             ClassDecl classDecl = transpiler.transpile(clazz);
             ClassTransformer.transformClass(clazz, classDecl);
 
+            if (!scriptManager.isClassAllowed(clazz.original.getName())) {
+                classDecl.addComment(
+                        "This class is not allowed By KubeJS!",
+                        "You should not load the class, or KubeJS will throw an error.",
+                        "Loading the class using require() will not throw an error, but the class will be undefined."
+                );
+            }
+
             TypeScriptFile scriptFile = new TypeScriptFile(clazz.classPath);
             scriptFile.addCode(classDecl);
 

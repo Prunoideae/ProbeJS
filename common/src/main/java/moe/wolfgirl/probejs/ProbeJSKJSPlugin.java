@@ -4,7 +4,8 @@ import dev.latvian.mods.kubejs.script.BindingsEvent;
 import moe.wolfgirl.probejs.features.plugin.ProbeJSEvents;
 import dev.latvian.mods.kubejs.script.ScriptType;
 import dev.latvian.mods.kubejs.util.ClassFilter;
-import moe.wolfgirl.probejs.next.ScriptDump;
+import moe.wolfgirl.probejs.next.snippet.SnippetDump;
+import moe.wolfgirl.probejs.next.typescript.ScriptDump;
 import moe.wolfgirl.probejs.next.ProbeEvents;
 import moe.wolfgirl.probejs.next.decompiler.ProbeDecompiler;
 import moe.wolfgirl.probejs.next.docs.ProbeBuiltinDocs;
@@ -97,5 +98,10 @@ public class ProbeJSKJSPlugin extends ProbeJSPlugin {
     @Override
     public Set<Class<?>> provideJavaClass(ScriptDump scriptDump) {
         return ProbeBuiltinDocs.INSTANCE.provideJavaClass(scriptDump);
+    }
+
+    @Override
+    public void addVSCodeSnippets(SnippetDump dump) {
+        ProbeBuiltinDocs.INSTANCE.addVSCodeSnippets(dump);
     }
 }

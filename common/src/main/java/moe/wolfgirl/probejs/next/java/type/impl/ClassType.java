@@ -18,13 +18,13 @@ public class ClassType extends TypeDescriptor {
     public ClassType(AnnotatedType type) {
         super(type.getAnnotations());
         clazz = (Class<?>) type.getType();
-        classPath = new ClassPath(RemapperUtils.getRemappedClassName(clazz));
+        classPath = new ClassPath(clazz);
     }
 
     public ClassType(Type type) {
         super(new Annotation[]{});
         clazz = (Class<?>) type;
-        classPath = new ClassPath(RemapperUtils.getRemappedClassName(clazz));
+        classPath = new ClassPath(clazz);
     }
 
     @Override

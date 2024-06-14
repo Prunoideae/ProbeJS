@@ -25,7 +25,7 @@ public class ConstructorDecl extends CommentableCode {
             paths.addAll(variable.getUsedClassPaths());
         }
         for (ParamDecl param : params) {
-            paths.addAll(param.type().getUsedClassPaths());
+            paths.addAll(param.type.getUsedClassPaths());
         }
         return paths;
     }

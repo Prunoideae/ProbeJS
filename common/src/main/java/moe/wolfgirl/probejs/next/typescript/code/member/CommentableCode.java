@@ -33,4 +33,21 @@ public abstract class CommentableCode extends Code {
             this.comments.addAll(List.of(comment.split("\\n")));
         }
     }
+
+    public void addCommentAtStart(String... comments) {
+        List<String> lines = new ArrayList<>();
+        for (String comment : comments) {
+            lines.addAll(List.of(comment.split("\\n")));
+        }
+        this.comments.addAll(0, lines);
+    }
+
+    public void linebreak() {
+        comments.add("");
+    }
+
+    public void newline(String... comments) {
+        this.comments.add("");
+        addComment(comments);
+    }
 }

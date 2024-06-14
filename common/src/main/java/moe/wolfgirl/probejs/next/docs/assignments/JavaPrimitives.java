@@ -5,7 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import dev.latvian.mods.unit.Unit;
-import moe.wolfgirl.probejs.next.ScriptDump;
+import moe.wolfgirl.probejs.next.typescript.ScriptDump;
 import moe.wolfgirl.probejs.next.docs.Primitives;
 import moe.wolfgirl.probejs.next.plugin.ProbeJSPlugin;
 import moe.wolfgirl.probejs.next.typescript.code.type.Types;

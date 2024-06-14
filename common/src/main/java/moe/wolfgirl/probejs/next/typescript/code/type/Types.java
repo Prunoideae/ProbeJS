@@ -16,6 +16,7 @@ public interface Types {
     JSPrimitiveType NUMBER = new JSPrimitiveType("number");
     JSPrimitiveType STRING = new JSPrimitiveType("string");
     JSPrimitiveType NEVER = new JSPrimitiveType("never");
+    JSPrimitiveType UNKNOWN = new JSPrimitiveType("unknown");
     JSPrimitiveType VOID = new JSPrimitiveType("void");
     JSPrimitiveType THIS = new JSPrimitiveType("this");
     JSPrimitiveType OBJECT = new JSPrimitiveType("object");

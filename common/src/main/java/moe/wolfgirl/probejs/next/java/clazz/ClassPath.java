@@ -12,12 +12,20 @@ import java.util.Arrays;
 import java.util.List;
 
 public record ClassPath(List<String> parts) {
+    private static List<String> transformJavaClass(Class<?> clazz) {
+        String name = RemapperUtils.getRemappedClassName(clazz);
+        String[] parts = name.split("\\.");
+        String className = "$" + parts[parts.length - 1];
+        parts[parts.length - 1] = className;
+        return Arrays.stream(parts).toList();
+    }
+
     public ClassPath(String className) {
         this(Arrays.stream(className.split("\\.")).toList());
     }
 
     public ClassPath(Class<?> clazz) {
-        this(RemapperUtils.getRemappedClassName(clazz));
+        this(transformJavaClass(clazz));
     }
 
     public String getName() {
@@ -32,12 +40,20 @@ public record ClassPath(List<String> parts) {
         return getConcatenated(".");
     }
 
+    public String getClassPathJava() {
+        List<String> copy = new ArrayList<>(parts);
+        String last = copy.get(copy.size() - 1);
+        if (last.startsWith("$")) last = last.substring(1);
+        copy.set(copy.size() - 1, last);
+        return String.join(".", copy);
+    }
+
     public String getTypeScriptPath() {
         return getConcatenated("/");
     }
 
     public Class<?> forName() throws ClassNotFoundException {
-        return Class.forName(getClassPath());
+        return Class.forName(getClassPathJava());
     }
 
     public List<String> getGenerics() throws ClassNotFoundException {

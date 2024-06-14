@@ -1,6 +1,7 @@
 package moe.wolfgirl.probejs.next.docs;
 
-import moe.wolfgirl.probejs.next.ScriptDump;
+import moe.wolfgirl.probejs.next.snippet.SnippetDump;
+import moe.wolfgirl.probejs.next.typescript.ScriptDump;
 import moe.wolfgirl.probejs.next.docs.assignments.EnumTypes;
 import moe.wolfgirl.probejs.next.docs.assignments.JavaPrimitives;
 import moe.wolfgirl.probejs.next.docs.assignments.WorldTypes;
@@ -14,9 +15,7 @@ import moe.wolfgirl.probejs.next.transpiler.Transpiler;
 import moe.wolfgirl.probejs.next.transpiler.TypeConverter;
 import moe.wolfgirl.probejs.next.typescript.TypeScriptFile;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Delegate calls to a set of internal ProbeJSPlugin to separate different
@@ -25,8 +24,10 @@ import java.util.Set;
 public class ProbeBuiltinDocs extends ProbeJSPlugin {
     public static final ProbeBuiltinDocs INSTANCE = new ProbeBuiltinDocs();
 
-    public final ProbeJSPlugin[] BUILTIN_DOCS = new ProbeJSPlugin[]{
+    // So docs can be added because we don't have access to forge stuffs here
+    public final static List<ProbeJSPlugin> BUILTIN_DOCS = new ArrayList<>(List.of(
             new RegistryTypes(),
+            new SpecialTypes(),
             new Primitives(),
             new JavaPrimitives(),
             new RecipeTypes(),
@@ -37,7 +38,8 @@ public class ProbeBuiltinDocs extends ProbeJSPlugin {
             new TagEvents(),
             new RecipeEvents(),
             new RegistryEvents(),
-    };
+            new ParamFix())
+    );
 
     @Override
     public void addGlobals(ScriptDump scriptDump) {
@@ -81,5 +83,12 @@ public class ProbeBuiltinDocs extends ProbeJSPlugin {
             allClasses.addAll(builtinDoc.provideJavaClass(scriptDump));
         }
         return allClasses;
+    }
+
+    @Override
+    public void addVSCodeSnippets(SnippetDump dump) {
+        for (ProbeJSPlugin builtinDoc : BUILTIN_DOCS) {
+            builtinDoc.addVSCodeSnippets(dump);
+        }
     }
 }

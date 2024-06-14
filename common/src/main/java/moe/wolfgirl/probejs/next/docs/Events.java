@@ -6,7 +6,7 @@ import com.mojang.datafixers.util.Pair;
 import dev.latvian.mods.kubejs.event.EventGroup;
 import dev.latvian.mods.kubejs.event.EventHandler;
 import dev.latvian.mods.kubejs.typings.desc.TypeDescJS;
-import moe.wolfgirl.probejs.next.ScriptDump;
+import moe.wolfgirl.probejs.next.typescript.ScriptDump;
 import moe.wolfgirl.probejs.next.plugin.ProbeJSPlugin;
 import moe.wolfgirl.probejs.next.transpiler.TypeConverter;
 import moe.wolfgirl.probejs.next.typescript.code.Code;

@@ -1,4 +1,4 @@
-package moe.wolfgirl.probejs.next;
+package moe.wolfgirl.probejs.next.typescript;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
@@ -18,8 +18,6 @@ import moe.wolfgirl.probejs.next.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.next.java.clazz.Clazz;
 import moe.wolfgirl.probejs.next.plugin.ProbeJSPlugin;
 import moe.wolfgirl.probejs.next.transpiler.Transpiler;
-import moe.wolfgirl.probejs.next.typescript.Declaration;
-import moe.wolfgirl.probejs.next.typescript.TypeScriptFile;
 import moe.wolfgirl.probejs.next.typescript.code.Code;
 import moe.wolfgirl.probejs.next.typescript.code.member.ClassDecl;
 import moe.wolfgirl.probejs.next.typescript.code.member.TypeDecl;
@@ -73,8 +71,6 @@ public class ScriptDump {
         this.transpiler = new Transpiler(manager);
         this.globals = new HashMap<>();
         this.accept = scriptPredicate;
-
-        ProbeJSPlugin.forEachPlugin(plugin -> plugin.assignType(this));
     }
 
     public void acceptClasses(Collection<Clazz> classes) {
@@ -133,7 +129,8 @@ public class ScriptDump {
         return ensurePath("src");
     }
 
-    public void dumpClasses() throws IOException, ClassNotFoundException {
+    public void dumpClasses() {
+        ProbeJSPlugin.forEachPlugin(plugin -> plugin.assignType(this));
         Path packageFolder = getPackageFolder();
 
         Map<ClassPath, TypeScriptFile> globalClasses = transpiler.dump(recordedClasses);

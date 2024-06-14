@@ -1,6 +1,7 @@
 package moe.wolfgirl.probejs.mixins;
 
 import moe.wolfgirl.probejs.ProbeConfig;
+import moe.wolfgirl.probejs.next.GlobalStates;
 import moe.wolfgirl.probejs.specials.special.FormatterLang;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import org.spongepowered.asm.mixin.Final;
@@ -25,11 +26,9 @@ public abstract class TranslatableMixin {
     private void init(CallbackInfo ci) {
         // So we populate keys even if no client storage is present
         // I wonder if this is CPU intensive but probably not (that much)
-        if (!ProbeConfig.INSTANCE.noAggressiveProbing) {
-            FormatterLang.modifyKeys(keys -> {
-                keys.add(key);
-                if (fallback != null) keys.add(fallback);
-            });
+        synchronized (GlobalStates.LANG_KEYS) {
+            GlobalStates.LANG_KEYS.add(key);
+            if (fallback != null) GlobalStates.LANG_KEYS.add(fallback);
         }
     }
 }

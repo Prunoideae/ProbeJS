@@ -9,7 +9,8 @@ import dev.latvian.mods.kubejs.level.gen.filter.mob.MobFilter;
 import dev.latvian.mods.kubejs.recipe.ReplacementMatch;
 import dev.latvian.mods.kubejs.util.NotificationBuilder;
 import dev.latvian.mods.rhino.mod.util.color.Color;
-import moe.wolfgirl.probejs.next.ScriptDump;
+import dev.latvian.mods.rhino.mod.wrapper.ColorWrapper;
+import moe.wolfgirl.probejs.next.typescript.ScriptDump;
 import moe.wolfgirl.probejs.next.docs.Primitives;
 import moe.wolfgirl.probejs.next.plugin.ProbeJSPlugin;
 import moe.wolfgirl.probejs.next.typescript.code.type.BaseType;
@@ -17,6 +18,10 @@ import moe.wolfgirl.probejs.next.typescript.code.type.Types;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TextColor;
 import net.minecraft.stats.Stat;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.MobCategory;
@@ -31,8 +36,6 @@ import net.minecraft.world.level.levelgen.placement.BiomeFilter;
 import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.functions.CopyNameFunction;
-
-import java.awt.*;
 
 public class WorldTypes extends ProbeJSPlugin {
     @Override
@@ -101,5 +104,64 @@ public class WorldTypes extends ProbeJSPlugin {
                 .returnType(Types.type(Color.class))
                 .build());
 
+        scriptDump.assignType(Component.class, Types.STRING);
+        scriptDump.assignType(Component.class, Types.object()
+                .member("text?", Types.STRING)
+                .member("translate?", Types.primitive("Special.LangKey"))
+                .member("with?", Types.ANY.asArray())
+                .member("color?", Types.type(Color.class))
+                .member("bold?", Types.BOOLEAN)
+                .member("italic?", Types.BOOLEAN)
+                .member("underlined?", Types.BOOLEAN)
+                .member("strikethrough?", Types.BOOLEAN)
+                .member("obfuscated?", Types.BOOLEAN)
+                .member("insertion?", Types.STRING)
+                .member("font?", Types.STRING)
+                .member("click?", Types.type(ClickEvent.class))
+                .member("hover?", Types.type(Component.class))
+                .member("extra?", Types.type(Component.class).asArray())
+                .build());
+        scriptDump.assignType(Component.class, Types.type(Component.class).asArray());
+
+        scriptDump.assignType(MutableComponent.class, Types.STRING);
+        scriptDump.assignType(MutableComponent.class, Types.object()
+                .member("text?", Types.STRING)
+                .member("translate?", Types.primitive("Special.LangKey"))
+                .member("with?", Types.ANY.asArray())
+                .member("color?", Types.type(Color.class))
+                .member("bold?", Types.BOOLEAN)
+                .member("italic?", Types.BOOLEAN)
+                .member("underlined?", Types.BOOLEAN)
+                .member("strikethrough?", Types.BOOLEAN)
+                .member("obfuscated?", Types.BOOLEAN)
+                .member("insertion?", Types.STRING)
+                .member("font?", Types.STRING)
+                .member("click?", Types.type(ClickEvent.class))
+                .member("hover?", Types.type(MutableComponent.class))
+                .member("extra?", Types.type(MutableComponent.class).asArray())
+                .build());
+        scriptDump.assignType(MutableComponent.class, Types.type(MutableComponent.class).asArray());
+
+        BaseType[] predefinedColors = ColorWrapper.MAP.keySet().stream().map(Types::generic).toArray(BaseType[]::new);
+        scriptDump.assignType(Color.class, Types.or(predefinedColors));
+        scriptDump.assignType(Color.class, Types.primitive("`#${string}`"));
+        scriptDump.assignType(Color.class, Primitives.INTEGER);
+
+        scriptDump.assignType(TextColor.class, Types.or(predefinedColors));
+        scriptDump.assignType(TextColor.class, Types.primitive("`#${string}`"));
+        scriptDump.assignType(TextColor.class, Primitives.INTEGER);
+
+        BaseType[] actions = new BaseType[]{
+                Types.literal("open_url"),
+                Types.literal("open_file"),
+                Types.literal("run_command"),
+                Types.literal("suggest_command"),
+                Types.literal("change_page"),
+                Types.literal("copy_to_clipboard"),
+        };
+        scriptDump.assignType(ClickEvent.class, Types.object()
+                .member("action", Types.or(actions))
+                .member("value", Types.STRING)
+                .build());
     }
 }

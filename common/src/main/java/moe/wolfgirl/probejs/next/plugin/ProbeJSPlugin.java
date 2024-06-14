@@ -3,7 +3,8 @@ package moe.wolfgirl.probejs.next.plugin;
 import com.mojang.datafixers.util.Pair;
 import dev.latvian.mods.kubejs.KubeJSPlugin;
 import dev.latvian.mods.kubejs.util.KubeJSPlugins;
-import moe.wolfgirl.probejs.next.ScriptDump;
+import moe.wolfgirl.probejs.next.snippet.SnippetDump;
+import moe.wolfgirl.probejs.next.typescript.ScriptDump;
 import moe.wolfgirl.probejs.next.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.next.transpiler.Transpiler;
 import moe.wolfgirl.probejs.next.transpiler.TypeConverter;
@@ -86,5 +87,9 @@ public class ProbeJSPlugin extends KubeJSPlugin {
      */
     public Set<Pair<String, String>> disableEventDumps(ScriptDump dump) {
         return Set.of();
+    }
+
+    public void addVSCodeSnippets(SnippetDump dump) {
+
     }
 }

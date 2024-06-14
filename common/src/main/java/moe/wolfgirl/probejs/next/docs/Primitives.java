@@ -1,6 +1,6 @@
 package moe.wolfgirl.probejs.next.docs;
 
-import moe.wolfgirl.probejs.next.ScriptDump;
+import moe.wolfgirl.probejs.next.typescript.ScriptDump;
 import moe.wolfgirl.probejs.next.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.next.plugin.ProbeJSPlugin;
 import moe.wolfgirl.probejs.next.transpiler.TypeConverter;

@@ -16,7 +16,7 @@ public class AnnotationHolder {
     }
 
     public boolean hasAnnotation(Class<? extends Annotation> annotation) {
-        return Arrays.stream(annotations).anyMatch(a -> annotation.isAssignableFrom(a.annotationType()));
+        return Arrays.stream(annotations).anyMatch(annotation::isInstance);
     }
 
     @SuppressWarnings("unchecked")
@@ -25,5 +25,10 @@ public class AnnotationHolder {
                 .filter(type::isInstance)
                 .map(a -> (T) a)
                 .toList();
+    }
+
+    public <T extends Annotation> T getAnnotation(Class<T> type) {
+        var annotations = getAnnotations(type);
+        return annotations.isEmpty() ? null : annotations.get(0);
     }
 }

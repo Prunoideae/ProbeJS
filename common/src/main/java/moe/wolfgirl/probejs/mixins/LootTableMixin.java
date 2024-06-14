@@ -1,5 +1,6 @@
 package moe.wolfgirl.probejs.mixins;
 
+import moe.wolfgirl.probejs.next.GlobalStates;
 import moe.wolfgirl.probejs.specials.special.FormatterLootTable;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.storage.loot.LootDataManager;
@@ -17,7 +18,10 @@ import java.util.stream.Collectors;
 public class LootTableMixin {
     @Inject(method = "apply*", at = @At("RETURN"))
     public void apply(Map<LootDataType<?>, Map<ResourceLocation, ?>> parsedMap, CallbackInfo ci) {
-        FormatterLootTable.LOOT_TABLES.clear();
-        FormatterLootTable.LOOT_TABLES.addAll(parsedMap.values().stream().map(Map::keySet).flatMap(Collection::stream).collect(Collectors.toSet()));
+        for (Map<ResourceLocation, ?> value : parsedMap.values()) {
+            for (ResourceLocation resourceLocation : value.keySet()) {
+                GlobalStates.LOOT_TABLES.add(resourceLocation.toString());
+            }
+        }
     }
 }

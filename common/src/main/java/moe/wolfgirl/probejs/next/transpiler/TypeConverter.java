@@ -1,6 +1,7 @@
 package moe.wolfgirl.probejs.next.transpiler;
 
 import dev.latvian.mods.kubejs.script.ScriptManager;
+import dev.latvian.mods.kubejs.typings.Generics;
 import dev.latvian.mods.kubejs.typings.desc.*;
 import moe.wolfgirl.probejs.next.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.next.java.type.TypeDescriptor;
@@ -39,8 +40,6 @@ public class TypeConverter {
 
     public BaseType convertType(TypeDescriptor descriptor) {
         if (descriptor instanceof ClassType classType) {
-            if (!scriptManager.isClassAllowed(classType.classPath.getClassPath())) return Types.ANY;
-
             return predefinedTypes.getOrDefault(
                     classType.classPath,
                     new TSClassType(classType.classPath)
@@ -48,6 +47,15 @@ public class TypeConverter {
         } else if (descriptor instanceof ArrayType arrayType) {
             return new TSArrayType(convertType(arrayType.component));
         } else if (descriptor instanceof ParamType paramType) {
+            Generics generics = paramType.getAnnotation(Generics.class);
+            if (generics != null) {
+                BaseType baseType = new TSClassType(new ClassPath(generics.base()));
+                List<BaseType> params = Arrays.stream(generics.value())
+                        .map(c -> (BaseType) new TSClassType(new ClassPath(c)))
+                        .toList();
+                return new TSParamType(baseType, params);
+            }
+
             BaseType base = convertType(paramType.base);
             if (base == Types.ANY) return Types.ANY;
             List<BaseType> params = paramType.params.stream().map(this::convertType).toList();
@@ -102,8 +110,8 @@ public class TypeConverter {
             return new JSLambdaType(
                     lambdaType.params.stream()
                             .map(t -> new ParamDecl(
-                                    t.name(), convertType(t.type()),
-                                    t.varArg(), t.optional()
+                                    t.name, convertType(t.type),
+                                    t.varArg, t.optional
                             )).toList(),
                     convertType(lambdaType.returnType)
             );
@@ -119,6 +127,15 @@ public class TypeConverter {
                     .map(this::convertType)
                     .toList());
         } else if (typeDesc instanceof GenericDescJS genericDesc) {
+            if (genericDesc.type() instanceof PrimitiveDescJS primitiveDesc && primitiveDesc.type().equals("Map")) {
+                if (genericDesc.types().length != 2) return Types.ANY;
+                BaseType valueType = convertType(genericDesc.types()[1]);
+                return Types.custom(
+                        (decl, formatType) -> "{[k: string]: %s}".formatted(valueType.line(decl, formatType)),
+                        valueType.getUsedClassPaths().toArray(new ClassPath[0])
+                );
+            }
+
             return new TSParamType(
                     convertType(genericDesc.type()),
                     Arrays.stream(genericDesc.types()).map(this::convertType).toList()
@@ -138,9 +155,10 @@ public class TypeConverter {
             String content = primitiveDesc.type();
             if (content.startsWith(PROBEJS_PREFIX)) {
                 content = content.substring(PROBEJS_PREFIX.length());
-                return new TSClassType(new ClassPath(content));
+                String[] parts = content.split("\\.");
+                parts[parts.length - 1] = "$" + parts[parts.length - 1];
+                return new TSClassType(new ClassPath(Arrays.stream(parts).toList()));
             } else {
-                if (content.equals("Map")) return Types.type(Map.class);
                 return Types.primitive(content);
             }
         }

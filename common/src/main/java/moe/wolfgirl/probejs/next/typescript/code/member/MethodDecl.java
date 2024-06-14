@@ -21,8 +21,8 @@ public class MethodDecl extends CommentableCode {
 
     public MethodDecl(String name, List<TSVariableType> variableTypes, List<ParamDecl> params, BaseType returnType) {
         this.name = name;
-        this.variableTypes = variableTypes;
-        this.params = params;
+        this.variableTypes = new ArrayList<>(variableTypes);
+        this.params = new ArrayList<>(params);
         this.returnType = returnType;
     }
 
@@ -34,7 +34,7 @@ public class MethodDecl extends CommentableCode {
             paths.addAll(variableType.getUsedClassPaths());
         }
         for (ParamDecl param : params) {
-            paths.addAll(param.type().getUsedClassPaths());
+            paths.addAll(param.type.getUsedClassPaths());
         }
         return paths;
     }

@@ -22,7 +22,7 @@ public class JSLambdaType extends BaseType {
     public Collection<ClassPath> getUsedClassPaths() {
         Set<ClassPath> classPaths = new HashSet<>(returnType.getUsedClassPaths());
         for (ParamDecl param : params) {
-            classPaths.addAll(param.type().getUsedClassPaths());
+            classPaths.addAll(param.type.getUsedClassPaths());
         }
         return classPaths;
     }

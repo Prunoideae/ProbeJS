@@ -9,6 +9,9 @@ import moe.wolfgirl.probejs.next.java.clazz.members.ParamInfo;
 import moe.wolfgirl.probejs.next.java.type.TypeDescriptor;
 import moe.wolfgirl.probejs.next.java.type.impl.VariableType;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
 public class ClassRegistry {
@@ -104,5 +107,22 @@ public class ClassRegistry {
 
     public Map<ClassPath, Clazz> getFoundClasses() {
         return foundClasses;
+    }
+
+    public void writeTo(Path path) throws IOException {
+        try (var writer = Files.newBufferedWriter(path)) {
+            for (ClassPath classPath : foundClasses.keySet()) {
+                writer.write(classPath.getClassPathJava() + "\n");
+            }
+        }
+    }
+
+    public void loadFrom(Path path) {
+        try (var reader = Files.newBufferedReader(path)) {
+            for (String className : (Iterable<String>) reader.lines()::iterator) {
+
+            }
+        } catch (IOException ignored) {
+        }
     }
 }

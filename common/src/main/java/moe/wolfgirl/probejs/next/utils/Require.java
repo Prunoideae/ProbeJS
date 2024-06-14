@@ -21,7 +21,7 @@ public class Require extends BaseFunction {
         String[] parts = result.split("/", 2);
         ClassPath path = new ClassPath(Arrays.stream(parts[1].split("/")).toList());
 
-        var loaded = innerWrapper.tryLoadClass(path.getClassPath());
+        var loaded = innerWrapper.tryLoadClass(path.getClassPathJava());
         return new RequireWrapper(path, loaded == null ? Undefined.instance : loaded);
     }
 
@@ -36,7 +36,7 @@ public class Require extends BaseFunction {
 
         @Override
         public String getClassName() {
-            return path.getClassPath();
+            return path.getClassPathJava();
         }
 
         @Override

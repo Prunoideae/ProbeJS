@@ -1,13 +1,16 @@
 package moe.wolfgirl.probejs.next.transpiler;
 
 import moe.wolfgirl.probejs.next.java.clazz.Clazz;
+import moe.wolfgirl.probejs.next.java.clazz.members.ConstructorInfo;
+import moe.wolfgirl.probejs.next.java.clazz.members.FieldInfo;
+import moe.wolfgirl.probejs.next.java.clazz.members.MethodInfo;
 import moe.wolfgirl.probejs.next.java.type.impl.VariableType;
 import moe.wolfgirl.probejs.next.transpiler.members.Constructor;
 import moe.wolfgirl.probejs.next.transpiler.members.Converter;
 import moe.wolfgirl.probejs.next.transpiler.members.Field;
 import moe.wolfgirl.probejs.next.transpiler.members.Method;
-import moe.wolfgirl.probejs.next.typescript.code.member.ClassDecl;
-import moe.wolfgirl.probejs.next.typescript.code.member.InterfaceDecl;
+import moe.wolfgirl.probejs.next.transpiler.transformation.ClassTransformer;
+import moe.wolfgirl.probejs.next.typescript.code.member.*;
 import moe.wolfgirl.probejs.next.typescript.code.type.BaseType;
 import moe.wolfgirl.probejs.next.typescript.code.type.TSVariableType;
 import moe.wolfgirl.probejs.next.typescript.code.type.Types;
@@ -53,11 +56,23 @@ public class ClassTranspiler extends Converter<Clazz, ClassDecl> {
                                 variableTypes
                         );
 
-        decl.fields.addAll(input.fields.stream().map(field::transpile).toList());
-        decl.methods.addAll(input.methods.stream().map(method::transpile).toList());
-        decl.constructors.addAll(input.constructors.stream().map(constructor::transpile).toList());
-        decl.isAbstract = input.attribute.isAbstract;
+        for (FieldInfo fieldInfo : input.fields) {
+            var fieldDecl = field.transpile(fieldInfo);
+            ClassTransformer.transformFields(fieldInfo, fieldDecl);
+            decl.fields.add(fieldDecl);
+        }
 
+        for (MethodInfo methodInfo : input.methods) {
+            var methodDecl = method.transpile(methodInfo);
+            ClassTransformer.transformMethods(methodInfo, methodDecl);
+            decl.methods.add(methodDecl);
+        }
+
+        for (ConstructorInfo constructorInfo : input.constructors) {
+            var constructorDecl = constructor.transpile(constructorInfo);
+            ClassTransformer.transformConstructors(constructorInfo, constructorDecl);
+            decl.constructors.add(constructorDecl);
+        }
         return decl;
     }
 }

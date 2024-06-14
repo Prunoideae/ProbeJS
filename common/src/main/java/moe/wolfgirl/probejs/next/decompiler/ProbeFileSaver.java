@@ -26,7 +26,9 @@ public class ProbeFileSaver implements IResultSaver {
 
     @Override
     public void saveClassFile(String path, String qualifiedName, String entryName, String content, int[] mapping) {
-        ClassPath classPath = new ClassPath(qualifiedName.replace("/", "."));
+        String[] parts = qualifiedName.split("/");
+        parts[parts.length - 1] = "$" + parts[parts.length - 1];
+        ClassPath classPath = new ClassPath(List.of(parts));
         result.put(classPath, new ParsedDocument(content));
     }
 

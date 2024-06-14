@@ -7,7 +7,7 @@ import dev.latvian.mods.kubejs.recipe.InputReplacement;
 import dev.latvian.mods.kubejs.recipe.OutputReplacement;
 import dev.latvian.mods.kubejs.recipe.filter.RecipeFilter;
 import dev.latvian.mods.kubejs.recipe.ingredientaction.IngredientActionFilter;
-import moe.wolfgirl.probejs.next.ScriptDump;
+import moe.wolfgirl.probejs.next.typescript.ScriptDump;
 import moe.wolfgirl.probejs.next.docs.Primitives;
 import moe.wolfgirl.probejs.next.plugin.ProbeJSPlugin;
 import moe.wolfgirl.probejs.next.typescript.code.type.Types;
@@ -16,7 +16,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.material.Fluid;
 
-import java.lang.reflect.Type;
 import java.util.Set;
 
 public class RecipeTypes extends ProbeJSPlugin {
@@ -42,7 +41,7 @@ public class RecipeTypes extends ProbeJSPlugin {
         scriptDump.assignType(InputItem.class, Types.type(Ingredient.class));
         scriptDump.assignType(InputItem.class, Types.primitive("`${number}x ${Special.Item}`"));
 
-        scriptDump.assignType(OutputItem.class, Types.typeOf(ItemStack.class));
+        scriptDump.assignType(OutputItem.class, Types.type(ItemStack.class));
         scriptDump.assignType(OutputItem.class, Types.object()
                 .member("item", Types.primitive("Special.Item"))
                 .member("chance", Primitives.DOUBLE)
@@ -72,7 +71,7 @@ public class RecipeTypes extends ProbeJSPlugin {
                 .member("output?", Types.type(OutputItem.class))
                 .build());
         scriptDump.assignType(FluidStackJS.class, Types.type(Fluid.class));
-        scriptDump.assignType(FluidStackJS.class, Types.primitive("-"));
+        scriptDump.assignType(FluidStackJS.class, Types.literal("-"));
         scriptDump.assignType(FluidStackJS.class, Types.object()
                 .member("fluid", Types.primitive("Special.Fluid"))
                 .member("amount?", Primitives.INTEGER)

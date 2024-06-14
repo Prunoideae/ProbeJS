@@ -1,12 +1,14 @@
 package moe.wolfgirl.probejs.mixins;
 
-import moe.wolfgirl.probejs.docs.DocCompiler;
 import dev.latvian.mods.kubejs.script.ScriptManager;
 import dev.latvian.mods.rhino.NativeJavaClass;
+import moe.wolfgirl.probejs.next.java.ClassRegistry;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import java.util.Collections;
 
 @Mixin(ScriptManager.class)
 public class OnJavaMixin {
@@ -14,6 +16,6 @@ public class OnJavaMixin {
     public void loadJavaClass(String name0, boolean warn, CallbackInfoReturnable<NativeJavaClass> cir) {
         var result = cir.getReturnValue();
         if (result == null) return;
-        DocCompiler.CapturedClasses.capturedJavaClasses.add(result.getClassObject());
+        ClassRegistry.REGISTRY.fromClasses(Collections.singleton(result.getClassObject()));
     }
 }

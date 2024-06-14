@@ -38,7 +38,8 @@ public class InterfaceDecl extends ClassDecl {
         List<String> body = new ArrayList<>();
 
         for (FieldDecl field : fields) {
-            if (!field.isStatic) throw new RuntimeException("Why an interface can have a non-static field?");
+            // if (!field.isStatic) throw new RuntimeException("Why an interface can have a non-static field?");
+            // Because ProbeJS can add non-static fields to it... And it's legal in TypeScript.
             namespace.addCode(new VariableDeclaration(
                     field.name,
                     field.type
@@ -75,8 +76,8 @@ public class InterfaceDecl extends ClassDecl {
         formatted.addAll(body);
         formatted.add("}\n");
 
-        // Static methods and fields
-        if (!namespace.isEmpty()) formatted.addAll(namespace.format(declaration));
+        // Static methods and fields, adds it even if it's empty, so auto import can still discover it
+        formatted.addAll(namespace.format(declaration));
         return formatted;
     }
 }
