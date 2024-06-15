@@ -1,0 +1,17 @@
+{
+    "probejs.dump.start": "ProbeJS 类型生成已启动。",
+    "probejs.dump.snippets_generated": "VSCode快捷脚本已生成。",
+    "probejs.dump.mod_changed": "检测到模组环境变动。",
+    "probejs.dump.decompiling": "反编译模组中，这可能需要一段时间。",
+    "probejs.dump.decompiled_x_class": "已反编译 %s 个类。",
+    "probejs.dump.class_discovered": "已发现需要生成类型文件的 %s 个类。",
+    "probejs.dump.dump_finished": "脚本类型 %s 的生成已完成。",
+    "probejs.dump.dump_error": "脚本类型 %s 的生成失败了，这大概可能也许是一个bug……",
+    "probejs.dump.report_progress": "生成类型文件中……当前进度：",
+    "probejs.dump.cleaning": "清理上一版本的类型文件中……这可能需要一点时间。",
+    "probejs.hello": "欢迎来到ProbeJS。即将生成类型文件。",
+    "probejs.enabled_warning": "ProbeJS正在运行！在你导出整合包之前，请排除生成的类型文件，并使用命令关闭ProbeJS：",
+    "probejs.bye_bye": "ProbeJS已被关闭。require() 仍可正常运行。记得不要打包类型文件。",
+    "probejs.removed_script": "已清理脚本类型 %s 的类型文件。",
+    "probejs.hello_again": "ProbeJS已开启，祝你生活美满。"
+}

@@ -119,12 +119,12 @@ public class ClassRegistry {
 
     public void loadFrom(Path path) {
         try (var reader = Files.newBufferedReader(path)) {
-            try {
-                for (String className : (Iterable<String>) reader.lines()::iterator) {
+            for (String className : (Iterable<String>) reader.lines()::iterator) {
+                try {
                     Class<?> loaded = Class.forName(className);
                     fromClasses(Collections.singleton(loaded));
+                } catch (Throwable ignored) {
                 }
-            } catch (Throwable ignored) {
             }
         } catch (IOException ignored) {
         }

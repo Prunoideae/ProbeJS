@@ -13,6 +13,8 @@ import java.util.stream.Collectors;
 
 public class ProbeFileSaver implements IResultSaver {
     public final Map<ClassPath, ParsedDocument> result = new HashMap<>();
+    private Runnable callback;
+    public int classCount = 0;
 
     @Override
     public void saveFolder(String path) {
@@ -30,6 +32,8 @@ public class ProbeFileSaver implements IResultSaver {
         parts[parts.length - 1] = "$" + parts[parts.length - 1];
         ClassPath classPath = new ClassPath(List.of(parts));
         result.put(classPath, new ParsedDocument(content));
+        classCount++;
+        if (callback != null) callback.run();
     }
 
     @Override
@@ -51,6 +55,8 @@ public class ProbeFileSaver implements IResultSaver {
     public void saveClassEntry(String path, String archiveName, String qualifiedName, String entryName, String content) {
         ClassPath classPath = new ClassPath(qualifiedName.replace("/", "."));
         result.put(classPath, new ParsedDocument(content));
+        classCount++;
+        if (callback != null) callback.run();
     }
 
     @Override
@@ -88,5 +94,10 @@ public class ProbeFileSaver implements IResultSaver {
             }
         }
         return classes;
+    }
+
+    public ProbeFileSaver callback(Runnable callback) {
+        this.callback = callback;
+        return this;
     }
 }

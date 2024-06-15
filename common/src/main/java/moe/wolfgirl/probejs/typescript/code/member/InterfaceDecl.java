@@ -1,6 +1,8 @@
 package moe.wolfgirl.probejs.typescript.code.member;
 
+import moe.wolfgirl.probejs.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.typescript.Declaration;
+import moe.wolfgirl.probejs.typescript.code.Code;
 import moe.wolfgirl.probejs.typescript.code.ts.MethodDeclaration;
 import moe.wolfgirl.probejs.typescript.code.ts.VariableDeclaration;
 import moe.wolfgirl.probejs.typescript.code.ts.Wrapped;
@@ -9,6 +11,7 @@ import moe.wolfgirl.probejs.typescript.code.type.TSVariableType;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -54,6 +57,21 @@ public class InterfaceDecl extends ClassDecl {
                     method.returnType
             ));
             else body.addAll(method.format(declaration));
+        }
+
+        // Adds a marker in it to prevent VSCode from not recognizing the namespace to import
+        if (namespace.isEmpty()) {
+            namespace.addCode(new Code() {
+                @Override
+                public Collection<ClassPath> getUsedClassPaths() {
+                    return List.of();
+                }
+
+                @Override
+                public List<String> format(Declaration declaration) {
+                    return List.of("probejs$$marker: never");
+                }
+            });
         }
 
         // Use hybrid to represent functional interfaces

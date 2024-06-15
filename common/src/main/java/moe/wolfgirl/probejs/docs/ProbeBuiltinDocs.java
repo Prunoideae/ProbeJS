@@ -38,8 +38,9 @@ public class ProbeBuiltinDocs extends ProbeJSPlugin {
             new TagEvents(),
             new RecipeEvents(),
             new RegistryEvents(),
-            new ParamFix())
-    );
+            new ParamFix(),
+            new Snippets()
+    ));
 
     @Override
     public void addGlobals(ScriptDump scriptDump) {

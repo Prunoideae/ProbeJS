@@ -41,6 +41,7 @@ public class ProbeDecompiler {
     }
 
     public void decompileContext() {
+        resultSaver.classCount = 0;
         try {
             engine.decompileContext();
         } finally {

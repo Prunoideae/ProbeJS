@@ -12,6 +12,7 @@ import dev.latvian.mods.kubejs.script.ScriptType;
 import dev.latvian.mods.kubejs.server.ServerScriptManager;
 import dev.latvian.mods.kubejs.util.UtilsJS;
 import moe.wolfgirl.probejs.ProbeJS;
+import moe.wolfgirl.probejs.ProbePaths;
 import moe.wolfgirl.probejs.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.java.clazz.Clazz;
 import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
@@ -41,16 +42,19 @@ import java.util.function.Supplier;
 public class ScriptDump {
     public static final Supplier<ScriptDump> SERVER_DUMP = () -> new ScriptDump(
             ServerScriptManager.getScriptManager(),
+            ProbePaths.PROBE.resolve("server"),
             KubeJSPaths.SERVER_SCRIPTS,
             (clazz -> true)
     );
     public static final Supplier<ScriptDump> CLIENT_DUMP = () -> new ScriptDump(
             KubeJS.getClientScriptManager(),
+            ProbePaths.PROBE.resolve("client"),
             KubeJSPaths.CLIENT_SCRIPTS,
             (clazz -> true)
     );
     public static final Supplier<ScriptDump> STARTUP_DUMP = () -> new ScriptDump(
             KubeJS.getStartupScriptManager(),
+            ProbePaths.PROBE.resolve("startup"),
             KubeJSPaths.STARTUP_SCRIPTS,
             (clazz -> true)
     );
@@ -58,16 +62,20 @@ public class ScriptDump {
     public final ScriptType scriptType;
     public final ScriptManager manager;
     public final Path basePath;
+    public final Path scriptPath;
     public final Map<String, Pair<Collection<String>, Wrapped.Global>> globals;
     public final Transpiler transpiler;
     public final Set<Clazz> recordedClasses = new HashSet<>();
     private final Predicate<Clazz> accept;
     private final Multimap<ClassPath, BaseType> convertibles = ArrayListMultimap.create();
+    public int dumped = 0;
+    public int total = 0;
 
-    public ScriptDump(ScriptManager manager, Path basePath, Predicate<Clazz> scriptPredicate) {
+    public ScriptDump(ScriptManager manager, Path basePath, Path scriptPath, Predicate<Clazz> scriptPredicate) {
         this.scriptType = manager.scriptType;
         this.manager = manager;
         this.basePath = basePath;
+        this.scriptPath = scriptPath;
         this.transpiler = new Transpiler(manager);
         this.globals = new HashMap<>();
         this.accept = scriptPredicate;
@@ -105,8 +113,13 @@ public class ScriptDump {
         globals.put(identifier, new Pair<>(excludedNames, global));
     }
 
+
     public Path ensurePath(String path) {
-        Path full = basePath.resolve(path);
+        return ensurePath(path, false);
+    }
+
+    public Path ensurePath(String path, boolean script) {
+        Path full = (script ? scriptPath : basePath).resolve(path);
         if (Files.notExists(full)) {
             UtilsJS.tryIO(() -> Files.createDirectories(full));
         }
@@ -126,15 +139,18 @@ public class ScriptDump {
     }
 
     public Path getSource() {
-        return ensurePath("src");
+        return ensurePath("src", true);
     }
 
-    public void dumpClasses() {
+    public void dumpClasses() throws IOException {
+        dumped = 0;
+        total = 0;
         ProbeJSPlugin.forEachPlugin(plugin -> plugin.assignType(this));
         Path packageFolder = getPackageFolder();
 
         Map<ClassPath, TypeScriptFile> globalClasses = transpiler.dump(recordedClasses);
         ProbeJSPlugin.forEachPlugin(plugin -> plugin.modifyClasses(this, globalClasses));
+        total = globalClasses.size();
         for (Map.Entry<ClassPath, TypeScriptFile> entry : globalClasses.entrySet()) {
             try {
                 ClassPath classPath = entry.getKey();
@@ -191,10 +207,12 @@ public class ScriptDump {
                 output.write(dir.resolve(
                         "%s.d.ts".formatted(classPath.getName())
                 ));
+                dumped++;
             } catch (Throwable t) {
                 t.printStackTrace();
             }
         }
+        (new TypeScriptFile(null)).write(getPackageFolder().resolve("index.d.ts"));
     }
 
     public void dumpGlobal() throws IOException {
@@ -213,10 +231,11 @@ public class ScriptDump {
             globalFile.addCode(global);
             globalFile.write(getGlobalFolder().resolve(identifier + ".d.ts"));
         }
+        (new TypeScriptFile(null)).write(getGlobalFolder().resolve("index.d.ts"));
     }
 
     public void dumpJSConfig() throws IOException {
-        writeMergedConfig(basePath.resolve("jsconfig.json"), """
+        writeMergedConfig(scriptPath.resolve("jsconfig.json"), """
                 {
                     "compilerOptions": {
                         "module": "commonjs",
@@ -225,15 +244,24 @@ public class ScriptDump {
                             "ES5",
                             "ES2015"
                         ],
-                        "rootDirs": [
-                            "./src",
-                            "./probe-types"
+                        "rootDir": "./src",
+                        "typeRoots": [
+                            "../../.probe/%s/probe-types"
                         ],
-                        "baseUrl": "./probe-types",
+                        "baseUrl": "../../.probe/%s/probe-types",
                         "skipLibCheck": true
-                    }
+                    },
+                    "include": [
+                        "./src/**/*",
+                        "../../.probe/%s/probe-types/**/*"
+                    ]
                 }
-                """);
+                """.formatted(basePath.getFileName(), basePath.getFileName(), basePath.getFileName())
+        );
+    }
+
+    public void removeClasses() throws IOException {
+        FileUtils.deleteDirectory(getTypeFolder().toFile());
     }
 
     public void dump() throws IOException, ClassNotFoundException {
@@ -241,21 +269,21 @@ public class ScriptDump {
 
         /*
          * TODO:
-         *  ├── client_script
-         *  │   ├── src/
-         *  │   ├── jsconfig.json
-         *  │   └── probe-types/
-         *  ├── server_script
-         *  │   ├── src/
-         *  │   ├── jsconfig.json
-         *  │   └── probe-types/
-         *  └── startup_script
-         *      ├── src/
-         *      ├── jsconfig.json
-         *      └── probe-types/
+         * .probe
+         *   │
+         *   ├── client
+         *   │   ├── probe-typings
+         *   │   └── globals
+         *   │
+         *   ├── server
+         *   │   ├── probe-typings
+         *   │   └── globals
+         *   │
+         *   └── startup
+         *       ├── probe-typings
+         *       └── globals
          */
 
-        FileUtils.deleteDirectory(getTypeFolder().toFile());
         dumpClasses();
         dumpGlobal();
         dumpJSConfig();
