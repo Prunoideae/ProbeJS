@@ -2,7 +2,7 @@ package moe.wolfgirl.probejs.mixins;
 
 import dev.latvian.mods.kubejs.script.ScriptManager;
 import dev.latvian.mods.rhino.NativeJavaClass;
-import moe.wolfgirl.probejs.next.java.ClassRegistry;
+import moe.wolfgirl.probejs.java.ClassRegistry;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

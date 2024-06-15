@@ -3,7 +3,7 @@ package moe.wolfgirl.probejs.forge;
 import moe.wolfgirl.probejs.ProbeJS;
 import dev.architectury.platform.forge.EventBuses;
 import moe.wolfgirl.probejs.forge.docs.ForgeEventDoc;
-import moe.wolfgirl.probejs.next.docs.ProbeBuiltinDocs;
+import moe.wolfgirl.probejs.docs.ProbeBuiltinDocs;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;

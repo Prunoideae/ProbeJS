@@ -1,8 +1,7 @@
 package moe.wolfgirl.probejs.mixins;
 
 import com.google.gson.JsonObject;
-import moe.wolfgirl.probejs.next.GlobalStates;
-import moe.wolfgirl.probejs.specials.special.FormatterRecipeId;
+import moe.wolfgirl.probejs.GlobalStates;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
@@ -12,7 +11,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @Mixin(value = RecipeManager.class, priority = 900)

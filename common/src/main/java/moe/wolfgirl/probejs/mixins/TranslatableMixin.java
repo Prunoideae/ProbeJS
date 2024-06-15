@@ -1,8 +1,6 @@
 package moe.wolfgirl.probejs.mixins;
 
-import moe.wolfgirl.probejs.ProbeConfig;
-import moe.wolfgirl.probejs.next.GlobalStates;
-import moe.wolfgirl.probejs.specials.special.FormatterLang;
+import moe.wolfgirl.probejs.GlobalStates;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -26,9 +24,9 @@ public abstract class TranslatableMixin {
     private void init(CallbackInfo ci) {
         // So we populate keys even if no client storage is present
         // I wonder if this is CPU intensive but probably not (that much)
-        synchronized (GlobalStates.LANG_KEYS) {
-            GlobalStates.LANG_KEYS.add(key);
-            if (fallback != null) GlobalStates.LANG_KEYS.add(fallback);
+        synchronized (GlobalStates.MIXIN_LANG_KEYS) {
+            GlobalStates.MIXIN_LANG_KEYS.add(key);
+            if (fallback != null) GlobalStates.MIXIN_LANG_KEYS.add(fallback);
         }
     }
 }
