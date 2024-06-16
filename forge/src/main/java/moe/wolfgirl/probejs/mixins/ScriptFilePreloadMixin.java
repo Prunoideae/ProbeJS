@@ -40,20 +40,26 @@ public class ScriptFilePreloadMixin {
         // Transform import stuffs so that we can use imports
         for (int i = 0; i < lines.length; i++) {
             String tLine = lines[i].trim();
-            if (tLine.contains("import") || tLine.contains("require")) {
+            if (tLine.startsWith("export")) {
+                lines[i] = tLine.substring(6);
+            } else if (tLine.contains("import") || tLine.contains("require")) {
                 List<String> sb = new ArrayList<>();
                 for (String s : tLine.split(";")) {
                     Matcher match = NameUtils.MATCH_IMPORT.matcher(s.trim());
                     if (match.matches()) {
-                        String names = match.group(1);
-                        String classPath = match.group(2);
-                        sb.add("let {%s} = require(%s)".formatted(names, classPath));
+                        String names = match.group(1).trim();
+                        String classPath = match.group(2).trim();
+                        if (classPath.startsWith("\"packages")) { // package import
+                            sb.add("let {%s} = require(%s)".formatted(names, classPath));
+                        }
                     } else {
                         Matcher requireMatch = NameUtils.MATCH_CONST_REQUIRE.matcher(s.trim());
                         if (requireMatch.matches()) {
-                            String names = requireMatch.group(1);
-                            String classPath = requireMatch.group(2);
-                            sb.add("let {%s} = require(%s)".formatted(names, classPath));
+                            String names = requireMatch.group(1).trim();
+                            String classPath = requireMatch.group(2).trim();
+                            if (classPath.startsWith("\"packages")) { // package import
+                                sb.add("let {%s} = require(%s)".formatted(names, classPath));
+                            }
                         } else {
                             sb.add(s);
                         }
