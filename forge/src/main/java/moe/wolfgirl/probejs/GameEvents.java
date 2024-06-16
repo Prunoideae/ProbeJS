@@ -26,6 +26,7 @@ public class GameEvents {
                     if (config.aggressive.get() || config.modHash.get() == -1) {
                         if (config.modHash.get() == -1) {
                             player.sendSystemMessage(Component.translatable("probejs.hello").kjs$gold());
+
                         }
                         if (config.registryHash.get() != GameUtils.registryHash()) {
                             ProbeDump dump = new ProbeDump();
@@ -40,6 +41,14 @@ public class GameEvents {
                                                 .kjs$aqua()
                                         ));
                     }
+                    player.sendSystemMessage(
+                            Component.translatable("probejs.wiki")
+                                    .append(Component.literal("Github Page")
+                                            .kjs$aqua()
+                                            .kjs$underlined()
+                                            .kjs$clickOpenUrl("https://github.com/Prunoideae/ProbeJS")
+                                            .kjs$hover(Component.literal("https://github.com/Prunoideae/ProbeJS")))
+                    );
                 }
             } catch (Throwable e) {
                 throw new RuntimeException(e);
@@ -84,6 +93,13 @@ public class GameEvents {
                                 .executes(context -> {
                                     ProbeConfig.INSTANCE.enabled.set(true);
                                     context.getSource().sendSystemMessage(Component.translatable("probejs.hello_again").kjs$aqua());
+                                    return Command.SINGLE_SUCCESS;
+                                })
+                        )
+                        .then(Commands.literal("no_isolation")
+                                .executes(context -> {
+                                    ProbeConfig.INSTANCE.isolatedScopes.set(false);
+                                    context.getSource().sendSystemMessage(Component.translatable("probejs.no_isolation").kjs$aqua());
                                     return Command.SINGLE_SUCCESS;
                                 })
                         )

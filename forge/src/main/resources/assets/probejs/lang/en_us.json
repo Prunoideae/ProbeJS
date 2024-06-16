@@ -13,5 +13,7 @@
     "probejs.enabled_warning": "ProbeJS is enabled! You should disable it and exclude .probe generated when you finished development by: ",
     "probejs.bye_bye": "ProbeJS is now disabled. require() still works, though. Don't forget to exclude the typing.",
     "probejs.hello_again": "ProbeJS is enabled now. Happy coding!",
-    "probejs.removed_script": "Removed typing for script type %s."
+    "probejs.removed_script": "Removed typing for script type %s.",
+    "probejs.no_isolation": "ProbeJS will not try to isolate different scopes now. Be aware of duplicated names.",
+    "probejs.wiki": "To learn about how to use ProbeJS (or report issue), please go to the "
 }
