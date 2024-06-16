@@ -1,0 +1,17 @@
+{
+    "probejs.dump.start": "ProbeJS dump started.",
+    "probejs.dump.snippets_generated": "Snippets for VSCode generated.",
+    "probejs.dump.mod_changed": "Mod environment changed.",
+    "probejs.dump.decompiling": "Decompiling mods, this might take some time...",
+    "probejs.dump.decompiled_x_class": "Decompiled %s classes.",
+    "probejs.dump.class_discovered": "Discovered %s classes to generate typing for.",
+    "probejs.dump.dump_finished": "The typing generation of script type %s is finished.",
+    "probejs.dump.dump_error": "Dump generation of script type %s failed, this might be a bug in code.",
+    "probejs.dump.report_progress": "Dump executing... Current progress: ",
+    "probejs.dump.cleaning": "Removing old dump files that might contain invalid classes... This can be slow.",
+    "probejs.hello": "Welcome to ProbeJS! An automatic dump is triggered to generate typing for you now!",
+    "probejs.enabled_warning": "ProbeJS is enabled! You should disable it and exclude .probe generated when you finished development by: ",
+    "probejs.bye_bye": "ProbeJS is now disabled. require() still works, though. Don't forget to exclude the typing.",
+    "probejs.hello_again": "ProbeJS is enabled now. Happy coding!",
+    "probejs.removed_script": "Removed typing for script type %s."
+}

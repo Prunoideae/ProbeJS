@@ -23,15 +23,8 @@ side = "BOTH"
 [[dependencies.probejs]]
 modId = "minecraft"
 mandatory = true
-versionRange = "[1.18.2,)"
+versionRange = "[1.20.1,)"
 ordering = "NONE"
-side = "BOTH"
-
-[[dependencies.probejs]]
-modId = "architectury"
-mandatory = true
-versionRange = "[4.1.39,)"
-ordering = "AFTER"
 side = "BOTH"
 
 [[dependencies.probejs]]
