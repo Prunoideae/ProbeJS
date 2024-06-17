@@ -14,6 +14,7 @@
     "probejs.bye_bye": "ProbeJS is now disabled. require() still works, though. Don't forget to exclude the typing.",
     "probejs.hello_again": "ProbeJS is enabled now. Happy coding!",
     "probejs.removed_script": "Removed typing for script type %s.",
+    "probejs.isolation": "ProbeJS will isolate each script files now, only `export`ed identifiers will be exposed.",
     "probejs.no_isolation": "ProbeJS will not try to isolate different scopes now. Be aware of duplicated names.",
     "probejs.wiki": "To learn about how to use ProbeJS (or report issue), please go to the "
 }

@@ -161,7 +161,7 @@ public class RegistryTypes extends ProbeJSPlugin {
 
             String registryName = key.location().getNamespace().equals("minecraft") ?
                     key.location().getPath() :
-                    key.toString();
+                    key.location().toString();
 
             Snippet registrySnippet = dump.snippet("probejs$$" + key.location());
             registrySnippet.prefix("@%s".formatted(registryName))

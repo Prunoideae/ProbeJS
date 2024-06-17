@@ -48,8 +48,8 @@ public class WorldTypes extends ProbeJSPlugin {
         scriptDump.assignType(BlockStatePredicate.class, Types.type(Block.class));
         scriptDump.assignType(BlockStatePredicate.class, Types.primitive("Special.BlockTag"));
         scriptDump.assignType(BlockStatePredicate.class, Types.primitive("RegExp"));
-        scriptDump.assignType(BlockStatePredicate.class, Types.primitive("*"));
-        scriptDump.assignType(BlockStatePredicate.class, Types.primitive("-"));
+        scriptDump.assignType(BlockStatePredicate.class, Types.literal("*"));
+        scriptDump.assignType(BlockStatePredicate.class, Types.literal("-"));
         scriptDump.assignType(RuleTest.class, Types.ignoreContext(Types.type(BlockStatePredicate.class), BaseType.FormatType.RETURN));
         scriptDump.assignType(RuleTest.class, Types.type(CompoundTag.class));
         scriptDump.assignType(MobCategory.class, Types.STRING);
@@ -142,7 +142,7 @@ public class WorldTypes extends ProbeJSPlugin {
                 .build());
         scriptDump.assignType(MutableComponent.class, Types.type(MutableComponent.class).asArray());
 
-        BaseType[] predefinedColors = ColorWrapper.MAP.keySet().stream().map(Types::generic).toArray(BaseType[]::new);
+        BaseType[] predefinedColors = ColorWrapper.MAP.keySet().stream().map(Types::literal).toArray(BaseType[]::new);
         scriptDump.assignType(Color.class, Types.or(predefinedColors));
         scriptDump.assignType(Color.class, Types.primitive("`#${string}`"));
         scriptDump.assignType(Color.class, Primitives.INTEGER);

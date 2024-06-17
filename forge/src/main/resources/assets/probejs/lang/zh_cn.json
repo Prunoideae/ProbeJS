@@ -13,5 +13,8 @@
     "probejs.enabled_warning": "ProbeJS正在运行！在你导出整合包之前，请排除生成的类型文件，并使用命令关闭ProbeJS：",
     "probejs.bye_bye": "ProbeJS已被关闭。require() 仍可正常运行。记得不要打包类型文件。",
     "probejs.removed_script": "已清理脚本类型 %s 的类型文件。",
-    "probejs.hello_again": "ProbeJS已开启，祝你生活美满。"
+    "probejs.hello_again": "ProbeJS已开启，祝你生活美满。",
+    "probejs.isolation": "ProbeJS将会隔离脚本作用域，只有具有export关键字的方法/变量可被其他脚本访问。",
+    "probejs.no_isolation": "ProbeJS现在不会隔离脚本作用域，请小心变量名污染。",
+    "probejs.wiki": "需要ProbeJS教程的话，请点击："
 }

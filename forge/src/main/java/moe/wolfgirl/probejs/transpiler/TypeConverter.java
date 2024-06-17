@@ -162,7 +162,7 @@ public class TypeConverter {
                 return Types.primitive(content);
             }
         }
-
+        
         throw new RuntimeException("Unknown TypeDescJS");
     }
 }

@@ -30,11 +30,17 @@ public class ProbeConfig {
         public final String name;
         public final T defaultValue;
         private T value;
+        private final String namespace;
 
 
         ConfigEntry(String name, @Nonnull T defaultValue) {
+            this(name, defaultValue, "probejs");
+        }
+
+        ConfigEntry(String name, @Nonnull T defaultValue, String namespace) {
             this.name = name;
             this.defaultValue = defaultValue;
+            this.namespace = namespace;
         }
 
         public void set(T value) {
@@ -42,7 +48,7 @@ public class ProbeConfig {
             if (Objects.equals(this.value, value)) return;
             this.value = value;
             try {
-                writeConfigEntry(name, this.value);
+                writeConfigEntry(this);
             } catch (IOException ignored) {
             }
         }
@@ -59,7 +65,7 @@ public class ProbeConfig {
         @SuppressWarnings("unchecked")
         private void fromSetting() throws IOException {
             Class<?> typeClass = defaultValue.getClass();
-            Object configValue = getConfigEntry(name);
+            Object configValue = getConfigEntry(this);
 
             if (configValue == null) value = null;
             else if (configValue instanceof Number number) {
@@ -76,7 +82,10 @@ public class ProbeConfig {
         }
     }
 
-    private static void writeConfigEntry(String name, Object value) throws IOException {
+    private static void writeConfigEntry(ConfigEntry<?> configEntry) throws IOException {
+        String name = configEntry.name;
+        Object value = configEntry.value;
+
         JsonObject current = new JsonObject();
         if (Files.exists(ProbePaths.SETTINGS_JSON)) {
             try (var reader = Files.newBufferedReader(ProbePaths.SETTINGS_JSON)) {
@@ -84,7 +93,7 @@ public class ProbeConfig {
                 current = ProbeJS.GSON.fromJson(JsonUtils.stripSussyJson5Stuffs(content), JsonObject.class);
             }
         }
-        current.add("probejs.%s".formatted(name), JsonUtils.parseObject(value));
+        current.add("%s.%s".formatted(configEntry.namespace, name), JsonUtils.parseObject(value));
 
         try (var writer = Files.newBufferedWriter(ProbePaths.SETTINGS_JSON)) {
             JsonWriter jsonWriter = ProbeJS.GSON_WRITER.newJsonWriter(writer);
@@ -93,7 +102,7 @@ public class ProbeConfig {
         }
     }
 
-    private static Object getConfigEntry(String name) throws IOException {
+    private static Object getConfigEntry(ConfigEntry<?> configEntry) throws IOException {
         JsonObject current = new JsonObject();
         if (Files.exists(ProbePaths.SETTINGS_JSON)) {
             try (var reader = Files.newBufferedReader(ProbePaths.SETTINGS_JSON)) {
@@ -102,7 +111,7 @@ public class ProbeConfig {
             }
         }
         if (JsonUtils.deserializeObject(current) instanceof Map<?, ?> map) {
-            return map.get("probejs.%s".formatted(name));
+            return map.get("%s.%s".formatted(configEntry.namespace, configEntry.name));
         }
         return null;
     }

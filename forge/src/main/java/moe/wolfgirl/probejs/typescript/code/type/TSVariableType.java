@@ -26,7 +26,7 @@ public class TSVariableType extends BaseType {
         return List.of(switch (input) {
             case INPUT, RETURN -> symbol;
             case VARIABLE -> extendsType == null ? symbol :
-                    "%s extends %s".formatted(symbol, extendsType.line(declaration, input));
+                    "%s extends %s".formatted(symbol, extendsType.line(declaration, FormatType.RETURN));
         });
     }
 }

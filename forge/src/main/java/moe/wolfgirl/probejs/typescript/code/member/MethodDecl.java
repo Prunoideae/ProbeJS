@@ -13,6 +13,7 @@ public class MethodDecl extends CommentableCode {
     public String name;
     public boolean isAbstract = false;
     public boolean isStatic = false;
+    public boolean isInterface = false;
     public List<TSVariableType> variableTypes;
     public List<ParamDecl> params;
     public BaseType returnType;
@@ -43,7 +44,7 @@ public class MethodDecl extends CommentableCode {
     public List<String> formatRaw(Declaration declaration) {
         // Format head - public static "name"<T, U extends A>
         List<String> modifiers = new ArrayList<>();
-        modifiers.add("public");
+        if (!isInterface) modifiers.add("public");
         if (isStatic) modifiers.add("static");
 
         String head = String.join(" ", modifiers);

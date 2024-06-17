@@ -157,8 +157,8 @@ public class ScriptDump {
         dumped = 0;
         total = 0;
         ProbeJSPlugin.forEachPlugin(plugin -> plugin.assignType(this));
-        Path packageFolder = getPackageFolder();
 
+        Map<String, BufferedWriter> files = new HashMap<>();
         Map<ClassPath, TypeScriptFile> globalClasses = transpiler.dump(recordedClasses);
         ProbeJSPlugin.forEachPlugin(plugin -> plugin.modifyClasses(this, globalClasses));
         total = globalClasses.size();
@@ -213,36 +213,52 @@ public class ScriptDump {
                 output.addCode(convertibleType);
                 output.addCode(typeExport);
 
-
-                Path dir = classPath.makePath(packageFolder);
-                output.write(dir.resolve(
-                        "%s.d.ts".formatted(classPath.getName())
-                ));
+                var fileKey = "%s_%s".formatted(classPath.parts().get(0), classPath.parts().get(1));
+                BufferedWriter writer = files.computeIfAbsent(fileKey, key -> {
+                    try {
+                        return Files.newBufferedWriter(getPackageFolder().resolve(key + ".d.ts"));
+                    } catch (IOException e) {
+                        ProbeJS.LOGGER.error("Failed to write %s.d.ts".formatted(key));
+                        return null;
+                    }
+                });
+                if (writer != null) output.writeAsModule(writer);
                 dumped++;
             } catch (Throwable t) {
                 t.printStackTrace();
             }
         }
-        (new TypeScriptFile(null)).write(getPackageFolder().resolve("index.d.ts"));
+
+        try (var writer = Files.newBufferedWriter(getPackageFolder().resolve("index.d.ts"))) {
+            for (Map.Entry<String, BufferedWriter> entry : files.entrySet()) {
+                String key = entry.getKey();
+                BufferedWriter value = entry.getValue();
+                writer.write("/// <reference path=%s />\n".formatted(ProbeJS.GSON.toJson(key + ".d.ts")));
+                value.close();
+            }
+        }
     }
 
     public void dumpGlobal() throws IOException {
         ProbeJSPlugin.forEachPlugin(plugin -> plugin.addGlobals(this));
 
-        for (Map.Entry<String, Pair<Collection<String>, Wrapped.Global>> entry : globals.entrySet()) {
-            String identifier = entry.getKey();
-            Pair<Collection<String>, Wrapped.Global> pair = entry.getValue();
-            var global = pair.getSecond();
-            var excluded = pair.getFirst();
+        try (var writer = Files.newBufferedWriter(getGlobalFolder().resolve("index.d.ts"))) {
+            for (Map.Entry<String, Pair<Collection<String>, Wrapped.Global>> entry : globals.entrySet()) {
+                String identifier = entry.getKey();
+                Pair<Collection<String>, Wrapped.Global> pair = entry.getValue();
+                var global = pair.getSecond();
+                var excluded = pair.getFirst();
 
-            TypeScriptFile globalFile = new TypeScriptFile(null);
-            for (String s : excluded) {
-                globalFile.excludeSymbol(s);
+                TypeScriptFile globalFile = new TypeScriptFile(null);
+                for (String s : excluded) {
+                    globalFile.excludeSymbol(s);
+                }
+                globalFile.addCode(global);
+                globalFile.write(getGlobalFolder().resolve(identifier + ".d.ts"));
+                writer.write("export * from %s\n".formatted(ProbeJS.GSON.toJson("./" + identifier)));
             }
-            globalFile.addCode(global);
-            globalFile.write(getGlobalFolder().resolve(identifier + ".d.ts"));
         }
-        (new TypeScriptFile(null)).write(getGlobalFolder().resolve("index.d.ts"));
+
     }
 
     public void dumpJSConfig() throws IOException {
@@ -264,10 +280,9 @@ public class ScriptDump {
                     },
                     "include": [
                         "./src/**/*",
-                        "../../.probe/%s/probe-types/**/*"
                     ]
                 }
-                """.formatted(basePath.getFileName(), basePath.getFileName(), basePath.getFileName())
+                """.formatted(basePath.getFileName(), basePath.getFileName())
         );
     }
 

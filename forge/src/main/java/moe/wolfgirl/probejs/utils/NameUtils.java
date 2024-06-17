@@ -11,6 +11,7 @@ public class NameUtils {
     public static final Pattern JS_IDENTIFIER_MATCH = Pattern.compile("[A-Za-z_$][A-Za-z0-9_$]*");
     public static final Pattern MATCH_IMPORT = Pattern.compile("^import \\{(.+)} from (.+)");
     public static final Pattern MATCH_CONST_REQUIRE = Pattern.compile("^const \\{(.+)} = require\\((.+)\\)");
+    public static final Pattern MATCH_ANY_REQUIRE = Pattern.compile("^.+ \\{(.+)} = require\\((.+)\\)");
 
 
     public static String[] extractAlphabets(String input) {

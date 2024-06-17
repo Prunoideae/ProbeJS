@@ -2,6 +2,8 @@ package moe.wolfgirl.probejs;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
+import moe.wolfgirl.probejs.linter.Linter;
+import moe.wolfgirl.probejs.linter.LintingWarning;
 import moe.wolfgirl.probejs.utils.GameUtils;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -12,6 +14,9 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 
 @Mod.EventBusSubscriber
@@ -46,9 +51,12 @@ public class GameEvents {
                                     .append(Component.literal("Github Page")
                                             .kjs$aqua()
                                             .kjs$underlined()
-                                            .kjs$clickOpenUrl("https://github.com/Prunoideae/ProbeJS")
-                                            .kjs$hover(Component.literal("https://github.com/Prunoideae/ProbeJS")))
+                                            .kjs$clickOpenUrl("https://kubejs.com/wiki/addons/third-party/probejs")
+                                            .kjs$hover(Component.literal("https://kubejs.com/wiki/addons/third-party/probejs")))
                     );
+
+                    // checks for stuffs
+                    player.server.kjs$runCommandSilent("probejs lint");
                 }
             } catch (Throwable e) {
                 throw new RuntimeException(e);
@@ -96,10 +104,44 @@ public class GameEvents {
                                     return Command.SINGLE_SUCCESS;
                                 })
                         )
-                        .then(Commands.literal("no_isolation")
+                        .then(Commands.literal("scope_isolation")
                                 .executes(context -> {
-                                    ProbeConfig.INSTANCE.isolatedScopes.set(false);
-                                    context.getSource().sendSystemMessage(Component.translatable("probejs.no_isolation").kjs$aqua());
+                                    boolean flag = !ProbeConfig.INSTANCE.isolatedScopes.get();
+                                    ProbeConfig.INSTANCE.isolatedScopes.set(flag);
+                                    context.getSource().sendSystemMessage(flag ?
+                                            Component.translatable("probejs.isolation").kjs$aqua() :
+                                            Component.translatable("probejs.no_isolation").kjs$aqua());
+                                    return Command.SINGLE_SUCCESS;
+                                })
+                        )
+                        .then(Commands.literal("lint")
+                                .requires(source -> ProbeConfig.INSTANCE.enabled.get() &&
+                                        source.getServer().isSingleplayer() &&
+                                        source.hasPermission(2))
+                                .executes(context -> {
+                                    try {
+                                        List<Component> warnings = new ArrayList<>();
+
+                                        var startup = Linter.STARTUP_SCRIPT.get();
+                                        for (LintingWarning lintingWarning : startup.lint()) {
+                                            warnings.add(lintingWarning.defaultFormatting(startup.scriptPath));
+                                        }
+
+                                        var server = Linter.SERVER_SCRIPT.get();
+                                        for (LintingWarning lintingWarning : server.lint()) {
+                                            warnings.add(lintingWarning.defaultFormatting(server.scriptPath));
+                                        }
+                                        var client = Linter.CLIENT_SCRIPT.get();
+                                        for (LintingWarning lintingWarning : client.lint()) {
+                                            warnings.add(lintingWarning.defaultFormatting(client.scriptPath));
+                                        }
+
+                                        for (Component warning : warnings) {
+                                            context.getSource().sendSystemMessage(warning);
+                                        }
+                                    } catch (Throwable e) {
+                                        ProbeJS.LOGGER.error(e.getMessage());
+                                    }
                                     return Command.SINGLE_SUCCESS;
                                 })
                         )

@@ -29,8 +29,9 @@ public class FieldDecl extends CommentableCode {
     @Override
     public List<String> formatRaw(Declaration declaration) {
         List<String> modifiers = new ArrayList<>();
-        if (isFinal) modifiers.add("readonly");
         if (isStatic) modifiers.add("static");
+        if (isFinal) modifiers.add("readonly");
+
 
         return List.of("%s %s: %s".formatted(
                 String.join(" ", modifiers), ProbeJS.GSON.toJson(name), type.line(declaration, BaseType.FormatType.RETURN)

@@ -21,10 +21,14 @@ public class InterfaceDecl extends ClassDecl {
     public InterfaceDecl(String name, @Nullable BaseType superClass, List<BaseType> interfaces, List<TSVariableType> variableTypes) {
         super(name, superClass, interfaces, variableTypes);
         this.namespace = new Wrapped.Namespace(name);
+
     }
 
     @Override
     public List<String> formatRaw(Declaration declaration) {
+        for (MethodDecl method : methods) {
+            method.isInterface = true;
+        }
         // Format head - export interface name<T> extends ... {
         String head = "export interface %s".formatted(name);
         if (variableTypes.size() != 0) {
@@ -69,7 +73,7 @@ public class InterfaceDecl extends ClassDecl {
 
                 @Override
                 public List<String> format(Declaration declaration) {
-                    return List.of("probejs$$marker: never");
+                    return List.of("const probejs$$marker: never");
                 }
             });
         }

@@ -1,5 +1,6 @@
 package moe.wolfgirl.probejs.typescript;
 
+import moe.wolfgirl.probejs.ProbeJS;
 import moe.wolfgirl.probejs.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.typescript.code.Code;
 
@@ -49,19 +50,30 @@ public class TypeScriptFile {
 
     public void write(Path writeTo) throws IOException {
         try (BufferedWriter writer = Files.newBufferedWriter(writeTo)) {
-            boolean written = false;
-            for (Reference value : declaration.references.values()) {
-                if (value.classPath().equals(classPath)) continue;
-                writer.write(value.getImport() + "\n");
-                written = true;
-            }
-            if (!written) {
-                writer.write("export {} // Mark the file as a module, do not remove unless there are other import/exports!");
-            }
-
-            writer.write("\n");
-            writer.write(format());
+            this.write(writer);
         }
+    }
+
+    public void write(BufferedWriter writer) throws IOException {
+        boolean written = false;
+        for (Reference value : declaration.references.values()) {
+            if (value.classPath().equals(classPath)) continue;
+            writer.write(value.getImport() + "\n");
+            written = true;
+        }
+        if (!written) {
+            writer.write("export {} // Mark the file as a module, do not remove unless there are other import/exports!");
+        }
+
+        writer.write("\n");
+        writer.write(format());
+    }
+
+    public void writeAsModule(BufferedWriter writer) throws IOException {
+        String modulePath = "packages/" + classPath.getTypeScriptPath();
+        writer.write("declare module %s {\n".formatted(ProbeJS.GSON.toJson(modulePath)));
+        this.write(writer);
+        writer.write("}\n");
     }
 
     @SuppressWarnings("unchecked")

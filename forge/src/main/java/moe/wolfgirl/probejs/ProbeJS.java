@@ -14,6 +14,7 @@ public class ProbeJS {
     public static final Logger LOGGER = LogManager.getLogger("probejs");
     public static final Gson GSON = new GsonBuilder()
             .serializeSpecialFloatingPointValues()
+            .setLenient()
             .disableHtmlEscaping()
             .create();
     public static final Gson GSON_WRITER = new GsonBuilder()

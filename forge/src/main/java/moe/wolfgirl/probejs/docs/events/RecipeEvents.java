@@ -30,8 +30,8 @@ import java.util.Map;
 import java.util.Set;
 
 public class RecipeEvents extends ProbeJSPlugin {
-    Map<String, String> SHORTCUTS = new HashMap<>();
-    ClassPath DOCUMENTED_RECIPES = new ClassPath("moe.wolfgirl.probejs.generated.DocumentedRecipes");
+    public static final Map<String, String> SHORTCUTS = new HashMap<>();
+    public static final ClassPath DOCUMENTED_RECIPES = new ClassPath("moe.wolfgirl.probejs.generated.DocumentedRecipes");
 
     {
         SHORTCUTS.put("shaped", "kubejs:shaped");

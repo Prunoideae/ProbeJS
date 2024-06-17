@@ -44,6 +44,8 @@ public class KubeJSScript {
                         String classPath = matcher.group(2).trim();
                         if (classPath.startsWith("\"packages")) { // package import
                             s = "let {%s} = require(%s)".formatted(names, classPath);
+                        } else {
+                            s = "";
                         }
                     }
                 }

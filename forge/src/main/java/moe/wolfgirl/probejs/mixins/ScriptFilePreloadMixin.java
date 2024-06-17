@@ -17,7 +17,7 @@ import java.util.List;
 @Mixin(ScriptFileInfo.class)
 public class ScriptFilePreloadMixin {
 
-    @Shadow
+    @Shadow(remap = false)
     public String[] lines;
 
     @Inject(method = "preload",
