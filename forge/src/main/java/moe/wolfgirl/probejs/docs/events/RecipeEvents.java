@@ -131,9 +131,11 @@ public class RecipeEvents extends ProbeJSPlugin {
                 .superClass(Types.type(schema.recipeType));
         for (RecipeKey<?> key : schema.keys) {
             if (key.noBuilders) continue;
-            builder.method(key.preferred, method -> method
-                    .returnType(Types.THIS)
-                    .param(key.preferred, converter.convertType(key.component.constructorDescription(TypeConverter.PROBEJS)))
+            builder.method(key.preferred, method -> {
+                        method.returnType(Types.THIS);
+                        var baseType = converter.convertType(key.component.constructorDescription(TypeConverter.PROBEJS));
+                        if (!baseType.equals(Types.BOOLEAN)) method.param(key.preferred, baseType);
+                    }
             );
         }
         return builder.build();

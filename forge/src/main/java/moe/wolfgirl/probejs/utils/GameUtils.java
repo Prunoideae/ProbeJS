@@ -10,27 +10,36 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class GameUtils {
-    public static long modHash() throws NoSuchAlgorithmException {
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        for (Mod mod : Platform.getMods()) {
-            digest.update((mod.getModId() + mod.getVersion()).getBytes());
+    public static long modHash() {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            for (Mod mod : Platform.getMods()) {
+                digest.update((mod.getModId() + mod.getVersion()).getBytes());
+            }
+            ByteBuffer buffer = ByteBuffer.wrap(digest.digest());
+            return buffer.getLong();
+        } catch (NoSuchAlgorithmException e) {
+            return -1;
         }
-        ByteBuffer buffer = ByteBuffer.wrap(digest.digest());
-        return buffer.getLong();
     }
 
-    public static long registryHash() throws NoSuchAlgorithmException {
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        RegistryInfo.MAP.values()
-                .stream()
-                .flatMap(info -> info.objects.keySet()
-                        .stream()
-                        .map(ResourceLocation::toString)
-                        .map(s -> info.key.location() + "/" + s)
-                )
-                .sorted()
-                .forEach(key -> digest.update(key.getBytes()));
-        ByteBuffer buffer = ByteBuffer.wrap(digest.digest());
-        return buffer.getLong();
+    public static long registryHash() {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            RegistryInfo.MAP.values()
+                    .stream()
+                    .flatMap(info -> info.objects.keySet()
+                            .stream()
+                            .map(ResourceLocation::toString)
+                            .map(s -> info.key.location() + "/" + s)
+                    )
+                    .sorted()
+                    .forEach(key -> digest.update(key.getBytes()));
+            ByteBuffer buffer = ByteBuffer.wrap(digest.digest());
+            return buffer.getLong();
+        } catch (NoSuchAlgorithmException e) {
+            return -1;
+        }
+
     }
 }

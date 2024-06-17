@@ -213,7 +213,7 @@ public class ScriptDump {
                 output.addCode(convertibleType);
                 output.addCode(typeExport);
 
-                var fileKey = "%s_%s".formatted(classPath.parts().get(0), classPath.parts().get(1));
+                var fileKey = "%s.%s".formatted(classPath.parts().get(0), classPath.parts().get(1));
                 BufferedWriter writer = files.computeIfAbsent(fileKey, key -> {
                     try {
                         return Files.newBufferedWriter(getPackageFolder().resolve(key + ".d.ts"));

@@ -26,6 +26,13 @@ public class NoNamespacePollution extends Rule {
                     s = s.substring(6).trim();
                     String[] parts = s.split(" ", 2);
 
+                    var identifier = switch (parts[0]) {
+                        case "function" -> parts[1].split("\\(", 2)[0];
+                        case "var", "let", "const" -> parts[1].split(" ")[0];
+                        default -> null;
+                    };
+                    if (identifier == null) continue;
+                    identifiers.put(identifier, new Pair<>(i, path));
                 }
             }
         } else {
@@ -33,7 +40,15 @@ public class NoNamespacePollution extends Rule {
             for (int i = 0; i < content.size(); i++) {
                 String s = content.get(i).trim();
                 if (s.startsWith("var") || s.startsWith("let") || s.startsWith("const") || s.startsWith("function")) {
+                    String[] parts = s.split(" ", 2);
 
+                    var identifier = switch (parts[0]) {
+                        case "function" -> parts[1].split("\\(", 2)[0];
+                        case "var", "let", "const" -> parts[1].split(" ")[0];
+                        default -> null;
+                    };
+                    if (identifier == null) continue;
+                    identifiers.put(identifier, new Pair<>(i, path));
                 }
             }
         }
@@ -54,7 +69,7 @@ public class NoNamespacePollution extends Rule {
                             LintingWarning.Level.ERROR,
                             path.getFirst(),
                             0,
-                            "Duplicated declaration of %s".formatted(identifier)));
+                            "Duplicate declaration of %s".formatted(identifier)));
                 }
             }
         }

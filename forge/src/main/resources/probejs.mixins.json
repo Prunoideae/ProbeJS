@@ -2,13 +2,15 @@
     "required": true,
     "compatibilityLevel": "JAVA_17",
     "package": "moe.wolfgirl.probejs.mixins",
-    "mixins": [
+    "client": [
         "EventBusMixin",
         "LootTableMixin",
         "OnJavaMixin",
         "RecipeManagerMixin",
-        "ScriptFilePreloadMixin",
         "TranslatableMixin"
+    ],
+    "mixins": [
+        "ScriptFilePreloadMixin"
     ],
     "injectors": {
         "defaultRequire": 1
