@@ -1,5 +1,6 @@
 package moe.wolfgirl.probejs.lang.java;
 
+import dev.latvian.mods.rhino.util.HideFromJS;
 import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.lang.java.clazz.Clazz;
 import moe.wolfgirl.probejs.lang.java.clazz.members.ConstructorInfo;
@@ -14,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
+@HideFromJS
 public class ClassRegistry {
     public static final ClassRegistry REGISTRY = new ClassRegistry();
 

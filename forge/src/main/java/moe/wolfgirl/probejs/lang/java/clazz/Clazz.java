@@ -1,5 +1,6 @@
 package moe.wolfgirl.probejs.lang.java.clazz;
 
+import dev.latvian.mods.rhino.util.HideFromJS;
 import moe.wolfgirl.probejs.lang.java.base.ClassPathProvider;
 import moe.wolfgirl.probejs.lang.java.base.TypeVariableHolder;
 import moe.wolfgirl.probejs.lang.java.clazz.members.ConstructorInfo;
@@ -17,6 +18,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Clazz extends TypeVariableHolder implements ClassPathProvider {
+
+    @HideFromJS
     public final Class<?> original;
     public final ClassPath classPath;
     public final List<ConstructorInfo> constructors;

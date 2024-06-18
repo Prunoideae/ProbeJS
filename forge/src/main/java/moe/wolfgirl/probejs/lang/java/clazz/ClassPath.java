@@ -1,6 +1,7 @@
 package moe.wolfgirl.probejs.lang.java.clazz;
 
 import dev.latvian.mods.kubejs.util.UtilsJS;
+import dev.latvian.mods.rhino.util.HideFromJS;
 import moe.wolfgirl.probejs.lang.java.ClassRegistry;
 import moe.wolfgirl.probejs.utils.RemapperUtils;
 
@@ -52,6 +53,7 @@ public record ClassPath(List<String> parts) {
         return getConcatenated("/");
     }
 
+    @HideFromJS
     public Class<?> forName() throws ClassNotFoundException {
         return Class.forName(getClassPathJava());
     }
@@ -61,6 +63,7 @@ public record ClassPath(List<String> parts) {
         return Arrays.stream(variables).map(TypeVariable::getName).toList();
     }
 
+    @HideFromJS
     public Clazz toClazz() {
         return ClassRegistry.REGISTRY.foundClasses.get(this);
     }

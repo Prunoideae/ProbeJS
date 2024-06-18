@@ -3,6 +3,7 @@ package moe.wolfgirl.probejs.plugin;
 import com.mojang.datafixers.util.Pair;
 import dev.latvian.mods.kubejs.KubeJSPlugin;
 import dev.latvian.mods.kubejs.util.KubeJSPlugins;
+import dev.latvian.mods.rhino.util.HideFromJS;
 import moe.wolfgirl.probejs.lang.snippet.SnippetDump;
 import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
 import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
@@ -23,6 +24,7 @@ import java.util.function.Consumer;
  */
 public class ProbeJSPlugin extends KubeJSPlugin {
 
+    @HideFromJS
     public static void forEachPlugin(Consumer<ProbeJSPlugin> consumer) {
         KubeJSPlugins.forEachPlugin(plugin -> {
             if (plugin instanceof ProbeJSPlugin probePlugin)
@@ -78,6 +80,7 @@ public class ProbeJSPlugin extends KubeJSPlugin {
     /**
      * Provides Java classes for the class registry to discover.
      */
+    @HideFromJS
     public Set<Class<?>> provideJavaClass(ScriptDump scriptDump) {
         return Set.of();
     }
