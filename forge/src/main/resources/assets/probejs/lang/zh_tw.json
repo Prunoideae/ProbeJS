@@ -1,0 +1,21 @@
+{
+    "probejs.dump.start": "ProbeJS 類型生成已啟動。",
+    "probejs.dump.snippets_generated": "VSCode 程式碼片段已生成。",
+    "probejs.dump.mod_changed": "檢測到模組環境變動。",
+    "probejs.dump.decompiling": "反編譯模組中，這可能需要一段時間。",
+    "probejs.dump.decompiled_x_class": "已反編譯 %s 個類別。",
+    "probejs.dump.class_discovered": "已發現需要生成類型文件的 %s 個類別。",
+    "probejs.dump.dump_finished": "腳本類型 %s 的生成已完成。",
+    "probejs.dump.dump_error": "腳本類型 %s 的生成失敗了，這大概可能也許是一個 bug……",
+    "probejs.dump.report_progress": "生成類型文件中……當前進度：",
+    "probejs.dump.cleaning": "清理上一版本的類別文件中……這可能需要一點時間。",
+    "probejs.hello": "歡迎來到 ProbeJS。ProbeJS 將會在註冊表出現變動時重新生成類型文件。",
+    "probejs.enabled_warning": "ProbeJS 正在運行！在你導出模組包之前，請排除生成的類型文件，並使用命令關閉 ProbeJS：",
+    "probejs.bye_bye": "ProbeJS 已被關閉。require() 仍可正常運行。記得不要打包類型文件。",
+    "probejs.removed_script": "已清理腳本類型 %s 的類型文件。",
+    "probejs.hello_again": "ProbeJS 已開啟，祝你生活美滿。",
+    "probejs.isolation": "ProbeJS 將會隔離腳本作用域，只有具有 export 關鍵字的方法 / 變數可被其他腳本訪問。",
+    "probejs.no_isolation": "ProbeJS 現在不會隔離腳本作用域，請小心變數名汙染。",
+    "probejs.wiki": "需要 ProbeJS 教學的話，請點擊：",
+    "probejs.lint_passed": "恭喜你，你的程式碼承受住了考驗。"
+}
