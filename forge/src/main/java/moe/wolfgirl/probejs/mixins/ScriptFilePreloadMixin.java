@@ -3,7 +3,7 @@ package moe.wolfgirl.probejs.mixins;
 import dev.latvian.mods.kubejs.script.ScriptFileInfo;
 import dev.latvian.mods.kubejs.script.ScriptSource;
 import dev.latvian.mods.kubejs.util.UtilsJS;
-import moe.wolfgirl.probejs.transformer.KubeJSScript;
+import moe.wolfgirl.probejs.lang.transformer.KubeJSScript;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;

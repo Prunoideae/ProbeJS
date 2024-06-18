@@ -1,11 +1,11 @@
 package moe.wolfgirl.probejs.docs.assignments;
 
 import dev.latvian.mods.rhino.util.EnumTypeWrapper;
-import moe.wolfgirl.probejs.typescript.ScriptDump;
-import moe.wolfgirl.probejs.java.clazz.Clazz;
+import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
+import moe.wolfgirl.probejs.lang.java.clazz.Clazz;
 import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
-import moe.wolfgirl.probejs.typescript.code.type.BaseType;
-import moe.wolfgirl.probejs.typescript.code.type.Types;
+import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
+import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
 
 import java.util.concurrent.locks.ReentrantLock;
 

@@ -3,11 +3,11 @@ package moe.wolfgirl.probejs.docs;
 import dev.latvian.mods.kubejs.bindings.TextWrapper;
 import dev.latvian.mods.kubejs.item.InputItem;
 import dev.latvian.mods.kubejs.item.OutputItem;
-import moe.wolfgirl.probejs.typescript.ScriptDump;
-import moe.wolfgirl.probejs.java.clazz.ClassPath;
+import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
+import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
-import moe.wolfgirl.probejs.typescript.TypeScriptFile;
-import moe.wolfgirl.probejs.typescript.code.type.Types;
+import moe.wolfgirl.probejs.lang.typescript.TypeScriptFile;
+import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
 import moe.wolfgirl.probejs.utils.DocUtils;
 import net.minecraft.network.chat.MutableComponent;
 

@@ -2,13 +2,13 @@ package moe.wolfgirl.probejs.docs;
 
 import moe.wolfgirl.probejs.GlobalStates;
 import moe.wolfgirl.probejs.ProbeJS;
-import moe.wolfgirl.probejs.snippet.SnippetDump;
-import moe.wolfgirl.probejs.typescript.ScriptDump;
+import moe.wolfgirl.probejs.lang.snippet.SnippetDump;
+import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
 import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
-import moe.wolfgirl.probejs.typescript.code.member.TypeDecl;
-import moe.wolfgirl.probejs.typescript.code.ts.Wrapped;
-import moe.wolfgirl.probejs.typescript.code.type.BaseType;
-import moe.wolfgirl.probejs.typescript.code.type.Types;
+import moe.wolfgirl.probejs.lang.typescript.code.member.TypeDecl;
+import moe.wolfgirl.probejs.lang.typescript.code.ts.Wrapped;
+import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
+import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
 
 import java.util.Collection;
 import java.util.stream.Collectors;

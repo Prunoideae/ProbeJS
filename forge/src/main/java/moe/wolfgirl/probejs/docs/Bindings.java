@@ -5,14 +5,14 @@ import dev.latvian.mods.rhino.BaseFunction;
 import dev.latvian.mods.rhino.Context;
 import dev.latvian.mods.rhino.NativeJavaClass;
 import dev.latvian.mods.rhino.Scriptable;
-import moe.wolfgirl.probejs.typescript.ScriptDump;
+import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
 import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
-import moe.wolfgirl.probejs.transpiler.TypeConverter;
-import moe.wolfgirl.probejs.typescript.code.Code;
-import moe.wolfgirl.probejs.typescript.code.ts.ReexportDeclaration;
-import moe.wolfgirl.probejs.typescript.code.ts.VariableDeclaration;
-import moe.wolfgirl.probejs.typescript.code.type.BaseType;
-import moe.wolfgirl.probejs.typescript.code.type.Types;
+import moe.wolfgirl.probejs.lang.transpiler.TypeConverter;
+import moe.wolfgirl.probejs.lang.typescript.code.Code;
+import moe.wolfgirl.probejs.lang.typescript.code.ts.ReexportDeclaration;
+import moe.wolfgirl.probejs.lang.typescript.code.ts.VariableDeclaration;
+import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
+import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
 
 import java.util.*;
 

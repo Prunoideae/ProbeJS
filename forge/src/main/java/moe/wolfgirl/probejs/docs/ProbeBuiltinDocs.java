@@ -1,7 +1,7 @@
 package moe.wolfgirl.probejs.docs;
 
-import moe.wolfgirl.probejs.snippet.SnippetDump;
-import moe.wolfgirl.probejs.typescript.ScriptDump;
+import moe.wolfgirl.probejs.lang.snippet.SnippetDump;
+import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
 import moe.wolfgirl.probejs.docs.assignments.EnumTypes;
 import moe.wolfgirl.probejs.docs.assignments.JavaPrimitives;
 import moe.wolfgirl.probejs.docs.assignments.WorldTypes;
@@ -9,11 +9,11 @@ import moe.wolfgirl.probejs.docs.assignments.RecipeTypes;
 import moe.wolfgirl.probejs.docs.events.RecipeEvents;
 import moe.wolfgirl.probejs.docs.events.RegistryEvents;
 import moe.wolfgirl.probejs.docs.events.TagEvents;
-import moe.wolfgirl.probejs.java.clazz.ClassPath;
+import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
-import moe.wolfgirl.probejs.transpiler.Transpiler;
-import moe.wolfgirl.probejs.transpiler.TypeConverter;
-import moe.wolfgirl.probejs.typescript.TypeScriptFile;
+import moe.wolfgirl.probejs.lang.transpiler.Transpiler;
+import moe.wolfgirl.probejs.lang.transpiler.TypeConverter;
+import moe.wolfgirl.probejs.lang.typescript.TypeScriptFile;
 
 import java.util.*;
 import java.util.function.Consumer;

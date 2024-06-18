@@ -2,8 +2,8 @@ package moe.wolfgirl.probejs.docs;
 
 import moe.wolfgirl.probejs.GlobalStates;
 import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
-import moe.wolfgirl.probejs.snippet.SnippetDump;
-import moe.wolfgirl.probejs.snippet.parts.Variable;
+import moe.wolfgirl.probejs.lang.snippet.SnippetDump;
+import moe.wolfgirl.probejs.lang.snippet.parts.Variable;
 import net.minecraft.core.registries.Registries;
 
 import java.util.List;

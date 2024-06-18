@@ -2,13 +2,13 @@ package moe.wolfgirl.probejs.docs;
 
 import dev.latvian.mods.kubejs.forge.ForgeEventWrapper;
 import moe.wolfgirl.probejs.GlobalStates;
-import moe.wolfgirl.probejs.java.clazz.ClassPath;
+import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
-import moe.wolfgirl.probejs.typescript.ScriptDump;
-import moe.wolfgirl.probejs.typescript.TypeScriptFile;
-import moe.wolfgirl.probejs.typescript.code.member.ClassDecl;
-import moe.wolfgirl.probejs.typescript.code.member.MethodDecl;
-import moe.wolfgirl.probejs.typescript.code.type.Types;
+import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
+import moe.wolfgirl.probejs.lang.typescript.TypeScriptFile;
+import moe.wolfgirl.probejs.lang.typescript.code.member.ClassDecl;
+import moe.wolfgirl.probejs.lang.typescript.code.member.MethodDecl;
+import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.GenericEvent;
 

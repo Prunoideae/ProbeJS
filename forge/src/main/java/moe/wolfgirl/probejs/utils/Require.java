@@ -4,7 +4,7 @@ package moe.wolfgirl.probejs.utils;
 import dev.latvian.mods.kubejs.bindings.JavaWrapper;
 import dev.latvian.mods.kubejs.script.ScriptManager;
 import dev.latvian.mods.rhino.*;
-import moe.wolfgirl.probejs.java.clazz.ClassPath;
+import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 
 import java.util.Arrays;
 

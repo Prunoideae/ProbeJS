@@ -1,13 +1,13 @@
 package moe.wolfgirl.probejs.docs;
 
-import moe.wolfgirl.probejs.typescript.ScriptDump;
-import moe.wolfgirl.probejs.java.clazz.ClassPath;
+import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
+import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
-import moe.wolfgirl.probejs.transpiler.TypeConverter;
-import moe.wolfgirl.probejs.typescript.Declaration;
-import moe.wolfgirl.probejs.typescript.code.Code;
-import moe.wolfgirl.probejs.typescript.code.type.js.JSPrimitiveType;
-import moe.wolfgirl.probejs.typescript.code.type.Types;
+import moe.wolfgirl.probejs.lang.transpiler.TypeConverter;
+import moe.wolfgirl.probejs.lang.typescript.Declaration;
+import moe.wolfgirl.probejs.lang.typescript.code.Code;
+import moe.wolfgirl.probejs.lang.typescript.code.type.js.JSPrimitiveType;
+import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
 
 import java.util.Collection;
 import java.util.List;

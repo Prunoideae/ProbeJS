@@ -1,9 +1,9 @@
 package moe.wolfgirl.probejs;
 
-import moe.wolfgirl.probejs.decompiler.ProbeDecompiler;
-import moe.wolfgirl.probejs.java.ClassRegistry;
-import moe.wolfgirl.probejs.snippet.SnippetDump;
-import moe.wolfgirl.probejs.typescript.ScriptDump;
+import moe.wolfgirl.probejs.lang.decompiler.ProbeDecompiler;
+import moe.wolfgirl.probejs.lang.java.ClassRegistry;
+import moe.wolfgirl.probejs.lang.snippet.SnippetDump;
+import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
 import moe.wolfgirl.probejs.utils.GameUtils;
 import net.minecraft.network.chat.Component;
 
@@ -67,8 +67,7 @@ public class ProbeDump {
         progressReport.accept(component);
     }
 
-    public void trigger(Consumer<Component> p) throws IOException, NoSuchAlgorithmException {
-
+    public void trigger(Consumer<Component> p) throws IOException {
         progressReport = p;
         report(Component.translatable("probejs.dump.start").kjs$green());
 

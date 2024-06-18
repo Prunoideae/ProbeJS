@@ -1,11 +1,11 @@
 package moe.wolfgirl.probejs.utils;
 
-import moe.wolfgirl.probejs.java.clazz.ClassPath;
-import moe.wolfgirl.probejs.typescript.TypeScriptFile;
-import moe.wolfgirl.probejs.typescript.code.member.ClassDecl;
-import moe.wolfgirl.probejs.typescript.code.member.MethodDecl;
-import moe.wolfgirl.probejs.typescript.code.member.ParamDecl;
-import moe.wolfgirl.probejs.typescript.code.type.BaseType;
+import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
+import moe.wolfgirl.probejs.lang.typescript.TypeScriptFile;
+import moe.wolfgirl.probejs.lang.typescript.code.member.ClassDecl;
+import moe.wolfgirl.probejs.lang.typescript.code.member.MethodDecl;
+import moe.wolfgirl.probejs.lang.typescript.code.member.ParamDecl;
+import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
 
 import java.util.function.Consumer;
 import java.util.function.Predicate;

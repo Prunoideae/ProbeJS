@@ -3,12 +3,12 @@ package moe.wolfgirl.probejs.plugin;
 import com.mojang.datafixers.util.Pair;
 import dev.latvian.mods.kubejs.KubeJSPlugin;
 import dev.latvian.mods.kubejs.util.KubeJSPlugins;
-import moe.wolfgirl.probejs.snippet.SnippetDump;
-import moe.wolfgirl.probejs.typescript.ScriptDump;
-import moe.wolfgirl.probejs.java.clazz.ClassPath;
-import moe.wolfgirl.probejs.transpiler.Transpiler;
-import moe.wolfgirl.probejs.transpiler.TypeConverter;
-import moe.wolfgirl.probejs.typescript.TypeScriptFile;
+import moe.wolfgirl.probejs.lang.snippet.SnippetDump;
+import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
+import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
+import moe.wolfgirl.probejs.lang.transpiler.Transpiler;
+import moe.wolfgirl.probejs.lang.transpiler.TypeConverter;
+import moe.wolfgirl.probejs.lang.typescript.TypeScriptFile;
 
 import java.util.Map;
 import java.util.Set;

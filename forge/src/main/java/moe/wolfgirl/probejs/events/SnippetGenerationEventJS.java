@@ -1,8 +1,8 @@
 package moe.wolfgirl.probejs.events;
 
 import dev.latvian.mods.kubejs.event.EventJS;
-import moe.wolfgirl.probejs.snippet.Snippet;
-import moe.wolfgirl.probejs.snippet.SnippetDump;
+import moe.wolfgirl.probejs.lang.snippet.Snippet;
+import moe.wolfgirl.probejs.lang.snippet.SnippetDump;
 
 import java.util.function.Consumer;
 

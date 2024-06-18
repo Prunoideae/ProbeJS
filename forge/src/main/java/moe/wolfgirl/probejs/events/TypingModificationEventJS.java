@@ -1,8 +1,8 @@
 package moe.wolfgirl.probejs.events;
 
-import moe.wolfgirl.probejs.java.clazz.ClassPath;
-import moe.wolfgirl.probejs.typescript.ScriptDump;
-import moe.wolfgirl.probejs.typescript.TypeScriptFile;
+import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
+import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
+import moe.wolfgirl.probejs.lang.typescript.TypeScriptFile;
 
 import java.util.Map;
 import java.util.function.Consumer;

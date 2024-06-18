@@ -6,16 +6,16 @@ import com.mojang.datafixers.util.Pair;
 import dev.latvian.mods.kubejs.event.EventGroup;
 import dev.latvian.mods.kubejs.event.EventHandler;
 import dev.latvian.mods.kubejs.typings.desc.TypeDescJS;
-import moe.wolfgirl.probejs.typescript.ScriptDump;
+import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
 import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
-import moe.wolfgirl.probejs.transpiler.TypeConverter;
-import moe.wolfgirl.probejs.typescript.code.Code;
-import moe.wolfgirl.probejs.typescript.code.ts.MethodDeclaration;
-import moe.wolfgirl.probejs.typescript.code.ts.Statements;
-import moe.wolfgirl.probejs.typescript.code.ts.Wrapped;
-import moe.wolfgirl.probejs.typescript.code.type.BaseType;
-import moe.wolfgirl.probejs.typescript.code.type.Types;
-import moe.wolfgirl.probejs.typescript.code.type.js.JSLambdaType;
+import moe.wolfgirl.probejs.lang.transpiler.TypeConverter;
+import moe.wolfgirl.probejs.lang.typescript.code.Code;
+import moe.wolfgirl.probejs.lang.typescript.code.ts.MethodDeclaration;
+import moe.wolfgirl.probejs.lang.typescript.code.ts.Statements;
+import moe.wolfgirl.probejs.lang.typescript.code.ts.Wrapped;
+import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
+import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
+import moe.wolfgirl.probejs.lang.typescript.code.type.js.JSLambdaType;
 
 import java.util.*;
 
