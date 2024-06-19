@@ -1,9 +1,7 @@
 package moe.wolfgirl.probejs.lang.decompiler;
 
-import moe.wolfgirl.probejs.lang.decompiler.remapper.ProbeRemapper;
 import net.neoforged.fml.ModList;
 import org.jetbrains.java.decompiler.main.Fernflower;
-import org.jetbrains.java.decompiler.main.extern.IFernflowerPreferences;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -25,24 +23,21 @@ public class ProbeDecompiler {
 
     public ProbeDecompiler() {
         this.resultSaver = new ProbeFileSaver();
-
         this.engine = new Fernflower(
                 resultSaver,
-                Map.of(
-                        IFernflowerPreferences.RENAME_ENTITIES, "1",
-                        IFernflowerPreferences.USER_RENAMER_CLASS, ProbeRemapper.class.getName()
-                ),
+                Map.of(),
                 new ProbeDecompilerLogger()
         );
     }
 
-    public void addSource(File source) {
+    public void addRuntimeSource(File source) {
+        // TODO: Use ProbeClassSource instead of file
         engine.addSource(source);
     }
 
     public void fromMods() {
         for (File modFile : findModFiles()) {
-            addSource(modFile);
+            addRuntimeSource(modFile);
         }
     }
 

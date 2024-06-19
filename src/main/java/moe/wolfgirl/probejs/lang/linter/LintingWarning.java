@@ -1,7 +1,7 @@
 package moe.wolfgirl.probejs.lang.linter;
 
-import dev.latvian.mods.rhino.mod.util.color.Color;
-import dev.latvian.mods.rhino.mod.wrapper.ColorWrapper;
+import dev.latvian.mods.kubejs.bindings.ColorWrapper;
+import dev.latvian.mods.kubejs.color.Color;
 import net.minecraft.network.chat.Component;
 
 import java.nio.file.Path;

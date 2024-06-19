@@ -127,7 +127,7 @@ public class RecipeEvents extends ProbeJSPlugin {
         ClassDecl.Builder builder = Statements.clazz(NameUtils.rlToTitle(id))
                 .superClass(converter.convertType(schema.recipeFactory.recipeType()));
         for (RecipeKey<?> key : schema.keys) {
-            if (key.functionNames.isEmpty()) continue;
+            if (key.functionNames == null || key.functionNames.isEmpty()) continue;
             builder.method(key.getPreferredBuilderKey(), method -> {
                         method.returnType(Types.THIS);
                         var baseType = converter.convertType(key.component.typeInfo());
@@ -155,6 +155,7 @@ public class RecipeEvents extends ProbeJSPlugin {
 
     @Override
     public Set<Class<?>> provideJavaClass(ScriptDump scriptDump) {
+        if (scriptDump.scriptType != ScriptType.SERVER) return Set.of();
         Set<Class<?>> classes = new HashSet<>();
         ServerScriptManager manager = (ServerScriptManager) scriptDump.manager;
         TypeConverter converter = scriptDump.transpiler.typeConverter;

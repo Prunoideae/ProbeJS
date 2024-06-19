@@ -27,7 +27,7 @@ public class ProbeDump {
     private Consumer<Component> progressReport;
 
     public void addScript(ScriptDump dump) {
-        scriptDumps.add(dump);
+        if (dump != null) scriptDumps.add(dump);
     }
 
     public void defaultScripts() {

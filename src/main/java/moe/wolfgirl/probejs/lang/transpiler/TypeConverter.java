@@ -74,7 +74,7 @@ public class TypeConverter {
                 yield builder.build();
             }
             case ClassTypeInfo info -> predefinedTypes.getOrDefault(
-                    new ClassPath(info.asClass()), Types.typeMaybeGeneric(info.asClass()));
+                    new ClassPath(info.asClass()), Types.type(info.asClass()));
             case ArrayTypeInfo info -> convertType(info.componentType()).asArray();
             case JSFixedArrayTypeInfo info -> {
                 var builder = Types.arrayOf();

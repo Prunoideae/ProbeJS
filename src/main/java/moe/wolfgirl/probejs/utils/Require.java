@@ -12,6 +12,7 @@ public class Require extends BaseFunction {
     private final KubeJSContext context;
 
     public Require(KubeJSContext context) {
+
         this.context = context;
     }
 

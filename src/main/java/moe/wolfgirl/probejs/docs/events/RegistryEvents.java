@@ -87,6 +87,7 @@ public class RegistryEvents extends ProbeJSPlugin {
         ClassDecl.Builder builder = Statements.clazz(NameUtils.rlToTitle(key.location().getPath()))
                 .superClass(Types.parameterized(Types.type(RegistryKubeEvent.class), Types.type(baseClass)));
 
+        /*
         for (Map.Entry<String, ? extends BuilderType<?>> entry : info.types.entrySet()) {
             String extra = entry.getKey();
             BuilderType<?> type = entry.getValue();
@@ -103,6 +104,7 @@ public class RegistryEvents extends ProbeJSPlugin {
                     .param("type", Types.literal(extra))
             );
         }
+        */
 
         return builder.build();
     }
@@ -116,11 +118,13 @@ public class RegistryEvents extends ProbeJSPlugin {
 
         }
 
+        /*
         for (RegistryInfo<?> value : RegistryInfo.MAP.values()) {
             for (BuilderType<?> builderType : value.types.values()) {
                 classes.add(builderType.builderClass());
             }
         }
+        */
         return classes;
     }
 }

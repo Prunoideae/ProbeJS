@@ -25,7 +25,9 @@ import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
 import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
 import moe.wolfgirl.probejs.lang.typescript.code.type.js.JSJoinedType;
 import moe.wolfgirl.probejs.utils.JsonUtils;
+import net.minecraft.server.MinecraftServer;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import org.apache.commons.io.FileUtils;
 
 import java.io.BufferedWriter;
@@ -41,17 +43,22 @@ import java.util.function.Supplier;
  * maintaining the file structures
  */
 public class ScriptDump {
-    public static final Supplier<ScriptDump> SERVER_DUMP = () -> new ScriptDump(
-            ServerScriptManager.getScriptManager(),
-            ProbePaths.PROBE.resolve("server"),
-            KubeJSPaths.SERVER_SCRIPTS,
-            (clazz -> {
-                for (OnlyIn annotation : clazz.getAnnotations(OnlyIn.class)) {
-                    if (annotation.value().isClient()) return false;
-                }
-                return true;
-            })
-    );
+    public static final Supplier<ScriptDump> SERVER_DUMP = () -> {
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        if (server == null) return null;
+        ServerScriptManager scriptManager = server.getServerResources().managers().kjs$getServerScriptManager();
+        return new ScriptDump(
+                scriptManager,
+                ProbePaths.PROBE.resolve("server"),
+                KubeJSPaths.SERVER_SCRIPTS,
+                (clazz -> {
+                    for (OnlyIn annotation : clazz.getAnnotations(OnlyIn.class)) {
+                        if (annotation.value().isClient()) return false;
+                    }
+                    return true;
+                })
+        );
+    };
     public static final Supplier<ScriptDump> CLIENT_DUMP = () -> new ScriptDump(
             KubeJS.getClientScriptManager(),
             ProbePaths.PROBE.resolve("client"),

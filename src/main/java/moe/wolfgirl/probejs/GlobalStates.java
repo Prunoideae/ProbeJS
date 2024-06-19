@@ -22,7 +22,10 @@ public class GlobalStates {
     public static final Set<String> LOOT_TABLES = new HashSet<>();
 
     public static final Supplier<Set<String>> LANG_KEYS = () -> {
-        Set<String> keys = new HashSet<>(MIXIN_LANG_KEYS);
+        Set<String> keys;
+        synchronized (MIXIN_LANG_KEYS) {
+            keys = new HashSet<>(MIXIN_LANG_KEYS);
+        }
         Minecraft mc = Minecraft.getInstance();
         LanguageManager manager = mc.getLanguageManager();
         LanguageInfo english = manager.getLanguage("en_us");

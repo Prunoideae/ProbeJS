@@ -16,6 +16,7 @@ import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
 import moe.wolfgirl.probejs.utils.NameUtils;
 import moe.wolfgirl.probejs.utils.RegistryUtils;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
@@ -24,6 +25,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.tags.TagKey;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
+import java.lang.reflect.Type;
 import java.util.*;
 
 /**
@@ -58,6 +60,11 @@ public class RegistryTypes extends ProbeJSPlugin {
         scriptDump.assignType(Registry.class, Types.or(registryNames.toArray(BaseType[]::new)));
         // TagKey<T> to Special.TagOf<T>
         scriptDump.assignType(TagKey.class, Types.parameterized(Types.primitive("Special.TagOf"), Types.generic("T")));
+        // HolderSet<T> to Special.LiteralOf<T> | Special.TagOf<T>
+        scriptDump.assignType(HolderSet.class, Types.or(
+                Types.parameterized(Types.primitive("Special.LiteralOf"), Types.generic("T")).asArray(),
+                Types.primitive("`${Special.TagOf<T>}`").asArray()
+        ));
     }
 
     @Override

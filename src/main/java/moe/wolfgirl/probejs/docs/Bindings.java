@@ -3,7 +3,6 @@ package moe.wolfgirl.probejs.docs;
 import dev.latvian.mods.kubejs.event.EventGroupWrapper;
 import dev.latvian.mods.kubejs.script.KubeJSContext;
 import dev.latvian.mods.rhino.BaseFunction;
-import dev.latvian.mods.rhino.Context;
 import dev.latvian.mods.rhino.NativeJavaClass;
 import dev.latvian.mods.rhino.Scriptable;
 import dev.latvian.mods.rhino.type.TypeInfo;
@@ -14,7 +13,6 @@ import moe.wolfgirl.probejs.lang.typescript.code.Code;
 import moe.wolfgirl.probejs.lang.typescript.code.ts.ReexportDeclaration;
 import moe.wolfgirl.probejs.lang.typescript.code.ts.VariableDeclaration;
 import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
-import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
 
 import java.util.*;
 
@@ -24,6 +22,7 @@ import java.util.*;
 public class Bindings extends ProbeJSPlugin {
     @Override
     public void addGlobals(ScriptDump scriptDump) {
+        // scans for globally exported objects
         KubeJSContext context = (KubeJSContext) scriptDump.manager.contextFactory.enter();
         Scriptable scope = context.topLevelScope;
         TypeConverter converter = scriptDump.transpiler.typeConverter;

@@ -7,12 +7,21 @@ plugins {
 }
 
 version = "${mod_version}"
+neoforge_version = "${neoforge_version}"
 group = project.maven_group
 
 loom {
     silentMojangMappingsLicense()
     accessWidenerPath = file("src/main/resources/probejs.accesswidener")
+
+    runs {
+        client {
+            vmArgs("-XX:+IgnoreUnrecognizedVMOptions", "-XX:+AllowEnhancedClassRedefinition")
+            runDir = 'run'
+        }
+    }
 }
+
 
 compileJava {
     options.encoding = "UTF-8"
@@ -23,6 +32,22 @@ java {
     sourceCompatibility = targetCompatibility = '21'
     withSourcesJar()
 }
+
+processResources {
+    def toReplace = [
+            "version"         : project.version,
+            "neoforge_version": project.neoforge_version,
+            "kubejs_version"          : project.kubejs_version,
+    ]
+
+    println("[Process Resources] Replacing properties in resources: " + toReplace)
+
+    inputs.properties toReplace
+    filesMatching("META-INF/neoforge.mods.toml") {
+        expand toReplace
+    }
+}
+
 
 repositories {
     mavenLocal()
@@ -67,7 +92,8 @@ dependencies {
 
     neoForge("net.neoforged:neoforge:$neoforge_version")
     modApi("dev.latvian.mods:rhino:$rhino_version") { transitive(false) }
-    modApi("dev.latvian.mods:kubejs-neoforge:$kubejs_version") { transitive(false) }
+    modApi("dev.latvian.mods:kubejs-neoforge:$kubejs_version")
+    modApi("dev.architectury:architectury-neoforge:$architectury_version")
 
     compileOnly 'org.java-websocket:Java-WebSocket:1.5.6'
     compileOnly 'com.github.javaparser:javaparser-symbol-solver-core:3.25.8'
