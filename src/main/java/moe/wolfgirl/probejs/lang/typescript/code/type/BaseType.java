@@ -13,7 +13,7 @@ public abstract class BaseType extends Code {
     public abstract List<String> format(Declaration declaration, FormatType input);
 
     public String line(Declaration declaration, FormatType input) {
-        return format(declaration, input).get(0);
+        return format(declaration, input).getFirst();
     }
 
     // Stuffs for convenience

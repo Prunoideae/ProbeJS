@@ -73,8 +73,7 @@ public class Events extends ProbeJSPlugin {
     private static MethodDeclaration formatEvent(TypeConverter converter, EventHandler handler, boolean useExtra) {
         var builder = Statements.method(handler.name);
         if (useExtra) {
-            TypeDescJS typeDesc = handler.extra.describeType.apply(TypeConverter.PROBEJS);
-            BaseType extraType = converter.convertType(typeDesc);
+            BaseType extraType = converter.convertType(handler.extra.describeType);
             builder.param("extra", extraType);
         }
         JSLambdaType callback = Types.lambda()

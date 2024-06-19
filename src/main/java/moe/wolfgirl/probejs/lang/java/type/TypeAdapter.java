@@ -15,20 +15,26 @@ public class TypeAdapter {
     }
 
     public static TypeDescriptor getTypeDescription(AnnotatedType type, boolean recursive) {
-        if (type == null) return null;
+        switch (type) {
+            case null -> {
+                return null;
+            }
+            case AnnotatedArrayType arrayType -> {
+                return new ArrayType(arrayType);
+            }
+            case AnnotatedParameterizedType paramType -> {
+                return new ParamType(paramType);
+            }
+            case AnnotatedTypeVariable typeVariable -> {
+                return new VariableType(typeVariable, recursive);
+            }
+            case AnnotatedWildcardType wildcardType -> {
+                return new moe.wolfgirl.probejs.lang.java.type.impl.WildcardType(wildcardType, recursive);
+            }
+            default -> {
+            }
+        }
 
-        if (type instanceof AnnotatedArrayType arrayType) {
-            return new ArrayType(arrayType);
-        }
-        if (type instanceof AnnotatedParameterizedType paramType) {
-            return new ParamType(paramType);
-        }
-        if (type instanceof AnnotatedTypeVariable typeVariable) {
-            return new VariableType(typeVariable, recursive);
-        }
-        if (type instanceof AnnotatedWildcardType wildcardType) {
-            return new moe.wolfgirl.probejs.lang.java.type.impl.WildcardType(wildcardType, recursive);
-        }
         if (type.getType() instanceof Class<?> clazz) {
             TypeVariable<?>[] interfaces = clazz.getTypeParameters();
             if (recursive && interfaces.length != 0)
@@ -47,31 +53,35 @@ public class TypeAdapter {
     }
 
     public static TypeDescriptor getTypeDescription(Type type, boolean recursive) {
-        if (type == null) return null;
+        switch (type) {
+            case null -> {
+                return null;
+            }
+            case GenericArrayType arrayType -> {
+                return new ArrayType(arrayType);
+            }
+            case ParameterizedType parameterizedType -> {
+                return new ParamType(parameterizedType);
+            }
+            case TypeVariable<?> typeVariable -> {
+                return new VariableType(typeVariable, recursive);
+            }
+            case WildcardType wildcardType -> {
+                return new moe.wolfgirl.probejs.lang.java.type.impl.WildcardType(wildcardType, recursive);
+            }
+            case Class<?> clazz -> {
+                TypeVariable<?>[] interfaces = clazz.getTypeParameters();
+                if (recursive && interfaces.length != 0)
+                    return new ParamType(
+                            new Annotation[]{},
+                            new ClassType(clazz),
+                            Collections.nCopies(interfaces.length, new ClassType(Object.class))
+                    );
+                return new ClassType(clazz);
+            }
+            default -> throw new RuntimeException("Unknown type to be resolved");
+        }
 
-        if (type instanceof GenericArrayType arrayType) {
-            return new ArrayType(arrayType);
-        }
-        if (type instanceof ParameterizedType parameterizedType) {
-            return new ParamType(parameterizedType);
-        }
-        if (type instanceof TypeVariable<?> typeVariable) {
-            return new VariableType(typeVariable, recursive);
-        }
-        if (type instanceof java.lang.reflect.WildcardType wildcardType) {
-            return new moe.wolfgirl.probejs.lang.java.type.impl.WildcardType(wildcardType, recursive);
-        }
-        if (type instanceof Class<?> clazz) {
-            TypeVariable<?>[] interfaces = clazz.getTypeParameters();
-            if (recursive && interfaces.length != 0)
-                return new ParamType(
-                        new Annotation[]{},
-                        new ClassType(clazz),
-                        Collections.nCopies(interfaces.length, new ClassType(Object.class))
-                );
-            return new ClassType(clazz);
-        }
-        throw new RuntimeException("Unknown type to be resolved");
     }
 
     public static TypeDescriptor consolidateType(TypeDescriptor in, String symbol, TypeDescriptor replacement) {

@@ -1,7 +1,6 @@
 package moe.wolfgirl.probejs.lang.java.type;
 
 import moe.wolfgirl.probejs.lang.java.base.AnnotationHolder;
-import moe.wolfgirl.probejs.lang.java.base.ClassPathProvider;
 import moe.wolfgirl.probejs.lang.java.base.ClassProvider;
 import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 
@@ -10,7 +9,7 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public abstract class TypeDescriptor extends AnnotationHolder implements ClassPathProvider, ClassProvider {
+public abstract class TypeDescriptor extends AnnotationHolder implements ClassProvider {
     public TypeDescriptor(Annotation[] annotations) {
         super(annotations);
     }

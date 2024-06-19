@@ -18,6 +18,7 @@ public interface ClassTransformer {
             new InjectAnnotation(),
             new InjectArray(),
             new InjectBeans(),
+            new InjectSelf(),
     };
 
     static void transformClass(Clazz clazz, ClassDecl classDecl) {
@@ -26,9 +27,9 @@ public interface ClassTransformer {
         }
     }
 
-    static void transformMethods(MethodInfo methodInfo, MethodDecl methodDecl) {
+    static void transformMethods(Clazz clazz, MethodInfo methodInfo, MethodDecl methodDecl) {
         for (ClassTransformer classTransformer : CLASS_TRANSFORMERS) {
-            classTransformer.transformMethod(methodInfo, methodDecl);
+            classTransformer.transformMethod(clazz, methodInfo, methodDecl);
         }
     }
 
@@ -44,9 +45,10 @@ public interface ClassTransformer {
         }
     }
 
-    void transform(Clazz clazz, ClassDecl classDecl);
+    default void transform(Clazz clazz, ClassDecl classDecl) {
+    }
 
-    default void transformMethod(MethodInfo methodInfo, MethodDecl methodDecl) {
+    default void transformMethod(Clazz clazz, MethodInfo methodInfo, MethodDecl methodDecl) {
 
     }
 

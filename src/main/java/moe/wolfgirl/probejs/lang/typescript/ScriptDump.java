@@ -180,7 +180,7 @@ public class ScriptDump {
                 BaseType thisType = Types.type(classPath);
                 List<String> generics = classDecl.variableTypes.stream().map(v -> v.symbol).toList();
 
-                if (generics.size() != 0) {
+                if (!generics.isEmpty()) {
                     String suffix = "<%s>".formatted(String.join(", ", generics));
                     symbol = symbol + suffix;
                     exportedSymbol = exportedSymbol + suffix;
@@ -313,23 +313,6 @@ public class ScriptDump {
         dumpClasses();
         dumpGlobal();
         dumpJSConfig();
-
-        // Since probe can have export now, it's not really needed for global to be here
-        /*
-        if (Files.notExists(srcFolder.resolve("globals.d.ts"))) {
-            write(srcFolder.resolve("globals.d.ts"), """
-                    export {} // Do not remove this line.
-
-                    // Add your own declarations of methods, variables and types here.
-                    // Using require will let VSCode think every script file is an isolated module,
-                    // so they will not be visible unless you declare them in the global scope.
-
-                    // You can also create additional declarations as you like.
-                    declare global {
-
-                    }""".strip());
-        }
-        */
     }
 
     private static void write(Path writeTo, String content) throws IOException {

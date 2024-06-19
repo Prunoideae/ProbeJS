@@ -9,7 +9,7 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
-import net.minecraftforge.server.ServerLifecycleHooks;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -92,7 +92,7 @@ public class Snippet {
     }
 
     private List<SnippetPart> getRecent() {
-        return allParts.get(allParts.size() - 1);
+        return allParts.getLast();
     }
 
     public JsonObject compile() {

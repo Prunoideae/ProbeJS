@@ -14,7 +14,7 @@ import java.util.List;
 
 public record ClassPath(List<String> parts) {
     private static List<String> transformJavaClass(Class<?> clazz) {
-        String name = RemapperUtils.getRemappedClassName(clazz);
+        String name = clazz.getName();
         String[] parts = name.split("\\.");
         String className = "$" + parts[parts.length - 1];
         parts[parts.length - 1] = className;

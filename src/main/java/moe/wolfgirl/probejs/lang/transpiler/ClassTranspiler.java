@@ -64,7 +64,7 @@ public class ClassTranspiler extends Converter<Clazz, ClassDecl> {
 
         for (MethodInfo methodInfo : input.methods) {
             var methodDecl = method.transpile(methodInfo);
-            ClassTransformer.transformMethods(methodInfo, methodDecl);
+            ClassTransformer.transformMethods(input, methodInfo, methodDecl);
             decl.methods.add(methodDecl);
         }
 

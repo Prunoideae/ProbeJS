@@ -1,12 +1,12 @@
 package moe.wolfgirl.probejs.events;
 
-import dev.latvian.mods.kubejs.event.EventJS;
+import dev.latvian.mods.kubejs.event.KubeEvent;
 import moe.wolfgirl.probejs.lang.snippet.Snippet;
 import moe.wolfgirl.probejs.lang.snippet.SnippetDump;
 
 import java.util.function.Consumer;
 
-public class SnippetGenerationEventJS extends EventJS {
+public class SnippetGenerationEventJS implements KubeEvent {
 
     private final SnippetDump dump;
 

@@ -41,12 +41,12 @@ public class Bindings extends ProbeJSPlugin {
 
                 if (value.getClass() == Class.class) {
                     if (((Class<?>) value).isInterface()) {
-                        reexported.put(id, converter.convertType(Types.typeOf((Class<?>) value)));
+                        reexported.put(id, converter.convertType(TypeInfo.of((Class<?>) value)));
                     } else {
-                        exported.put(id, converter.convertType(Types.typeOf((Class<?>) value)));
+                        exported.put(id, converter.convertType(TypeInfo.of((Class<?>) value)));
                     }
                 } else if (!(value instanceof BaseFunction || value instanceof EventGroupWrapper)) {
-                    exported.put(id, converter.convertType(Types.typeMaybeGeneric(value.getClass())));
+                    exported.put(id, converter.convertType(TypeInfo.of(value.getClass())));
                 }
             }
         }

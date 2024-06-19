@@ -1,11 +1,8 @@
 package moe.wolfgirl.probejs.lang.java.clazz.members;
 
-import moe.wolfgirl.probejs.lang.java.base.ClassPathProvider;
 import moe.wolfgirl.probejs.lang.java.base.TypeVariableHolder;
-import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.lang.java.type.TypeAdapter;
 import moe.wolfgirl.probejs.lang.java.type.TypeDescriptor;
-import moe.wolfgirl.probejs.lang.java.type.impl.VariableType;
 import dev.latvian.mods.rhino.JavaMembers;
 
 import java.lang.reflect.Method;
@@ -15,7 +12,7 @@ import java.lang.reflect.TypeVariable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class MethodInfo extends TypeVariableHolder implements ClassPathProvider {
+public class MethodInfo extends TypeVariableHolder {
     public final String name;
     public final List<ParamInfo> params;
     public TypeDescriptor returnType;
@@ -40,19 +37,6 @@ public class MethodInfo extends TypeVariableHolder implements ClassPathProvider 
             }
             this.returnType = TypeAdapter.consolidateType(this.returnType, symbol.getName(), replacement);
         }
-    }
-
-    @Override
-    public Collection<ClassPath> getClassPaths() {
-        Set<ClassPath> paths = new HashSet<>();
-        for (ParamInfo param : params) {
-            paths.addAll(param.getClassPaths());
-        }
-        paths.addAll(returnType.getClassPaths());
-        for (VariableType variableType : variableTypes) {
-            paths.addAll(variableType.getClassPaths());
-        }
-        return paths;
     }
 
     public static class MethodAttributes {

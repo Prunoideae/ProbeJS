@@ -1,28 +1,28 @@
 package moe.wolfgirl.probejs.utils;
 
 
-import dev.latvian.mods.kubejs.bindings.JavaWrapper;
-import dev.latvian.mods.kubejs.script.ScriptManager;
+import dev.latvian.mods.kubejs.script.KubeJSContext;
 import dev.latvian.mods.rhino.*;
+import dev.latvian.mods.rhino.type.TypeInfo;
 import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 
 import java.util.Arrays;
 
 public class Require extends BaseFunction {
-    private final JavaWrapper innerWrapper;
+    private final KubeJSContext context;
 
-    public Require(ScriptManager manager) {
-        this.innerWrapper = new JavaWrapper(manager);
+    public Require(KubeJSContext context) {
+        this.context = context;
     }
 
     @Override
     public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
-        String result = (String) Context.jsToJava(cx, args[0], String.class);
+        String result = (String) context.jsToJava(args[0], TypeInfo.STRING);
         String[] parts = result.split("/", 2);
         ClassPath path = new ClassPath(Arrays.stream(parts[1].split("/")).toList());
 
-        var loaded = innerWrapper.tryLoadClass(path.getClassPathJava());
-        return new RequireWrapper(path, loaded == null ? Undefined.instance : loaded);
+        var loaded = context.loadJavaClass(path.getClassPathJava(), false);
+        return new RequireWrapper(path, loaded == null ? Undefined.INSTANCE : loaded);
     }
 
     public static class RequireWrapper extends ScriptableObject {

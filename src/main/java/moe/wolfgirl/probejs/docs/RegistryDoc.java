@@ -1,6 +1,7 @@
 package moe.wolfgirl.probejs.docs;
 
 import dev.latvian.mods.kubejs.registry.RegistryInfo;
+import dev.latvian.mods.kubejs.registry.RegistryType;
 import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.lang.snippet.Snippet;
 import moe.wolfgirl.probejs.lang.snippet.SnippetDump;
@@ -28,7 +29,7 @@ import java.util.*;
 /**
  * Assign types to all the registry types
  */
-public class RegistryTypes extends ProbeJSPlugin {
+public class RegistryDoc extends ProbeJSPlugin {
     public static final String LITERAL_FIELD = "probejsInternal$$Literal";
     public static final String TAG_FIELD = "probejsInternal$$Tag";
     public static final String OF_TYPE_DECL = "T extends { %s: infer U } ? U : string";

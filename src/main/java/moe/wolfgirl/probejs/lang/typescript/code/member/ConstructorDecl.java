@@ -34,7 +34,7 @@ public class ConstructorDecl extends CommentableCode {
     public List<String> formatRaw(Declaration declaration) {
         // Format head - constructor<T>
         String head = "constructor";
-        if (variableTypes.size() != 0) {
+        if (!variableTypes.isEmpty()) {
             String variables = variableTypes.stream()
                     .map(type -> type.line(declaration, BaseType.FormatType.VARIABLE))
                     .collect(Collectors.joining(", "));

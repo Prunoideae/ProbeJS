@@ -1,10 +1,13 @@
 package moe.wolfgirl.probejs.docs.events;
 
 import dev.latvian.mods.kubejs.recipe.RecipeKey;
+import dev.latvian.mods.kubejs.recipe.RecipesKubeEvent;
 import dev.latvian.mods.kubejs.recipe.schema.RecipeNamespace;
 import dev.latvian.mods.kubejs.recipe.schema.RecipeSchema;
 import dev.latvian.mods.kubejs.recipe.schema.RecipeSchemaType;
+import dev.latvian.mods.kubejs.recipe.schema.UnknownRecipeSchemaType;
 import dev.latvian.mods.kubejs.script.ScriptType;
+import dev.latvian.mods.kubejs.server.ServerScriptManager;
 import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
 import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
@@ -21,10 +24,8 @@ import moe.wolfgirl.probejs.lang.typescript.code.type.js.JSLambdaType;
 import moe.wolfgirl.probejs.lang.typescript.code.type.js.JSObjectType;
 import moe.wolfgirl.probejs.utils.NameUtils;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class RecipeEvents extends ProbeJSPlugin {
     public static final Map<String, String> SHORTCUTS = new HashMap<>();
@@ -47,23 +48,22 @@ public class RecipeEvents extends ProbeJSPlugin {
     public void modifyClasses(ScriptDump scriptDump, Map<ClassPath, TypeScriptFile> globalClasses) {
         if (scriptDump.scriptType != ScriptType.SERVER) return;
         TypeConverter converter = scriptDump.transpiler.typeConverter;
+        ServerScriptManager manager = (ServerScriptManager) scriptDump.manager;
 
         // Generate recipe schema classes
         // Also generate the documented recipe class containing all stuffs from everywhere
         ClassDecl.Builder documentedRecipes = Statements.clazz(DOCUMENTED_RECIPES.getName());
 
-        for (Map.Entry<String, RecipeNamespace> entry : RecipeNamespace.getAll().entrySet()) {
+        for (Map.Entry<String, RecipeNamespace> entry : manager.recipeSchemaStorage.namespaces.entrySet()) {
             String namespaceId = entry.getKey();
             RecipeNamespace namespace = entry.getValue();
 
-            Map<String, BaseType> namespaceMembers = new HashMap<>();
-
+            var builder = Types.object();
             for (Map.Entry<String, RecipeSchemaType> e : namespace.entrySet()) {
                 String schemaId = e.getKey();
                 RecipeSchemaType schemaType = e.getValue();
-                if (schemaType instanceof JsonRecipeSchemaType) continue;
+                if (schemaType instanceof UnknownRecipeSchemaType) continue;
                 RecipeSchema schema = schemaType.schema;
-                if (schema == SpecialRecipeSchema.SCHEMA) continue;
 
                 ClassPath schemaPath = getSchemaClassPath(namespaceId, schemaId);
                 ClassDecl schemaDecl = generateSchemaClass(schemaId, schema, converter);
@@ -72,17 +72,17 @@ public class RecipeEvents extends ProbeJSPlugin {
                 globalClasses.put(schemaPath, schemaFile);
 
                 JSLambdaType recipeFunction = generateSchemaFunction(schemaPath, schema, converter);
-                namespaceMembers.put(schemaId, recipeFunction);
+                builder.member(schemaId, recipeFunction);
             }
 
-            documentedRecipes.field(namespaceId, new JSObjectType(namespaceMembers));
+            documentedRecipes.field(namespaceId, builder.build());
         }
         TypeScriptFile documentFile = new TypeScriptFile(DOCUMENTED_RECIPES);
         documentFile.addCode(documentedRecipes.build());
         globalClasses.put(DOCUMENTED_RECIPES, documentFile);
 
         // Inject types into the RecipeEventJS
-        TypeScriptFile recipeEventFile = globalClasses.get(new ClassPath(RecipesEventJS.class));
+        TypeScriptFile recipeEventFile = globalClasses.get(new ClassPath(RecipesKubeEvent.class));
         ClassDecl recipeEvent = recipeEventFile.findCode(ClassDecl.class).orElse(null);
         if (recipeEvent == null) return; // What???
         recipeEvent.methods.stream()
@@ -100,7 +100,7 @@ public class RecipeEvents extends ProbeJSPlugin {
         for (FieldDecl field : recipeEvent.fields) {
             if (!SHORTCUTS.containsKey(field.name)) continue;
             String[] parts = SHORTCUTS.get(field.name).split(":", 2);
-            RecipeSchema shortcutSchema = RecipeNamespace.getAll().get(parts[0]).get(parts[1]).schema;
+            RecipeSchema shortcutSchema = manager.recipeSchemaStorage.namespaces.get(parts[0]).get(parts[1]).schema;
             ClassPath returnType = getSchemaClassPath(parts[0], parts[1]);
             field.type = generateSchemaFunction(returnType, shortcutSchema, converter);
 
@@ -125,13 +125,13 @@ public class RecipeEvents extends ProbeJSPlugin {
      */
     private static ClassDecl generateSchemaClass(String id, RecipeSchema schema, TypeConverter converter) {
         ClassDecl.Builder builder = Statements.clazz(NameUtils.rlToTitle(id))
-                .superClass(Types.type(schema.recipeType));
+                .superClass(converter.convertType(schema.recipeFactory.recipeType()));
         for (RecipeKey<?> key : schema.keys) {
-            if (key.noBuilders) continue;
-            builder.method(key.preferred, method -> {
+            if (key.functionNames.isEmpty()) continue;
+            builder.method(key.getPreferredBuilderKey(), method -> {
                         method.returnType(Types.THIS);
-                        var baseType = converter.convertType(key.component.constructorDescription(TypeConverter.PROBEJS));
-                        if (!baseType.equals(Types.BOOLEAN)) method.param(key.preferred, baseType);
+                        var baseType = converter.convertType(key.component.typeInfo());
+                        if (!baseType.equals(Types.BOOLEAN)) method.param(key.getPreferredBuilderKey(), baseType);
                     }
             );
         }
@@ -145,8 +145,8 @@ public class RecipeEvents extends ProbeJSPlugin {
 
         for (RecipeKey<?> key : schema.keys) {
             if (key.excluded) continue;
-            builder.param(key.preferred,
-                    converter.convertType(key.component.constructorDescription(TypeConverter.PROBEJS)),
+            builder.param(key.getPreferredBuilderKey(),
+                    converter.convertType(key.component.typeInfo()),
                     key.optional(), false);
         }
 
@@ -156,9 +156,13 @@ public class RecipeEvents extends ProbeJSPlugin {
     @Override
     public Set<Class<?>> provideJavaClass(ScriptDump scriptDump) {
         Set<Class<?>> classes = new HashSet<>();
-        for (RecipeNamespace namespace : RecipeNamespace.getAll().values()) {
+        ServerScriptManager manager = (ServerScriptManager) scriptDump.manager;
+        TypeConverter converter = scriptDump.transpiler.typeConverter;
+
+        for (RecipeNamespace namespace : manager.recipeSchemaStorage.namespaces.values()) {
             for (RecipeSchemaType schemaType : namespace.values()) {
-                classes.add(schemaType.schema.recipeType);
+                var type = converter.convertType(schemaType.schema.recipeFactory.recipeType());
+                classes.addAll(type.getClasses());
             }
         }
         return classes;

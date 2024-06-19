@@ -31,11 +31,11 @@ public class InterfaceDecl extends ClassDecl {
         }
         // Format head - export interface name<T> extends ... {
         String head = "export interface %s".formatted(name);
-        if (variableTypes.size() != 0) {
+        if (!variableTypes.isEmpty()) {
             String variables = variableTypes.stream().map(type -> type.line(declaration, BaseType.FormatType.VARIABLE)).collect(Collectors.joining(", "));
             head = "%s<%s>".formatted(head, variables);
         }
-        if (interfaces.size() != 0) {
+        if (!interfaces.isEmpty()) {
             String formatted = interfaces.stream().map(type -> type.line(declaration)).collect(Collectors.joining(", "));
             head = "%s extends %s".formatted(head, formatted);
         }
@@ -82,7 +82,7 @@ public class InterfaceDecl extends ClassDecl {
         // (a: SomeClass<number>, b: SomeClass<string>): void;
         if (methods.stream().filter(method -> method.isAbstract).count() == 1) {
             body.add("");
-            MethodDecl method = methods.get(0);
+            MethodDecl method = methods.getFirst();
             String hybridBody = ParamDecl.formatParams(method.params, declaration);
             String returnType = method.returnType.line(declaration);
 

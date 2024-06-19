@@ -31,7 +31,7 @@ public class InjectBeans implements ClassTransformer {
                 classDecl.bodyCode.add(new BeanDecl(
                         "set %s(value: %s)",
                         beanName,
-                        Types.ignoreContext(method.params.get(0).type, BaseType.FormatType.INPUT)
+                        Types.ignoreContext(method.params.getFirst().type, BaseType.FormatType.INPUT)
                 ));
             } else if (method.params.isEmpty()) {
                 if (method.name.startsWith("get")) {

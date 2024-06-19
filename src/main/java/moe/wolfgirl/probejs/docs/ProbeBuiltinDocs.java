@@ -28,7 +28,7 @@ public class ProbeBuiltinDocs extends ProbeJSPlugin {
 
     // So docs can be added because we don't have access to forge stuffs here
     public final static List<Supplier<ProbeJSPlugin>> BUILTIN_DOCS = new ArrayList<>(List.of(
-            RegistryTypes::new,
+            RegistryDoc::new,
             SpecialTypes::new,
             Primitives::new,
             JavaPrimitives::new,

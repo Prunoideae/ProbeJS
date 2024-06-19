@@ -1,8 +1,8 @@
 package moe.wolfgirl.probejs.docs.events;
 
 import dev.latvian.mods.kubejs.registry.BuilderType;
-import dev.latvian.mods.kubejs.registry.RegistryEventJS;
 import dev.latvian.mods.kubejs.registry.RegistryInfo;
+import dev.latvian.mods.kubejs.registry.RegistryKubeEvent;
 import dev.latvian.mods.kubejs.script.ScriptType;
 import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
 import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
@@ -37,7 +37,7 @@ public class RegistryEvents extends ProbeJSPlugin {
                     key.location().toString();
 
             MethodDeclaration declaration = Statements.method("registry")
-                    .param("extra", Types.literal(extraName))
+                    .param("type", Types.literal(extraName))
                     .param("handler", Types.lambda()
                             .param("event", Types.type(registryPath))
                             .build()
@@ -66,7 +66,7 @@ public class RegistryEvents extends ProbeJSPlugin {
         }
 
         // Let createCustom to use Supplier<T> instead of object
-        TypeScriptFile registryEvent = globalClasses.get(new ClassPath(RegistryEventJS.class));
+        TypeScriptFile registryEvent = globalClasses.get(new ClassPath(RegistryKubeEvent.class));
         ClassDecl eventClass = registryEvent.findCode(ClassDecl.class).orElse(null);
         if (eventClass == null) return;
 
@@ -85,7 +85,7 @@ public class RegistryEvents extends ProbeJSPlugin {
 
     private static ClassDecl generateRegistryClass(ResourceKey<?> key, RegistryInfo<?> info) {
         ClassDecl.Builder builder = Statements.clazz(NameUtils.rlToTitle(key.location().getPath()))
-                .superClass(Types.parameterized(Types.type(RegistryEventJS.class), Types.type(info.objectBaseClass)));
+                .superClass(Types.parameterized(Types.type(RegistryKubeEvent.class), Types.type(info.objectBaseClass)));
 
         for (Map.Entry<String, ? extends BuilderType<?>> entry : info.types.entrySet()) {
             String extra = entry.getKey();

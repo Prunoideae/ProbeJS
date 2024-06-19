@@ -40,7 +40,7 @@ public class MethodDeclaration extends CommentableCode {
     public List<String> formatRaw(Declaration declaration) {
         // Format head - function name<T, U extends A>
         String head = "function %s".formatted(name);
-        if (variableTypes.size() != 0) {
+        if (!variableTypes.isEmpty()) {
             String variables = variableTypes.stream()
                     .map(type -> type.line(declaration))
                     .collect(Collectors.joining(", "));

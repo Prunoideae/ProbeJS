@@ -1,6 +1,7 @@
 package moe.wolfgirl.probejs.plugin;
 
-import dev.latvian.mods.kubejs.script.BindingsEvent;
+import dev.latvian.mods.kubejs.event.EventGroupRegistry;
+import dev.latvian.mods.kubejs.script.BindingRegistry;
 import dev.latvian.mods.kubejs.script.ScriptType;
 import dev.latvian.mods.kubejs.util.ClassFilter;
 import moe.wolfgirl.probejs.events.ProbeEvents;
@@ -21,15 +22,16 @@ import java.util.Map;
 import java.util.Set;
 
 public class BuiltinProbeJSPlugin extends ProbeJSPlugin {
+
     @Override
-    public void registerEvents() {
-        ProbeEvents.GROUP.register();
+    public void registerEvents(EventGroupRegistry registry) {
+        registry.register(ProbeEvents.GROUP);
     }
 
     @Override
-    public void registerBindings(BindingsEvent event) {
-        if (event.manager.scriptType == ScriptType.CLIENT) event.add("Types", Types.class);
-        event.add("require", new Require(event.manager));
+    public void registerBindings(BindingRegistry bindings) {
+        if (bindings.type() == ScriptType.CLIENT) bindings.add("Types", Types.class);
+        bindings.add("require", new Require(bindings.context()));
     }
 
     @Override

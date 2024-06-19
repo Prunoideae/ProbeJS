@@ -49,7 +49,7 @@ public class MethodDecl extends CommentableCode {
 
         String head = String.join(" ", modifiers);
         head = "%s %s".formatted(head, ProbeJS.GSON.toJson(name));
-        if (variableTypes.size() != 0) {
+        if (!variableTypes.isEmpty()) {
             String variables = variableTypes.stream()
                     .map(type -> type.line(declaration, BaseType.FormatType.VARIABLE))
                     .collect(Collectors.joining(", "));

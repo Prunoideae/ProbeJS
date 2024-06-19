@@ -20,7 +20,7 @@ public class InjectAnnotation implements ClassTransformer {
     }
 
     @Override
-    public void transformMethod(MethodInfo methodInfo, MethodDecl decl) {
+    public void transformMethod(Clazz clazz, MethodInfo methodInfo, MethodDecl decl) {
         var params = applyInfo(methodInfo, decl);
         if (methodInfo.hasAnnotation(Deprecated.class)) {
             decl.newline("@deprecated");

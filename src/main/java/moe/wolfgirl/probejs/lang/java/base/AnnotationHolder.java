@@ -29,6 +29,6 @@ public class AnnotationHolder {
 
     public <T extends Annotation> T getAnnotation(Class<T> type) {
         var annotations = getAnnotations(type);
-        return annotations.isEmpty() ? null : annotations.get(0);
+        return annotations.isEmpty() ? null : annotations.getFirst();
     }
 }

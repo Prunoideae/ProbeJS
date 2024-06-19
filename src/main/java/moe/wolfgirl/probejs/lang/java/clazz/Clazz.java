@@ -1,15 +1,12 @@
 package moe.wolfgirl.probejs.lang.java.clazz;
 
 import dev.latvian.mods.rhino.util.HideFromJS;
-import moe.wolfgirl.probejs.lang.java.base.ClassPathProvider;
 import moe.wolfgirl.probejs.lang.java.base.TypeVariableHolder;
 import moe.wolfgirl.probejs.lang.java.clazz.members.ConstructorInfo;
 import moe.wolfgirl.probejs.lang.java.clazz.members.FieldInfo;
 import moe.wolfgirl.probejs.lang.java.clazz.members.MethodInfo;
-import moe.wolfgirl.probejs.lang.java.clazz.members.ParamInfo;
 import moe.wolfgirl.probejs.lang.java.type.TypeAdapter;
 import moe.wolfgirl.probejs.lang.java.type.TypeDescriptor;
-import moe.wolfgirl.probejs.lang.java.type.impl.VariableType;
 import moe.wolfgirl.probejs.utils.RemapperUtils;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,7 +14,7 @@ import java.lang.reflect.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class Clazz extends TypeVariableHolder implements ClassPathProvider {
+public class Clazz extends TypeVariableHolder {
 
     @HideFromJS
     public final Class<?> original;
@@ -65,28 +62,6 @@ public class Clazz extends TypeVariableHolder implements ClassPathProvider {
     }
 
     @Override
-    public Collection<ClassPath> getClassPaths() {
-        Set<ClassPath> paths = new HashSet<>();
-        for (ConstructorInfo constructor : constructors) {
-            paths.addAll(constructor.getClassPaths());
-        }
-        for (FieldInfo field : fields) {
-            paths.addAll(field.getClassPaths());
-        }
-        for (MethodInfo method : methods) {
-            paths.addAll(method.getClassPaths());
-        }
-        if (superClass != null) paths.addAll(superClass.getClassPaths());
-        for (TypeDescriptor i : interfaces) {
-            paths.addAll(i.getClassPaths());
-        }
-        for (VariableType variableType : variableTypes) {
-            paths.addAll(variableType.getClassPaths());
-        }
-        return paths;
-    }
-
-    @Override
     public int hashCode() {
         return classPath.hashCode();
     }
@@ -97,38 +72,6 @@ public class Clazz extends TypeVariableHolder implements ClassPathProvider {
         if (o == null || getClass() != o.getClass()) return false;
         Clazz clazz = (Clazz) o;
         return Objects.equals(classPath, clazz.classPath);
-    }
-
-    public Set<ClassPath> getUsedClasses() {
-        Set<ClassPath> used = new HashSet<>();
-
-        for (MethodInfo method : methods) {
-            used.addAll(method.returnType.getClassPaths());
-            for (ParamInfo param : method.params) {
-                used.addAll(param.type.getClassPaths());
-            }
-        }
-
-        for (FieldInfo field : fields) {
-            used.addAll(field.type.getClassPaths());
-        }
-
-        for (ConstructorInfo constructor : constructors) {
-            for (ParamInfo param : constructor.params) {
-                used.addAll(param.type.getClassPaths());
-            }
-        }
-
-        if (superClass != null) used.addAll(superClass.getClassPaths());
-        for (TypeDescriptor i : interfaces) {
-            used.addAll(i.getClassPaths());
-        }
-
-        for (VariableType variableType : variableTypes) {
-            used.addAll(variableType.getClassPaths());
-        }
-
-        return used;
     }
 
     /**

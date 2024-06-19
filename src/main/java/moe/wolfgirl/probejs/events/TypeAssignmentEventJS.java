@@ -1,10 +1,10 @@
 package moe.wolfgirl.probejs.events;
 
-import dev.latvian.mods.kubejs.event.EventJS;
+import dev.latvian.mods.kubejs.event.KubeEvent;
 import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
 import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
 
-public class TypeAssignmentEventJS extends EventJS {
+public class TypeAssignmentEventJS implements KubeEvent {
     private final ScriptDump scriptDump;
 
     public TypeAssignmentEventJS(ScriptDump scriptDump) {

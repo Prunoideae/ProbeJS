@@ -20,10 +20,8 @@ public class EnumTypes extends ProbeJSPlugin {
         try {
             for (Clazz recordedClass : scriptDump.recordedClasses) {
                 if (!recordedClass.original.isEnum()) continue;
-                TypeInfo.of(recordedClass.original)
-                EnumTypeInfo<?> typeWrapper = EnumTypeWrapper.get(recordedClass.original);
-                BaseType[] types = typeWrapper.nameValues
-                        .keySet()
+                EnumTypeInfo typeWrapper = (EnumTypeInfo) TypeInfo.of(recordedClass.original);
+                BaseType[] types = typeWrapper.enumConstants()
                         .stream()
                         .map(Types::literal)
                         .toArray(BaseType[]::new);
