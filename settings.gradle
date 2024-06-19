@@ -7,6 +7,5 @@ pluginManagement {
     }
 }
 
-include("forge")
 
 rootProject.name = "ProbeJS"

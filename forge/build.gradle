@@ -4,16 +4,11 @@ plugins {
 
 architectury {
     platformSetupLoomIde()
-    forge()
+    neoForge()
 }
 
 loom {
-    accessWidenerPath = file("src/main/resources/probejs.accesswidener")
 
-    forge {
-        convertAccessWideners = true
-        mixinConfig("probejs.mixins.json")
-    }
 }
 
 configurations {
@@ -21,7 +16,15 @@ configurations {
 }
 
 dependencies {
-    forge("net.neoforged:forge:${rootProject.minecraft_version}-${rootProject.forge_version}")
+    minecraft "com.mojang:minecraft:$minecraft_version"
+    mappings loom.layered() {
+        officialMojangMappings()
+        parchment("org.parchmentmc.data:parchment-1.20.6:$rootProject.parchment_version@zip")
+    }
+
+    neoForge("net.neoforged:neoforge:$rootProject.neoforge_version")
+
+    modApi("dev.latvian.mods:rhino:$rootProject.rhino_version") { transitive(false) }
 
     modImplementation "dev.latvian.mods:kubejs-forge:${rootProject.kubejs_version}"
     modImplementation "dev.latvian.mods:rhino-forge:${rootProject.rhino_version}"
