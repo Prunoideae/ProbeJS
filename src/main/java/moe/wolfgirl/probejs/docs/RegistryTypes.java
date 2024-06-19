@@ -1,6 +1,5 @@
 package moe.wolfgirl.probejs.docs;
 
-import dev.latvian.mods.kubejs.registry.RegistryInfo;
 import dev.latvian.mods.kubejs.registry.RegistryType;
 import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.lang.snippet.Snippet;
@@ -15,6 +14,7 @@ import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
 import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
 import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
 import moe.wolfgirl.probejs.utils.NameUtils;
+import moe.wolfgirl.probejs.utils.RegistryUtils;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
@@ -29,7 +29,7 @@ import java.util.*;
 /**
  * Assign types to all the registry types
  */
-public class RegistryDoc extends ProbeJSPlugin {
+public class RegistryTypes extends ProbeJSPlugin {
     public static final String LITERAL_FIELD = "probejsInternal$$Literal";
     public static final String TAG_FIELD = "probejsInternal$$Tag";
     public static final String OF_TYPE_DECL = "T extends { %s: infer U } ? U : string";
@@ -37,15 +37,16 @@ public class RegistryDoc extends ProbeJSPlugin {
     @Override
     public void assignType(ScriptDump scriptDump) {
         List<BaseType> registryNames = new ArrayList<>();
+        MinecraftServer currentServer = ServerLifecycleHooks.getCurrentServer();
+        if (currentServer == null) return;
+        RegistryAccess access = currentServer.registryAccess();
 
-        for (Map.Entry<ResourceKey<? extends Registry<?>>, RegistryInfo<?>> entry : RegistryInfo.MAP.entrySet()) {
-            ResourceKey<? extends Registry<?>> key = entry.getKey();
-            RegistryInfo<?> info = entry.getValue();
-
-            if (info.getVanillaRegistry() == null) continue;
+        for (ResourceKey<? extends Registry<?>> key : RegistryUtils.getRegistries(access)) {
+            RegistryType<?> type = RegistryType.ofKey(key);
+            if (type == null) continue;
 
             String typeName = NameUtils.rlToTitle(key.location().getPath());
-            scriptDump.assignType(info.objectBaseClass, Types.primitive("Special.%s".formatted(typeName)));
+            scriptDump.assignType(type.baseClass(), Types.primitive("Special.%s".formatted(typeName)));
             registryNames.add(Types.literal(key.location().toString()));
         }
 
@@ -66,7 +67,7 @@ public class RegistryDoc extends ProbeJSPlugin {
         if (currentServer == null) return;
         RegistryAccess registryAccess = currentServer.registryAccess();
 
-        for (ResourceKey<? extends Registry<?>> key : RegistryInfo.MAP.keySet()) {
+        for (ResourceKey<? extends Registry<?>> key : RegistryUtils.getRegistries(registryAccess)) {
             Registry<?> registry = registryAccess.registry(key).orElse(null);
             if (registry == null) continue;
 
@@ -107,12 +108,16 @@ public class RegistryDoc extends ProbeJSPlugin {
 
     @Override
     public void modifyClasses(ScriptDump scriptDump, Map<ClassPath, TypeScriptFile> globalClasses) {
-        // We inject literal and tag into registry types
-        for (Map.Entry<ResourceKey<? extends Registry<?>>, RegistryInfo<?>> entry : RegistryInfo.MAP.entrySet()) {
-            ResourceKey<? extends Registry<?>> key = entry.getKey();
-            RegistryInfo<?> info = entry.getValue();
+        MinecraftServer currentServer = ServerLifecycleHooks.getCurrentServer();
+        if (currentServer == null) return;
+        RegistryAccess registryAccess = currentServer.registryAccess();
 
-            TypeScriptFile typeScriptFile = globalClasses.get(new ClassPath(info.objectBaseClass));
+        // We inject literal and tag into registry types
+        for (ResourceKey<? extends Registry<?>> key : RegistryUtils.getRegistries(registryAccess)) {
+            RegistryType<?> type = RegistryType.ofKey(key);
+            if (type == null) continue;
+
+            TypeScriptFile typeScriptFile = globalClasses.get(new ClassPath(type.baseClass()));
             if (typeScriptFile == null) continue;
             ClassDecl classDecl = typeScriptFile.findCode(ClassDecl.class).orElse(null);
             if (classDecl == null) continue;
@@ -133,13 +138,19 @@ public class RegistryDoc extends ProbeJSPlugin {
     @Override
     public Set<Class<?>> provideJavaClass(ScriptDump scriptDump) {
         Set<Class<?>> registryObjectClasses = new HashSet<>();
-        for (RegistryInfo<?> value : RegistryInfo.MAP.values()) {
-            Registry<?> registry = value.getVanillaRegistry();
+        MinecraftServer currentServer = ServerLifecycleHooks.getCurrentServer();
+        if (currentServer == null) return registryObjectClasses;
+        RegistryAccess registryAccess = currentServer.registryAccess();
+
+        for (ResourceKey<? extends Registry<?>> value : RegistryUtils.getRegistries(registryAccess)) {
+            Registry<?> registry = registryAccess.registry(value).orElse(null);
             if (registry == null) continue;
             for (Object o : registry) {
                 registryObjectClasses.add(o.getClass());
             }
-            registryObjectClasses.add(value.objectBaseClass);
+            RegistryType<?> type = RegistryType.ofKey(value);
+            if (type == null) continue;
+            registryObjectClasses.add(type.baseClass());
         }
         return registryObjectClasses;
     }
@@ -150,7 +161,7 @@ public class RegistryDoc extends ProbeJSPlugin {
         if (currentServer == null) return;
         RegistryAccess registryAccess = currentServer.registryAccess();
 
-        for (ResourceKey<? extends Registry<?>> key : RegistryInfo.MAP.keySet()) {
+        for (ResourceKey<? extends Registry<?>> key : RegistryUtils.getRegistries(registryAccess)) {
             Registry<?> registry = registryAccess.registry(key).orElse(null);
             if (registry == null) continue;
 

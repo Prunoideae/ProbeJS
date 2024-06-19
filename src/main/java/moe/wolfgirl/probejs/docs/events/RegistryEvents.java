@@ -1,8 +1,6 @@
 package moe.wolfgirl.probejs.docs.events;
 
-import dev.latvian.mods.kubejs.registry.BuilderType;
-import dev.latvian.mods.kubejs.registry.RegistryInfo;
-import dev.latvian.mods.kubejs.registry.RegistryKubeEvent;
+import dev.latvian.mods.kubejs.registry.*;
 import dev.latvian.mods.kubejs.script.ScriptType;
 import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
 import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
@@ -14,7 +12,9 @@ import moe.wolfgirl.probejs.lang.typescript.code.ts.Statements;
 import moe.wolfgirl.probejs.lang.typescript.code.ts.Wrapped;
 import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
 import moe.wolfgirl.probejs.utils.NameUtils;
+import moe.wolfgirl.probejs.utils.RegistryUtils;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 
 import java.util.HashSet;
@@ -28,9 +28,8 @@ public class RegistryEvents extends ProbeJSPlugin {
         if (scriptDump.scriptType != ScriptType.STARTUP) return;
 
         Wrapped.Namespace groupNamespace = new Wrapped.Namespace("StartupEvents");
-        for (Map.Entry<ResourceKey<? extends Registry<?>>, RegistryInfo<?>> entry : RegistryInfo.MAP.entrySet()) {
-            ResourceKey<? extends Registry<?>> key = entry.getKey();
 
+        for (ResourceKey<? extends Registry<?>> key : BuiltInRegistries.REGISTRY.registryKeySet()) {
             ClassPath registryPath = getRegistryClassPath(key.location().getNamespace(), key.location().getPath());
             String extraName = key.location().getNamespace().equals("minecraft") ?
                     key.location().getPath() :
@@ -53,12 +52,13 @@ public class RegistryEvents extends ProbeJSPlugin {
     public void modifyClasses(ScriptDump scriptDump, Map<ClassPath, TypeScriptFile> globalClasses) {
         if (scriptDump.scriptType != ScriptType.STARTUP) return;
 
-        for (Map.Entry<ResourceKey<? extends Registry<?>>, RegistryInfo<?>> entry : RegistryInfo.MAP.entrySet()) {
-            ResourceKey<? extends Registry<?>> key = entry.getKey();
-            RegistryInfo<?> info = entry.getValue();
+        for (ResourceKey<? extends Registry<?>> key : BuiltInRegistries.REGISTRY.registryKeySet()) {
+            RegistryInfo<?> info = RegistryInfo.of(RegistryUtils.castKey(key));
+            RegistryType<?> type = RegistryType.ofKey(key);
+            if (type == null) continue;
 
             ClassPath registryPath = getRegistryClassPath(key.location().getNamespace(), key.location().getPath());
-            ClassDecl registryClass = generateRegistryClass(key, info);
+            ClassDecl registryClass = generateRegistryClass(key, type.baseClass(), info);
 
             TypeScriptFile registryFile = new TypeScriptFile(registryPath);
             registryFile.addCode(registryClass);
@@ -83,9 +83,9 @@ public class RegistryEvents extends ProbeJSPlugin {
         ));
     }
 
-    private static ClassDecl generateRegistryClass(ResourceKey<?> key, RegistryInfo<?> info) {
+    private static ClassDecl generateRegistryClass(ResourceKey<?> key, Class<?> baseClass, RegistryInfo<?> info) {
         ClassDecl.Builder builder = Statements.clazz(NameUtils.rlToTitle(key.location().getPath()))
-                .superClass(Types.parameterized(Types.type(RegistryKubeEvent.class), Types.type(info.objectBaseClass)));
+                .superClass(Types.parameterized(Types.type(RegistryKubeEvent.class), Types.type(baseClass)));
 
         for (Map.Entry<String, ? extends BuilderType<?>> entry : info.types.entrySet()) {
             String extra = entry.getKey();
@@ -110,6 +110,12 @@ public class RegistryEvents extends ProbeJSPlugin {
     @Override
     public Set<Class<?>> provideJavaClass(ScriptDump scriptDump) {
         Set<Class<?>> classes = new HashSet<>();
+
+        for (ResourceKey<? extends Registry<?>> key : BuiltInRegistries.REGISTRY.registryKeySet()) {
+            RegistryInfo<?> registryInfo = RegistryInfo.of(RegistryUtils.castKey(key));
+
+        }
+
         for (RegistryInfo<?> value : RegistryInfo.MAP.values()) {
             for (BuilderType<?> builderType : value.types.values()) {
                 classes.add(builderType.builderClass());

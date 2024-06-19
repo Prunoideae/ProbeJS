@@ -1,7 +1,7 @@
 package moe.wolfgirl.probejs.lang.decompiler;
 
 import moe.wolfgirl.probejs.lang.decompiler.remapper.ProbeRemapper;
-import net.minecraftforge.fml.ModList;
+import net.neoforged.fml.ModList;
 import org.jetbrains.java.decompiler.main.Fernflower;
 import org.jetbrains.java.decompiler.main.extern.IFernflowerPreferences;
 

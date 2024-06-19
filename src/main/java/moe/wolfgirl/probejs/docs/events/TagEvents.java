@@ -1,6 +1,5 @@
 package moe.wolfgirl.probejs.docs.events;
 
-import dev.latvian.mods.kubejs.registry.RegistryInfo;
 import dev.latvian.mods.kubejs.script.ScriptType;
 import dev.latvian.mods.kubejs.server.tag.TagKubeEvent;
 import dev.latvian.mods.kubejs.server.tag.TagWrapper;
@@ -15,6 +14,7 @@ import moe.wolfgirl.probejs.lang.typescript.code.ts.Wrapped;
 import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
 import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
 import moe.wolfgirl.probejs.utils.NameUtils;
+import moe.wolfgirl.probejs.utils.RegistryUtils;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
@@ -41,7 +41,7 @@ public class TagEvents extends ProbeJSPlugin {
         RegistryAccess registryAccess = currentServer.registryAccess();
 
         Wrapped.Namespace groupNamespace = new Wrapped.Namespace("ServerEvents");
-        for (ResourceKey<? extends Registry<?>> key : RegistryInfo.MAP.keySet()) {
+        for (ResourceKey<? extends Registry<?>> key : RegistryUtils.getRegistries(registryAccess)) {
             Registry<?> registry = registryAccess.registry(key).orElse(null);
             if (registry == null) continue;
 

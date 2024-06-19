@@ -21,7 +21,6 @@ public class RecipeTypes extends ProbeJSPlugin {
         scriptDump.assignType(ItemStack.class, Types.object()
                 .member("item", Types.primitive("Special.Item"))
                 .member("count?", Primitives.INTEGER)
-                .member("nbt?", Types.primitive("{}"))
                 .build());
 
         scriptDump.assignType(Ingredient.class, Types.type(ItemStack.class));
@@ -33,7 +32,6 @@ public class RecipeTypes extends ProbeJSPlugin {
         scriptDump.assignType(Ingredient.class, Types.primitive("`#${Special.ItemTag}`"));
         scriptDump.assignType(Ingredient.class, Types.primitive("`@${Special.Mod}`"));
         scriptDump.assignType(Ingredient.class, Types.primitive("`%${Special.CreativeModeTab}`"));
-
 
 
         scriptDump.assignType(RecipeFilter.class, Types.primitive("RegExp"));
@@ -51,12 +49,12 @@ public class RecipeTypes extends ProbeJSPlugin {
                 .member("input?", Types.type(Ingredient.class))
                 .member("output?", Types.type(ItemStack.class))
                 .build());
+
         scriptDump.assignType(FluidStack.class, Types.type(Fluid.class));
         scriptDump.assignType(FluidStack.class, Types.literal("-"));
         scriptDump.assignType(FluidStack.class, Types.object()
                 .member("fluid", Types.primitive("Special.Fluid"))
                 .member("amount?", Primitives.INTEGER)
-                .member("nbt?", Types.OBJECT)
                 .build());
     }
 

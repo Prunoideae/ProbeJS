@@ -271,7 +271,7 @@ public class ScriptDump {
                             "ES5",
                             "ES2015"
                         ],
-                        "rootDir": "./src",
+                        "rootDir": ".",
                         "typeRoots": [
                             "../../.probe/%s/probe-types"
                         ],
@@ -279,7 +279,8 @@ public class ScriptDump {
                         "skipLibCheck": true
                     },
                     "include": [
-                        "./src/**/*",
+                        "./**/*.js",
+                        "./**/*.ts",
                     ]
                 }
                 """.formatted(basePath.getFileName(), basePath.getFileName())
