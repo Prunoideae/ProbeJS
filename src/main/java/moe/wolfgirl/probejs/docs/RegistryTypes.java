@@ -63,7 +63,7 @@ public class RegistryTypes extends ProbeJSPlugin {
         // HolderSet<T> to Special.LiteralOf<T> | Special.TagOf<T>
         scriptDump.assignType(HolderSet.class, Types.or(
                 Types.parameterized(Types.primitive("Special.LiteralOf"), Types.generic("T")).asArray(),
-                Types.primitive("`${Special.TagOf<T>}`").asArray()
+                Types.primitive("`#${Special.TagOf<T>}`").asArray()
         ));
     }
 

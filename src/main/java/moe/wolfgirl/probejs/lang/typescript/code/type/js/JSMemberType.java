@@ -25,8 +25,12 @@ public abstract class JSMemberType extends BaseType {
     }
 
     protected String formatMembers(Declaration declaration, FormatType type) {
-        return members.stream().map(m -> m.format(declaration, type)).collect(Collectors.joining(", "));
+        return members.stream()
+                .map(m -> m.format(declaration, type, this::getMemberName))
+                .collect(Collectors.joining(", "));
     }
+
+    protected abstract String getMemberName(String name);
 
     public static abstract class Builder<T extends Builder<T, O>, O extends BaseType> {
         public final Collection<JSParam> members = new ArrayList<>();

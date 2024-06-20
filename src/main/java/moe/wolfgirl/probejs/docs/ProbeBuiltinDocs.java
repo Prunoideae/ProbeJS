@@ -1,11 +1,8 @@
 package moe.wolfgirl.probejs.docs;
 
+import moe.wolfgirl.probejs.docs.assignments.*;
 import moe.wolfgirl.probejs.lang.snippet.SnippetDump;
 import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
-import moe.wolfgirl.probejs.docs.assignments.EnumTypes;
-import moe.wolfgirl.probejs.docs.assignments.JavaPrimitives;
-import moe.wolfgirl.probejs.docs.assignments.WorldTypes;
-import moe.wolfgirl.probejs.docs.assignments.RecipeTypes;
 import moe.wolfgirl.probejs.docs.events.RecipeEvents;
 import moe.wolfgirl.probejs.docs.events.RegistryEvents;
 import moe.wolfgirl.probejs.docs.events.TagEvents;
@@ -35,6 +32,7 @@ public class ProbeBuiltinDocs extends ProbeJSPlugin {
             RecipeTypes::new,
             WorldTypes::new,
             EnumTypes::new,
+            RecordTypes::new,
             Bindings::new,
             Events::new,
             TagEvents::new,

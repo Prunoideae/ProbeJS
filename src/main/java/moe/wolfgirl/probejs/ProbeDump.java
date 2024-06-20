@@ -48,7 +48,7 @@ public class ProbeDump {
             });
             decompiler.decompileContext();
             decompiler.resultSaver.writeTo(ProbePaths.DECOMPILED);
-            ClassRegistry.REGISTRY.fromClasses(decompiler.resultSaver.getClasses());
+            ClassRegistry.REGISTRY.fromClasses(decompiler.scanner.getScannedClasses());
         }
 
         report(Component.translatable("probejs.dump.cleaning"));

@@ -26,6 +26,7 @@ public class KubeJSScript {
 
             List<String> parts = new ArrayList<>();
             for (String s : tLine.split(";")) {
+                s = s.trim();
                 if (s.startsWith("import")) {
                     Matcher match = NameUtils.MATCH_IMPORT.matcher(s.trim());
                     if (match.matches()) {

@@ -1,9 +1,9 @@
 package moe.wolfgirl.probejs.plugin;
 
 import dev.latvian.mods.kubejs.event.EventGroupRegistry;
+import dev.latvian.mods.kubejs.plugin.ClassFilter;
 import dev.latvian.mods.kubejs.script.BindingRegistry;
 import dev.latvian.mods.kubejs.script.ScriptType;
-import dev.latvian.mods.kubejs.util.ClassFilter;
 import moe.wolfgirl.probejs.events.ProbeEvents;
 import moe.wolfgirl.probejs.docs.ProbeBuiltinDocs;
 import moe.wolfgirl.probejs.events.SnippetGenerationEventJS;
@@ -35,7 +35,7 @@ public class BuiltinProbeJSPlugin extends ProbeJSPlugin {
     }
 
     @Override
-    public void registerClasses(ScriptType type, ClassFilter filter) {
+    public void registerClasses( ClassFilter filter) {
         // lol
         filter.deny("org.jetbrains.java.decompiler");
         filter.deny("com.github.javaparser");

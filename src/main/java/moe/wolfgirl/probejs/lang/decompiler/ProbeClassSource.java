@@ -1,33 +1,67 @@
 package moe.wolfgirl.probejs.lang.decompiler;
 
 import org.jetbrains.java.decompiler.main.extern.IContextSource;
+import org.jetbrains.java.decompiler.main.extern.IResultSaver;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
+import java.util.*;
 
 public class ProbeClassSource implements IContextSource {
 
-    private final Class<?> clazz;
+    private final Map<String, Class<?>> classes;
 
-    public ProbeClassSource(Class<?> clazz) {
-        this.clazz = clazz;
+    public ProbeClassSource(Collection<Class<?>> classes) {
+        this.classes = new HashMap<>();
+        for (Class<?> clazz : classes) {
+            this.classes.put(clazz.getName().replace(".", "/"), clazz);
+        }
     }
 
     @Override
     public String getName() {
-        return clazz.getName();
+        return ProbeClassSource.class.getName();
     }
 
     @Override
     public Entries getEntries() {
-        return new Entries(List.of(Entry.parse(clazz.getName())), List.of(), List.of(), List.of());
+        List<Entry> entries = classes.keySet().stream().map(Entry::atBase).toList();
+        return new Entries(entries, List.of(), List.of(), List.of());
     }
 
     @Override
     public InputStream getInputStream(String resource) throws IOException {
-        String name = clazz.getName();
-        String path = name.replace(".", "/") + ".class";
-        return clazz.getClassLoader().getResourceAsStream(path);
+        Class<?> clazz = classes.get(resource.substring(0, resource.length() - IContextSource.CLASS_SUFFIX.length()));
+        return clazz.getClassLoader().getResourceAsStream(resource);
+    }
+
+    @Override
+    public IOutputSink createOutputSink(IResultSaver saver) {
+        return new IOutputSink() {
+            @Override
+            public void begin() {
+
+            }
+
+            @Override
+            public void acceptClass(String qualifiedName, String fileName, String content, int[] mapping) {
+                saver.saveClassEntry("probejs", "probejs", qualifiedName, fileName, content, mapping);
+            }
+
+            @Override
+            public void acceptDirectory(String directory) {
+
+            }
+
+            @Override
+            public void acceptOther(String path) {
+
+            }
+
+            @Override
+            public void close() throws IOException {
+
+            }
+        };
     }
 }

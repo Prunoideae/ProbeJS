@@ -22,7 +22,7 @@ public class NameUtils {
         StringBuilder result = new StringBuilder();
         for (int i = 0; i < words.length; i++) {
             String word = words[i];
-            if (word.length() > 0) {
+            if (!word.isEmpty()) {
                 if (i == 0) {
                     result.append(Character.toLowerCase(word.charAt(0)));
                 } else {

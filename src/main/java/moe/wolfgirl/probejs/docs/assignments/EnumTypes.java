@@ -23,6 +23,8 @@ public class EnumTypes extends ProbeJSPlugin {
                 EnumTypeInfo typeWrapper = (EnumTypeInfo) TypeInfo.of(recordedClass.original);
                 BaseType[] types = typeWrapper.enumConstants()
                         .stream()
+                        .map(EnumTypeInfo::getName)
+                        .map(String::toLowerCase)
                         .map(Types::literal)
                         .toArray(BaseType[]::new);
                 scriptDump.assignType(recordedClass.classPath, Types.or(types));

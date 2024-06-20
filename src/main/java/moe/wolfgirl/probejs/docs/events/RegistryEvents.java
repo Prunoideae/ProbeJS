@@ -17,6 +17,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 
+import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -87,24 +88,19 @@ public class RegistryEvents extends ProbeJSPlugin {
         ClassDecl.Builder builder = Statements.clazz(NameUtils.rlToTitle(key.location().getPath()))
                 .superClass(Types.parameterized(Types.type(RegistryKubeEvent.class), Types.type(baseClass)));
 
-        /*
-        for (Map.Entry<String, ? extends BuilderType<?>> entry : info.types.entrySet()) {
-            String extra = entry.getKey();
-            BuilderType<?> type = entry.getValue();
+        BuilderType<?> defaultType = info.getDefaultType();
+        if (defaultType != null) {
+            builder.method("create", method -> method
+                    .returnType(Types.typeMaybeGeneric(defaultType.builderClass()))
+                    .param("name", Types.STRING));
+        }
 
-            if (extra.equals("basic")) {
-                builder.method("create", method -> method
-                        .returnType(Types.typeMaybeGeneric(type.builderClass()))
-                        .param("name", Types.STRING));
-            }
-
+        for (BuilderType<?> type : info.getTypes()) {
             builder.method("create", method -> method
                     .returnType(Types.typeMaybeGeneric(type.builderClass()))
                     .param("name", Types.STRING)
-                    .param("type", Types.literal(extra))
-            );
+                    .param("type", Types.literal(type.type())));
         }
-        */
 
         return builder.build();
     }
@@ -115,16 +111,13 @@ public class RegistryEvents extends ProbeJSPlugin {
 
         for (ResourceKey<? extends Registry<?>> key : BuiltInRegistries.REGISTRY.registryKeySet()) {
             RegistryInfo<?> registryInfo = RegistryInfo.of(RegistryUtils.castKey(key));
-
-        }
-
-        /*
-        for (RegistryInfo<?> value : RegistryInfo.MAP.values()) {
-            for (BuilderType<?> builderType : value.types.values()) {
-                classes.add(builderType.builderClass());
+            var defaultType = registryInfo.getDefaultType();
+            if (defaultType != null) classes.add(defaultType.builderClass());
+            for (BuilderType<?> type : registryInfo.getTypes()) {
+                classes.add(type.builderClass());
             }
         }
-        */
+
         return classes;
     }
 }

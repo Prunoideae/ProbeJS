@@ -1,8 +1,9 @@
 package moe.wolfgirl.probejs.plugin;
 
 import com.mojang.datafixers.util.Pair;
-import dev.latvian.mods.kubejs.KubeJSPlugin;
-import dev.latvian.mods.kubejs.util.KubeJSPlugins;
+
+import dev.latvian.mods.kubejs.plugin.KubeJSPlugin;
+import dev.latvian.mods.kubejs.plugin.KubeJSPlugins;
 import dev.latvian.mods.rhino.util.HideFromJS;
 import moe.wolfgirl.probejs.lang.snippet.SnippetDump;
 import moe.wolfgirl.probejs.lang.typescript.ScriptDump;

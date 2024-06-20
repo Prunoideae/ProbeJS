@@ -1,9 +1,11 @@
 package moe.wolfgirl.probejs.lang.decompiler;
 
+import moe.wolfgirl.probejs.ProbeJS;
 import net.neoforged.fml.ModList;
 import org.jetbrains.java.decompiler.main.Fernflower;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +22,7 @@ public class ProbeDecompiler {
 
     public final Fernflower engine;
     public final ProbeFileSaver resultSaver;
+    public final ProbeClassScanner scanner;
 
     public ProbeDecompiler() {
         this.resultSaver = new ProbeFileSaver();
@@ -28,11 +31,15 @@ public class ProbeDecompiler {
                 Map.of(),
                 new ProbeDecompilerLogger()
         );
+        this.scanner = new ProbeClassScanner();
     }
 
     public void addRuntimeSource(File source) {
-        // TODO: Use ProbeClassSource instead of file
-        engine.addSource(source);
+        try {
+            scanner.acceptFile(source);
+        } catch (IOException e) {
+            ProbeJS.LOGGER.error("Unable to load file: %s".formatted(source));
+        }
     }
 
     public void fromMods() {
@@ -42,6 +49,9 @@ public class ProbeDecompiler {
     }
 
     public void decompileContext() {
+        ProbeClassSource source = new ProbeClassSource(scanner.getScannedClasses());
+        engine.addSource(source);
+
         resultSaver.classCount = 0;
         try {
             engine.decompileContext();

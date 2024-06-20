@@ -163,8 +163,8 @@ public class ScriptDump {
     public void dumpClasses() throws IOException {
         dumped = 0;
         total = 0;
+        transpiler.init();
         ProbeJSPlugin.forEachPlugin(plugin -> plugin.assignType(this));
-
         Map<String, BufferedWriter> files = new HashMap<>();
         Map<ClassPath, TypeScriptFile> globalClasses = transpiler.dump(recordedClasses);
         ProbeJSPlugin.forEachPlugin(plugin -> plugin.modifyClasses(this, globalClasses));

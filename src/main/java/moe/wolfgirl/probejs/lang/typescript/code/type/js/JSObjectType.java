@@ -1,5 +1,6 @@
 package moe.wolfgirl.probejs.lang.typescript.code.type.js;
 
+import moe.wolfgirl.probejs.ProbeJS;
 import moe.wolfgirl.probejs.lang.typescript.Declaration;
 
 import java.util.*;
@@ -8,6 +9,11 @@ public class JSObjectType extends JSMemberType {
 
     public JSObjectType(Collection<JSParam> members) {
         super(members);
+    }
+
+    @Override
+    protected String getMemberName(String name) {
+        return ProbeJS.GSON.toJson(name);
     }
 
     @Override
