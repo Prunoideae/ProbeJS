@@ -21,6 +21,6 @@ public class ProbeJS {
             .create();
 
     public ProbeJS() {
-     
+
     }
 }

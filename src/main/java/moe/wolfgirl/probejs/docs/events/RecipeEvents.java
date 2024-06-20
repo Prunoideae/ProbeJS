@@ -8,6 +8,9 @@ import dev.latvian.mods.kubejs.recipe.schema.RecipeSchemaType;
 import dev.latvian.mods.kubejs.recipe.schema.UnknownRecipeSchemaType;
 import dev.latvian.mods.kubejs.script.ScriptType;
 import dev.latvian.mods.kubejs.server.ServerScriptManager;
+import moe.wolfgirl.probejs.lang.schema.ObjectElement;
+import moe.wolfgirl.probejs.lang.schema.SchemaDump;
+import moe.wolfgirl.probejs.lang.schema.SchemaElement;
 import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
 import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
@@ -23,6 +26,8 @@ import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
 import moe.wolfgirl.probejs.lang.typescript.code.type.js.JSLambdaType;
 import moe.wolfgirl.probejs.lang.typescript.code.type.js.JSObjectType;
 import moe.wolfgirl.probejs.utils.NameUtils;
+import net.minecraft.server.MinecraftServer;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -167,5 +172,39 @@ public class RecipeEvents extends ProbeJSPlugin {
             }
         }
         return classes;
+    }
+
+    private void populateKeys(Set<String> strings) {
+        Set<String> withArray = new HashSet<>();
+
+        for (String string : strings) {
+            withArray.add(string + "[]");
+            withArray.add(string + "[][]");
+        }
+        strings.addAll(withArray);
+    }
+
+    @Override
+    public void addJsonSchema(SchemaDump dump) {
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        if (server == null) return;
+        ServerScriptManager scriptManager = server.getServerResources().managers().kjs$getServerScriptManager();
+        Set<String> keys = new HashSet<>();
+        keys.addAll(scriptManager.recipeSchemaStorage.simpleComponents.keySet());
+        keys.addAll(scriptManager.recipeSchemaStorage.dynamicComponents.keySet());
+        populateKeys(keys); // because enum is fixed, so we generate [] and [][] types here
+
+        dump.newSchema("recipe",
+                ObjectElement.of()
+                        .object("keys", object -> object
+                                .stringType("name")
+                                .stringType("role", o -> o.enums("input", "output", "other"))
+                                .stringType("type", o -> o.enums(keys.toArray()))
+                                .anyType("optional")
+                                .asArray())
+                        .stringType("unique", SchemaElement::asArray)
+                        .object("constructors", SchemaElement::asArray)
+                        .object("functions")
+        );
     }
 }

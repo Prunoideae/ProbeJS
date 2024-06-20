@@ -1,6 +1,7 @@
 package moe.wolfgirl.probejs.docs;
 
 import moe.wolfgirl.probejs.docs.assignments.*;
+import moe.wolfgirl.probejs.lang.schema.SchemaDump;
 import moe.wolfgirl.probejs.lang.snippet.SnippetDump;
 import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
 import moe.wolfgirl.probejs.docs.events.RecipeEvents;
@@ -87,5 +88,10 @@ public class ProbeBuiltinDocs extends ProbeJSPlugin {
     @Override
     public void addVSCodeSnippets(SnippetDump dump) {
         forEach(builtinDoc -> builtinDoc.addVSCodeSnippets(dump));
+    }
+
+    @Override
+    public void addJsonSchema(SchemaDump dump) {
+        forEach(builtinDoc -> builtinDoc.addJsonSchema(dump));
     }
 }

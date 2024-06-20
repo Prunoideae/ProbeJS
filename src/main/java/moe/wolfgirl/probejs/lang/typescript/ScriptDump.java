@@ -2,8 +2,6 @@ package moe.wolfgirl.probejs.lang.typescript;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import com.google.gson.JsonObject;
-import com.google.gson.stream.JsonWriter;
 import com.mojang.datafixers.util.Pair;
 import dev.latvian.mods.kubejs.KubeJS;
 import dev.latvian.mods.kubejs.KubeJSPaths;
@@ -24,7 +22,7 @@ import moe.wolfgirl.probejs.lang.typescript.code.ts.Wrapped;
 import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
 import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
 import moe.wolfgirl.probejs.lang.typescript.code.type.js.JSJoinedType;
-import moe.wolfgirl.probejs.utils.JsonUtils;
+import moe.wolfgirl.probejs.utils.DocUtils;
 import net.minecraft.server.MinecraftServer;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
@@ -269,7 +267,7 @@ public class ScriptDump {
     }
 
     public void dumpJSConfig() throws IOException {
-        writeMergedConfig(scriptPath.resolve("jsconfig.json"), """
+        DocUtils.writeMergedConfig(scriptPath.resolve("jsconfig.json"), """
                 {
                     "compilerOptions": {
                         "module": "commonjs",
@@ -327,17 +325,6 @@ public class ScriptDump {
         try (BufferedWriter writer = Files.newBufferedWriter(writeTo)) {
             writer.write(content);
         }
-    }
-
-    private static void writeMergedConfig(Path path, String config) throws IOException {
-        JsonObject updates = ProbeJS.GSON.fromJson(config, JsonObject.class);
-        JsonObject read = Files.exists(path) ? ProbeJS.GSON.fromJson(Files.newBufferedReader(path), JsonObject.class) : new JsonObject();
-        if (read == null) read = new JsonObject();
-        JsonObject original = (JsonObject) JsonUtils.mergeJsonRecursively(read, updates);
-        JsonWriter jsonWriter = ProbeJS.GSON_WRITER.newJsonWriter(Files.newBufferedWriter(path));
-        jsonWriter.setIndent("    ");
-        ProbeJS.GSON_WRITER.toJson(original, JsonObject.class, jsonWriter);
-        jsonWriter.close();
     }
 
 }

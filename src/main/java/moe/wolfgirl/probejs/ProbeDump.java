@@ -2,15 +2,15 @@ package moe.wolfgirl.probejs;
 
 import moe.wolfgirl.probejs.lang.decompiler.ProbeDecompiler;
 import moe.wolfgirl.probejs.lang.java.ClassRegistry;
+import moe.wolfgirl.probejs.lang.schema.SchemaDump;
 import moe.wolfgirl.probejs.lang.snippet.SnippetDump;
 import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
+import moe.wolfgirl.probejs.utils.DocUtils;
 import moe.wolfgirl.probejs.utils.GameUtils;
 import net.minecraft.network.chat.Component;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -21,6 +21,7 @@ public class ProbeDump {
     public static final Path SNIPPET_PATH = ProbePaths.WORKSPACE_SETTINGS.resolve("probe.code-snippets");
     public static final Path CLASS_CACHE = ProbePaths.PROBE.resolve("classes.txt");
 
+    final SchemaDump schemaDump = new SchemaDump();
     final SnippetDump snippetDump = new SnippetDump();
     final Collection<ScriptDump> scriptDumps = new ArrayList<>();
     final ProbeDecompiler decompiler = new ProbeDecompiler();
@@ -74,6 +75,12 @@ public class ProbeDump {
         // Create the snippets
         snippetDump.fromDocs();
         snippetDump.writeTo(SNIPPET_PATH);
+
+
+        // And schemas
+        schemaDump.fromDocs();
+        schemaDump.writeTo(ProbePaths.WORKSPACE_SETTINGS);
+        writeVSCodeConfig();
 
         report(Component.translatable("probejs.dump.snippets_generated"));
 
@@ -130,11 +137,18 @@ public class ProbeDump {
         reportingThread.start();
     }
 
-    public void cleanup(Consumer<Component> p) throws IOException {
-        Files.deleteIfExists(SNIPPET_PATH);
-        for (ScriptDump scriptDump : scriptDumps) {
-            scriptDump.removeClasses();
-            p.accept(Component.translatable("probejs.removed_script", scriptDump.manager.scriptType.toString()));
-        }
+    private void writeVSCodeConfig() throws IOException {
+        DocUtils.writeMergedConfig(ProbePaths.VSCODE_JSON, """
+                {
+                    "json.schemas": [
+                        {
+                            "fileMatch": [
+                                "/recipe_schemas/*.json"
+                            ],
+                            "url": "./.vscode/recipe.json"
+                        }
+                    ]
+                }
+                """);
     }
 }
