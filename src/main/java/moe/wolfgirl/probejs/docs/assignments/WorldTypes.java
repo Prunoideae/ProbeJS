@@ -14,6 +14,7 @@ import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
 import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
 import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.ClickEvent;
@@ -27,6 +28,7 @@ import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
@@ -148,5 +150,8 @@ public class WorldTypes extends ProbeJSPlugin {
                 .member("action", Types.or(actions))
                 .member("value", Types.STRING)
                 .build());
+
+        scriptDump.assignType(DataComponentMap.class, Types.STRING);
+        scriptDump.assignType(ItemEnchantments.class, Types.primitive("{[key in Special.Enchantment]?: integer}"));
     }
 }

@@ -24,7 +24,7 @@ import java.util.function.Supplier;
 public class ProbeBuiltinDocs extends ProbeJSPlugin {
     public static final ProbeBuiltinDocs INSTANCE = new ProbeBuiltinDocs();
 
-    // So docs can be added because we don't have access to forge stuffs here
+    // So docs can be added stateless
     public final static List<Supplier<ProbeJSPlugin>> BUILTIN_DOCS = new ArrayList<>(List.of(
             RegistryTypes::new,
             SpecialTypes::new,

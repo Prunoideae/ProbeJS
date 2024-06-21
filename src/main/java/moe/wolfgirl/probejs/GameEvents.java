@@ -2,6 +2,7 @@ package moe.wolfgirl.probejs;
 
 import com.mojang.brigadier.Command;
 import dev.latvian.mods.kubejs.KubeJS;
+import moe.wolfgirl.probejs.features.bridge.ProbeServer;
 import moe.wolfgirl.probejs.lang.linter.Linter;
 import moe.wolfgirl.probejs.utils.GameUtils;
 import net.minecraft.commands.Commands;
@@ -50,12 +51,31 @@ public class GameEvents {
             }
             player.sendSystemMessage(
                     Component.translatable("probejs.wiki")
-                            .append(Component.literal("Github Page")
+                            .append(Component.literal("Wiki Page")
                                     .kjs$aqua()
                                     .kjs$underlined()
                                     .kjs$clickOpenUrl("https://kubejs.com/wiki/addons/third-party/probejs")
                                     .kjs$hover(Component.literal("https://kubejs.com/wiki/addons/third-party/probejs")))
             );
+
+            if (config.interactive.get()) {
+                GlobalStates.SERVER = new ProbeServer(config.interactivePort.get());
+                GlobalStates.SERVER.start();
+                player.sendSystemMessage(
+                        Component.translatable("probejs.interactive", config.interactivePort.get())
+                );
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void playerLeft(ClientPlayerNetworkEvent.LoggingOut event) {
+        if (GlobalStates.SERVER != null) {
+            try {
+                GlobalStates.SERVER.stop();
+                GlobalStates.SERVER = null;
+            } catch (InterruptedException ignored) {
+            }
         }
     }
 

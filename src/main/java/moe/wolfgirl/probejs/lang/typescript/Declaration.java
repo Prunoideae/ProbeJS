@@ -10,7 +10,7 @@ import java.util.Set;
 
 public class Declaration {
     private static final String SYMBOL_TEMPLATE = "%s$%d";
-    public static final String INPUT_TEMPLATE = "%s$Type";
+    public static final String INPUT_TEMPLATE = "%s$$Type";
 
     public final Map<ClassPath, Reference> references;
     private final Map<ClassPath, Pair<String, String>> symbols;

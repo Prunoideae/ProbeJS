@@ -3,6 +3,9 @@ package moe.wolfgirl.probejs.utils;
 import com.google.gson.*;
 import org.apache.commons.lang3.StringUtils;
 
+import java.lang.reflect.Type;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -134,5 +137,18 @@ public class JsonUtils {
         }
 
         return second;
+    }
+
+    public static class PathConverter implements JsonDeserializer<Path>, JsonSerializer<Path> {
+
+        @Override
+        public Path deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            return Paths.get(json.getAsString());
+        }
+
+        @Override
+        public JsonElement serialize(Path src, Type typeOfSrc, JsonSerializationContext context) {
+            return new JsonPrimitive(src.toString());
+        }
     }
 }

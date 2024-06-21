@@ -34,7 +34,7 @@ import java.util.*;
 public class RegistryTypes extends ProbeJSPlugin {
     public static final String LITERAL_FIELD = "probejsInternal$$Literal";
     public static final String TAG_FIELD = "probejsInternal$$Tag";
-    public static final String OF_TYPE_DECL = "T extends { %s: infer U } ? U : string";
+    public static final String OF_TYPE_DECL = "T extends { %s: infer U } ? U : never";
 
     @Override
     public void assignType(ScriptDump scriptDump) {
