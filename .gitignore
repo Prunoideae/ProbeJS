@@ -18,3 +18,5 @@ gradle-app.setting
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
 /.idea/
+ProbeJS_client.launch
+ProbeJS_server.launch

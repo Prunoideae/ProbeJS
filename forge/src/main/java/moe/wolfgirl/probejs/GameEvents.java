@@ -6,6 +6,7 @@ import moe.wolfgirl.probejs.lang.linter.Linter;
 import moe.wolfgirl.probejs.utils.GameUtils;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.client.event.RegisterClientCommandsEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -14,7 +15,7 @@ import net.minecraftforge.fml.common.Mod;
 
 import java.util.function.Consumer;
 
-@Mod.EventBusSubscriber
+@Mod.EventBusSubscriber(value = Dist.CLIENT)
 public class GameEvents {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
