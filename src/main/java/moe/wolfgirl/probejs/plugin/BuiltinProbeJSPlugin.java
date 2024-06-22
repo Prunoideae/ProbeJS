@@ -3,7 +3,6 @@ package moe.wolfgirl.probejs.plugin;
 import dev.latvian.mods.kubejs.event.EventGroupRegistry;
 import dev.latvian.mods.kubejs.plugin.ClassFilter;
 import dev.latvian.mods.kubejs.script.BindingRegistry;
-import dev.latvian.mods.kubejs.script.ScriptType;
 import moe.wolfgirl.probejs.events.ProbeEvents;
 import moe.wolfgirl.probejs.docs.ProbeBuiltinDocs;
 import moe.wolfgirl.probejs.events.SnippetGenerationEventJS;
@@ -17,7 +16,6 @@ import moe.wolfgirl.probejs.lang.transpiler.TypeConverter;
 import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
 import moe.wolfgirl.probejs.lang.typescript.TypeScriptFile;
 import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
-import moe.wolfgirl.probejs.utils.Require;
 
 import java.util.Map;
 import java.util.Set;
@@ -31,8 +29,7 @@ public class BuiltinProbeJSPlugin extends ProbeJSPlugin {
 
     @Override
     public void registerBindings(BindingRegistry bindings) {
-        if (bindings.type() == ScriptType.CLIENT) bindings.add("Types", Types.class);
-        bindings.add("require", new Require(bindings.context()));
+        bindings.add("Types", Types.class);
     }
 
     @Override

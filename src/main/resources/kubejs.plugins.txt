@@ -1,1 +1,2 @@
 moe.wolfgirl.probejs.plugin.BuiltinProbeJSPlugin client
+moe.wolfgirl.probejs.plugin.ProbeJSKJSPlugin
