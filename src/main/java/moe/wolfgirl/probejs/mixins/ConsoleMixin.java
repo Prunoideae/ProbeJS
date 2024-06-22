@@ -4,7 +4,6 @@ import dev.latvian.mods.kubejs.script.ConsoleLine;
 import dev.latvian.mods.kubejs.util.ConsoleJS;
 import dev.latvian.mods.rhino.RhinoException;
 import moe.wolfgirl.probejs.GlobalStates;
-import moe.wolfgirl.probejs.ProbeJS;
 import moe.wolfgirl.probejs.lang.linter.LintingWarning;
 import moe.wolfgirl.probejs.utils.FileUtils;
 import org.spongepowered.asm.mixin.Mixin;
@@ -23,7 +22,6 @@ public class ConsoleMixin {
             remap = false,
             at = @At("HEAD"))
     public void reportError(String message, Throwable error, Pattern exitPattern, CallbackInfoReturnable<ConsoleLine> cir) {
-        ProbeJS.LOGGER.info(message);
         if (error instanceof RhinoException rhinoException) {
             Path path = FileUtils.parseSourcePath(rhinoException.sourceName());
             if (path == null) return;
