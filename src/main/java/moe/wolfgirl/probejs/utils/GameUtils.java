@@ -1,5 +1,6 @@
 package moe.wolfgirl.probejs.utils;
 
+import dev.latvian.mods.kubejs.server.ServerScriptManager;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -10,10 +11,10 @@ import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import net.neoforged.neoforgespi.language.IModInfo;
 
+import javax.annotation.Nullable;
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.stream.Collectors;
 
 public class GameUtils {
     public static long modHash() {
@@ -54,6 +55,12 @@ public class GameUtils {
         } catch (NoSuchAlgorithmException e) {
             return -1;
         }
+    }
 
+    @Nullable
+    public static ServerScriptManager getServerScriptManager() {
+        MinecraftServer currentServer = ServerLifecycleHooks.getCurrentServer();
+        if (currentServer == null) return null;
+        return currentServer.getServerResources().managers().kjs$getServerScriptManager();
     }
 }

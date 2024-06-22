@@ -1,15 +1,17 @@
 package moe.wolfgirl.probejs;
 
+import moe.wolfgirl.probejs.features.schema.SchemaDownloader;
 import moe.wolfgirl.probejs.lang.decompiler.ProbeDecompiler;
 import moe.wolfgirl.probejs.lang.java.ClassRegistry;
 import moe.wolfgirl.probejs.lang.schema.SchemaDump;
 import moe.wolfgirl.probejs.lang.snippet.SnippetDump;
 import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
-import moe.wolfgirl.probejs.utils.DocUtils;
+import moe.wolfgirl.probejs.utils.FileUtils;
 import moe.wolfgirl.probejs.utils.GameUtils;
 import net.minecraft.network.chat.Component;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -56,6 +58,13 @@ public class ProbeDump {
         for (ScriptDump scriptDump : scriptDumps) {
             scriptDump.removeClasses();
             report(Component.translatable("probejs.removed_script", scriptDump.manager.scriptType.toString()));
+        }
+
+        SchemaDownloader downloader = new SchemaDownloader();
+        try (var zipStream = downloader.openSchemaStream()) {
+            downloader.processFile(zipStream);
+        } catch (Throwable err) {
+            ProbeJS.LOGGER.error(err.getMessage());
         }
     }
 
@@ -138,7 +147,7 @@ public class ProbeDump {
     }
 
     private void writeVSCodeConfig() throws IOException {
-        DocUtils.writeMergedConfig(ProbePaths.VSCODE_JSON, """
+        FileUtils.writeMergedConfig(ProbePaths.VSCODE_JSON, """
                 {
                     "json.schemas": [
                         {

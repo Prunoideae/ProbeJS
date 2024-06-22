@@ -1,4 +1,4 @@
-package moe.wolfgirl.probejs.docs;
+package moe.wolfgirl.probejs.docs.assignments;
 
 import dev.latvian.mods.kubejs.registry.RegistryType;
 import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
@@ -25,7 +25,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.tags.TagKey;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
-import java.lang.reflect.Type;
 import java.util.*;
 
 /**

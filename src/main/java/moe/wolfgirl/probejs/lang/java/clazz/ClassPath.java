@@ -3,7 +3,6 @@ package moe.wolfgirl.probejs.lang.java.clazz;
 import dev.latvian.mods.kubejs.util.UtilsJS;
 import dev.latvian.mods.rhino.util.HideFromJS;
 import moe.wolfgirl.probejs.lang.java.ClassRegistry;
-import moe.wolfgirl.probejs.utils.RemapperUtils;
 
 import java.lang.reflect.TypeVariable;
 import java.nio.file.Files;

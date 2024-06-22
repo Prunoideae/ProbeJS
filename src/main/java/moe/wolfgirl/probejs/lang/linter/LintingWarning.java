@@ -1,7 +1,9 @@
 package moe.wolfgirl.probejs.lang.linter;
 
+import com.google.gson.JsonElement;
 import dev.latvian.mods.kubejs.bindings.ColorWrapper;
 import dev.latvian.mods.kubejs.color.Color;
+import moe.wolfgirl.probejs.ProbeJS;
 import net.minecraft.network.chat.Component;
 
 import java.nio.file.Path;
@@ -27,5 +29,9 @@ public record LintingWarning(Path file, Level level, int line, int column, Strin
                 .append(Component.literal("] "))
                 .append(Component.literal(stripped.toString()))
                 .append(Component.literal(":%d:%d: %s".formatted(line, column, message)));
+    }
+
+    public JsonElement asPayload() {
+        return ProbeJS.GSON.toJsonTree(this);
     }
 }

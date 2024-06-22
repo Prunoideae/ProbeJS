@@ -64,4 +64,18 @@ public class NameUtils {
     public static String snakeToTitle(String s) {
         return Arrays.stream(s.split("_")).map(NameUtils::getCapitalized).collect(Collectors.joining());
     }
+
+    public static String replaceRegion(String str, int start, int end, String oldText, String newText) {
+        if (start < 0 || start >= end || end > str.length()) {
+            throw new IllegalArgumentException("Invalid start or end index");
+        }
+
+        String prefix = str.substring(0, start);
+        String region = str.substring(start, end);
+        String suffix = str.substring(end);
+
+        String replacedRegion = region.replace(oldText, newText);
+
+        return prefix + replacedRegion + suffix;
+    }
 }

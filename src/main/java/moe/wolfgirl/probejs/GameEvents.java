@@ -7,6 +7,7 @@ import moe.wolfgirl.probejs.lang.linter.Linter;
 import moe.wolfgirl.probejs.utils.GameUtils;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
+import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -16,7 +17,7 @@ import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
 
 import java.util.function.Consumer;
 
-@EventBusSubscriber
+@EventBusSubscriber(value = Dist.CLIENT)
 public class GameEvents {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -58,23 +59,12 @@ public class GameEvents {
                                     .kjs$hover(Component.literal("https://kubejs.com/wiki/addons/third-party/probejs")))
             );
 
-            if (config.interactive.get()) {
+            if (config.interactive.get() && GlobalStates.SERVER == null) {
                 GlobalStates.SERVER = new ProbeServer(config.interactivePort.get());
                 GlobalStates.SERVER.start();
                 player.sendSystemMessage(
                         Component.translatable("probejs.interactive", config.interactivePort.get())
                 );
-            }
-        }
-    }
-
-    @SubscribeEvent
-    public static void playerLeft(ClientPlayerNetworkEvent.LoggingOut event) {
-        if (GlobalStates.SERVER != null) {
-            try {
-                GlobalStates.SERVER.stop();
-                GlobalStates.SERVER = null;
-            } catch (InterruptedException ignored) {
             }
         }
     }
@@ -90,12 +80,18 @@ public class GameEvents {
                                     KubeJS.PROXY.reloadClientInternal();
                                     ProbeDump dump = new ProbeDump();
                                     dump.defaultScripts();
-                                    try {
-                                        Consumer<Component> reportProgress = component -> context.getSource().sendSystemMessage(component);
-                                        dump.trigger(reportProgress);
-                                    } catch (Throwable e) {
-                                        throw new RuntimeException(e);
-                                    }
+                                    (new Thread(() -> {
+                                        try {
+                                            Consumer<Component> reportProgress = component -> context.getSource().sendSystemMessage(component);
+                                            dump.trigger(reportProgress);
+                                        } catch (Throwable e) {
+                                            ProbeJS.LOGGER.error(e.getMessage());
+                                            for (StackTraceElement stackTraceElement : e.getStackTrace()) {
+                                                ProbeJS.LOGGER.error(stackTraceElement.toString());
+                                            }
+                                            throw new RuntimeException(e);
+                                        }
+                                    })).start();
                                     return Command.SINGLE_SUCCESS;
                                 })
                         )

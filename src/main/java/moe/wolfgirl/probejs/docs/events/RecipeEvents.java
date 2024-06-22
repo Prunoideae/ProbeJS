@@ -25,6 +25,7 @@ import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
 import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
 import moe.wolfgirl.probejs.lang.typescript.code.type.js.JSLambdaType;
 import moe.wolfgirl.probejs.lang.typescript.code.type.js.JSObjectType;
+import moe.wolfgirl.probejs.utils.GameUtils;
 import moe.wolfgirl.probejs.utils.NameUtils;
 import net.minecraft.server.MinecraftServer;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
@@ -36,7 +37,7 @@ public class RecipeEvents extends ProbeJSPlugin {
     public static final Map<String, String> SHORTCUTS = new HashMap<>();
     public static final ClassPath DOCUMENTED_RECIPES = new ClassPath("moe.wolfgirl.probejs.generated.DocumentedRecipes");
 
-    {
+    static {
         SHORTCUTS.put("shaped", "kubejs:shaped");
         SHORTCUTS.put("shapeless", "kubejs:shapeless");
         SHORTCUTS.put("smelting", "minecraft:smelting");
@@ -186,9 +187,8 @@ public class RecipeEvents extends ProbeJSPlugin {
 
     @Override
     public void addJsonSchema(SchemaDump dump) {
-        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-        if (server == null) return;
-        ServerScriptManager scriptManager = server.getServerResources().managers().kjs$getServerScriptManager();
+        ServerScriptManager scriptManager = GameUtils.getServerScriptManager();
+        if (scriptManager == null) return;
         Set<String> keys = new HashSet<>();
         keys.addAll(scriptManager.recipeSchemaStorage.simpleComponents.keySet());
         keys.addAll(scriptManager.recipeSchemaStorage.dynamicComponents.keySet());

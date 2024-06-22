@@ -1,4 +1,4 @@
-package moe.wolfgirl.probejs.docs;
+package moe.wolfgirl.probejs.docs.assignments;
 
 import moe.wolfgirl.probejs.GlobalStates;
 import moe.wolfgirl.probejs.ProbeJS;

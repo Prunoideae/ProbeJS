@@ -22,7 +22,7 @@ import moe.wolfgirl.probejs.lang.typescript.code.ts.Wrapped;
 import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
 import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
 import moe.wolfgirl.probejs.lang.typescript.code.type.js.JSJoinedType;
-import moe.wolfgirl.probejs.utils.DocUtils;
+import moe.wolfgirl.probejs.utils.GameUtils;
 import net.minecraft.server.MinecraftServer;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
@@ -42,9 +42,9 @@ import java.util.function.Supplier;
  */
 public class ScriptDump {
     public static final Supplier<ScriptDump> SERVER_DUMP = () -> {
-        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-        if (server == null) return null;
-        ServerScriptManager scriptManager = server.getServerResources().managers().kjs$getServerScriptManager();
+        ServerScriptManager scriptManager = GameUtils.getServerScriptManager();
+        if (scriptManager == null) return null;
+
         return new ScriptDump(
                 scriptManager,
                 ProbePaths.PROBE.resolve("server"),
@@ -267,7 +267,7 @@ public class ScriptDump {
     }
 
     public void dumpJSConfig() throws IOException {
-        DocUtils.writeMergedConfig(scriptPath.resolve("jsconfig.json"), """
+        moe.wolfgirl.probejs.utils.FileUtils.writeMergedConfig(scriptPath.resolve("jsconfig.json"), """
                 {
                     "compilerOptions": {
                         "module": "commonjs",

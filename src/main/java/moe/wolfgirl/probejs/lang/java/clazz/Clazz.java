@@ -1,5 +1,9 @@
 package moe.wolfgirl.probejs.lang.java.clazz;
 
+import dev.latvian.mods.kubejs.KubeJS;
+import dev.latvian.mods.kubejs.script.KubeJSContext;
+import dev.latvian.mods.kubejs.script.ScriptManager;
+import dev.latvian.mods.rhino.JavaMembers;
 import dev.latvian.mods.rhino.util.HideFromJS;
 import moe.wolfgirl.probejs.lang.java.base.TypeVariableHolder;
 import moe.wolfgirl.probejs.lang.java.clazz.members.ConstructorInfo;
@@ -7,7 +11,6 @@ import moe.wolfgirl.probejs.lang.java.clazz.members.FieldInfo;
 import moe.wolfgirl.probejs.lang.java.clazz.members.MethodInfo;
 import moe.wolfgirl.probejs.lang.java.type.TypeAdapter;
 import moe.wolfgirl.probejs.lang.java.type.TypeDescriptor;
-import moe.wolfgirl.probejs.utils.RemapperUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.*;
@@ -30,17 +33,21 @@ public class Clazz extends TypeVariableHolder {
     public Clazz(Class<?> clazz) {
         super(clazz.getTypeParameters(), clazz.getAnnotations());
 
+        ScriptManager manager = KubeJS.getStartupScriptManager();
+        KubeJSContext context = (KubeJSContext) manager.contextFactory.enter();
+        JavaMembers members = JavaMembers.lookupClass(context, context.topLevelScope, clazz, clazz, false);
+
         this.original = clazz;
         this.classPath = new ClassPath(clazz);
-        this.constructors = RemapperUtils.getConstructors(clazz)
+        this.constructors = members.getAccessibleConstructors()
                 .stream()
                 .map(ConstructorInfo::new)
                 .collect(Collectors.toList());
-        this.fields = RemapperUtils.getFields(clazz)
+        this.fields = members.getAccessibleFields(context, false)
                 .stream()
                 .map(FieldInfo::new)
                 .collect(Collectors.toList());
-        this.methods = RemapperUtils.getMethods(clazz)
+        this.methods = members.getAccessibleMethods(context, false)
                 .stream()
                 .filter(m -> !m.method.isSynthetic())
                 .filter(m -> !hasIdenticalParentMethodAndEnsureNotDirectlyImplementsInterfaceSinceTypeScriptDoesNotHaveInterfaceAtRuntimeInTypeDeclarationFilesJustBecauseItSucks(m.method, clazz))
