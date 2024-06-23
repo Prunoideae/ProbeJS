@@ -10,8 +10,7 @@
         "OnJavaMixin",
         "RecipeManagerMixin",
         "TranslatableMixin",
-        "ScriptManagerMixin",
-        "ServerScriptManagerMixin"
+        "ScriptManagerMixin"
     ],
     "mixins": [
         "ScriptFilePreloadMixin"

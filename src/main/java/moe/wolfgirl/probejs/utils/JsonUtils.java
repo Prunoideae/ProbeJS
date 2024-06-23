@@ -151,4 +151,17 @@ public class JsonUtils {
             return new JsonPrimitive(src.toString());
         }
     }
+
+    public static JsonElement errorAsPayload(Throwable throwable) {
+        JsonObject object = new JsonObject();
+
+        object.addProperty("message", throwable.getMessage());
+        JsonArray jsonArray = new JsonArray();
+        for (StackTraceElement stackTraceElement : throwable.getStackTrace()) {
+            jsonArray.add(stackTraceElement.toString());
+        }
+        object.add("stackTrace", jsonArray);
+
+        return object;
+    }
 }

@@ -6,6 +6,7 @@ import com.mojang.datafixers.util.Pair;
 import dev.latvian.mods.kubejs.event.EventGroup;
 import dev.latvian.mods.kubejs.event.EventGroups;
 import dev.latvian.mods.kubejs.event.EventHandler;
+import dev.latvian.mods.kubejs.typings.Info;
 import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
 import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
 import moe.wolfgirl.probejs.lang.transpiler.TypeConverter;
@@ -76,11 +77,18 @@ public class Events extends ProbeJSPlugin {
             BaseType extraType = converter.convertType(handler.extra.describeType);
             builder.param("extra", extraType);
         }
+        Class<?> eventClass = handler.eventType.get();
         JSLambdaType callback = Types.lambda()
-                .param("event", Types.typeMaybeGeneric(handler.eventType.get()))
+                .param("event", Types.typeMaybeGeneric(eventClass))
                 .build();
         builder.param("handler", callback);
-        return builder.build();
+
+
+        MethodDeclaration methodDeclaration = builder.build();
+        for (Info info : eventClass.getAnnotationsByType(Info.class)) {
+            methodDeclaration.addComment(info.value());
+        }
+        return methodDeclaration;
     }
 
     private static Set<Pair<String, String>> getDisabledEvents(ScriptDump dump) {

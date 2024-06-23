@@ -23,6 +23,7 @@ public class GlobalStates {
     public static final Set<String> MIXIN_LANG_KEYS = new HashSet<>();
     public static final Set<String> RECIPE_IDS = new HashSet<>();
     public static final Set<String> LOOT_TABLES = new HashSet<>();
+    public static long ERROR_TIMESTAMP = 0;
 
     public static final Supplier<Set<String>> LANG_KEYS = () -> {
         Set<String> keys;
