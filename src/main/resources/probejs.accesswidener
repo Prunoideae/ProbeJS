@@ -3,3 +3,5 @@ accessible field net/minecraft/client/resources/language/ClientLanguage storage 
 accessible field net/minecraft/client/renderer/texture/TextureAtlas texturesByName Ljava/util/Map;
 accessible field net/minecraft/client/renderer/texture/TextureManager byPath Ljava/util/Map;
 accessible field net/minecraft/client/resources/model/ModelManager bakedRegistry Ljava/util/Map;
+
+accessible field net/minecraft/world/level/block/state/StateHolder PROPERTY_ENTRY_TO_STRING_FUNCTION Ljava/util/function/Function;

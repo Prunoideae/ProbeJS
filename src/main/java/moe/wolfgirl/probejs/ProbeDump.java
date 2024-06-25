@@ -11,7 +11,6 @@ import moe.wolfgirl.probejs.utils.GameUtils;
 import net.minecraft.network.chat.Component;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,10 +39,12 @@ public class ProbeDump {
     }
 
     private void onModChange() throws IOException {
-        // Decompile stuffs
+        // Decompile stuffs - here we scan mod classes even if we don't decompile
+        // So we have all classes without needing to decompile
+        decompiler.fromMods();
         if (ProbeConfig.INSTANCE.enableDecompiler.get()) {
             report(Component.translatable("probejs.dump.decompiling").kjs$gold());
-            decompiler.fromMods();
+
             decompiler.resultSaver.callback(() -> {
                 if (decompiler.resultSaver.classCount % 3000 == 0) {
                     report(Component.translatable("probejs.dump.decompiled_x_class", decompiler.resultSaver.classCount));
@@ -51,8 +52,8 @@ public class ProbeDump {
             });
             decompiler.decompileContext();
             decompiler.resultSaver.writeTo(ProbePaths.DECOMPILED);
-            ClassRegistry.REGISTRY.fromClasses(decompiler.scanner.getScannedClasses());
         }
+        ClassRegistry.REGISTRY.fromClasses(decompiler.scanner.getScannedClasses());
 
         report(Component.translatable("probejs.dump.cleaning"));
         for (ScriptDump scriptDump : scriptDumps) {

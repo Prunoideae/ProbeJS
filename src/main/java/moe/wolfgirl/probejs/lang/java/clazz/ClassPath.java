@@ -29,7 +29,7 @@ public record ClassPath(List<String> parts) {
     }
 
     public String getName() {
-        return parts.get(parts.size() - 1);
+        return parts.getLast();
     }
 
     public String getConcatenated(String sep) {
@@ -42,7 +42,7 @@ public record ClassPath(List<String> parts) {
 
     public String getClassPathJava() {
         List<String> copy = new ArrayList<>(parts);
-        String last = copy.get(copy.size() - 1);
+        String last = copy.getLast();
         if (last.startsWith("$")) last = last.substring(1);
         copy.set(copy.size() - 1, last);
         return String.join(".", copy);
@@ -69,7 +69,7 @@ public record ClassPath(List<String> parts) {
 
     public List<String> getPackage() {
         List<String> classPath = new ArrayList<>(parts);
-        classPath.remove(classPath.size() - 1);
+        classPath.removeLast();
         return classPath;
     }
 

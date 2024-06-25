@@ -8,6 +8,7 @@ import moe.wolfgirl.probejs.lang.typescript.code.ts.VariableDeclaration;
 import moe.wolfgirl.probejs.lang.typescript.code.ts.Wrapped;
 import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
 import moe.wolfgirl.probejs.lang.typescript.code.type.TSVariableType;
+import org.apache.commons.lang3.mutable.MutableInt;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -80,12 +81,18 @@ public class InterfaceDecl extends ClassDecl {
 
         // Use hybrid to represent functional interfaces
         // (a: SomeClass<number>, b: SomeClass<string>): void;
-        if (methods.stream().filter(method -> method.isAbstract).count() == 1) {
-            body.add("");
-            MethodDecl method = methods.getFirst();
-            String hybridBody = ParamDecl.formatParams(method.params, declaration);
-            String returnType = method.returnType.line(declaration);
+        MutableInt count = new MutableInt(0);
+        MethodDecl hybrid = methods.stream()
+                .filter(method -> !method.isStatic)
+                .filter(method -> method.isAbstract)
+                .peek(c -> count.add(1))
+                .reduce((a, b) -> b)
+                .orElse(null);
 
+        if (count.getValue() == 1 && hybrid != null) {
+            body.add("");
+            String hybridBody = ParamDecl.formatParams(hybrid.params, declaration);
+            String returnType = hybrid.returnType.line(declaration);
             body.add("%s: %s".formatted(hybridBody, returnType));
         }
 

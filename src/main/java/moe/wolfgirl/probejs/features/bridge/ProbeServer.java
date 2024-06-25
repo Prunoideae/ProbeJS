@@ -3,14 +3,19 @@ package moe.wolfgirl.probejs.features.bridge;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import moe.wolfgirl.probejs.ProbeJS;
-import moe.wolfgirl.probejs.features.autolint.LintCommand;
+import moe.wolfgirl.probejs.features.interop.EvaluateCommand;
+import moe.wolfgirl.probejs.features.interop.LintCommand;
+import moe.wolfgirl.probejs.features.interop.ListRegistryCommand;
+import moe.wolfgirl.probejs.features.interop.ReloadCommand;
 import net.minecraft.server.MinecraftServer;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
+import java.net.Inet4Address;
 import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,12 +26,16 @@ public class ProbeServer extends WebSocketServer {
     public static final Command[] REGISTRY = new Command[]{
             new PingCommand(),
             new LintCommand(),
+            new ListRegistryCommand.Objects(),
+            new ListRegistryCommand.Tags(),
+            new ReloadCommand(),
+            new EvaluateCommand(),
     };
 
     private final Map<String, Command> dispatcher = new HashMap<>();
 
-    public ProbeServer(int port) {
-        super(new InetSocketAddress(port));
+    public ProbeServer(int port) throws UnknownHostException {
+        super(new InetSocketAddress(Inet4Address.getByName("127.0.0.1"), port));
 
         for (Command command : REGISTRY) {
             dispatcher.put(command.identifier(), command);

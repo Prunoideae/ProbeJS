@@ -15,6 +15,7 @@ import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
 
 
+import java.net.UnknownHostException;
 import java.util.function.Consumer;
 
 @EventBusSubscriber(value = Dist.CLIENT)
@@ -60,8 +61,12 @@ public class GameEvents {
             );
 
             if (config.interactive.get() && GlobalStates.SERVER == null) {
-                GlobalStates.SERVER = new ProbeServer(config.interactivePort.get());
-                GlobalStates.SERVER.start();
+                try {
+                    GlobalStates.SERVER = new ProbeServer(config.interactivePort.get());
+                    GlobalStates.SERVER.start();
+                } catch (UnknownHostException e) {
+                    throw new RuntimeException(e);
+                }
                 player.sendSystemMessage(
                         Component.translatable("probejs.interactive", config.interactivePort.get())
                 );

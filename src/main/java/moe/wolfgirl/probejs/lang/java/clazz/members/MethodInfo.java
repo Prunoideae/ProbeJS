@@ -1,14 +1,12 @@
 package moe.wolfgirl.probejs.lang.java.clazz.members;
 
+import dev.latvian.mods.rhino.Context;
 import moe.wolfgirl.probejs.lang.java.base.TypeVariableHolder;
 import moe.wolfgirl.probejs.lang.java.type.TypeAdapter;
 import moe.wolfgirl.probejs.lang.java.type.TypeDescriptor;
 import dev.latvian.mods.rhino.JavaMembers;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
+import java.lang.reflect.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -23,9 +21,15 @@ public class MethodInfo extends TypeVariableHolder {
         Method method = methodInfo.method;
         this.attributes = new MethodAttributes(method);
         this.name = methodInfo.name;
-        this.params = Arrays.stream(method.getParameters())
-                .map(ParamInfo::new)
-                .collect(Collectors.toList());
+
+        Parameter[] parameters = method.getParameters();
+        this.params = new ArrayList<>(parameters.length);
+        for (int i = 0; i < parameters.length; i++) {
+            Parameter parameter = parameters[i];
+            if (i == 0 && parameter.getType() == Context.class) continue;
+            this.params.add(new ParamInfo(parameter));
+        }
+
         this.returnType = TypeAdapter.getTypeDescription(method.getAnnotatedReturnType());
 
         for (Map.Entry<TypeVariable<?>, Type> entry : remapper.entrySet()) {

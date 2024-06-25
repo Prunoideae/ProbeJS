@@ -9,8 +9,8 @@
         "LootTableMixin",
         "OnJavaMixin",
         "RecipeManagerMixin",
-        "TranslatableMixin",
-        "ScriptManagerMixin"
+        "ScriptManagerMixin",
+        "TranslatableMixin"
     ],
     "mixins": [
         "ScriptFilePreloadMixin"

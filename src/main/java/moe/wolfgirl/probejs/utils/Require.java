@@ -19,10 +19,16 @@ public class Require extends BaseFunction {
     @Override
     public Object call(Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
         String result = (String) context.jsToJava(args[0], TypeInfo.STRING);
+        if (!result.startsWith("packages")) {
+            return new RequireWrapper(null, Undefined.INSTANCE);
+        }
         String[] parts = result.split("/", 2);
         ClassPath path = new ClassPath(Arrays.stream(parts[1].split("/")).toList());
 
         var loaded = context.loadJavaClass(path.getClassPathJava(), false);
+        if (loaded == null) {
+            ((KubeJSContext) cx).getConsole().warn("Class '%s' not loaded".formatted(path.getClassPathJava()));
+        }
         return new RequireWrapper(path, loaded == null ? Undefined.INSTANCE : loaded);
     }
 
@@ -42,7 +48,7 @@ public class Require extends BaseFunction {
 
         @Override
         public Object get(Context cx, String name, Scriptable start) {
-            if (name.equals(path.getName())) return clazz;
+            if (path == null || name.equals(path.getName())) return clazz;
             return super.get(cx, name, start);
         }
     }

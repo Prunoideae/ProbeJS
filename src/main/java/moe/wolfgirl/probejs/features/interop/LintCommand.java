@@ -1,4 +1,4 @@
-package moe.wolfgirl.probejs.features.autolint;
+package moe.wolfgirl.probejs.features.interop;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;

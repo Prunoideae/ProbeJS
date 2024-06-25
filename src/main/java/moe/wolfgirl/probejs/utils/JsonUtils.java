@@ -1,6 +1,8 @@
 package moe.wolfgirl.probejs.utils;
 
 import com.google.gson.*;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.JsonOps;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Type;
@@ -163,5 +165,10 @@ public class JsonUtils {
         object.add("stackTrace", jsonArray);
 
         return object;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> JsonElement forceEncodeAsJson(Codec<T> codec, Object value) {
+        return codec.encodeStart(JsonOps.INSTANCE, (T) value).result().orElse(JsonNull.INSTANCE);
     }
 }
