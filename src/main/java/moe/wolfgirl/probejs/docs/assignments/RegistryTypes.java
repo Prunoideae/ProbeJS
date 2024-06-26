@@ -96,6 +96,7 @@ public class RegistryTypes extends ProbeJSPlugin {
             BaseType[] tagNames = registry.getTagNames()
                     .map(TagKey::location)
                     .map(ResourceLocation::toString)
+                    .map(s -> "#" + s)
                     .map(Types::literal)
                     .toArray(BaseType[]::new);
 

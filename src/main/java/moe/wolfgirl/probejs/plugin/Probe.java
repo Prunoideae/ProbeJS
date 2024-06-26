@@ -25,7 +25,7 @@ public class Probe {
         }
     }
 
-    public Player getCurrentPlayer(Context context, Object placeholder) { //TODO: remove placeholder when the context bug is fixed
+    public Player getCurrentPlayer(Context context) { //TODO: remove placeholder when the context bug is fixed
         KubeJSContext kContext = (KubeJSContext) context;
         testSourceFile(context);
         if (kContext.getType() == ScriptType.CLIENT) {
@@ -42,7 +42,7 @@ public class Probe {
     public BlockContainerJS getLastRightClickedBlock(Context context) {
         testSourceFile(context);
         if (GlobalStates.LAST_RIGHTCLICKED == null) return null;
-        Player currentPlayer = getCurrentPlayer(context, null);
+        Player currentPlayer = getCurrentPlayer(context);
         if (currentPlayer == null) return null;
         return currentPlayer.level().kjs$getBlock(GlobalStates.LAST_RIGHTCLICKED);
     }

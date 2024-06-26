@@ -20,7 +20,6 @@ import java.util.Set;
 public class RecipeTypes extends ProbeJSPlugin {
     @Override
     public void assignType(ScriptDump scriptDump) {
-        boolean complexType = ProbeConfig.INSTANCE.complete.get();
 
         scriptDump.assignType(ItemLike.class, Types.type(Item.class));
 
@@ -33,12 +32,11 @@ public class RecipeTypes extends ProbeJSPlugin {
                 .build());
 
         scriptDump.assignType(ItemStack.class, Types.type(Item.class));
-        if (complexType) {
-            scriptDump.assignType(ItemStack.class, Types.object()
-                    .member("item", Types.primitive("Special.Item"))
-                    .member("count", true, Primitives.INTEGER)
-                    .build());
-        }
+        scriptDump.assignType(ItemStack.class, Types.object()
+                .member("item", Types.primitive("Special.Item"))
+                .member("count", true, Primitives.INTEGER)
+                .build());
+
 
         scriptDump.assignType(Ingredient.class, Types.type(ItemStack.class));
         scriptDump.assignType(Ingredient.class, Types.type(Ingredient.class).asArray());

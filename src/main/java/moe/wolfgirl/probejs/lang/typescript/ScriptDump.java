@@ -158,6 +158,10 @@ public class ScriptDump {
         return ensurePath("src", true);
     }
 
+    public Path getTest() {
+        return ensurePath("test", true);
+    }
+
     public void dumpClasses() throws IOException {
         dumped = 0;
         total = 0;
@@ -298,23 +302,7 @@ public class ScriptDump {
 
     public void dump() throws IOException, ClassNotFoundException {
         getSource();
-
-        /*
-         * TODO:
-         * .probe
-         *   │
-         *   ├── client
-         *   │   ├── probe-typings
-         *   │   └── globals
-         *   │
-         *   ├── server
-         *   │   ├── probe-typings
-         *   │   └── globals
-         *   │
-         *   └── startup
-         *       ├── probe-typings
-         *       └── globals
-         */
+        getTest();
 
         dumpClasses();
         dumpGlobal();
@@ -326,5 +314,4 @@ public class ScriptDump {
             writer.write(content);
         }
     }
-
 }

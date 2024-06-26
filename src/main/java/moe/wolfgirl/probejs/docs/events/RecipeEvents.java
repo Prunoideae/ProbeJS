@@ -117,6 +117,7 @@ public class RecipeEvents extends ProbeJSPlugin {
 
     }
 
+
     private static ClassPath getSchemaClassPath(String namespace, String id) {
         return new ClassPath("moe.wolfgirl.probejs.generated.schema.%s.%s".formatted(
                 namespace, NameUtils.rlToTitle(id)
