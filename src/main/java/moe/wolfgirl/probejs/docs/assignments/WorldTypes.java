@@ -42,9 +42,9 @@ public class WorldTypes extends ProbeJSPlugin {
     @Override
     public void assignType(ScriptDump scriptDump) {
         scriptDump.assignType(BlockStatePredicate.class, Types.type(BlockStatePredicate.class).asArray());
-        scriptDump.assignType(BlockStatePredicate.class, Types.object()
-                .member("or", true,  Types.type(BlockStatePredicate.class))
-                .member("not", true,  Types.type(BlockStatePredicate.class))
+        scriptDump.assignType(BlockStatePredicate.class, "BlockStatePredicateObject", Types.object()
+                .member("or", true, Types.type(BlockStatePredicate.class))
+                .member("not", true, Types.type(BlockStatePredicate.class))
                 .build());
         scriptDump.assignType(BlockStatePredicate.class, Types.type(Block.class));
         scriptDump.assignType(BlockStatePredicate.class, Types.primitive("Special.BlockTag"));
@@ -59,11 +59,11 @@ public class WorldTypes extends ProbeJSPlugin {
         scriptDump.assignType(BiomeFilter.class, Types.primitive("Special.Biome"));
         scriptDump.assignType(BiomeFilter.class, Types.primitive("RegExp"));
         scriptDump.assignType(BiomeFilter.class, Types.type(BiomeFilter.class).asArray());
-        scriptDump.assignType(BiomeFilter.class, Types.object()
-                .member("or", true,  Types.type(BiomeFilter.class))
-                .member("not", true,  Types.type(BiomeFilter.class))
-                .member("id", true,  Types.primitive("Special.Biome"))
-                .member("type", true,  Types.primitive("Special.Biome"))
+        scriptDump.assignType(BiomeFilter.class, "BiomeFilterObject", Types.object()
+                .member("or", true, Types.type(BiomeFilter.class))
+                .member("not", true, Types.type(BiomeFilter.class))
+                .member("id", true, Types.primitive("Special.Biome"))
+                .member("type", true, Types.primitive("Special.Biome"))
                 .member("tag", Types.primitive("Special.BiomeTag"))
                 .build());
         scriptDump.assignType(Tier.class, Types.STRING);
@@ -93,40 +93,40 @@ public class WorldTypes extends ProbeJSPlugin {
                 .build());
 
         scriptDump.assignType(Component.class, Types.STRING);
-        scriptDump.assignType(Component.class, Types.object()
-                .member("text", true,  Types.STRING)
-                .member("translate", true,  Types.primitive("Special.LangKey"))
-                .member("with", true,  Types.ANY.asArray())
-                .member("color", true,  Types.type(Color.class))
-                .member("bold", true,  Types.BOOLEAN)
-                .member("italic", true,  Types.BOOLEAN)
-                .member("underlined", true,  Types.BOOLEAN)
-                .member("strikethrough", true,  Types.BOOLEAN)
-                .member("obfuscated", true,  Types.BOOLEAN)
-                .member("insertion", true,  Types.STRING)
-                .member("font", true,  Types.STRING)
-                .member("click", true,  Types.type(ClickEvent.class))
-                .member("hover", true,  Types.type(Component.class))
-                .member("extra", true,  Types.type(Component.class).asArray())
+        scriptDump.assignType(Component.class, "ComponentObject", Types.object()
+                .member("text", true, Types.STRING)
+                .member("translate", true, Types.primitive("Special.LangKey"))
+                .member("with", true, Types.ANY.asArray())
+                .member("color", true, Types.type(Color.class))
+                .member("bold", true, Types.BOOLEAN)
+                .member("italic", true, Types.BOOLEAN)
+                .member("underlined", true, Types.BOOLEAN)
+                .member("strikethrough", true, Types.BOOLEAN)
+                .member("obfuscated", true, Types.BOOLEAN)
+                .member("insertion", true, Types.STRING)
+                .member("font", true, Types.STRING)
+                .member("click", true, Types.type(ClickEvent.class))
+                .member("hover", true, Types.type(Component.class))
+                .member("extra", true, Types.type(Component.class).asArray())
                 .build());
         scriptDump.assignType(Component.class, Types.type(Component.class).asArray());
 
         scriptDump.assignType(MutableComponent.class, Types.STRING);
-        scriptDump.assignType(MutableComponent.class, Types.object()
-                .member("text", true,  Types.STRING)
-                .member("translate", true,  Types.primitive("Special.LangKey"))
-                .member("with", true,  Types.ANY.asArray())
-                .member("color", true,  Types.type(Color.class))
-                .member("bold", true,  Types.BOOLEAN)
-                .member("italic", true,  Types.BOOLEAN)
-                .member("underlined", true,  Types.BOOLEAN)
-                .member("strikethrough", true,  Types.BOOLEAN)
-                .member("obfuscated", true,  Types.BOOLEAN)
-                .member("insertion", true,  Types.STRING)
-                .member("font", true,  Types.STRING)
-                .member("click", true,  Types.type(ClickEvent.class))
-                .member("hover", true,  Types.type(MutableComponent.class))
-                .member("extra", true,  Types.type(MutableComponent.class).asArray())
+        scriptDump.assignType(MutableComponent.class, "ComponentObject", Types.object()
+                .member("text", true, Types.STRING)
+                .member("translate", true, Types.primitive("Special.LangKey"))
+                .member("with", true, Types.ANY.asArray())
+                .member("color", true, Types.type(Color.class))
+                .member("bold", true, Types.BOOLEAN)
+                .member("italic", true, Types.BOOLEAN)
+                .member("underlined", true, Types.BOOLEAN)
+                .member("strikethrough", true, Types.BOOLEAN)
+                .member("obfuscated", true, Types.BOOLEAN)
+                .member("insertion", true, Types.STRING)
+                .member("font", true, Types.STRING)
+                .member("click", true, Types.type(ClickEvent.class))
+                .member("hover", true, Types.type(MutableComponent.class))
+                .member("extra", true, Types.type(MutableComponent.class).asArray())
                 .build());
         scriptDump.assignType(MutableComponent.class, Types.type(MutableComponent.class).asArray());
 

@@ -83,7 +83,7 @@ public class ScriptDump {
     public final Transpiler transpiler;
     public final Set<Clazz> recordedClasses = new HashSet<>();
     private final Predicate<Clazz> accept;
-    private final Multimap<ClassPath, BaseType> convertibles = ArrayListMultimap.create();
+    private final Multimap<ClassPath, TypeDecl> convertibles = ArrayListMultimap.create();
     public int dumped = 0;
     public int total = 0;
 
@@ -114,7 +114,15 @@ public class ScriptDump {
     }
 
     public void assignType(ClassPath classPath, BaseType type) {
-        convertibles.put(classPath, type);
+        convertibles.put(classPath, new TypeDecl(null, type));
+    }
+
+    public void assignType(Class<?> classPath, String name, BaseType type) {
+        assignType(new ClassPath(classPath), name, type);
+    }
+
+    public void assignType(ClassPath classPath, String name, BaseType type) {
+        convertibles.put(classPath, new TypeDecl(name, type));
     }
 
     public void addGlobal(String identifier, Code... content) {
@@ -199,8 +207,20 @@ public class ScriptDump {
                 exportedType = Types.ignoreContext(exportedType, BaseType.FormatType.INPUT);
                 thisType = Types.ignoreContext(thisType, BaseType.FormatType.RETURN);
 
-                List<BaseType> allTypes = new ArrayList<>(convertibles.get(classPath));
-                allTypes.add(thisType);
+                List<BaseType> allTypes = new ArrayList<>();
+                List<TypeDecl> delegatedTypes = new ArrayList<>();
+                for (TypeDecl typeDecl : convertibles.get(classPath)) {
+                    if (typeDecl.symbol == null) allTypes.add(typeDecl.type);
+                    else {
+                        delegatedTypes.add(typeDecl);
+                        allTypes.add(Types.primitive(typeDecl.symbol));
+                    }
+                }
+
+                if (allTypes.isEmpty()) {
+                    allTypes.add(thisType); // Don't add if there are wrapping, for better compatibility with duck typing
+                }
+
                 TypeDecl convertibleType = new TypeDecl(
                         exportedSymbol,
                         new JSJoinedType.Union(allTypes)
@@ -219,6 +239,9 @@ public class ScriptDump {
                         Global type exported for convenience, use class-specific
                         types if there's a naming conflict.
                         """);
+                for (TypeDecl delegatedType : delegatedTypes) {
+                    output.addCode(delegatedType);
+                }
                 output.addCode(convertibleType);
                 output.addCode(typeExport);
 

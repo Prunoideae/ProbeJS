@@ -32,7 +32,7 @@ public class RecipeTypes extends ProbeJSPlugin {
                 .build());
 
         scriptDump.assignType(ItemStack.class, Types.type(Item.class));
-        scriptDump.assignType(ItemStack.class, Types.object()
+        scriptDump.assignType(ItemStack.class, "ItemWithCount", Types.object()
                 .member("item", Types.primitive("Special.Item"))
                 .member("count", true, Primitives.INTEGER)
                 .build());
@@ -54,7 +54,7 @@ public class RecipeTypes extends ProbeJSPlugin {
         scriptDump.assignType(RecipeFilter.class, Types.literal("-"));
         scriptDump.assignType(RecipeFilter.class, Types.type(RecipeFilter.class).asArray());
 
-        scriptDump.assignType(RecipeFilter.class, Types.object()
+        scriptDump.assignType(RecipeFilter.class, "RecipeFilterObject", Types.object()
                 .member("or", true, Types.type(RecipeFilter.class))
                 .member("not", true, Types.type(RecipeFilter.class))
                 .member("id", true, Types.primitive("Special.RecipeId"))
@@ -67,10 +67,15 @@ public class RecipeTypes extends ProbeJSPlugin {
 
         scriptDump.assignType(FluidStack.class, Types.type(Fluid.class));
         scriptDump.assignType(FluidStack.class, Types.literal("-"));
-        scriptDump.assignType(FluidStack.class, Types.object()
+        scriptDump.assignType(FluidStack.class, "FluidWithAmount", Types.object()
                 .member("fluid", Types.primitive("Special.Fluid"))
                 .member("amount", true, Primitives.INTEGER)
                 .build());
+    }
+
+    @Override
+    public void addGlobals(ScriptDump scriptDump) {
+        super.addGlobals(scriptDump);
     }
 
     @Override

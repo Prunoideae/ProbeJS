@@ -19,6 +19,7 @@ public interface ClassTransformer {
             new InjectArray(),
             new InjectBeans(),
             new InjectSelf(),
+            new InjectSpecialType(),
     };
 
     static void transformClass(Clazz clazz, ClassDecl classDecl) {

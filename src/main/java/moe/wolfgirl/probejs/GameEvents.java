@@ -27,7 +27,7 @@ import java.util.function.Consumer;
 
 @EventBusSubscriber(value = Dist.CLIENT)
 public class GameEvents {
-    private static final int MOD_LIMIT = 200;
+    private static final int MOD_LIMIT = 350;
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void playerJoined(ClientPlayerNetworkEvent.LoggingIn event) {
