@@ -1,5 +1,6 @@
 package moe.wolfgirl.probejs.lang.transformer;
 
+import com.mojang.datafixers.util.Pair;
 import dev.latvian.mods.kubejs.KubeJS;
 import dev.latvian.mods.kubejs.script.ScriptManager;
 import dev.latvian.mods.kubejs.util.Lazy;
@@ -11,10 +12,7 @@ import moe.wolfgirl.probejs.ProbeConfig;
 import moe.wolfgirl.probejs.ProbeJS;
 import moe.wolfgirl.probejs.utils.NameUtils;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
@@ -40,6 +38,7 @@ public class KubeJSScript {
     public void processRequire() {
         String joined = String.join("\n", lines);
         AstRoot root = PARSER.get().parse(String.join("\n", lines), "script.js", 0);
+        List<Integer[]> cuts = new ArrayList<>();
 
         for (AstNode statement : root.getStatements()) {
             if (statement instanceof VariableDeclaration declaration) {
@@ -49,17 +48,30 @@ public class KubeJSScript {
                     if (variable.getInitializer() instanceof FunctionCall call &&
                             call.getTarget() instanceof Name name) {
                         if (name.getIdentifier().equals("require")) {
-                            joined = NameUtils.replaceRegion(joined,
-                                    statement.getPosition(),
-                                    statement.getPosition() + statement.getLength(),
-                                    "const ",
-                                    PLACEHOLDER
-                            );
+                            var loaded = call.getArguments().getFirst();
+
+                            if (loaded instanceof StringLiteral literal) {
+                                if (literal.getValue().startsWith("packages/")) {
+                                    joined = NameUtils.replaceRegion(joined,
+                                            statement.getPosition(),
+                                            statement.getPosition() + statement.getLength(),
+                                            "const ",
+                                            PLACEHOLDER
+                                    );
+                                } else {
+                                    cuts.add(new Integer[]{statement.getPosition(), statement.getPosition() + statement.getLength()});
+                                }
+                            }
+
+
                         }
                     }
                 }
             }
         }
+
+        cuts.sort(Comparator.comparing(p -> p[0]));
+        joined = NameUtils.cutOffStartEnds(joined, cuts);
 
         joined = joined.replace(PLACEHOLDER, "let ");
         lines = new ArrayList<>(List.of(joined.split("\\n")));
@@ -104,6 +116,7 @@ public class KubeJSScript {
             if (ProbeConfig.INSTANCE.isolatedScopes.get() && !exportedSymbols.isEmpty())
                 wrapScope();
         } catch (Throwable ignore) {
+            ProbeJS.LOGGER.info(ignore.getMessage());
         }
 
         return lines.toArray(String[]::new);

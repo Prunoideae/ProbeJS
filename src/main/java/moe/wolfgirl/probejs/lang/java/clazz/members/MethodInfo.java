@@ -26,7 +26,7 @@ public class MethodInfo extends TypeVariableHolder {
         this.params = new ArrayList<>(parameters.length);
         for (int i = 0; i < parameters.length; i++) {
             Parameter parameter = parameters[i];
-            if (i == 0 && parameter.getType() == Context.class) continue;
+            if (i == 0 && Context.class.isAssignableFrom(parameter.getType())) continue;
             this.params.add(new ParamInfo(parameter));
         }
 

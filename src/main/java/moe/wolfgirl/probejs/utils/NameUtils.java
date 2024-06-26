@@ -2,6 +2,7 @@ package moe.wolfgirl.probejs.utils;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -77,5 +78,20 @@ public class NameUtils {
         String replacedRegion = region.replace(oldText, newText);
 
         return prefix + replacedRegion + suffix;
+    }
+
+    public static String cutOffStartEnds(String str, List<Integer[]> pairs) {
+        StringBuilder result = new StringBuilder(str);
+
+        // Iterate over the pairs in reverse order
+        for (int i = pairs.size() - 1; i >= 0; i--) {
+            int start = pairs.get(i)[0];
+            int end = pairs.get(i)[1] + 1;
+
+            // Cut off the substring from start to end (exclusive)
+            result.delete(start, end);
+        }
+
+        return result.toString();
     }
 }
