@@ -25,6 +25,7 @@ public class ProbeConfig {
     public ConfigEntry<Long> modHash = new ConfigEntry<>("modHash", -1L);
     public ConfigEntry<Long> registryHash = new ConfigEntry<>("registryHash", -1L);
     public ConfigEntry<Boolean> isolatedScopes = new ConfigEntry<>("isolatedScope", false);
+    public ConfigEntry<Boolean> complete = new ConfigEntry<>("complete", true);
 
     public static class ConfigEntry<T> {
         public final String name;

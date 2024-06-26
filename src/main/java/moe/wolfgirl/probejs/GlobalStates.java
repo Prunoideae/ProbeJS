@@ -5,7 +5,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.ClientLanguage;
 import net.minecraft.client.resources.language.LanguageInfo;
 import net.minecraft.client.resources.language.LanguageManager;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforgespi.language.IModInfo;
@@ -68,4 +70,8 @@ public class GlobalStates {
                     .stream()
                     .map(IModInfo::getModId)
                     .collect(Collectors.toSet());
+
+    // For probing stuffs
+    public static BlockPos LAST_RIGHTCLICKED = null;
+    public static Entity LAST_ENTITY = null;
 }

@@ -1,6 +1,7 @@
 package moe.wolfgirl.probejs.docs.assignments;
 
 import dev.latvian.mods.kubejs.registry.RegistryType;
+import moe.wolfgirl.probejs.ProbeConfig;
 import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.lang.snippet.Snippet;
 import moe.wolfgirl.probejs.lang.snippet.SnippetDump;
@@ -68,6 +69,8 @@ public class RegistryTypes extends ProbeJSPlugin {
 
     @Override
     public void addGlobals(ScriptDump scriptDump) {
+        boolean enabled = ProbeConfig.INSTANCE.complete.get();
+
         Wrapped.Namespace special = new Wrapped.Namespace("Special");
         MinecraftServer currentServer = ServerLifecycleHooks.getCurrentServer();
         if (currentServer == null) return;
@@ -84,7 +87,7 @@ public class RegistryTypes extends ProbeJSPlugin {
                 entryNames.add(entryName.toString());
             }
 
-            BaseType types = Types.or(entryNames.stream().map(Types::literal).toArray(BaseType[]::new));
+            BaseType types = enabled ? Types.or(entryNames.stream().map(Types::literal).toArray(BaseType[]::new)) : Types.STRING;
             String typeName = NameUtils.rlToTitle(key.location().getPath());
 
             TypeDecl typeDecl = new TypeDecl(typeName, types);
@@ -96,7 +99,7 @@ public class RegistryTypes extends ProbeJSPlugin {
                     .map(Types::literal)
                     .toArray(BaseType[]::new);
 
-            BaseType tagTypes = Types.or(tagNames);
+            BaseType tagTypes = enabled ? Types.or(tagNames) : Types.STRING;
             String tagName = typeName + "Tag";
 
             TypeDecl tagDecl = new TypeDecl(tagName, tagTypes);

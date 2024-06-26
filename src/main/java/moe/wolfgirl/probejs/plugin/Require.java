@@ -1,4 +1,4 @@
-package moe.wolfgirl.probejs.utils;
+package moe.wolfgirl.probejs.plugin;
 
 
 import dev.latvian.mods.kubejs.script.KubeJSContext;

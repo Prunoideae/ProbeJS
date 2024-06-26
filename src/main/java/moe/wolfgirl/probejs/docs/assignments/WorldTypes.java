@@ -32,6 +32,7 @@ import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.placement.BiomeFilter;
 import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest;
 import net.minecraft.world.level.storage.loot.LootContext;
@@ -84,7 +85,7 @@ public class WorldTypes extends ProbeJSPlugin {
         scriptDump.assignType(BlockTintFunction.class, Types.type(BlockTintFunction.class).asArray());
         scriptDump.assignType(BlockTintFunction.class, Types.STRING);
         scriptDump.assignType(BlockTintFunction.class, Types.lambda()
-                .param("state", Types.type(ItemStack.class))
+                .param("state", Types.type(BlockState.class))
                 .param("level", Types.type(BlockAndTintGetter.class))
                 .param("pos", Types.type(BlockPos.class))
                 .param("index", Primitives.INTEGER)
