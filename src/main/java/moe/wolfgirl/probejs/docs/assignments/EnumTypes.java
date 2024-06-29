@@ -17,8 +17,8 @@ public class EnumTypes extends ProbeJSPlugin {
     @Override
     public void assignType(ScriptDump scriptDump) {
         LOCK.lock();
-        try {
-            for (Clazz recordedClass : scriptDump.recordedClasses) {
+        for (Clazz recordedClass : scriptDump.recordedClasses) {
+            try {
                 if (!recordedClass.original.isEnum()) continue;
                 EnumTypeInfo typeWrapper = (EnumTypeInfo) TypeInfo.of(recordedClass.original);
                 BaseType[] types = typeWrapper.enumConstants()
@@ -28,9 +28,10 @@ public class EnumTypes extends ProbeJSPlugin {
                         .map(Types::literal)
                         .toArray(BaseType[]::new);
                 scriptDump.assignType(recordedClass.classPath, Types.or(types));
+            } catch (Throwable ignore) {
             }
-        } finally {
-            LOCK.unlock();
+
         }
+        LOCK.unlock();
     }
 }

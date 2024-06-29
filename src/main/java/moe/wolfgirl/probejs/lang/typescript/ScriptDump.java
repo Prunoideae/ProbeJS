@@ -174,7 +174,16 @@ public class ScriptDump {
         dumped = 0;
         total = 0;
         transpiler.init();
-        ProbeJSPlugin.forEachPlugin(plugin -> plugin.assignType(this));
+        ProbeJSPlugin.forEachPlugin(plugin -> {
+            try {
+                plugin.assignType(this);
+            } catch (Throwable t) {
+                ProbeJS.LOGGER.error(t.getMessage());
+                for (StackTraceElement stackTraceElement : t.getStackTrace()) {
+                    ProbeJS.LOGGER.error(stackTraceElement.toString());
+                }
+            }
+        });
         Map<String, BufferedWriter> files = new HashMap<>();
         Map<ClassPath, TypeScriptFile> globalClasses = transpiler.dump(recordedClasses);
         ProbeJSPlugin.forEachPlugin(plugin -> plugin.modifyClasses(this, globalClasses));
@@ -257,7 +266,10 @@ public class ScriptDump {
                 if (writer != null) output.writeAsModule(writer);
                 dumped++;
             } catch (Throwable t) {
-                t.printStackTrace();
+                ProbeJS.LOGGER.error(t.getMessage());
+                for (StackTraceElement stackTraceElement : t.getStackTrace()) {
+                    ProbeJS.LOGGER.error(stackTraceElement.toString());
+                }
             }
         }
 
