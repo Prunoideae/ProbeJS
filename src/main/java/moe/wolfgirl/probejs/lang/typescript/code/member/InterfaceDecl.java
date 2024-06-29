@@ -8,6 +8,7 @@ import moe.wolfgirl.probejs.lang.typescript.code.ts.VariableDeclaration;
 import moe.wolfgirl.probejs.lang.typescript.code.ts.Wrapped;
 import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
 import moe.wolfgirl.probejs.lang.typescript.code.type.TSVariableType;
+import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.jetbrains.annotations.Nullable;
 
@@ -91,8 +92,11 @@ public class InterfaceDecl extends ClassDecl {
 
         if (count.getValue() == 1 && hybrid != null) {
             body.add("");
+            for (ParamDecl param : hybrid.params) {
+                param.type = Types.ignoreContext(param.type, BaseType.FormatType.RETURN);
+            }
             String hybridBody = ParamDecl.formatParams(hybrid.params, declaration);
-            String returnType = hybrid.returnType.line(declaration);
+            String returnType = hybrid.returnType.line(declaration, BaseType.FormatType.INPUT);
             body.add("%s: %s".formatted(hybridBody, returnType));
         }
 

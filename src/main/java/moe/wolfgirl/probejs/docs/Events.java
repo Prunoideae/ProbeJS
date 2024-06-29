@@ -53,7 +53,7 @@ public class Events extends ProbeJSPlugin {
                 if (handler.target != null) {
                     groupNamespace.addCode(formatEvent(converter, handler, true));
                 }
-                groupNamespace.addCode(formatEvent(converter, handler, false));
+                if (!handler.targetRequired) groupNamespace.addCode(formatEvent(converter, handler, false));
             }
             codes.add(groupNamespace);
         }

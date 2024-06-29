@@ -43,12 +43,10 @@ public class Clazz extends TypeVariableHolder {
                 .stream()
                 .map(ConstructorInfo::new)
                 .collect(Collectors.toList());
-        this.fields = members.getAccessibleFields(context, false)
-                .stream()
-                .map(FieldInfo::new)
-                .collect(Collectors.toList());
+        Set<String> names = new HashSet<>();
         this.methods = members.getAccessibleMethods(context, false)
                 .stream()
+                .peek(m -> names.add(m.name))
                 .filter(m -> !m.method.isSynthetic())
                 .filter(m -> !hasIdenticalParentMethodAndEnsureNotDirectlyImplementsInterfaceSinceTypeScriptDoesNotHaveInterfaceAtRuntimeInTypeDeclarationFilesJustBecauseItSucks(m.method, clazz))
                 .map(method -> {
@@ -56,6 +54,12 @@ public class Clazz extends TypeVariableHolder {
                     return new MethodInfo(method, replacement);
                 })
                 .collect(Collectors.toList());
+        this.fields = members.getAccessibleFields(context, false)
+                .stream()
+                .filter(f -> !names.contains(f.name))
+                .map(FieldInfo::new)
+                .collect(Collectors.toList());
+
 
         if (clazz.getSuperclass() != Object.class) {
             this.superClass = TypeAdapter.getTypeDescription(clazz.getAnnotatedSuperclass());

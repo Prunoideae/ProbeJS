@@ -19,6 +19,12 @@ import net.minecraft.core.HolderSet;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.TypeVariable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 public class InjectSpecialType implements ClassTransformer {
@@ -42,17 +48,39 @@ public class InjectSpecialType implements ClassTransformer {
         }
     }
 
+    private static int findReturnTypeIndex(Class<?> clazz) {
+        Method functional = Arrays.stream(clazz.getMethods()).filter(m -> {
+            int modifiers = m.getModifiers();
+            return Modifier.isAbstract(modifiers);
+        }).findFirst().orElse(null);
+        if (functional == null) return -1;
+        if (functional.getGenericReturnType() instanceof TypeVariable<?> typeVariable) {
+            TypeVariable<?>[] typeVars = clazz.getTypeParameters();
+            for (int i = 0; i < typeVars.length; i++) {
+                if (typeVars[i].getName().equals(typeVariable.getName())) {
+                    return i;
+                }
+            }
+        }
+        return -1;
+    }
+
     public static void modifyLambda(ParamDecl param, ParamInfo info) {
         if (info.type instanceof ParamType paramType &&
                 paramType.base instanceof ClassType classType &&
                 classType.clazz.isAnnotationPresent(FunctionalInterface.class) &&
                 param.type instanceof TSParamType tsParamType) {
-            param.type = new TSParamType(
-                    tsParamType.baseType,
-                    tsParamType.params.stream()
-                            .map(c -> Types.ignoreContext(c, BaseType.FormatType.RETURN))
-                            .toList()
-            );
+
+            List<BaseType> params = new ArrayList<>(tsParamType.params);
+            int returnIndex = findReturnTypeIndex(classType.clazz);
+            for (int i = 0; i < params.size(); i++) {
+                BaseType p = params.get(i);
+                params.set(i, Types.ignoreContext(p, returnIndex == i ?
+                        BaseType.FormatType.INPUT :
+                        BaseType.FormatType.RETURN));
+            }
+
+            param.type = new TSParamType(tsParamType.baseType, params);
         }
     }
 
