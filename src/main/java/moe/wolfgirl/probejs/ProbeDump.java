@@ -167,11 +167,14 @@ public class ProbeDump {
 
     private void appendGitIgnore() throws IOException {
         boolean shouldAppend;
+
         try (var reader = Files.newBufferedReader(ProbePaths.GIT_IGNORE)) {
             shouldAppend = reader.lines().noneMatch(s -> s.equals(".probe"));
+        } catch (IOException ignore) {
+            shouldAppend = true;
         }
 
-        try (var writer = Files.newBufferedWriter(ProbePaths.GIT_IGNORE, StandardOpenOption.APPEND)) {
+        try (var writer = Files.newBufferedWriter(ProbePaths.GIT_IGNORE, StandardOpenOption.APPEND, StandardOpenOption.CREATE)) {
             if (shouldAppend) {
                 writer.write("\n.probe\n");
             }

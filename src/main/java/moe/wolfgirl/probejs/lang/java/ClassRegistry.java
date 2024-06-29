@@ -110,6 +110,7 @@ public class ClassRegistry {
             currentClasses.clear();
             for (Class<?> c : fetchedClass) {
                 try {
+                    Class.forName(c.getName());
                     Clazz clazz = new Clazz(c);
                     foundClasses.put(clazz.classPath, clazz);
                     currentClasses.add(clazz);
