@@ -27,6 +27,8 @@ import moe.wolfgirl.probejs.lang.typescript.code.type.js.JSLambdaType;
 import moe.wolfgirl.probejs.lang.typescript.code.type.js.JSObjectType;
 import moe.wolfgirl.probejs.utils.GameUtils;
 import moe.wolfgirl.probejs.utils.NameUtils;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
@@ -70,6 +72,10 @@ public class RecipeEvents extends ProbeJSPlugin {
                 RecipeSchemaType schemaType = e.getValue();
                 if (schemaType instanceof UnknownRecipeSchemaType) continue;
                 RecipeSchema schema = schemaType.schema;
+                if (schema.isHidden()) continue;
+                if (!BuiltInRegistries.RECIPE_SERIALIZER.containsKey(
+                        ResourceLocation.fromNamespaceAndPath(namespaceId, schemaId))
+                ) continue;
 
                 ClassPath schemaPath = getSchemaClassPath(namespaceId, schemaId);
                 ClassDecl schemaDecl = generateSchemaClass(schemaId, schema, converter);

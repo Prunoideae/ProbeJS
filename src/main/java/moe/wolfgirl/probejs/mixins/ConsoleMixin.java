@@ -1,8 +1,8 @@
 package moe.wolfgirl.probejs.mixins;
 
+import dev.latvian.mods.kubejs.script.ConsoleJS;
 import dev.latvian.mods.kubejs.script.ConsoleLine;
 import dev.latvian.mods.kubejs.script.ScriptType;
-import dev.latvian.mods.kubejs.util.ConsoleJS;
 import dev.latvian.mods.kubejs.util.LogType;
 import dev.latvian.mods.rhino.RhinoException;
 import moe.wolfgirl.probejs.GlobalStates;

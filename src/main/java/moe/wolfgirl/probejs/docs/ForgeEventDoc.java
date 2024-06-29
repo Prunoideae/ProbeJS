@@ -37,10 +37,17 @@ public class ForgeEventDoc extends ProbeJSPlugin {
                                 )
                         )
                 );
-                method.params.get(0).type = Types.generic("T");
-                method.params.get(1).type = Types.lambda()
-                        .param("event", Types.parameterized(Types.primitive("InstanceType"), Types.primitive("T")))
-                        .build();
+                if (method.params.getFirst().name.equals("priority")) {
+                    method.params.get(1).type = Types.generic("T");
+                    method.params.get(2).type = Types.lambda()
+                            .param("event", Types.parameterized(Types.primitive("InstanceType"), Types.primitive("T")))
+                            .build();
+                } else {
+                    method.params.get(0).type = Types.generic("T");
+                    method.params.get(1).type = Types.lambda()
+                            .param("event", Types.parameterized(Types.primitive("InstanceType"), Types.primitive("T")))
+                            .build();
+                }
             }
         }
     }

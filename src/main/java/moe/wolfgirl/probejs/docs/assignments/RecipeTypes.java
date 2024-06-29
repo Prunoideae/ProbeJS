@@ -13,7 +13,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.material.Fluid;
+import net.neoforged.neoforge.common.crafting.SizedIngredient;
 import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.crafting.FluidIngredient;
 
 import java.util.Set;
 
@@ -48,6 +50,7 @@ public class RecipeTypes extends ProbeJSPlugin {
         scriptDump.assignType(Ingredient.class, Types.primitive("`@${Special.Mod}`"));
         scriptDump.assignType(Ingredient.class, Types.primitive("`%${Special.CreativeModeTab}`"));
 
+        scriptDump.assignType(SizedIngredient.class, Types.type(ItemStack.class));
 
         scriptDump.assignType(RecipeFilter.class, Types.primitive("RegExp"));
         scriptDump.assignType(RecipeFilter.class, Types.literal("*"));
@@ -71,6 +74,12 @@ public class RecipeTypes extends ProbeJSPlugin {
                 .member("fluid", Types.primitive("Special.Fluid"))
                 .member("amount", true, Primitives.INTEGER)
                 .build());
+
+        // Note that this is fluid ingredient without amount
+        scriptDump.assignType(FluidIngredient.class, Types.type(Fluid.class));
+        scriptDump.assignType(FluidIngredient.class, Types.primitive("`#${Special.FluidTag}`"));
+        scriptDump.assignType(FluidIngredient.class, Types.primitive("`@${Special.Mod}`"));
+        scriptDump.assignType(FluidIngredient.class, Types.primitive("RegExp"));
     }
 
     @Override

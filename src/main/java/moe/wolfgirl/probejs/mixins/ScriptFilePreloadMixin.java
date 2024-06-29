@@ -1,8 +1,8 @@
 package moe.wolfgirl.probejs.mixins;
 
+import dev.latvian.mods.kubejs.script.ScriptFile;
 import dev.latvian.mods.kubejs.script.ScriptFileInfo;
-import dev.latvian.mods.kubejs.script.ScriptSource;
-import dev.latvian.mods.kubejs.util.UtilsJS;
+import dev.latvian.mods.kubejs.script.ScriptPack;
 import moe.wolfgirl.probejs.lang.transformer.KubeJSScript;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -14,28 +14,17 @@ import java.io.IOException;
 import java.util.List;
 
 
-@Mixin(ScriptFileInfo.class)
+@Mixin(value = ScriptFile.class, remap = false)
 public class ScriptFilePreloadMixin {
 
     @Shadow(remap = false)
     public String[] lines;
 
-    @Inject(method = "preload",
+    @Inject(method = "<init>",
             at = @At(value = "RETURN"),
             remap = false)
-    private void probejs$$preloadFile(ScriptSource source, CallbackInfo ci) throws IOException {
-
-        // I don't know why it won't work... But The fact is that I have to reload
-        // stuffs again.
-        lines = source.readSource((ScriptFileInfo) (Object) this).toArray(UtilsJS.EMPTY_STRING_ARRAY);
-        for (int i = 0; i < lines.length; i++) {
-            var tline = lines[i].trim();
-            if (tline.startsWith("//")) {
-                lines[i] = "";
-            }
-        }
-
-        // Transform import stuffs so that we can use imports etc
+    private void probejs$$preloadFile(ScriptPack pack, ScriptFileInfo info, CallbackInfo ci) throws IOException {
+        // Transform import stuffs so that we can use require etc
         lines = (new KubeJSScript(List.of(lines))).transform();
     }
 }

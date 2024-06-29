@@ -7,7 +7,10 @@ import dev.latvian.mods.kubejs.event.EventGroup;
 import dev.latvian.mods.kubejs.event.EventGroups;
 import dev.latvian.mods.kubejs.event.EventHandler;
 import dev.latvian.mods.kubejs.typings.Info;
+import moe.wolfgirl.probejs.lang.transpiler.transformation.InjectSpecialType;
 import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
+import moe.wolfgirl.probejs.lang.typescript.code.type.TSClassType;
+import moe.wolfgirl.probejs.lang.typescript.code.type.TSParamType;
 import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
 import moe.wolfgirl.probejs.lang.transpiler.TypeConverter;
 import moe.wolfgirl.probejs.lang.typescript.code.Code;
@@ -21,6 +24,7 @@ import moe.wolfgirl.probejs.lang.typescript.code.type.js.JSLambdaType;
 import java.util.*;
 
 public class Events extends ProbeJSPlugin {
+
     @Override
     public void addGlobals(ScriptDump scriptDump) {
 
@@ -46,7 +50,7 @@ public class Events extends ProbeJSPlugin {
 
             Wrapped.Namespace groupNamespace = new Wrapped.Namespace(group);
             for (EventHandler handler : handlers) {
-                if (handler.extra != null) {
+                if (handler.target != null) {
                     groupNamespace.addCode(formatEvent(converter, handler, true));
                 }
                 groupNamespace.addCode(formatEvent(converter, handler, false));
@@ -74,7 +78,14 @@ public class Events extends ProbeJSPlugin {
     private static MethodDeclaration formatEvent(TypeConverter converter, EventHandler handler, boolean useExtra) {
         var builder = Statements.method(handler.name);
         if (useExtra) {
-            BaseType extraType = converter.convertType(handler.extra.describeType);
+            BaseType extraType = converter.convertType(handler.target.describeType);
+            if (extraType instanceof TSParamType paramType &&
+                    paramType.params.size() == 1 &&
+                    paramType.baseType instanceof TSClassType classType) {
+                if (InjectSpecialType.NO_WRAPPING.contains(classType.classPath)) {
+                    paramType.params.set(0, Types.ignoreContext(paramType.params.getFirst(), BaseType.FormatType.RETURN));
+                }
+            }
             builder.param("extra", extraType);
         }
         Class<?> eventClass = handler.eventType.get();

@@ -12,6 +12,7 @@ public class ProbePaths {
     public static Path WORKSPACE_SETTINGS = KubeJSPaths.GAMEDIR.resolve(".vscode");
     public static Path SETTINGS_JSON = KubeJSPaths.CONFIG.resolve("probe-settings.json");
     public static Path VSCODE_JSON = WORKSPACE_SETTINGS.resolve("settings.json");
+    public static Path GIT_IGNORE = KubeJSPaths.GAMEDIR.resolve(".gitignore");
     public static Path DECOMPILED = PROBE.resolve("decompiled");
 
     public static void init() {

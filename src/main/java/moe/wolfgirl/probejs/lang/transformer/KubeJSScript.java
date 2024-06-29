@@ -1,9 +1,5 @@
 package moe.wolfgirl.probejs.lang.transformer;
 
-import com.mojang.datafixers.util.Pair;
-import dev.latvian.mods.kubejs.KubeJS;
-import dev.latvian.mods.kubejs.script.ScriptManager;
-import dev.latvian.mods.kubejs.util.Lazy;
 import dev.latvian.mods.rhino.Context;
 import dev.latvian.mods.rhino.ContextFactory;
 import dev.latvian.mods.rhino.Parser;
@@ -14,7 +10,6 @@ import moe.wolfgirl.probejs.utils.NameUtils;
 
 import java.util.*;
 import java.util.function.Supplier;
-import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
 public class KubeJSScript {
@@ -41,29 +36,31 @@ public class KubeJSScript {
         List<Integer[]> cuts = new ArrayList<>();
 
         for (AstNode statement : root.getStatements()) {
+            // declaring
             if (statement instanceof VariableDeclaration declaration) {
-                if (!declaration.isConst()) continue;
                 var variables = declaration.getVariables();
                 for (VariableInitializer variable : variables) {
                     if (variable.getInitializer() instanceof FunctionCall call &&
                             call.getTarget() instanceof Name name) {
+                        // used require()
                         if (name.getIdentifier().equals("require")) {
                             var loaded = call.getArguments().getFirst();
-
                             if (loaded instanceof StringLiteral literal) {
+                                // is java package, transform if it's const
                                 if (literal.getValue().startsWith("packages/")) {
-                                    joined = NameUtils.replaceRegion(joined,
-                                            statement.getPosition(),
-                                            statement.getPosition() + statement.getLength(),
-                                            "const ",
-                                            PLACEHOLDER
-                                    );
+                                    if (declaration.isConst()) {
+                                        joined = NameUtils.replaceRegion(joined,
+                                                statement.getPosition(),
+                                                statement.getPosition() + statement.getLength(),
+                                                "const ",
+                                                PLACEHOLDER
+                                        );
+                                    }
                                 } else {
+                                    // not java package, cut it
                                     cuts.add(new Integer[]{statement.getPosition(), statement.getPosition() + statement.getLength()});
                                 }
                             }
-
-
                         }
                     }
                 }
@@ -115,8 +112,8 @@ public class KubeJSScript {
             // If there's no symbol to be exported, it will be global mode
             if (ProbeConfig.INSTANCE.isolatedScopes.get() && !exportedSymbols.isEmpty())
                 wrapScope();
-        } catch (Throwable ignore) {
-            ProbeJS.LOGGER.info(ignore.getMessage());
+        } catch (Throwable t) {
+            ProbeJS.LOGGER.info(t.getMessage());
         }
 
         return lines.toArray(String[]::new);

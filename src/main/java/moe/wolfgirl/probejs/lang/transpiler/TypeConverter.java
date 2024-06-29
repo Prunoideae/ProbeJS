@@ -8,10 +8,7 @@ import moe.wolfgirl.probejs.lang.java.type.impl.*;
 import moe.wolfgirl.probejs.lang.typescript.code.type.*;
 import moe.wolfgirl.probejs.lang.typescript.code.type.js.*;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Adapts a TypeDescriptor into a BaseType
@@ -63,6 +60,10 @@ public class TypeConverter {
     }
 
     public BaseType convertType(TypeInfo typeInfo) {
+        return convertType(typeInfo, true);
+    }
+
+    public BaseType convertType(TypeInfo typeInfo, boolean baseType) {
         if (typeInfo == TypeInfo.NONE) return Types.NEVER;
 
         return switch (typeInfo) {
@@ -73,8 +74,18 @@ public class TypeConverter {
                 }
                 yield builder.build();
             }
-            case ClassTypeInfo info -> predefinedTypes.getOrDefault(
-                    new ClassPath(info.asClass()), Types.type(info.asClass()));
+            case ClassTypeInfo info -> {
+                Class<?> clazz = info.asClass();
+                if (predefinedTypes.containsKey(new ClassPath(clazz))) yield predefinedTypes.get(new ClassPath(clazz));
+                if (clazz.getTypeParameters().length != 0 && !baseType) {
+                    yield Types.parameterized(Types.type(clazz),
+                            Collections.nCopies(clazz.getTypeParameters().length, Types.OBJECT)
+                                    .toArray(BaseType[]::new)
+                    );
+                } else {
+                    yield Types.type(clazz);
+                }
+            }
             case ArrayTypeInfo info -> convertType(info.componentType()).asArray();
             case JSFixedArrayTypeInfo info -> {
                 var builder = Types.arrayOf();
@@ -96,7 +107,9 @@ public class TypeConverter {
                 if (info.rawType() == TypeInfo.RAW_OPTIONAL) {
                     yield Types.optional(convertType(info.param(0)));
                 }
-                var params = Arrays.stream(info.params()).map(this::convertType).toArray(BaseType[]::new);
+                var params = Arrays.stream(info.params())
+                        .map(p -> this.convertType(p, false))
+                        .toArray(BaseType[]::new);
                 yield Types.parameterized(convertType(info.rawType()), params);
             }
             case null, default -> Types.ANY;

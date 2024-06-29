@@ -33,4 +33,4 @@ By then, you can use the `require` function to get type hinting for the exported
 const { myFunction, myVariable } = require("./myScript")
 ```
 
-Note that this is type-hinting only, and the `export` will be stripped out during the loading process. `require`ing a script will do nothing,
+Note that this is type-hinting only, and the `export` will be stripped out during the loading process. `require`ing a script will do nothing. You should be careful that all the variables are actually visible to each other, unless with the `scope isolation` on.

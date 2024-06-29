@@ -11,7 +11,9 @@ import moe.wolfgirl.probejs.utils.GameUtils;
 import net.minecraft.network.chat.Component;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -91,6 +93,7 @@ public class ProbeDump {
         schemaDump.fromDocs();
         schemaDump.writeTo(ProbePaths.WORKSPACE_SETTINGS);
         writeVSCodeConfig();
+        appendGitIgnore();
 
         report(Component.translatable("probejs.dump.snippets_generated"));
 
@@ -160,5 +163,18 @@ public class ProbeDump {
                     ]
                 }
                 """);
+    }
+
+    private void appendGitIgnore() throws IOException {
+        boolean shouldAppend;
+        try (var reader = Files.newBufferedReader(ProbePaths.GIT_IGNORE)) {
+            shouldAppend = reader.lines().noneMatch(s -> s.equals(".probe"));
+        }
+
+        try (var writer = Files.newBufferedWriter(ProbePaths.GIT_IGNORE, StandardOpenOption.APPEND)) {
+            if (shouldAppend) {
+                writer.write("\n.probe\n");
+            }
+        }
     }
 }

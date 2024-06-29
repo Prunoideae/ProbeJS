@@ -1,11 +1,16 @@
 package moe.wolfgirl.probejs.docs.assignments;
 
+import dev.latvian.mods.rhino.type.ClassTypeInfo;
+import dev.latvian.mods.rhino.type.ParameterizedTypeInfo;
 import dev.latvian.mods.rhino.type.RecordTypeInfo;
 import dev.latvian.mods.rhino.type.TypeInfo;
+import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.lang.java.clazz.Clazz;
 import moe.wolfgirl.probejs.lang.transpiler.TypeConverter;
+import moe.wolfgirl.probejs.lang.transpiler.transformation.InjectSpecialType;
 import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
 import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
+import moe.wolfgirl.probejs.lang.typescript.code.type.TSParamType;
 import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
 import moe.wolfgirl.probejs.lang.typescript.code.type.js.JSArrayType;
 import moe.wolfgirl.probejs.lang.typescript.code.type.js.JSObjectType;
@@ -25,6 +30,14 @@ public class RecordTypes extends ProbeJSPlugin {
 
             for (RecordTypeInfo.Component component : typeWrapper.recordComponents().values()) {
                 BaseType type = converter.convertType(component.type());
+
+                if (component.type() instanceof ParameterizedTypeInfo parameterizedTypeInfo) {
+                    if (InjectSpecialType.NO_WRAPPING.contains(new ClassPath(parameterizedTypeInfo.rawType().asClass()))) {
+                        if (type instanceof TSParamType paramType) {
+                            paramType.params.replaceAll(baseType -> Types.ignoreContext(baseType, BaseType.FormatType.RETURN));
+                        }
+                    }
+                }
 
                 objectType.member(component.name(), true, type);
                 arrayType.member(component.name(), true, type);

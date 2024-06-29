@@ -39,14 +39,15 @@ public class ClassRegistry {
 
     public void fromClasses(Collection<Class<?>> classes) {
         for (Class<?> c : classes) {
-            if (c.isSynthetic()) continue;
-            if (c.isAnonymousClass()) continue;
-            if (!foundClasses.containsKey(new ClassPath(c))) {
-                try {
+            try {
+                if (c.isSynthetic()) continue;
+                if (c.isAnonymousClass()) continue;
+                if (!foundClasses.containsKey(new ClassPath(c))) {
+
                     Clazz clazz = new Clazz(c);
                     foundClasses.put(clazz.classPath, clazz);
-                } catch (Throwable ignored) {
                 }
+            } catch (Throwable ignored) {
             }
         }
     }

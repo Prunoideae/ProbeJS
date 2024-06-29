@@ -3,19 +3,16 @@ package moe.wolfgirl.probejs.lang.typescript.code.type;
 import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.lang.typescript.Declaration;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class TSParamType extends BaseType {
     public BaseType baseType;
-    public final List<BaseType> params;
+    public List<BaseType> params;
 
     public TSParamType(BaseType baseType, List<BaseType> params) {
         this.baseType = baseType;
-        this.params = params;
+        this.params = new ArrayList<>(params);
     }
 
     @Override
