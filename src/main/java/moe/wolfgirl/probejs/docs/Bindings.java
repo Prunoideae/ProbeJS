@@ -7,6 +7,7 @@ import dev.latvian.mods.rhino.NativeJavaClass;
 import dev.latvian.mods.rhino.Scriptable;
 import dev.latvian.mods.rhino.type.TypeInfo;
 import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
+import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
 import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
 import moe.wolfgirl.probejs.lang.transpiler.TypeConverter;
 import moe.wolfgirl.probejs.lang.typescript.code.Code;
@@ -40,7 +41,7 @@ public class Bindings extends ProbeJSPlugin {
 
                 if (value.getClass() == Class.class) {
                     if (((Class<?>) value).isInterface()) {
-                        reexported.put(id, converter.convertType(TypeInfo.of((Class<?>) value)));
+                        reexported.put(id, Types.typeOf(converter.convertType(TypeInfo.of((Class<?>) value))));
                     } else {
                         exported.put(id, converter.convertType(TypeInfo.of((Class<?>) value)));
                     }

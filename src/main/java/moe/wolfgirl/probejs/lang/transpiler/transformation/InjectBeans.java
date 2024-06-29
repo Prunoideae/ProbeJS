@@ -24,6 +24,7 @@ public class InjectBeans implements ClassTransformer {
             names.add(method.name);
         }
         for (MethodDecl method : classDecl.methods) {
+            if (method.isStatic) continue;
             if (method.name.startsWith("set") && method.params.size() == 1) {
                 if (method.name.length() == 3) continue;
                 String beanName = NameUtils.firstLower(method.name.substring(3));
