@@ -130,7 +130,12 @@ public class WorldTypes extends ProbeJSPlugin {
                 .build());
         scriptDump.assignType(MutableComponent.class, Types.type(MutableComponent.class).asArray());
 
-        BaseType[] predefinedColors = ColorWrapper.MAP.keySet().stream().map(Types::literal).toArray(BaseType[]::new);
+        BaseType[] predefinedColors = ColorWrapper.MAP.keySet()
+                .stream()
+                .map(String::toLowerCase)
+                .distinct()
+                .map(Types::literal)
+                .toArray(BaseType[]::new);
         scriptDump.assignType(Color.class, Types.or(predefinedColors));
         scriptDump.assignType(Color.class, Types.primitive("`#${string}`"));
         scriptDump.assignType(Color.class, Primitives.INTEGER);
