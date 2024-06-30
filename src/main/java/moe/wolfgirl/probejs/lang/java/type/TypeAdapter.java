@@ -29,7 +29,7 @@ public class TypeAdapter {
                 return new VariableType(typeVariable, recursive);
             }
             case AnnotatedWildcardType wildcardType -> {
-                return new moe.wolfgirl.probejs.lang.java.type.impl.WildcardType(wildcardType, recursive);
+                return new moe.wolfgirl.probejs.lang.java.type.impl.WildcardType(wildcardType);
             }
             default -> {
             }
@@ -67,7 +67,7 @@ public class TypeAdapter {
                 return new VariableType(typeVariable, recursive);
             }
             case WildcardType wildcardType -> {
-                return new moe.wolfgirl.probejs.lang.java.type.impl.WildcardType(wildcardType, recursive);
+                return new moe.wolfgirl.probejs.lang.java.type.impl.WildcardType(wildcardType);
             }
             case Class<?> clazz -> {
                 TypeVariable<?>[] interfaces = clazz.getTypeParameters();
