@@ -8,10 +8,10 @@ import java.lang.reflect.AnnotatedWildcardType;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public class WildcardType extends TypeDescriptor {
+public class WildType extends TypeDescriptor {
     public Optional<TypeDescriptor> bound;
 
-    public WildcardType(AnnotatedWildcardType wildcardType) {
+    public WildType(AnnotatedWildcardType wildcardType) {
         super(wildcardType.getAnnotations());
         if (wildcardType.getAnnotatedLowerBounds().length != 0) {
             bound = Optional.of(TypeAdapter.getTypeDescription(wildcardType.getAnnotatedLowerBounds()[0]));
@@ -22,7 +22,7 @@ public class WildcardType extends TypeDescriptor {
         }
     }
 
-    public WildcardType(java.lang.reflect.WildcardType wildcardType) {
+    public WildType(java.lang.reflect.WildcardType wildcardType) {
         super(new Annotation[]{});
         if (wildcardType.getLowerBounds().length != 0) {
             bound = Optional.of(TypeAdapter.getTypeDescription(wildcardType.getLowerBounds()[0]));
@@ -31,6 +31,11 @@ public class WildcardType extends TypeDescriptor {
         } else {
             bound = Optional.empty();
         }
+    }
+
+    public WildType(Optional<TypeDescriptor> bound) {
+        super(new Annotation[]{});
+        this.bound = bound;
     }
 
     @Override

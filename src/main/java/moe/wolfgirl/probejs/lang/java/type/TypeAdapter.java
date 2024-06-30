@@ -1,9 +1,6 @@
 package moe.wolfgirl.probejs.lang.java.type;
 
-import moe.wolfgirl.probejs.lang.java.type.impl.ArrayType;
-import moe.wolfgirl.probejs.lang.java.type.impl.ClassType;
-import moe.wolfgirl.probejs.lang.java.type.impl.ParamType;
-import moe.wolfgirl.probejs.lang.java.type.impl.VariableType;
+import moe.wolfgirl.probejs.lang.java.type.impl.*;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
@@ -29,7 +26,7 @@ public class TypeAdapter {
                 return new VariableType(typeVariable, recursive);
             }
             case AnnotatedWildcardType wildcardType -> {
-                return new moe.wolfgirl.probejs.lang.java.type.impl.WildcardType(wildcardType);
+                return new WildType(wildcardType);
             }
             default -> {
             }
@@ -67,7 +64,7 @@ public class TypeAdapter {
                 return new VariableType(typeVariable, recursive);
             }
             case WildcardType wildcardType -> {
-                return new moe.wolfgirl.probejs.lang.java.type.impl.WildcardType(wildcardType);
+                return new WildType(wildcardType);
             }
             case Class<?> clazz -> {
                 TypeVariable<?>[] interfaces = clazz.getTypeParameters();
@@ -97,6 +94,9 @@ public class TypeAdapter {
                     consolidateType(paramType.base, symbol, replacement),
                     paramType.params.stream().map(t -> consolidateType(t, symbol, replacement)).toList()
             );
+        }
+        if (in instanceof WildType wildType) {
+            return new WildType(wildType.bound.map(t -> consolidateType(t, symbol, replacement)));
         }
         return in;
     }

@@ -53,8 +53,8 @@ public class TypeConverter {
                     return new TSVariableType(variableType.symbol, new JSJoinedType.Intersection(converted));
                 }
             }
-        } else if (descriptor instanceof WildcardType wildcardType) {
-            return wildcardType.stream().findAny().map(this::convertType).orElse(Types.ANY);
+        } else if (descriptor instanceof WildType wildType) {
+            return wildType.stream().findAny().map(this::convertType).orElse(Types.ANY);
         }
         throw new RuntimeException("Unknown subclass of TypeDescriptor.");
     }
