@@ -143,8 +143,7 @@ public class RecipeEvents extends ProbeJSPlugin {
             if (key.functionNames == null || key.functionNames.isEmpty()) continue;
             builder.method(key.getPreferredBuilderKey(), method -> {
                         method.returnType(Types.THIS);
-                        var baseType = converter.convertType(key.component.typeInfo());
-                        if (!baseType.equals(Types.BOOLEAN)) method.param(key.getPreferredBuilderKey(), baseType);
+                        method.param(key.getPreferredBuilderKey(), converter.convertType(key.component.typeInfo()));
                     }
             );
         }
@@ -157,7 +156,7 @@ public class RecipeEvents extends ProbeJSPlugin {
                 .returnType(Types.type(returnType));
 
         for (RecipeKey<?> key : schema.keys) {
-            if (key.excluded) continue;
+            if (!key.includeInAutoConstructors()) continue;
             builder.param(key.getPreferredBuilderKey(),
                     converter.convertType(key.component.typeInfo()),
                     key.optional(), false);
