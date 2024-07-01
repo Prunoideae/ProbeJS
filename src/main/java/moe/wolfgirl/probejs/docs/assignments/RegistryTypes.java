@@ -2,6 +2,7 @@ package moe.wolfgirl.probejs.docs.assignments;
 
 import dev.latvian.mods.kubejs.registry.RegistryType;
 import moe.wolfgirl.probejs.ProbeConfig;
+import moe.wolfgirl.probejs.ProbeJS;
 import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.lang.snippet.Snippet;
 import moe.wolfgirl.probejs.lang.snippet.SnippetDump;
@@ -154,8 +155,12 @@ public class RegistryTypes extends ProbeJSPlugin {
         for (ResourceKey<? extends Registry<?>> value : RegistryUtils.getRegistries(registryAccess)) {
             Registry<?> registry = registryAccess.registry(value).orElse(null);
             if (registry == null) continue;
-            for (Object o : registry) {
-                registryObjectClasses.add(o.getClass());
+            try {
+                for (Object o : registry) {
+                    registryObjectClasses.add(o.getClass());
+                }
+            } catch (Throwable t) {
+                ProbeJS.LOGGER.error("Unable to fetch registry info for %s".formatted(value));
             }
             RegistryType<?> type = RegistryType.ofKey(value);
             if (type == null) continue;

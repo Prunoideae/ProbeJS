@@ -46,6 +46,9 @@ public class GameEvents {
                         Linter.defaultLint(player::sendSystemMessage);
                     } catch (Throwable e) {
                         ProbeJS.LOGGER.error(e.getMessage());
+                        for (StackTraceElement stackTraceElement : e.getStackTrace()) {
+                            ProbeJS.LOGGER.error(stackTraceElement.toString());
+                        }
                         throw new RuntimeException(e);
                     }
                 })).start();

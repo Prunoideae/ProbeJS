@@ -1,5 +1,6 @@
 package moe.wolfgirl.probejs.docs;
 
+import moe.wolfgirl.probejs.ProbeJS;
 import moe.wolfgirl.probejs.docs.assignments.*;
 import moe.wolfgirl.probejs.lang.schema.SchemaDump;
 import moe.wolfgirl.probejs.lang.snippet.SnippetDump;
@@ -46,7 +47,16 @@ public class ProbeBuiltinDocs extends ProbeJSPlugin {
 
     private static void forEach(Consumer<ProbeJSPlugin> consumer) {
         for (Supplier<ProbeJSPlugin> builtinDoc : BUILTIN_DOCS) {
-            consumer.accept(builtinDoc.get());
+            try {
+                consumer.accept(builtinDoc.get());
+            } catch (Throwable t) {
+                ProbeJS.LOGGER.error("Error when applying builtin doc: %s".formatted(builtinDoc.get().getClass()));
+                ProbeJS.LOGGER.error(t.getMessage());
+                for (StackTraceElement stackTraceElement : t.getStackTrace()) {
+                    ProbeJS.LOGGER.error(stackTraceElement.toString());
+                }
+                ProbeJS.LOGGER.error("If you found any problem in generated docs, please report to ProbeJS's github!");
+            }
         }
     }
 
