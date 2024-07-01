@@ -2,7 +2,6 @@ package moe.wolfgirl.probejs;
 
 import com.mojang.brigadier.Command;
 import dev.latvian.mods.kubejs.KubeJS;
-import dev.latvian.mods.kubejs.block.BlockRightClickedKubeEvent;
 import moe.wolfgirl.probejs.features.bridge.ProbeServer;
 import moe.wolfgirl.probejs.lang.linter.Linter;
 import moe.wolfgirl.probejs.utils.GameUtils;
@@ -131,7 +130,7 @@ public class GameEvents {
                                 })
                         )
                         .then(Commands.literal("scope_isolation")
-                                .requires(source -> source.hasPermission(2))
+                                .requires(source -> ProbeConfig.INSTANCE.enabled.get() && source.hasPermission(2))
                                 .executes(context -> {
                                     boolean flag = !ProbeConfig.INSTANCE.isolatedScopes.get();
                                     ProbeConfig.INSTANCE.isolatedScopes.set(flag);
