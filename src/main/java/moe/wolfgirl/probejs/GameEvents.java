@@ -151,9 +151,22 @@ public class GameEvents {
                                 .requires(source -> ProbeConfig.INSTANCE.enabled.get() && source.hasPermission(2))
                                 .executes(context -> {
                                     boolean flag = !ProbeConfig.INSTANCE.complete.get();
+                                    ProbeConfig.INSTANCE.complete.set(flag);
                                     context.getSource().sendSystemMessage(flag ?
                                             Component.translatable("probejs.complete") :
                                             Component.translatable("probejs.no_complete"));
+                                    return Command.SINGLE_SUCCESS;
+                                })
+                        )
+                        .then(Commands.literal("decompile")
+                                .requires(source -> ProbeConfig.INSTANCE.enabled.get() && source.hasPermission(2))
+                                .executes(context -> {
+                                    boolean flag = !ProbeConfig.INSTANCE.enableDecompiler.get();
+                                    ProbeConfig.INSTANCE.enableDecompiler.set(flag);
+                                    context.getSource().sendSystemMessage(flag ?
+                                            Component.translatable("probejs.decompile") :
+                                            Component.translatable("probejs.no_decompile"));
+                                    if (flag) ProbeConfig.INSTANCE.modHash.set(-2L);
                                     return Command.SINGLE_SUCCESS;
                                 })
                         )

@@ -20,17 +20,11 @@ public class ProbeDecompiler {
                 .collect(Collectors.toList());
     }
 
-    public final Fernflower engine;
     public final ProbeFileSaver resultSaver;
     public final ProbeClassScanner scanner;
 
     public ProbeDecompiler() {
         this.resultSaver = new ProbeFileSaver();
-        this.engine = new Fernflower(
-                resultSaver,
-                Map.of(),
-                new ProbeDecompilerLogger()
-        );
         this.scanner = new ProbeClassScanner();
     }
 
@@ -49,6 +43,10 @@ public class ProbeDecompiler {
     }
 
     public void decompileContext() {
+        Fernflower engine = new Fernflower(
+                resultSaver, Map.of(),
+                new ProbeDecompilerLogger()
+        );
         ProbeClassSource source = new ProbeClassSource(scanner.getScannedClasses());
         engine.addSource(source);
 

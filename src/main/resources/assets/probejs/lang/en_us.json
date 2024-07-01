@@ -21,5 +21,7 @@
     "probejs.interactive": "ProbeJS interactive server is listening on port %s.",
     "probejs.complete": "ProbeJS will dump all the complex types now, at expense of VSCode performance.",
     "probejs.no_complete": "ProbeJS will disable some types in dump now, so your VSCode should run faster. Use snippets for those types missing.",
-    "probejs.performance": "You installed %s mods! You might want to use /probejs complete to disable some typing for performance."
+    "probejs.performance": "You installed %s mods! You might want to use /probejs complete to disable some typing for performance.",
+    "probejs.decompile": "ProbeJS will decompile mod sources at next dump, decompilation will also trigger when mod list changed.",
+    "probejs.no_decompile": "ProbeJS will not decompile mod sources now."
 }
