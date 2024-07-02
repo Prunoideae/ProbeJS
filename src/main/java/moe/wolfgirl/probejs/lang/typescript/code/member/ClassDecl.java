@@ -78,7 +78,7 @@ public class ClassDecl extends CommentableCode {
         modifiers.add("class");
 
         String head = "%s %s".formatted(String.join(" ", modifiers), name);
-        if (variableTypes.size() != 0) {
+        if (!variableTypes.isEmpty()) {
             String variables = variableTypes.stream()
                     .map(type -> type.line(declaration, BaseType.FormatType.VARIABLE))
                     .collect(Collectors.joining(", "));
@@ -86,7 +86,7 @@ public class ClassDecl extends CommentableCode {
         }
 
         if (superClass != null) head = "%s extends %s".formatted(head, superClass.line(declaration));
-        if (interfaces.size() != 0) {
+        if (!interfaces.isEmpty()) {
             String formatted = interfaces.stream()
                     .map(type -> type.line(declaration))
                     .collect(Collectors.joining(", "));

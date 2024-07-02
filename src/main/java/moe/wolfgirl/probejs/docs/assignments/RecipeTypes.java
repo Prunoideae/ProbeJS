@@ -25,7 +25,7 @@ public class RecipeTypes extends ProbeJSPlugin {
 
         scriptDump.assignType(ItemLike.class, Types.type(Item.class));
 
-        scriptDump.assignType(ItemPredicate.class, Types.type(Item.class));
+        scriptDump.assignType(ItemPredicate.class, Types.type(Ingredient.class));
         scriptDump.assignType(ItemPredicate.class, Types.literal("*"));
         scriptDump.assignType(ItemPredicate.class, Types.literal("-"));
         scriptDump.assignType(ItemPredicate.class, Types.lambda()

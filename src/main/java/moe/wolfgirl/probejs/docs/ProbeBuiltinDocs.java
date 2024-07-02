@@ -2,6 +2,7 @@ package moe.wolfgirl.probejs.docs;
 
 import moe.wolfgirl.probejs.ProbeJS;
 import moe.wolfgirl.probejs.docs.assignments.*;
+import moe.wolfgirl.probejs.docs.events.ViewerEvents;
 import moe.wolfgirl.probejs.lang.schema.SchemaDump;
 import moe.wolfgirl.probejs.lang.snippet.SnippetDump;
 import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
@@ -42,7 +43,9 @@ public class ProbeBuiltinDocs extends ProbeJSPlugin {
             RegistryEvents::new,
             ParamFix::new,
             Snippets::new,
-            ForgeEventDoc::new
+            ForgeEventDoc::new,
+            AdditionalTypes::new,
+            ViewerEvents::new
     ));
 
     private static void forEach(Consumer<ProbeJSPlugin> consumer) {

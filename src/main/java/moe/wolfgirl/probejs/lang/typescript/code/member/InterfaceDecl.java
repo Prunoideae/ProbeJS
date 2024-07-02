@@ -101,13 +101,17 @@ public class InterfaceDecl extends ClassDecl {
         }
 
         // tail - }
-
+        List<String> tail = new ArrayList<>();
+        for (Code code : bodyCode) {
+            tail.addAll(code.format(declaration));
+        }
+        tail.add("}\n");
 
         // Concatenate them as a whole
         List<String> formatted = new ArrayList<>();
         formatted.add(head);
         formatted.addAll(body);
-        formatted.add("}\n");
+        formatted.addAll(tail);
 
         // Static methods and fields, adds it even if it's empty, so auto import can still discover it
         formatted.addAll(namespace.format(declaration));

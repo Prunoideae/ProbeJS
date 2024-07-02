@@ -8,6 +8,7 @@ import moe.wolfgirl.probejs.lang.typescript.code.type.js.*;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.function.BiFunction;
+import java.util.function.Predicate;
 
 public interface Types {
     JSPrimitiveType ANY = new JSPrimitiveType("any");
@@ -118,5 +119,23 @@ public interface Types {
 
     static TSOptionalType optional(BaseType type) {
         return new TSOptionalType(type);
+    }
+
+    static BaseType filter(BaseType type, Predicate<BaseType> typePredicate) {
+        return switch (type) {
+            case JSJoinedType.Union union -> new JSJoinedType.Union(
+                    union.types.stream()
+                            .filter(t -> !typePredicate.test(t))
+                            .map(t -> filter(t, typePredicate))
+                            .toList()
+            );
+            case JSJoinedType.Intersection intersection -> new JSJoinedType.Intersection(
+                    intersection.types.stream()
+                            .filter(t -> !typePredicate.test(t))
+                            .map(t -> filter(t, typePredicate))
+                            .toList()
+            );
+            case null, default -> type;
+        };
     }
 }

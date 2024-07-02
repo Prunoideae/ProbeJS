@@ -43,7 +43,6 @@ public class GameEvents {
                     dump.defaultScripts();
                     try {
                         dump.trigger(player::sendSystemMessage);
-                        Linter.defaultLint(player::sendSystemMessage);
                     } catch (Throwable e) {
                         ProbeJS.LOGGER.error(e.getMessage());
                         for (StackTraceElement stackTraceElement : e.getStackTrace()) {
@@ -64,8 +63,6 @@ public class GameEvents {
                             Component.translatable("probejs.performance", ModList.get().size())
                     );
                 }
-
-                Linter.defaultLint(player::sendSystemMessage);
             }
             player.sendSystemMessage(
                     Component.translatable("probejs.wiki")
