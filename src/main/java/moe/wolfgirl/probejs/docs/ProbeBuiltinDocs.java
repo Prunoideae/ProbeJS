@@ -14,6 +14,7 @@ import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
 import moe.wolfgirl.probejs.lang.transpiler.Transpiler;
 import moe.wolfgirl.probejs.lang.transpiler.TypeConverter;
 import moe.wolfgirl.probejs.lang.typescript.TypeScriptFile;
+import moe.wolfgirl.probejs.utils.GameUtils;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -54,11 +55,8 @@ public class ProbeBuiltinDocs extends ProbeJSPlugin {
                 consumer.accept(builtinDoc.get());
             } catch (Throwable t) {
                 ProbeJS.LOGGER.error("Error when applying builtin doc: %s".formatted(builtinDoc.get().getClass()));
-                ProbeJS.LOGGER.error(t.getMessage());
-                for (StackTraceElement stackTraceElement : t.getStackTrace()) {
-                    ProbeJS.LOGGER.error(stackTraceElement.toString());
-                }
-                ProbeJS.LOGGER.error("If you found any problem in generated docs, please report to ProbeJS's github!");
+                GameUtils.logException(t);
+                ProbeJS.LOGGER.error("If you found severe problem in generated docs (e.g. largely missing types), please report to ProbeJS's github!");
             }
         }
     }

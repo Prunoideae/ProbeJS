@@ -44,10 +44,7 @@ public class GameEvents {
                     try {
                         dump.trigger(player::sendSystemMessage);
                     } catch (Throwable e) {
-                        ProbeJS.LOGGER.error(e.getMessage());
-                        for (StackTraceElement stackTraceElement : e.getStackTrace()) {
-                            ProbeJS.LOGGER.error(stackTraceElement.toString());
-                        }
+                        GameUtils.logException(e);
                         throw new RuntimeException(e);
                     }
                 })).start();
@@ -103,10 +100,7 @@ public class GameEvents {
                                             Consumer<Component> reportProgress = component -> context.getSource().sendSystemMessage(component);
                                             dump.trigger(reportProgress);
                                         } catch (Throwable e) {
-                                            ProbeJS.LOGGER.error(e.getMessage());
-                                            for (StackTraceElement stackTraceElement : e.getStackTrace()) {
-                                                ProbeJS.LOGGER.error(stackTraceElement.toString());
-                                            }
+                                            GameUtils.logException(e);
                                             throw new RuntimeException(e);
                                         }
                                     })).start();

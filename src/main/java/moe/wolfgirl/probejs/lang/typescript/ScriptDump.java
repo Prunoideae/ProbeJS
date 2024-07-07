@@ -178,10 +178,7 @@ public class ScriptDump {
             try {
                 plugin.assignType(this);
             } catch (Throwable t) {
-                ProbeJS.LOGGER.error(t.getMessage());
-                for (StackTraceElement stackTraceElement : t.getStackTrace()) {
-                    ProbeJS.LOGGER.error(stackTraceElement.toString());
-                }
+                GameUtils.logException(t);
             }
         });
         Map<String, BufferedWriter> files = new HashMap<>();
@@ -266,10 +263,7 @@ public class ScriptDump {
                 if (writer != null) output.writeAsModule(writer);
                 dumped++;
             } catch (Throwable t) {
-                ProbeJS.LOGGER.error(t.getMessage());
-                for (StackTraceElement stackTraceElement : t.getStackTrace()) {
-                    ProbeJS.LOGGER.error(stackTraceElement.toString());
-                }
+                GameUtils.logException(t);
             }
         }
 

@@ -5,6 +5,7 @@ import moe.wolfgirl.probejs.ProbeJS;
 import moe.wolfgirl.probejs.lang.linter.rules.NoNamespacePollution;
 import moe.wolfgirl.probejs.lang.linter.rules.RespectPriority;
 import moe.wolfgirl.probejs.lang.linter.rules.Rule;
+import moe.wolfgirl.probejs.utils.GameUtils;
 import net.minecraft.network.chat.Component;
 
 import java.io.IOException;
@@ -105,7 +106,7 @@ public class Linter {
                 report.accept(Component.translatable("probejs.lint_passed")
                         .kjs$green());
         } catch (Throwable e) {
-            ProbeJS.LOGGER.error(e.getMessage());
+            GameUtils.logException(e);
         }
     }
 }

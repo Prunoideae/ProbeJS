@@ -5,7 +5,7 @@ import dev.latvian.mods.rhino.ContextFactory;
 import dev.latvian.mods.rhino.Parser;
 import dev.latvian.mods.rhino.ast.*;
 import moe.wolfgirl.probejs.ProbeConfig;
-import moe.wolfgirl.probejs.ProbeJS;
+import moe.wolfgirl.probejs.utils.GameUtils;
 import moe.wolfgirl.probejs.utils.NameUtils;
 
 import java.util.*;
@@ -113,7 +113,7 @@ public class KubeJSScript {
             if (ProbeConfig.INSTANCE.isolatedScopes.get() && !exportedSymbols.isEmpty())
                 wrapScope();
         } catch (Throwable t) {
-            ProbeJS.LOGGER.info(t.getMessage());
+            GameUtils.logException(t);
         }
 
         return lines.toArray(String[]::new);

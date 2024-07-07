@@ -1,6 +1,7 @@
 package moe.wolfgirl.probejs.utils;
 
 import dev.latvian.mods.kubejs.server.ServerScriptManager;
+import moe.wolfgirl.probejs.ProbeJS;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -62,5 +63,12 @@ public class GameUtils {
         MinecraftServer currentServer = ServerLifecycleHooks.getCurrentServer();
         if (currentServer == null) return null;
         return currentServer.getServerResources().managers().kjs$getServerScriptManager();
+    }
+
+    public static void logException(Throwable t) {
+        ProbeJS.LOGGER.error(t);
+        for (StackTraceElement stackTraceElement : t.getStackTrace()) {
+            ProbeJS.LOGGER.error(stackTraceElement.toString());
+        }
     }
 }
