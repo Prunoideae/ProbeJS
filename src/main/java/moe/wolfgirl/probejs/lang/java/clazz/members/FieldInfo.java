@@ -33,7 +33,7 @@ public class FieldInfo extends AnnotationHolder {
         }
 
         public Object getStaticValue() throws IllegalAccessException {
-            if (isStatic) throw new RuntimeException("The field is not static!");
+            if (!isStatic) throw new RuntimeException("The field is not static!");
             return field.get(null);
         }
     }

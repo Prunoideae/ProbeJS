@@ -156,7 +156,7 @@ public class RecipeEvents extends ProbeJSPlugin {
                 .returnType(Types.type(returnType));
 
         for (RecipeKey<?> key : schema.keys) {
-            if (!key.includeInAutoConstructors()) continue;
+            if (key.excluded) continue;
             builder.param(key.getPreferredBuilderKey(),
                     converter.convertType(key.component.typeInfo()),
                     key.optional(), false);

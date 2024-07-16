@@ -53,7 +53,8 @@ public class RegistryEvents extends ProbeJSPlugin {
         if (scriptDump.scriptType != ScriptType.STARTUP) return;
 
         for (ResourceKey<? extends Registry<?>> key : BuiltInRegistries.REGISTRY.registryKeySet()) {
-            RegistryInfo<?> info = RegistryInfo.of(RegistryUtils.castKey(key));
+            BuilderTypeRegistryHandler.Info<?> info = BuilderTypeRegistryHandler.info(RegistryUtils.castKey(key));
+            if (info == null) continue;
             RegistryType<?> type = RegistryType.ofKey(key);
             if (type == null) continue;
 
@@ -83,18 +84,18 @@ public class RegistryEvents extends ProbeJSPlugin {
         ));
     }
 
-    private static ClassDecl generateRegistryClass(ResourceKey<?> key, Class<?> baseClass, RegistryInfo<?> info) {
+    private static ClassDecl generateRegistryClass(ResourceKey<?> key, Class<?> baseClass, BuilderTypeRegistryHandler.Info<?> info) {
         ClassDecl.Builder builder = Statements.clazz(NameUtils.rlToTitle(key.location().getPath()))
                 .superClass(Types.parameterized(Types.type(RegistryKubeEvent.class), Types.type(baseClass)));
 
-        BuilderType<?> defaultType = info.getDefaultType();
+        BuilderType<?> defaultType = info.defaultType();
         if (defaultType != null) {
             builder.method("create", method -> method
                     .returnType(Types.typeMaybeGeneric(defaultType.builderClass()))
                     .param("name", Types.STRING));
         }
 
-        for (BuilderType<?> type : info.getTypes()) {
+        for (BuilderType<?> type : info.types()) {
             builder.method("create", method -> method
                     .returnType(Types.typeMaybeGeneric(type.builderClass()))
                     .param("name", Types.STRING)
@@ -109,10 +110,11 @@ public class RegistryEvents extends ProbeJSPlugin {
         Set<Class<?>> classes = new HashSet<>();
 
         for (ResourceKey<? extends Registry<?>> key : BuiltInRegistries.REGISTRY.registryKeySet()) {
-            RegistryInfo<?> registryInfo = RegistryInfo.of(RegistryUtils.castKey(key));
-            var defaultType = registryInfo.getDefaultType();
+            BuilderTypeRegistryHandler.Info<?> registryInfo = BuilderTypeRegistryHandler.info(RegistryUtils.castKey(key));
+            if (registryInfo == null) continue;
+            var defaultType = registryInfo.defaultType();
             if (defaultType != null) classes.add(defaultType.builderClass());
-            for (BuilderType<?> type : registryInfo.getTypes()) {
+            for (BuilderType<?> type : registryInfo.types()) {
                 classes.add(type.builderClass());
             }
         }

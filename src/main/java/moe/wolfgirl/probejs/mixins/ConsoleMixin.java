@@ -54,7 +54,8 @@ public class ConsoleMixin {
             remap = false,
             at = @At("RETURN"))
     public void reportWarning(LogType type, Throwable error, Object message, CallbackInfoReturnable<ConsoleLine> cir) {
-        if (!(type == LogType.WARN || type == LogType.ERROR || type == LogType.INFO) || GlobalStates.SERVER == null) return;
+        if (!(type == LogType.WARN || type == LogType.ERROR || type == LogType.INFO) || GlobalStates.SERVER == null)
+            return;
         ConsoleLine line = cir.getReturnValue();
         if (line == null) return;
         if (error instanceof RhinoException) return;
@@ -72,7 +73,10 @@ public class ConsoleMixin {
 
         var sourceLine = line.sourceLines.stream().findFirst().orElse(null);
         if (sourceLine == null) return;
-        Path path = FileUtils.parseSourcePath("%s:%s".formatted(scriptType, sourceLine.source()));
+        String lineWithSource = sourceLine.source().contains(":") ?
+                sourceLine.source() :
+                "%s:%s".formatted(scriptType, sourceLine.source());
+        Path path = FileUtils.parseSourcePath(lineWithSource);
         if (path != null && path.toString().endsWith(".js")) {
             GlobalStates.SERVER.broadcast("accept_error", (new LintingWarning(
                     path, level,

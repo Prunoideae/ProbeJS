@@ -76,7 +76,7 @@ public class SchemaDownloader {
     }
 
     public Path validateSchemaPath(String namespace, String recipe) throws IOException {
-        Path dirPath = KubeJSPaths.DATA.resolve("%s/kubejs/recipe_schemas".formatted(namespace));
+        Path dirPath = KubeJSPaths.DATA.resolve("%s/kubejs/recipe_schema".formatted(namespace));
         if (!Files.exists(dirPath)) Files.createDirectories(dirPath);
         return dirPath.resolve("%s.json".formatted(recipe));
     }
