@@ -4,6 +4,8 @@ import net.minecraft.network.chat.Component;
 
 import java.util.function.Consumer;
 
+import moe.wolfgirl.probejs.utils.GameUtils;
+
 /**
  * @author ZZZank
  */
