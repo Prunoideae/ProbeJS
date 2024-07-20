@@ -38,16 +38,9 @@ public class GameEvents {
                 player.sendSystemMessage(Component.translatable("probejs.hello").kjs$gold());
             }
             if (config.registryHash.get() != GameUtils.registryHash()) {
-                (new Thread(() -> {  // Don't stall the client
-                    ProbeDump dump = new ProbeDump();
-                    dump.defaultScripts();
-                    try {
-                        dump.trigger(player::sendSystemMessage);
-                    } catch (Throwable e) {
-                        GameUtils.logException(e);
-                        throw new RuntimeException(e);
-                    }
-                })).start();
+                if (!ProbeDumpingThread.exists()) {
+                    ProbeDumpingThread.create(player::sendSystemMessage).start();
+                }
             } else {
                 player.sendSystemMessage(
                         Component.translatable("probejs.enabled_warning")
@@ -92,18 +85,13 @@ public class GameEvents {
                         .then(Commands.literal("dump")
                                 .requires(source -> ProbeConfig.INSTANCE.enabled.get() && source.hasPermission(2))
                                 .executes(context -> {
+                                    Consumer<Component> messageSender = component -> context.getSource().sendSystemMessage(component);
+                                    if (ProbeDumpingThread.exists()) {
+                                        messageSender.accept(Component.translatable("probejs.already_running"));
+                                        return Command.SINGLE_SUCCESS;
+                                    }
                                     KubeJS.PROXY.reloadClientInternal();
-                                    ProbeDump dump = new ProbeDump();
-                                    dump.defaultScripts();
-                                    (new Thread(() -> {
-                                        try {
-                                            Consumer<Component> reportProgress = component -> context.getSource().sendSystemMessage(component);
-                                            dump.trigger(reportProgress);
-                                        } catch (Throwable e) {
-                                            GameUtils.logException(e);
-                                            throw new RuntimeException(e);
-                                        }
-                                    })).start();
+                                    ProbeDumpingThread.create(messageSender).start();
                                     return Command.SINGLE_SUCCESS;
                                 })
                         )

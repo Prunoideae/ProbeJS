@@ -130,7 +130,8 @@ public class ProbeDump {
                     report(Component.translatable("probejs.dump.dump_error", scriptDump.manager.scriptType.toString()).kjs$red());
                     throw new RuntimeException(e);
                 }
-            });
+            },
+            "ProbeDumpingThread-" + scriptDump.scriptType.name);
             t.start();
             dumpThreads.add(t);
         }
@@ -146,7 +147,8 @@ public class ProbeDump {
                     throw new RuntimeException(e);
                 }
             }
-        });
+        },
+        "ProbeDumpingThread-report");
         reportingThread.start();
     }
 
