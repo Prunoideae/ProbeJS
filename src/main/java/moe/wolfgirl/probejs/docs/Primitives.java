@@ -1,5 +1,6 @@
 package moe.wolfgirl.probejs.docs;
 
+import dev.latvian.mods.kubejs.util.KubeResourceLocation;
 import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
 import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
@@ -8,6 +9,7 @@ import moe.wolfgirl.probejs.lang.typescript.Declaration;
 import moe.wolfgirl.probejs.lang.typescript.code.Code;
 import moe.wolfgirl.probejs.lang.typescript.code.type.js.JSPrimitiveType;
 import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.Collection;
 import java.util.List;
@@ -75,6 +77,8 @@ public class Primitives extends ProbeJSPlugin {
 
         converter.addType(Boolean.class, Types.BOOLEAN);
         converter.addType(Boolean.TYPE, Types.BOOLEAN);
+
+        converter.addType(KubeResourceLocation.class, Types.type(ResourceLocation.class));
     }
 
     @Override
