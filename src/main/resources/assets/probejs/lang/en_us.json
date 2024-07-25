@@ -1,4 +1,5 @@
 {
+    "probejs.already_running": "There's already a dumping thread running, please wait.",
     "probejs.dump.start": "ProbeJS dump started.",
     "probejs.dump.snippets_generated": "Snippets for VSCode generated.",
     "probejs.dump.mod_changed": "Mod environment changed.",
