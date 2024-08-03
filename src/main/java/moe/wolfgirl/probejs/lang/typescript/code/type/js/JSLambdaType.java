@@ -9,6 +9,8 @@ import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
 
 import java.util.*;
 
+import javax.annotation.Nullable;
+
 public class JSLambdaType extends BaseType {
     public final List<ParamDecl> params;
     public final BaseType returnType;
@@ -30,7 +32,12 @@ public class JSLambdaType extends BaseType {
     @Override
     public List<String> format(Declaration declaration, FormatType input) {
         // (arg0: type, arg1: type...) => returnType
-        return List.of("%s => %s".formatted(ParamDecl.formatParams(params, declaration), returnType.line(declaration, FormatType.RETURN)));
+        return List.of("%s => %s".formatted(
+            //when formatType is INPUT, aka this lambda is a param itself, params of this lambda should be concrete ...
+            ParamDecl.formatParams(params, declaration, input == FormatType.INPUT ? FormatType.RETURN : FormatType.INPUT),
+            //...and return type should be duck type
+            returnType.line(declaration, input)
+        ));
     }
 
     public String formatWithName(String name, Declaration declaration, FormatType input) {
@@ -44,10 +51,14 @@ public class JSLambdaType extends BaseType {
     public static class Builder {
         public final List<ParamDecl> params = new ArrayList<>();
         public BaseType returnType = Types.VOID;
-        public boolean arrowFunction = true;
+        @Nullable
+        public FormatType forceFormatType = null;
 
         public Builder returnType(BaseType type) {
-            this.returnType = Types.ignoreContext(type, arrowFunction ? FormatType.INPUT : FormatType.RETURN);
+            if (forceFormatType != null) {
+                type = Types.ignoreContext(type, forceFormatType);
+            }
+            this.returnType = type;
             return this;
         }
 
@@ -60,12 +71,25 @@ public class JSLambdaType extends BaseType {
         }
 
         public Builder param(String symbol, BaseType type, boolean isOptional, boolean isVarArg) {
-            params.add(new ParamDecl(symbol, Types.ignoreContext(type, arrowFunction ? FormatType.RETURN : FormatType.INPUT), isVarArg, isOptional));
+            if (forceFormatType != null) {
+                type = Types.ignoreContext(type, forceFormatType);
+            }
+            params.add(new ParamDecl(symbol, type, isVarArg, isOptional));
             return this;
         }
 
-        public Builder method() {
-            arrowFunction = false;
+        public Builder methodTypeStyle() {
+            forceFormatType = FormatType.RETURN;
+            return this;
+        }
+
+        public Builder lambdaTypeStyle() {
+            forceFormatType = FormatType.INPUT;
+            return this;
+        }
+
+        public Builder defaultTypeStyle() {
+            forceFormatType = null;
             return this;
         }
 

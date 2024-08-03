@@ -152,7 +152,7 @@ public class RecipeEvents extends ProbeJSPlugin {
 
     private static JSLambdaType generateSchemaFunction(ClassPath returnType, RecipeSchema schema, TypeConverter converter) {
         JSLambdaType.Builder builder = Types.lambda()
-                .method()
+                .methodTypeStyle()
                 .returnType(Types.type(returnType));
 
         for (RecipeKey<?> key : schema.keys) {
