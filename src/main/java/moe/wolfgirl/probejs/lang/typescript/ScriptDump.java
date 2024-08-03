@@ -23,9 +23,7 @@ import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
 import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
 import moe.wolfgirl.probejs.lang.typescript.code.type.js.JSJoinedType;
 import moe.wolfgirl.probejs.utils.GameUtils;
-import net.minecraft.server.MinecraftServer;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import org.apache.commons.io.FileUtils;
 
 import java.io.BufferedWriter;
@@ -330,8 +328,10 @@ public class ScriptDump {
     }
 
     public void dump() throws IOException, ClassNotFoundException {
-        getSource();
-        getTest();
+        // getSource();
+        // if (ProbeConfig.INSTANCE.interactive.get()){
+        //     getTest();
+        // }
 
         dumpClasses();
         dumpGlobal();

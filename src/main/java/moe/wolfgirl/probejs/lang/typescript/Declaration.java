@@ -24,6 +24,8 @@ public class Declaration {
     }
 
     public void addClass(ClassPath path) {
+        if (references.containsKey(path)) return;
+
         // So we determine a unique original that is safe to use at startup
         var names = getSymbolName(path);
         this.references.put(path, new Reference(path, names.getFirst(), names.getSecond()));

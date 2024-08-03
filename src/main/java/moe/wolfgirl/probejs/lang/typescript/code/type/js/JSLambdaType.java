@@ -27,6 +27,7 @@ public class JSLambdaType extends BaseType {
         return classPaths;
     }
 
+    // TODO: type-aware formatting instead of hardcoding at builder level
     @Override
     public List<String> format(Declaration declaration, FormatType input) {
         // (arg0: type, arg1: type...) => returnType

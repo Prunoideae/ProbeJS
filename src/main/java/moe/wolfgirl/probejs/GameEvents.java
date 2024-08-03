@@ -38,7 +38,7 @@ public class GameEvents {
                 player.sendSystemMessage(Component.translatable("probejs.hello").kjs$gold());
             }
             if (config.registryHash.get() != GameUtils.registryHash()) {
-                if (!ProbeDumpingThread.exists()) {
+                if (!ProbeDumpingThread.exists()) { // Not very possible but anyway
                     ProbeDumpingThread.create(player::sendSystemMessage).start();
                 }
             } else {
