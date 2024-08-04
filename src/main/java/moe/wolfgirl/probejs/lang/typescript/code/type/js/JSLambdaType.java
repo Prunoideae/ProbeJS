@@ -56,7 +56,7 @@ public class JSLambdaType extends BaseType {
 
         public Builder returnType(BaseType type) {
             if (forceFormatType != null) {
-                type = Types.ignoreContext(type, forceFormatType);
+                type = Types.ignoreContext(type, forceFormatType == FormatType.INPUT ? FormatType.RETURN : FormatType.INPUT);
             }
             this.returnType = type;
             return this;
