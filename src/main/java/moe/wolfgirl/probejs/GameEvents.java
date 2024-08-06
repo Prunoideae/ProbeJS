@@ -3,6 +3,7 @@ package moe.wolfgirl.probejs;
 import com.mojang.brigadier.Command;
 import dev.latvian.mods.kubejs.KubeJS;
 import moe.wolfgirl.probejs.features.bridge.ProbeServer;
+import moe.wolfgirl.probejs.features.http.ImageServer;
 import moe.wolfgirl.probejs.lang.linter.Linter;
 import moe.wolfgirl.probejs.utils.GameUtils;
 import net.minecraft.commands.Commands;
@@ -63,11 +64,16 @@ public class GameEvents {
                                     .kjs$hover(Component.literal("https://kubejs.com/wiki/addons/third-party/probejs")))
             );
 
-            if (config.interactive.get() && GlobalStates.SERVER == null) {
+            if (config.interactive.get()) {
                 try {
-                    GlobalStates.SERVER = new ProbeServer(config.interactivePort.get());
-                    GlobalStates.SERVER.start();
-                } catch (UnknownHostException e) {
+                    if (GlobalStates.WS_SERVER == null) {
+                        GlobalStates.WS_SERVER = new ProbeServer(config.interactivePort.get());
+                        GlobalStates.WS_SERVER.start();
+                    }
+                    if (GlobalStates.HTTP_SERVER == null) {
+                        GlobalStates.HTTP_SERVER = ImageServer.serve();
+                    }
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
                 player.sendSystemMessage(

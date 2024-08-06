@@ -23,6 +23,7 @@ import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
 import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
 import moe.wolfgirl.probejs.lang.typescript.code.type.js.JSJoinedType;
 import moe.wolfgirl.probejs.utils.GameUtils;
+import moe.wolfgirl.probejs.utils.ProbeFileUtils;
 import net.neoforged.api.distmarker.OnlyIn;
 import org.apache.commons.io.FileUtils;
 
@@ -298,7 +299,7 @@ public class ScriptDump {
     }
 
     public void dumpJSConfig() throws IOException {
-        moe.wolfgirl.probejs.utils.FileUtils.writeMergedConfig(scriptPath.resolve("jsconfig.json"), """
+        ProbeFileUtils.writeMergedConfig(scriptPath.resolve("jsconfig.json"), """
                 {
                     "compilerOptions": {
                         "module": "commonjs",

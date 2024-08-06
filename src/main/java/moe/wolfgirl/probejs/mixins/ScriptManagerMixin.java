@@ -14,8 +14,8 @@ public abstract class ScriptManagerMixin {
 
     @Inject(method = "reload", remap = false, at = @At("HEAD"))
     public void reloadStart(CallbackInfo ci) {
-        if (GlobalStates.SERVER != null) {
-            GlobalStates.SERVER.broadcast("clear_error", JsonNull.INSTANCE);
+        if (GlobalStates.WS_SERVER != null) {
+            GlobalStates.WS_SERVER.broadcast("clear_error", JsonNull.INSTANCE);
         }
     }
 }

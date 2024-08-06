@@ -1,5 +1,6 @@
 package moe.wolfgirl.probejs;
 
+import com.sun.net.httpserver.HttpServer;
 import moe.wolfgirl.probejs.features.bridge.ProbeServer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.ClientLanguage;
@@ -19,7 +20,8 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class GlobalStates {
-    public static ProbeServer SERVER;
+    public static ProbeServer WS_SERVER;
+    public static HttpServer HTTP_SERVER;
 
     public static final Set<Class<?>> KNOWN_EVENTS = new HashSet<>();
     public static final Set<String> MIXIN_LANG_KEYS = new HashSet<>();

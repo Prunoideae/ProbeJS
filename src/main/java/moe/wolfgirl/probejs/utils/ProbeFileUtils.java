@@ -11,7 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Consumer;
 
-public class FileUtils {
+public class ProbeFileUtils {
     public static void forEachFile(Path basePath, Consumer<Path> callback) throws IOException {
         try (var dirStream = Files.newDirectoryStream(basePath)) {
             for (Path path : dirStream) {

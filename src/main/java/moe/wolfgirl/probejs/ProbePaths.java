@@ -15,6 +15,8 @@ public class ProbePaths {
     public static Path GIT_IGNORE = KubeJSPaths.GAMEDIR.resolve(".gitignore");
     public static Path DECOMPILED = PROBE.resolve("decompiled");
 
+    public static Path IMAGES = PROBE.resolve("images");
+
     public static void init() {
         if (Files.notExists(PROBE)) {
             UtilsJS.tryIO(() -> Files.createDirectories(PROBE));
@@ -22,8 +24,11 @@ public class ProbePaths {
         if (Files.notExists(WORKSPACE_SETTINGS)) {
             UtilsJS.tryIO(() -> Files.createDirectories(WORKSPACE_SETTINGS));
         }
-        if (Files.notExists(ProbePaths.DECOMPILED)) {
-            UtilsJS.tryIO(() -> Files.createDirectories(ProbePaths.DECOMPILED));
+        if (Files.notExists(DECOMPILED)) {
+            UtilsJS.tryIO(() -> Files.createDirectories(DECOMPILED));
+        }
+        if (Files.notExists(IMAGES)) {
+            UtilsJS.tryIO(() -> Files.createDirectories(IMAGES));
         }
     }
 

@@ -6,7 +6,7 @@ import moe.wolfgirl.probejs.lang.java.ClassRegistry;
 import moe.wolfgirl.probejs.lang.schema.SchemaDump;
 import moe.wolfgirl.probejs.lang.snippet.SnippetDump;
 import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
-import moe.wolfgirl.probejs.utils.FileUtils;
+import moe.wolfgirl.probejs.utils.ProbeFileUtils;
 import moe.wolfgirl.probejs.utils.GameUtils;
 import net.minecraft.network.chat.Component;
 
@@ -153,7 +153,7 @@ public class ProbeDump {
     }
 
     private void writeVSCodeConfig() throws IOException {
-        FileUtils.writeMergedConfig(ProbePaths.VSCODE_JSON, """
+        ProbeFileUtils.writeMergedConfig(ProbePaths.VSCODE_JSON, """
                 {
                     "json.schemas": [
                         {

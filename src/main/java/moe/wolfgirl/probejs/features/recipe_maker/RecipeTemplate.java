@@ -12,7 +12,5 @@ import java.util.List;
  * Or should I just make a GUI in game?
  */
 public class RecipeTemplate {
-    public final List<RecipeKey<?>> inputs = new ArrayList<>();
-    public final List<RecipeKey<?>> outputs = new ArrayList<>();
-    public final List<RecipeKey<?>> others = new ArrayList<>();
+
 }

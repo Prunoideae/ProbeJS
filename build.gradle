@@ -83,6 +83,7 @@ dependencies {
     jarJar implementation('com.github.javaparser:javaparser-symbol-solver-core:3.24.8')
     jarJar implementation('com.github.javaparser:javaparser-core:3.24.8')
     jarJar implementation("org.vineflower:vineflower:1.10.1")
+    jarJar implementation('com.madgag:animated-gif-lib:1.4')
 }
 
 compileJava {

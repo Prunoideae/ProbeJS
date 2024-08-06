@@ -7,7 +7,7 @@ import dev.latvian.mods.kubejs.util.LogType;
 import dev.latvian.mods.rhino.RhinoException;
 import moe.wolfgirl.probejs.GlobalStates;
 import moe.wolfgirl.probejs.lang.linter.LintingWarning;
-import moe.wolfgirl.probejs.utils.FileUtils;
+import moe.wolfgirl.probejs.utils.ProbeFileUtils;
 import moe.wolfgirl.probejs.utils.JsonUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -31,20 +31,20 @@ public class ConsoleMixin {
             remap = false,
             at = @At("HEAD"))
     public void reportError(String message, Throwable error, Pattern exitPattern, CallbackInfoReturnable<ConsoleLine> cir) {
-        if (GlobalStates.SERVER != null) {
+        if (GlobalStates.WS_SERVER != null) {
             if (error instanceof RhinoException rhinoException) {
-                Path path = FileUtils.parseSourcePath(rhinoException.sourceName());
+                Path path = ProbeFileUtils.parseSourcePath(rhinoException.sourceName());
                 if (path == null) return;
                 LintingWarning warning = new LintingWarning(path, LintingWarning.Level.ERROR,
                         rhinoException.lineNumber(), rhinoException.columnNumber(),
                         rhinoException.details()
                 );
-                GlobalStates.SERVER.broadcast("accept_error", warning.asPayload());
+                GlobalStates.WS_SERVER.broadcast("accept_error", warning.asPayload());
             } else {
                 // No flooding
                 if (System.currentTimeMillis() - GlobalStates.ERROR_TIMESTAMP > 2000) {
                     GlobalStates.ERROR_TIMESTAMP = System.currentTimeMillis();
-                    GlobalStates.SERVER.broadcast("accept_error_no_line", JsonUtils.errorAsPayload(error));
+                    GlobalStates.WS_SERVER.broadcast("accept_error_no_line", JsonUtils.errorAsPayload(error));
                 }
             }
         }
@@ -54,7 +54,7 @@ public class ConsoleMixin {
             remap = false,
             at = @At("RETURN"))
     public void reportWarning(LogType type, Throwable error, Object message, CallbackInfoReturnable<ConsoleLine> cir) {
-        if (!(type == LogType.WARN || type == LogType.ERROR || type == LogType.INFO) || GlobalStates.SERVER == null)
+        if (!(type == LogType.WARN || type == LogType.ERROR || type == LogType.INFO) || GlobalStates.WS_SERVER == null)
             return;
         ConsoleLine line = cir.getReturnValue();
         if (line == null) return;
@@ -76,9 +76,9 @@ public class ConsoleMixin {
         String lineWithSource = sourceLine.source().contains(":") ?
                 sourceLine.source() :
                 "%s:%s".formatted(scriptType, sourceLine.source());
-        Path path = FileUtils.parseSourcePath(lineWithSource);
+        Path path = ProbeFileUtils.parseSourcePath(lineWithSource);
         if (path != null && path.toString().endsWith(".js")) {
-            GlobalStates.SERVER.broadcast("accept_error", (new LintingWarning(
+            GlobalStates.WS_SERVER.broadcast("accept_error", (new LintingWarning(
                     path, level,
                     sourceLine.line(), 0,
                     line.message
