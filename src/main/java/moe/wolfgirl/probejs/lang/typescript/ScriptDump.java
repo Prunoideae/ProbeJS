@@ -13,6 +13,7 @@ import moe.wolfgirl.probejs.ProbeJS;
 import moe.wolfgirl.probejs.ProbePaths;
 import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.lang.java.clazz.Clazz;
+import moe.wolfgirl.probejs.lang.typescript.code.ImportInfo;
 import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
 import moe.wolfgirl.probejs.lang.transpiler.Transpiler;
 import moe.wolfgirl.probejs.lang.typescript.code.Code;
@@ -197,7 +198,7 @@ public class ScriptDump {
                 //     type Type_ = ExportedType
                 // }
                 String symbol = classPath.getName() + "_";
-                String exportedSymbol = Declaration.INPUT_TEMPLATE.formatted(classPath.getName());
+                String exportedSymbol = ImportInfo.INPUT_TEMPLATE.formatted(classPath.getName());
                 BaseType exportedType = Types.type(classPath);
                 BaseType thisType = Types.type(classPath);
                 List<String> generics = classDecl.variableTypes.stream().map(v -> v.symbol).toList();

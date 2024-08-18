@@ -1,8 +1,8 @@
 package moe.wolfgirl.probejs.lang.typescript.code.ts;
 
-import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.lang.typescript.Declaration;
 import moe.wolfgirl.probejs.lang.typescript.code.Code;
+import moe.wolfgirl.probejs.lang.typescript.code.ImportInfo;
 import moe.wolfgirl.probejs.lang.typescript.code.member.CommentableCode;
 
 import java.util.*;
@@ -15,10 +15,10 @@ public abstract class Wrapped extends CommentableCode {
     }
 
     @Override
-    public Collection<ClassPath> getUsedClassPaths() {
-        Set<ClassPath> innerPaths = new HashSet<>();
+    public Collection<ImportInfo> getUsedImports() {
+        Set<ImportInfo> innerPaths = new HashSet<>();
         for (Code code : codes) {
-            innerPaths.addAll(code.getUsedClassPaths());
+            innerPaths.addAll(code.getUsedImports());
         }
         return innerPaths;
     }

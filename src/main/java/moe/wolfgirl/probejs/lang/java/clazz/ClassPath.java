@@ -15,8 +15,6 @@ public record ClassPath(List<String> parts) {
     private static List<String> transformJavaClass(Class<?> clazz) {
         String name = clazz.getName();
         String[] parts = name.split("\\.");
-        String className = "$" + parts[parts.length - 1];
-        parts[parts.length - 1] = className;
         return Arrays.stream(parts).toList();
     }
 
@@ -29,7 +27,7 @@ public record ClassPath(List<String> parts) {
     }
 
     public String getName() {
-        return parts.getLast();
+        return "$" + parts.getLast();
     }
 
     public String getConcatenated(String sep) {
@@ -49,7 +47,7 @@ public record ClassPath(List<String> parts) {
     }
 
     public String getTypeScriptPath() {
-        return getConcatenated("/");
+        return getConcatenated(".");
     }
 
     @HideFromJS

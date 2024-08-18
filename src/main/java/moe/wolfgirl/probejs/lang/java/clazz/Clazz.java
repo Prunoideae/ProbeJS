@@ -47,7 +47,7 @@ public class Clazz extends TypeVariableHolder {
         this.methods = members.getAccessibleMethods(context, false)
                 .stream()
                 .peek(m -> names.add(m.name))
-                .filter(m -> !m.method.isSynthetic())
+                // .filter(m -> !m.method.isSynthetic())
                 .filter(m -> !hasIdenticalParentMethodAndEnsureNotDirectlyImplementsInterfaceSinceTypeScriptDoesNotHaveInterfaceAtRuntimeInTypeDeclarationFilesJustBecauseItSucks(m.method, clazz))
                 .map(method -> {
                     Map<TypeVariable<?>, Type> replacement = getGenericTypeReplacementForParentInterfaceMethodsJustBecauseJavaDoNotKnowToReplaceThemWithGenericArgumentsOfThisClass(clazz, method.method);

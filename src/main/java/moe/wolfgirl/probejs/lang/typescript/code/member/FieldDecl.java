@@ -3,6 +3,7 @@ package moe.wolfgirl.probejs.lang.typescript.code.member;
 import moe.wolfgirl.probejs.ProbeJS;
 import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.lang.typescript.Declaration;
+import moe.wolfgirl.probejs.lang.typescript.code.ImportInfo;
 import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
 
 import java.util.ArrayList;
@@ -22,8 +23,8 @@ public class FieldDecl extends CommentableCode {
     }
 
     @Override
-    public Collection<ClassPath> getUsedClassPaths() {
-        return type.getUsedClassPaths();
+    public Collection<ImportInfo> getUsedImports() {
+        return type.getUsedImports();
     }
 
     @Override
@@ -31,7 +32,6 @@ public class FieldDecl extends CommentableCode {
         List<String> modifiers = new ArrayList<>();
         if (isStatic) modifiers.add("static");
         if (isFinal) modifiers.add("readonly");
-
 
         return List.of("%s %s: %s".formatted(
                 String.join(" ", modifiers), ProbeJS.GSON.toJson(name), type.line(declaration, BaseType.FormatType.RETURN)

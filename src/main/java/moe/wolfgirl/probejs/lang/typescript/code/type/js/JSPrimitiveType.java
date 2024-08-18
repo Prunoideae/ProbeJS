@@ -1,7 +1,7 @@
 package moe.wolfgirl.probejs.lang.typescript.code.type.js;
 
-import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.lang.typescript.Declaration;
+import moe.wolfgirl.probejs.lang.typescript.code.ImportInfo;
 import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
 
 import java.util.Collection;
@@ -18,7 +18,7 @@ public class JSPrimitiveType extends BaseType {
 
 
     @Override
-    public Collection<ClassPath> getUsedClassPaths() {
+    public Collection<ImportInfo> getUsedImports() {
         return List.of();
     }
 

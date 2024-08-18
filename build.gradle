@@ -2,8 +2,7 @@ plugins {
     id 'base'
     id 'java'
     id 'maven-publish'
-    id 'net.neoforged.moddev' version "1.0.14"
-    id "me.shedaniel.unified-publishing" version "0.1.+"
+    id 'net.neoforged.moddev' version "2.0.10-beta"
 }
 
 version = "${mod_version}"
@@ -26,7 +25,7 @@ neoForge {
     }
 
     parchment {
-        minecraftVersion = minecraft_version
+        minecraftVersion = parchment_mc_version
         mappingsVersion = parchment_version
     }
 }
@@ -47,6 +46,7 @@ repositories {
         url "https://maven.latvian.dev/releases"
         content {
             includeGroup "dev.latvian.mods"
+            includeGroup "dev.latvian.apps"
         }
     }
 
@@ -76,7 +76,7 @@ repositories {
 dependencies {
     api("dev.latvian.mods:rhino:$rhino_version") { transitive(false) }
     api("dev.latvian.mods:kubejs-neoforge:$kubejs_version")
-
+    implementation ("dev.latvian.apps:tiny-java-server:$tiny_server_version")
     compileOnly("dev.architectury:architectury-neoforge:$architectury_version")
 
     jarJar implementation('org.java-websocket:Java-WebSocket:1.5.6')

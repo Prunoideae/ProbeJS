@@ -4,6 +4,7 @@ import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.lang.java.clazz.Clazz;
 import moe.wolfgirl.probejs.lang.typescript.Declaration;
 import moe.wolfgirl.probejs.lang.typescript.code.Code;
+import moe.wolfgirl.probejs.lang.typescript.code.ImportInfo;
 import moe.wolfgirl.probejs.lang.typescript.code.member.ClassDecl;
 import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
 import moe.wolfgirl.probejs.lang.typescript.code.type.TSParamType;
@@ -31,8 +32,8 @@ public class InjectArray implements ClassTransformer {
         }
 
         @Override
-        public Collection<ClassPath> getUsedClassPaths() {
-            return type.getUsedClassPaths();
+        public Collection<ImportInfo> getUsedImports() {
+            return type.getUsedImports();
         }
 
         @Override
@@ -47,7 +48,7 @@ public class InjectArray implements ClassTransformer {
             BaseType iterType = classDecl.methods.stream()
                     .filter(m -> m.name.equals("iterator"))
                     .filter(m -> m.returnType instanceof TSParamType)
-                    .map(m -> ((TSParamType) m.returnType).params.get(0))
+                    .map(m -> ((TSParamType) m.returnType).params.getFirst())
                     .findFirst().orElse(null);
             if (iterType == null) return;
 

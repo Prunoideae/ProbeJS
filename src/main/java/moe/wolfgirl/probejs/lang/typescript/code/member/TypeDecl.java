@@ -1,7 +1,7 @@
 package moe.wolfgirl.probejs.lang.typescript.code.member;
 
-import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.lang.typescript.Declaration;
+import moe.wolfgirl.probejs.lang.typescript.code.ImportInfo;
 import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
 
 import java.util.Collection;
@@ -21,8 +21,8 @@ public class TypeDecl extends CommentableCode {
 
 
     @Override
-    public Collection<ClassPath> getUsedClassPaths() {
-        return type.getUsedClassPaths();
+    public Collection<ImportInfo> getUsedImports() {
+        return type.getUsedImportsAs(ImportInfo.Type.TYPE);
     }
 
     @Override

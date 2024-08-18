@@ -29,7 +29,7 @@ public class Attachments extends ProbeJSPlugin {
             BlockEntityAttachmentType attachment = entry.getValue();
 
             var baseType = converter.convertType(attachment.input());
-            baseType.getUsedClassPaths().forEach(typeScriptFile.declaration::addClass);
+            baseType.getUsedImports().forEach(typeScriptFile.declaration::addClass);
 
             classDecl.methods.add(Types.lambda()
                     .method()

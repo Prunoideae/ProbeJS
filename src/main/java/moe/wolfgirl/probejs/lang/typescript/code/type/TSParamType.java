@@ -2,6 +2,7 @@ package moe.wolfgirl.probejs.lang.typescript.code.type;
 
 import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.lang.typescript.Declaration;
+import moe.wolfgirl.probejs.lang.typescript.code.ImportInfo;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -16,10 +17,10 @@ public class TSParamType extends BaseType {
     }
 
     @Override
-    public Collection<ClassPath> getUsedClassPaths() {
-        Set<ClassPath> paths = new HashSet<>(baseType.getUsedClassPaths());
+    public Collection<ImportInfo> getUsedImports() {
+        Set<ImportInfo> paths = new HashSet<>(baseType.getUsedImports());
         for (BaseType param : params) {
-            paths.addAll(param.getUsedClassPaths());
+            paths.addAll(param.getUsedImports());
         }
         return paths;
     }

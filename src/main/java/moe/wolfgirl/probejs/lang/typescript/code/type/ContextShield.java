@@ -2,6 +2,7 @@ package moe.wolfgirl.probejs.lang.typescript.code.type;
 
 import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.lang.typescript.Declaration;
+import moe.wolfgirl.probejs.lang.typescript.code.ImportInfo;
 
 import java.util.Collection;
 import java.util.List;
@@ -16,8 +17,8 @@ public class ContextShield extends BaseType {
     }
 
     @Override
-    public Collection<ClassPath> getUsedClassPaths() {
-        return inner.getUsedClassPaths();
+    public Collection<ImportInfo> getUsedImports() {
+        return inner.getUsedImports();
     }
 
     @Override

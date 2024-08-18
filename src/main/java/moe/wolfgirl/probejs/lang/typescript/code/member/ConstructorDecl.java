@@ -2,6 +2,7 @@ package moe.wolfgirl.probejs.lang.typescript.code.member;
 
 import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.lang.typescript.Declaration;
+import moe.wolfgirl.probejs.lang.typescript.code.ImportInfo;
 import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
 import moe.wolfgirl.probejs.lang.typescript.code.type.TSVariableType;
 
@@ -19,13 +20,13 @@ public class ConstructorDecl extends CommentableCode {
     }
 
     @Override
-    public Collection<ClassPath> getUsedClassPaths() {
-        Set<ClassPath> paths = new HashSet<>();
+    public Collection<ImportInfo> getUsedImports() {
+        Set<ImportInfo> paths = new HashSet<>();
         for (TSVariableType variable : variableTypes) {
-            paths.addAll(variable.getUsedClassPaths());
+            paths.addAll(variable.getUsedImports());
         }
         for (ParamDecl param : params) {
-            paths.addAll(param.type.getUsedClassPaths());
+            paths.addAll(param.type.getUsedImportsAs(ImportInfo.Type.TYPE));
         }
         return paths;
     }
@@ -42,7 +43,7 @@ public class ConstructorDecl extends CommentableCode {
         }
 
         // Format body - (a: type, ...)
-        String body = ParamDecl.formatParams(params, declaration);
+        String body = ParamDecl.formatParams(params, declaration, BaseType.FormatType.INPUT);
 
         // Format tail - {/** content */}
         String tail = "";

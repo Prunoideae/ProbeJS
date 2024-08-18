@@ -2,8 +2,8 @@ package moe.wolfgirl.probejs.docs;
 
 
 import dev.latvian.mods.kubejs.neoforge.NativeEventWrapper;
-import moe.wolfgirl.probejs.GlobalStates;
 import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
+import moe.wolfgirl.probejs.lang.typescript.code.ImportInfo;
 import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
 import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
 import moe.wolfgirl.probejs.lang.typescript.TypeScriptFile;
@@ -13,16 +13,14 @@ import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
 import net.neoforged.bus.api.Event;
 
 
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 public class ForgeEventDoc extends ProbeJSPlugin {
 
     @Override
     public void modifyClasses(ScriptDump scriptDump, Map<ClassPath, TypeScriptFile> globalClasses) {
         TypeScriptFile typeScriptFile = globalClasses.get(new ClassPath(NativeEventWrapper.class));
-        typeScriptFile.declaration.addClass(new ClassPath(Event.class));
+        typeScriptFile.declaration.addClass(new ImportInfo(new ClassPath(Event.class), ImportInfo.Type.ORIGINAL));
         ClassDecl classDecl = typeScriptFile.findCode(ClassDecl.class).orElse(null);
         if (classDecl == null) return;
 
@@ -50,12 +48,5 @@ public class ForgeEventDoc extends ProbeJSPlugin {
                 }
             }
         }
-    }
-
-    @Override
-    public Set<Class<?>> provideJavaClass(ScriptDump scriptDump) {
-        Set<Class<?>> classes = new HashSet<>(GlobalStates.KNOWN_EVENTS);
-        classes.add(Event.class);
-        return classes;
     }
 }

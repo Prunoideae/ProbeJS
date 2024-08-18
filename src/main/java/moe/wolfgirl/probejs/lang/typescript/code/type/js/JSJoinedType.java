@@ -1,7 +1,7 @@
 package moe.wolfgirl.probejs.lang.typescript.code.type.js;
 
-import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.lang.typescript.Declaration;
+import moe.wolfgirl.probejs.lang.typescript.code.ImportInfo;
 import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
 
 import java.util.Collection;
@@ -21,10 +21,10 @@ public abstract class JSJoinedType extends BaseType {
 
 
     @Override
-    public Collection<ClassPath> getUsedClassPaths() {
-        Set<ClassPath> paths = new HashSet<>();
+    public Collection<ImportInfo> getUsedImports() {
+        Set<ImportInfo> paths = new HashSet<>();
         for (BaseType type : types) {
-            paths.addAll(type.getUsedClassPaths());
+            paths.addAll(type.getUsedImports());
         }
         return paths;
     }

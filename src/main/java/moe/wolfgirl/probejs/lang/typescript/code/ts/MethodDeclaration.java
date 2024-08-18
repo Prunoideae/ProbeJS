@@ -1,7 +1,7 @@
 package moe.wolfgirl.probejs.lang.typescript.code.ts;
 
-import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.lang.typescript.Declaration;
+import moe.wolfgirl.probejs.lang.typescript.code.ImportInfo;
 import moe.wolfgirl.probejs.lang.typescript.code.member.CommentableCode;
 import moe.wolfgirl.probejs.lang.typescript.code.member.ParamDecl;
 import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
@@ -25,13 +25,13 @@ public class MethodDeclaration extends CommentableCode {
     }
 
     @Override
-    public Collection<ClassPath> getUsedClassPaths() {
-        Set<ClassPath> paths = new HashSet<>(returnType.getUsedClassPaths());
+    public Collection<ImportInfo> getUsedImports() {
+        Set<ImportInfo> paths = new HashSet<>(returnType.getUsedImports());
         for (TSVariableType variableType : variableTypes) {
-            paths.addAll(variableType.getUsedClassPaths());
+            paths.addAll(variableType.getUsedImports());
         }
         for (ParamDecl param : params) {
-            paths.addAll(param.type.getUsedClassPaths());
+            paths.addAll(param.type.getUsedImports());
         }
         return paths;
     }
@@ -42,13 +42,13 @@ public class MethodDeclaration extends CommentableCode {
         String head = "function %s".formatted(name);
         if (!variableTypes.isEmpty()) {
             String variables = variableTypes.stream()
-                    .map(type -> type.line(declaration))
+                    .map(type -> type.line(declaration, BaseType.FormatType.VARIABLE))
                     .collect(Collectors.joining(", "));
             head = "%s<%s>".formatted(head, variables);
         }
 
         // Format body - (a: type, ...)
-        String body = ParamDecl.formatParams(params, declaration);
+        String body = ParamDecl.formatParams(params, declaration, BaseType.FormatType.INPUT);
 
         // Format tail - : returnType
         String tail = ": %s".formatted(returnType.line(declaration, BaseType.FormatType.RETURN));

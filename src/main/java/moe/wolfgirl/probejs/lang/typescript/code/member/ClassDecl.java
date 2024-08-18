@@ -3,6 +3,7 @@ package moe.wolfgirl.probejs.lang.typescript.code.member;
 import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.lang.typescript.Declaration;
 import moe.wolfgirl.probejs.lang.typescript.code.Code;
+import moe.wolfgirl.probejs.lang.typescript.code.ImportInfo;
 import moe.wolfgirl.probejs.lang.typescript.code.member.clazz.ConstructorBuilder;
 import moe.wolfgirl.probejs.lang.typescript.code.member.clazz.MethodBuilder;
 import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
@@ -43,28 +44,32 @@ public class ClassDecl extends CommentableCode {
         this.variableTypes = variableTypes;
     }
 
+    public boolean isInterface(){
+        return false;
+    }
+
     @Override
-    public Collection<ClassPath> getUsedClassPaths() {
-        Set<ClassPath> paths = new HashSet<>();
+    public Collection<ImportInfo> getUsedImports() {
+        Set<ImportInfo> paths = new HashSet<>();
         for (FieldDecl field : fields) {
-            paths.addAll(field.getUsedClassPaths());
+            paths.addAll(field.getUsedImports());
         }
         for (ConstructorDecl constructor : constructors) {
-            paths.addAll(constructor.getUsedClassPaths());
+            paths.addAll(constructor.getUsedImports());
         }
         for (MethodDecl method : methods) {
-            paths.addAll(method.getUsedClassPaths());
+            paths.addAll(method.getUsedImports());
         }
         for (BaseType anInterface : interfaces) {
-            paths.addAll(anInterface.getUsedClassPaths());
+            paths.addAll(anInterface.getUsedImports());
         }
         for (TSVariableType variableType : variableTypes) {
-            paths.addAll(variableType.getUsedClassPaths());
+            paths.addAll(variableType.getUsedImports());
         }
         for (Code code : bodyCode) {
-            paths.addAll(code.getUsedClassPaths());
+            paths.addAll(code.getUsedImports());
         }
-        if (superClass != null) paths.addAll(superClass.getUsedClassPaths());
+        if (superClass != null) paths.addAll(superClass.getUsedImports());
 
         return paths;
     }

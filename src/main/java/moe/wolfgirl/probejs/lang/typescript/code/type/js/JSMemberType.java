@@ -2,6 +2,7 @@ package moe.wolfgirl.probejs.lang.typescript.code.type.js;
 
 import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.lang.typescript.Declaration;
+import moe.wolfgirl.probejs.lang.typescript.code.ImportInfo;
 import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
 
 import java.util.*;
@@ -16,18 +17,22 @@ public abstract class JSMemberType extends BaseType {
     }
 
     @Override
-    public Collection<ClassPath> getUsedClassPaths() {
-        Set<ClassPath> paths = new HashSet<>();
+    public Collection<ImportInfo> getUsedImports() {
+        Set<ImportInfo> paths = new HashSet<>();
         for (JSParam member : members) {
-            paths.addAll(member.type().getUsedClassPaths());
+            paths.addAll(member.type().getUsedImports());
         }
         return paths;
     }
 
     protected String formatMembers(Declaration declaration, FormatType type) {
+        return formatMembers(declaration, type, ", ");
+    }
+
+    protected String formatMembers(Declaration declaration, FormatType type, String delimiter) {
         return members.stream()
                 .map(m -> m.format(declaration, type, this::getMemberName))
-                .collect(Collectors.joining(", "));
+                .collect(Collectors.joining(delimiter));
     }
 
     protected abstract String getMemberName(String name);

@@ -1,7 +1,7 @@
 package moe.wolfgirl.probejs.lang.typescript.code.type;
 
-import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.lang.typescript.Declaration;
+import moe.wolfgirl.probejs.lang.typescript.code.ImportInfo;
 
 import java.util.Collection;
 import java.util.List;
@@ -14,8 +14,8 @@ public class TSArrayType extends BaseType {
     }
 
     @Override
-    public Collection<ClassPath> getUsedClassPaths() {
-        return component.getUsedClassPaths();
+    public Collection<ImportInfo> getUsedImports() {
+        return component.getUsedImports();
     }
 
     @Override

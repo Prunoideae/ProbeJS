@@ -13,6 +13,7 @@ import moe.wolfgirl.probejs.lang.schema.SchemaDump;
 import moe.wolfgirl.probejs.lang.schema.SchemaElement;
 import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
 import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
+import moe.wolfgirl.probejs.lang.typescript.code.ImportInfo;
 import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
 import moe.wolfgirl.probejs.lang.transpiler.TypeConverter;
 import moe.wolfgirl.probejs.lang.transpiler.transformation.InjectBeans;
@@ -21,19 +22,14 @@ import moe.wolfgirl.probejs.lang.typescript.code.Code;
 import moe.wolfgirl.probejs.lang.typescript.code.member.ClassDecl;
 import moe.wolfgirl.probejs.lang.typescript.code.member.FieldDecl;
 import moe.wolfgirl.probejs.lang.typescript.code.ts.Statements;
-import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
 import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
 import moe.wolfgirl.probejs.lang.typescript.code.type.js.JSLambdaType;
-import moe.wolfgirl.probejs.lang.typescript.code.type.js.JSObjectType;
 import moe.wolfgirl.probejs.utils.GameUtils;
 import moe.wolfgirl.probejs.utils.NameUtils;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.MinecraftServer;
-import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class RecipeEvents extends ProbeJSPlugin {
     public static final Map<String, String> SHORTCUTS = new HashMap<>();
@@ -106,7 +102,7 @@ public class RecipeEvents extends ProbeJSPlugin {
                 beanDecl.baseType = Types.type(DOCUMENTED_RECIPES);
             }
         }
-        recipeEventFile.declaration.addClass(DOCUMENTED_RECIPES);
+        recipeEventFile.declaration.addClass(ImportInfo.original(DOCUMENTED_RECIPES));
 
         // Make shortcuts valid recipe functions
         for (FieldDecl field : recipeEvent.fields) {
@@ -116,7 +112,7 @@ public class RecipeEvents extends ProbeJSPlugin {
             ClassPath returnType = getSchemaClassPath(parts[0], parts[1]);
             field.type = generateSchemaFunction(returnType, shortcutSchema, converter);
 
-            for (ClassPath usedClassPath : field.type.getUsedClassPaths()) {
+            for (ImportInfo usedClassPath : field.type.getUsedImports()) {
                 recipeEventFile.declaration.addClass(usedClassPath);
             }
         }

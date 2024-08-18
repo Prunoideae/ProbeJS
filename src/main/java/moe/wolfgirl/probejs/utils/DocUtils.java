@@ -2,6 +2,7 @@ package moe.wolfgirl.probejs.utils;
 
 import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.lang.typescript.TypeScriptFile;
+import moe.wolfgirl.probejs.lang.typescript.code.ImportInfo;
 import moe.wolfgirl.probejs.lang.typescript.code.member.ClassDecl;
 import moe.wolfgirl.probejs.lang.typescript.code.member.MethodDecl;
 import moe.wolfgirl.probejs.lang.typescript.code.member.ParamDecl;
@@ -24,7 +25,7 @@ public class DocUtils {
 
     public static void replaceParamType(TypeScriptFile file, Predicate<MethodDecl> test, int index, BaseType toReplace) {
         applyParam(file, test, index, decl -> decl.type = toReplace);
-        for (ClassPath usedClassPath : toReplace.getUsedClassPaths()) {
+        for (ImportInfo usedClassPath : toReplace.getUsedImports()) {
             file.declaration.addClass(usedClassPath);
         }
     }

@@ -22,23 +22,23 @@ public final class ParamDecl {
         this.optional = optional;
     }
 
-    public String format(int index, Declaration declaration) {
+    public String format(int index, Declaration declaration, BaseType.FormatType formatType) {
         String result = NameUtils.isNameSafe(name) ? name : "arg%d".formatted(index);
         if (varArg) result = "...%s".formatted(result);
         return "%s%s: %s".formatted(
                 result,
                 optional ? "?" : "",
-                type.line(declaration, BaseType.FormatType.INPUT)
+                type.line(declaration, formatType)
         );
     }
 
-    public static String formatParams(List<ParamDecl> params, Declaration declaration) {
+    public static String formatParams(List<ParamDecl> params, Declaration declaration, BaseType.FormatType formatType) {
         List<String> formattedParams = new ArrayList<>();
         ListIterator<ParamDecl> it = params.listIterator();
         while (it.hasNext()) {
             int index = it.nextIndex();
             ParamDecl param = it.next();
-            formattedParams.add(param.format(index, declaration));
+            formattedParams.add(param.format(index, declaration, formatType));
         }
         return "(%s)".formatted(String.join(", ", formattedParams));
     }

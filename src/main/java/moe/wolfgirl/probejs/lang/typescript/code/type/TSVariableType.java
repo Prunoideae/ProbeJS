@@ -1,7 +1,7 @@
 package moe.wolfgirl.probejs.lang.typescript.code.type;
 
-import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.lang.typescript.Declaration;
+import moe.wolfgirl.probejs.lang.typescript.code.ImportInfo;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
@@ -17,8 +17,8 @@ public class TSVariableType extends BaseType {
     }
 
     @Override
-    public Collection<ClassPath> getUsedClassPaths() {
-        return extendsType == null ? List.of() : extendsType.getUsedClassPaths();
+    public Collection<ImportInfo> getUsedImports() {
+        return extendsType == null ? List.of() : extendsType.getUsedImports();
     }
 
     @Override

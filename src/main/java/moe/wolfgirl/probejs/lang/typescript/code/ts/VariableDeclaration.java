@@ -2,6 +2,7 @@ package moe.wolfgirl.probejs.lang.typescript.code.ts;
 
 import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.lang.typescript.Declaration;
+import moe.wolfgirl.probejs.lang.typescript.code.ImportInfo;
 import moe.wolfgirl.probejs.lang.typescript.code.member.CommentableCode;
 import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
 
@@ -19,8 +20,8 @@ public class VariableDeclaration extends CommentableCode {
     }
 
     @Override
-    public Collection<ClassPath> getUsedClassPaths() {
-        return type.getUsedClassPaths();
+    public Collection<ImportInfo> getUsedImports() {
+        return type.getUsedImports();
     }
 
     @Override

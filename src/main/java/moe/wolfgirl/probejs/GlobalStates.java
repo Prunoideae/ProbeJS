@@ -1,7 +1,10 @@
 package moe.wolfgirl.probejs;
 
-import com.sun.net.httpserver.HttpServer;
-import moe.wolfgirl.probejs.features.bridge.ProbeServer;
+import dev.latvian.apps.tinyserver.ws.WSHandler;
+import dev.latvian.apps.tinyserver.ws.WSSession;
+import dev.latvian.mods.kubejs.web.KJSHTTPRequest;
+import dev.latvian.mods.kubejs.web.KJSWSSession;
+import moe.wolfgirl.probejs.features.web.KubedexHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.ClientLanguage;
 import net.minecraft.client.resources.language.LanguageInfo;
@@ -20,14 +23,9 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class GlobalStates {
-    public static ProbeServer WS_SERVER;
-    public static HttpServer HTTP_SERVER;
-
-    public static final Set<Class<?>> KNOWN_EVENTS = new HashSet<>();
     public static final Set<String> MIXIN_LANG_KEYS = new HashSet<>();
     public static final Set<String> RECIPE_IDS = new HashSet<>();
     public static final Set<String> LOOT_TABLES = new HashSet<>();
-    public static long ERROR_TIMESTAMP = 0;
 
     public static final Supplier<Set<String>> LANG_KEYS = () -> {
         Set<String> keys;
@@ -76,4 +74,7 @@ public class GlobalStates {
     // For probing stuffs
     public static BlockPos LAST_RIGHTCLICKED = null;
     public static Entity LAST_ENTITY = null;
+
+    // WS endpoints
+    public static WSHandler<KJSHTTPRequest, KJSWSSession> KUBEDEX = null;
 }

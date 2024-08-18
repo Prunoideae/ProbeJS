@@ -3,6 +3,7 @@ package moe.wolfgirl.probejs.lang.typescript.code.type;
 import moe.wolfgirl.probejs.ProbeJS;
 import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.lang.typescript.Declaration;
+import moe.wolfgirl.probejs.lang.typescript.code.ImportInfo;
 import moe.wolfgirl.probejs.lang.typescript.code.type.js.*;
 
 import java.util.Arrays;
@@ -105,7 +106,11 @@ public interface Types {
         return new ContextShield(type, formatType);
     }
 
-    static BaseType custom(BiFunction<Declaration, BaseType.FormatType, String> formatter, ClassPath... imports) {
+    static BaseType ignoreImport(BaseType type, ImportInfo.Type importType) {
+        return new ImportShield(type, importType);
+    }
+
+    static BaseType custom(BiFunction<Declaration, BaseType.FormatType, String> formatter, ImportInfo... imports) {
         return new CustomType(formatter, imports);
     }
 

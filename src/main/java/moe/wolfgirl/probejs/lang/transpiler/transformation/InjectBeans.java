@@ -1,10 +1,10 @@
 package moe.wolfgirl.probejs.lang.transpiler.transformation;
 
 import moe.wolfgirl.probejs.ProbeJS;
-import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.lang.java.clazz.Clazz;
 import moe.wolfgirl.probejs.lang.typescript.Declaration;
 import moe.wolfgirl.probejs.lang.typescript.code.Code;
+import moe.wolfgirl.probejs.lang.typescript.code.ImportInfo;
 import moe.wolfgirl.probejs.lang.typescript.code.member.ClassDecl;
 import moe.wolfgirl.probejs.lang.typescript.code.member.MethodDecl;
 import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
@@ -62,8 +62,8 @@ public class InjectBeans implements ClassTransformer {
         }
 
         @Override
-        public Collection<ClassPath> getUsedClassPaths() {
-            return baseType.getUsedClassPaths();
+        public Collection<ImportInfo> getUsedImports() {
+            return baseType.getUsedImports();
         }
 
         @Override

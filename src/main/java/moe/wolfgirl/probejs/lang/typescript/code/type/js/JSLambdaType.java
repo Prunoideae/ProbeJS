@@ -1,7 +1,7 @@
 package moe.wolfgirl.probejs.lang.typescript.code.type.js;
 
-import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.lang.typescript.Declaration;
+import moe.wolfgirl.probejs.lang.typescript.code.ImportInfo;
 import moe.wolfgirl.probejs.lang.typescript.code.member.MethodDecl;
 import moe.wolfgirl.probejs.lang.typescript.code.member.ParamDecl;
 import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
@@ -19,10 +19,10 @@ public class JSLambdaType extends BaseType {
     }
 
     @Override
-    public Collection<ClassPath> getUsedClassPaths() {
-        Set<ClassPath> classPaths = new HashSet<>(returnType.getUsedClassPaths());
+    public Collection<ImportInfo> getUsedImports() {
+        Set<ImportInfo> classPaths = new HashSet<>(returnType.getUsedImports());
         for (ParamDecl param : params) {
-            classPaths.addAll(param.type.getUsedClassPaths());
+            classPaths.addAll(param.type.getUsedImports());
         }
         return classPaths;
     }
@@ -31,11 +31,10 @@ public class JSLambdaType extends BaseType {
     @Override
     public List<String> format(Declaration declaration, FormatType input) {
         // (arg0: type, arg1: type...) => returnType
-        return List.of("%s => %s".formatted(ParamDecl.formatParams(params, declaration), returnType.line(declaration, FormatType.RETURN)));
-    }
-
-    public String formatWithName(String name, Declaration declaration, FormatType input) {
-        return "%s%s: %s".formatted(name, ParamDecl.formatParams(params, declaration), returnType.line(declaration, FormatType.RETURN));
+        return List.of("%s => %s".formatted(
+                ParamDecl.formatParams(params, declaration, input == FormatType.RETURN ? FormatType.INPUT : FormatType.RETURN),
+                returnType.line(declaration, input))
+        );
     }
 
     public MethodDecl asMethod(String methodName) {

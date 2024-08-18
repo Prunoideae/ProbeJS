@@ -1,9 +1,11 @@
 package moe.wolfgirl.probejs.mixins;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import dev.latvian.mods.kubejs.kubedex.KubedexPayloadHandler;
+import dev.latvian.mods.kubejs.web.local.KubeJSWeb;
 import moe.wolfgirl.probejs.GlobalStates;
 import moe.wolfgirl.probejs.utils.JsonUtils;
 import net.minecraft.core.BlockPos;
@@ -29,39 +31,44 @@ public class KubedexMixin {
     @Inject(method = "itemStacks", remap = false, at = @At("RETURN"))
     private static void handleItem(ServerPlayer player, Collection<ItemStack> stacks, CallbackInfo ci) {
         var ops = player.server.registryAccess().createSerializationContext(NbtOps.INSTANCE);
-        if (GlobalStates.WS_SERVER != null) {
-            GlobalStates.WS_SERVER.broadcast("accept_items", JsonUtils.parseObject(
-                    stacks.stream().map(s -> s.kjs$toItemString0(ops)).toList()
-            ));
+        if (GlobalStates.KUBEDEX != null) {
+            KubeJSWeb.broadcastEvent(GlobalStates.KUBEDEX, "item", () -> {
+                var jsonArray = new JsonArray();
+                for (ItemStack stack : stacks) {
+                    jsonArray.add(stack.kjs$toItemString0(ops));
+                }
+                return jsonArray;
+            });
         }
     }
 
     @Inject(method = "block", remap = false, at = @At("RETURN"))
     private static void handleBlock(ServerPlayer player, BlockPos pos, CallbackInfo ci) {
-        if (GlobalStates.WS_SERVER != null) {
-            RegistryAccess access = player.server.registryAccess();
+        if (GlobalStates.KUBEDEX != null) {
             Registry<Block> blockRegistry = BuiltInRegistries.BLOCK;
             var blockState = player.level().getBlockState(pos);
 
             if (blockState.isAir()) return;
-            JsonObject payload = new JsonObject();
+            KubeJSWeb.broadcastEvent(GlobalStates.KUBEDEX, "block", () -> {
+                JsonObject payload = new JsonObject();
 
-            // Block ID
-            payload.addProperty("id", blockRegistry.getKey(blockState.getBlock()).toString());
+                // Block ID
+                payload.addProperty("id", blockRegistry.getKey(blockState.getBlock()).toString());
 
-            // Properties
-            if (!blockState.getValues().isEmpty()) {
-                JsonArray properties = new JsonArray();
-                blockState.getValues()
-                        .entrySet()
-                        .stream()
-                        .map(StateHolder.PROPERTY_ENTRY_TO_STRING_FUNCTION)
-                        .map(JsonPrimitive::new)
-                        .forEach(properties::add);
-                payload.add("properties", properties);
-            }
+                // Properties
+                if (!blockState.getValues().isEmpty()) {
+                    JsonArray properties = new JsonArray();
+                    blockState.getValues()
+                            .entrySet()
+                            .stream()
+                            .map(StateHolder.PROPERTY_ENTRY_TO_STRING_FUNCTION)
+                            .map(JsonPrimitive::new)
+                            .forEach(properties::add);
+                    payload.add("properties", properties);
+                }
 
-            GlobalStates.WS_SERVER.broadcast("accept_block", payload);
+                return payload;
+            });
         }
     }
 }

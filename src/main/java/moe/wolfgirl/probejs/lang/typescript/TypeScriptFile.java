@@ -3,6 +3,7 @@ package moe.wolfgirl.probejs.lang.typescript;
 import moe.wolfgirl.probejs.ProbeJS;
 import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.lang.typescript.code.Code;
+import moe.wolfgirl.probejs.lang.typescript.code.ImportInfo;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -22,7 +23,7 @@ public class TypeScriptFile {
         this.codeList = new ArrayList<>();
 
         if (self != null) {
-            declaration.addClass(self);
+            declaration.addClass(ImportInfo.original(self));
         }
         this.classPath = self;
     }
@@ -33,7 +34,7 @@ public class TypeScriptFile {
 
     public void addCode(Code code) {
         codeList.add(code);
-        for (ClassPath usedClassPath : code.getUsedClassPaths()) {
+        for (ImportInfo usedClassPath : code.getUsedImports()) {
             declaration.addClass(usedClassPath);
         }
     }
@@ -70,7 +71,7 @@ public class TypeScriptFile {
     }
 
     public void writeAsModule(BufferedWriter writer) throws IOException {
-        String modulePath = "packages/" + classPath.getTypeScriptPath();
+        String modulePath = classPath.getTypeScriptPath();
         writer.write("declare module %s {\n".formatted(ProbeJS.GSON.toJson(modulePath)));
         this.write(writer);
         writer.write("}\n");

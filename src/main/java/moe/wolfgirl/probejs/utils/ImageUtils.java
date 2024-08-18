@@ -62,6 +62,8 @@ public class ImageUtils {
 
             matrix4fStack.popMatrix();
             RenderSystem.applyModelViewMatrix();
+
+            renderTarget.destroyBuffers();
         });
 
         LOCK.unlock();
