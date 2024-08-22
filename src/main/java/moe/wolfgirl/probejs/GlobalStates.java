@@ -1,10 +1,5 @@
 package moe.wolfgirl.probejs;
 
-import dev.latvian.apps.tinyserver.ws.WSHandler;
-import dev.latvian.apps.tinyserver.ws.WSSession;
-import dev.latvian.mods.kubejs.web.KJSHTTPRequest;
-import dev.latvian.mods.kubejs.web.KJSWSSession;
-import moe.wolfgirl.probejs.features.web.KubedexHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.ClientLanguage;
 import net.minecraft.client.resources.language.LanguageInfo;
@@ -74,7 +69,4 @@ public class GlobalStates {
     // For probing stuffs
     public static BlockPos LAST_RIGHTCLICKED = null;
     public static Entity LAST_ENTITY = null;
-
-    // WS endpoints
-    public static WSHandler<KJSHTTPRequest, KJSWSSession> KUBEDEX = null;
 }

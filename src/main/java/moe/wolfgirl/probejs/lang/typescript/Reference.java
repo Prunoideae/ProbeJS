@@ -14,7 +14,10 @@ public record Reference(ClassPath classPath,
         // FIXME: make the implementation correct
         if (types.contains(ImportInfo.Type.TYPE)) {
             types.add(ImportInfo.Type.ORIGINAL);
+        } else if (types.contains(ImportInfo.Type.ORIGINAL)) {
+            types.add(ImportInfo.Type.TYPE);
         }
+
         String original = classPath.getName();
         String names = types().stream().map(op -> original.equals(symbol) ?
                 op.applyTemplate(symbol) :

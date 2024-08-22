@@ -36,6 +36,7 @@ public class ProbeBuiltinDocs extends ProbeJSPlugin {
             RecipeTypes::new,
             WorldTypes::new,
             EnumTypes::new,
+            InterfaceTypes::new,
             RecordTypes::new,
             Bindings::new,
             Events::new,

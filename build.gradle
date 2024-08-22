@@ -79,11 +79,9 @@ dependencies {
     implementation ("dev.latvian.apps:tiny-java-server:$tiny_server_version")
     compileOnly("dev.architectury:architectury-neoforge:$architectury_version")
 
-    jarJar implementation('org.java-websocket:Java-WebSocket:1.5.6')
     jarJar implementation('com.github.javaparser:javaparser-symbol-solver-core:3.24.8')
     jarJar implementation('com.github.javaparser:javaparser-core:3.24.8')
     jarJar implementation("org.vineflower:vineflower:1.10.1")
-    jarJar implementation('com.madgag:animated-gif-lib:1.4')
 }
 
 compileJava {

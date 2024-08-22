@@ -30,7 +30,6 @@ public class EnumTypes extends ProbeJSPlugin {
                 scriptDump.assignType(recordedClass.classPath, Types.or(types));
             } catch (Throwable ignore) {
             }
-
         }
         LOCK.unlock();
     }
