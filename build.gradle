@@ -71,6 +71,13 @@ repositories {
             includeGroup "dev.emi"
         }
     }
+
+    maven {
+        url 'https://jitpack.io'
+        content {
+            includeGroup "com.github.rtyley"
+        }
+    }
 }
 
 dependencies {

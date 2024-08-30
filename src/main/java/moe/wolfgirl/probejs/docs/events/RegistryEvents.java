@@ -85,7 +85,7 @@ public class RegistryEvents extends ProbeJSPlugin {
     }
 
     private static ClassDecl generateRegistryClass(ResourceKey<?> key, Class<?> baseClass, BuilderTypeRegistryHandler.Info<?> info) {
-        ClassDecl.Builder builder = Statements.clazz(NameUtils.rlToTitle(key.location().getPath()))
+        ClassDecl.Builder builder = Statements.clazz("$" + NameUtils.rlToTitle(key.location().getPath()))
                 .superClass(Types.parameterized(Types.type(RegistryKubeEvent.class), Types.type(baseClass)));
 
         BuilderType<?> defaultType = info.defaultType();

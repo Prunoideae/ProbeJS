@@ -2,6 +2,7 @@ package moe.wolfgirl.probejs.lang.decompiler;
 
 import moe.wolfgirl.probejs.ProbeJS;
 import net.neoforged.fml.ModList;
+import net.neoforged.fml.loading.LoadingModList;
 import org.jetbrains.java.decompiler.main.Fernflower;
 
 import java.io.File;
@@ -9,6 +10,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class ProbeDecompiler {
@@ -16,7 +18,14 @@ public class ProbeDecompiler {
         ModList modList = ModList.get();
         return modList.getModFiles().stream()
                 .map(fileInfo -> fileInfo.getFile().getFilePath())
-                .map(Path::toFile)
+                .map(path -> {
+                    try {
+                        return path.toFile();
+                    } catch (Exception ignore) {
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 

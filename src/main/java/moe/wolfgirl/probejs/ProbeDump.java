@@ -155,6 +155,7 @@ public class ProbeDump {
     private void writeVSCodeConfig() throws IOException {
         ProbeFileUtils.writeMergedConfig(ProbePaths.VSCODE_JSON, """
                 {
+                    "typescript.tsserver.maxTsServerMemory": 4096,
                     "json.schemas": [
                         {
                             "fileMatch": [

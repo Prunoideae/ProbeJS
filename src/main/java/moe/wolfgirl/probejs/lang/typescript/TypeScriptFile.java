@@ -39,6 +39,14 @@ public class TypeScriptFile {
         }
     }
 
+    public void refreshImports() {
+        for (Code code : codeList) {
+            for (ImportInfo usedImport : code.getUsedImports()) {
+                declaration.addClass(usedImport);
+            }
+        }
+    }
+
     public String format() {
         List<String> formatted = new ArrayList<>();
 
