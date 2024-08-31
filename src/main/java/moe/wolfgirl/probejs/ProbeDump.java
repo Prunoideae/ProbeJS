@@ -6,6 +6,7 @@ import moe.wolfgirl.probejs.lang.java.ClassRegistry;
 import moe.wolfgirl.probejs.lang.schema.SchemaDump;
 import moe.wolfgirl.probejs.lang.snippet.SnippetDump;
 import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
+import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
 import moe.wolfgirl.probejs.utils.ProbeFileUtils;
 import moe.wolfgirl.probejs.utils.GameUtils;
 import net.minecraft.network.chat.Component;
@@ -14,9 +15,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -55,7 +54,14 @@ public class ProbeDump {
             decompiler.decompileContext();
             decompiler.resultSaver.writeTo(ProbePaths.DECOMPILED);
         }
-        ClassRegistry.REGISTRY.fromClasses(decompiler.scanner.getScannedClasses());
+
+        if (ProbeConfig.INSTANCE.classScanning.get()) {
+            ClassRegistry.REGISTRY.fromClasses(decompiler.scanner.getScannedClasses(), 0);
+        } else {
+            Set<Class<?>> retained = new HashSet<>();
+            ProbeJSPlugin.forEachPlugin(plugin -> retained.addAll(plugin.filterScannedClasses(decompiler.scanner.getScannedClasses())));
+            ClassRegistry.REGISTRY.fromClasses(retained, 0);
+        }
 
         report(Component.translatable("probejs.dump.cleaning"));
         for (ScriptDump scriptDump : scriptDumps) {
@@ -111,12 +117,12 @@ public class ProbeDump {
         // Fetch classes that will be used in the dump
         ClassRegistry.REGISTRY.loadFrom(CLASS_CACHE);
         for (ScriptDump scriptDump : scriptDumps) {
-            ClassRegistry.REGISTRY.fromClasses(scriptDump.retrieveClasses());
+            ClassRegistry.REGISTRY.fromClasses(scriptDump.retrieveClasses(), 0);
         }
 
         ClassRegistry.REGISTRY.discoverClasses();
         ClassRegistry.REGISTRY.writeTo(CLASS_CACHE);
-        report(Component.translatable("probejs.dump.class_discovered", ClassRegistry.REGISTRY.foundClasses.keySet().size()));
+        report(Component.translatable("probejs.dump.class_discovered", ClassRegistry.REGISTRY.getFoundClasses().size()));
 
         // Spawn a thread for each dump
         List<Thread> dumpThreads = new ArrayList<>();
@@ -131,7 +137,7 @@ public class ProbeDump {
                     throw new RuntimeException(e);
                 }
             },
-            "ProbeDumpingThread-" + scriptDump.scriptType.name);
+                    "ProbeDumpingThread-" + scriptDump.scriptType.name);
             t.start();
             dumpThreads.add(t);
         }
@@ -148,7 +154,7 @@ public class ProbeDump {
                 }
             }
         },
-        "ProbeDumpingThread-report");
+                "ProbeDumpingThread-report");
         reportingThread.start();
     }
 

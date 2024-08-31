@@ -29,6 +29,7 @@ public class Clazz extends TypeVariableHolder {
     public final TypeDescriptor superClass;
     public final List<TypeDescriptor> interfaces;
     public final ClassAttribute attribute;
+    public int recursionDepth;
 
     public Clazz(Class<?> clazz) {
         super(clazz.getTypeParameters(), clazz.getAnnotations());
@@ -70,6 +71,7 @@ public class Clazz extends TypeVariableHolder {
                 .map(TypeAdapter::getTypeDescription)
                 .collect(Collectors.toList());
         this.attribute = new ClassAttribute(clazz);
+        this.recursionDepth = 0;
     }
 
     @Override

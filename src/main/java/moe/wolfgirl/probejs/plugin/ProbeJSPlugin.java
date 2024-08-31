@@ -101,4 +101,11 @@ public class ProbeJSPlugin implements KubeJSPlugin {
     public void addJsonSchema(SchemaDump dump) {
 
     }
+
+    /**
+     * Marks a class to be forcefully loaded even if class scanning is turned off
+     */
+    public Set<Class<?>> filterScannedClasses(Set<Class<?>> clazz) {
+        return Set.of();
+    }
 }

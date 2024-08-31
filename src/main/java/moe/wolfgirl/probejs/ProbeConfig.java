@@ -19,9 +19,8 @@ public class ProbeConfig {
 
     public ConfigEntry<Boolean> enabled = new ConfigEntry<>("enabled", true);
     public ConfigEntry<Boolean> enableDecompiler = new ConfigEntry<>("enableDecompiler", false);
-    public ConfigEntry<Boolean> aggressive = new ConfigEntry<>("aggressive", false);
-    public ConfigEntry<Boolean> interactive = new ConfigEntry<>("interactive", false);
-    public ConfigEntry<Integer> interactivePort = new ConfigEntry<>("interactivePort", 7796);
+    public ConfigEntry<Integer> recursionDepth = new ConfigEntry<>("recursionDepth", 5);
+    public ConfigEntry<Boolean> classScanning = new ConfigEntry<>("classScanning", false);
     public ConfigEntry<Long> modHash = new ConfigEntry<>("modHash", -1L);
     public ConfigEntry<Long> registryHash = new ConfigEntry<>("registryHash", -1L);
     public ConfigEntry<Boolean> isolatedScopes = new ConfigEntry<>("isolatedScope", false);
@@ -32,6 +31,7 @@ public class ProbeConfig {
         public final T defaultValue;
         private T value;
         private final String namespace;
+        private boolean changed = true;
 
 
         ConfigEntry(String name, @Nonnull T defaultValue) {
@@ -50,13 +50,14 @@ public class ProbeConfig {
             this.value = value;
             try {
                 writeConfigEntry(this);
+                changed = true;
             } catch (IOException ignored) {
             }
         }
 
         public T get() {
             try {
-                fromSetting();
+                if (changed) fromSetting();
             } catch (IOException e) {
                 return defaultValue;
             }

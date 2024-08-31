@@ -83,7 +83,7 @@ repositories {
 dependencies {
     api("dev.latvian.mods:rhino:$rhino_version") { transitive(false) }
     api("dev.latvian.mods:kubejs-neoforge:$kubejs_version")
-    implementation ("dev.latvian.apps:tiny-java-server:$tiny_server_version")
+    implementation("dev.latvian.apps:tiny-java-server:$tiny_server_version")
     compileOnly("dev.architectury:architectury-neoforge:$architectury_version")
 
     jarJar implementation('com.github.javaparser:javaparser-symbol-solver-core:3.24.8')
@@ -94,6 +94,7 @@ dependencies {
 compileJava {
     options.encoding = "UTF-8"
     options.release.set(21)
+    options.compilerArgs << '-parameters'
 }
 
 java {

@@ -14,6 +14,8 @@ import net.neoforged.bus.api.Event;
 
 
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ForgeEventDoc extends ProbeJSPlugin {
 
@@ -48,5 +50,10 @@ public class ForgeEventDoc extends ProbeJSPlugin {
                 }
             }
         }
+    }
+
+    @Override
+    public Set<Class<?>> filterScannedClasses(Set<Class<?>> clazz) {
+        return clazz.stream().filter(Event.class::isAssignableFrom).collect(Collectors.toSet());
     }
 }

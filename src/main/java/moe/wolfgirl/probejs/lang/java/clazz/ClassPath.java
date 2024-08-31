@@ -60,11 +60,6 @@ public record ClassPath(List<String> parts) {
         return Arrays.stream(variables).map(TypeVariable::getName).toList();
     }
 
-    @HideFromJS
-    public Clazz toClazz() {
-        return ClassRegistry.REGISTRY.foundClasses.get(this);
-    }
-
     public List<String> getPackage() {
         List<String> classPath = new ArrayList<>(parts);
         classPath.removeLast();

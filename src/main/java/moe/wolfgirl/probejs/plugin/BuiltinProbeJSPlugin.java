@@ -108,4 +108,9 @@ public class BuiltinProbeJSPlugin extends ProbeJSPlugin {
     public void addJsonSchema(SchemaDump dump) {
         ProbeBuiltinDocs.INSTANCE.addJsonSchema(dump);
     }
+
+    @Override
+    public Set<Class<?>> filterScannedClasses(Set<Class<?>> clazz) {
+        return ProbeBuiltinDocs.INSTANCE.filterScannedClasses(clazz);
+    }
 }

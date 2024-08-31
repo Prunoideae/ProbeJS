@@ -1,6 +1,7 @@
 package moe.wolfgirl.probejs.lang.java;
 
 import dev.latvian.mods.rhino.util.HideFromJS;
+import moe.wolfgirl.probejs.ProbeConfig;
 import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.lang.java.clazz.Clazz;
 import moe.wolfgirl.probejs.lang.java.clazz.members.ConstructorInfo;
@@ -14,30 +15,28 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @HideFromJS
 public class ClassRegistry {
     public static final ClassRegistry REGISTRY = new ClassRegistry();
 
-    public Map<ClassPath, Clazz> foundClasses = new HashMap<>();
+    private final Map<ClassPath, Clazz> foundClasses = new HashMap<>();
 
-    public void fromPackage(Collection<ClassPath> classPaths) {
-        for (ClassPath pack : classPaths) {
-            if (!foundClasses.containsKey(pack)) {
-                foundClasses.put(pack, pack.toClazz());
-            }
-        }
+    public void putClass(ClassPath classPath, Clazz clazz) {
+        if (classPath.getName().contains("-")) return;
+        foundClasses.put(classPath, clazz);
     }
 
     public void fromClazz(Collection<Clazz> classes) {
         for (Clazz c : classes) {
             if (!foundClasses.containsKey(c.classPath)) {
-                foundClasses.put(c.classPath, c);
+                putClass(c.classPath, c);
             }
         }
     }
 
-    public void fromClasses(Collection<Class<?>> classes) {
+    public void fromClasses(Collection<Class<?>> classes, int recursionDepth) {
         for (Class<?> c : classes) {
             try {
                 // We test if the class actually exists from forName
@@ -53,7 +52,8 @@ public class ClassRegistry {
                 if (c.isAnonymousClass()) continue;
                 if (!foundClasses.containsKey(new ClassPath(c))) {
                     Clazz clazz = new Clazz(c);
-                    foundClasses.put(clazz.classPath, clazz);
+                    clazz.recursionDepth = recursionDepth;
+                    putClass(clazz.classPath, clazz);
                 }
             } catch (Throwable ignored) {
             }
@@ -100,7 +100,10 @@ public class ClassRegistry {
     }
 
     public void discoverClasses() {
+        // We mark the recursion depth of the class, so a class with depth X
+        // will need X jumps from any found classes to be referenced
         Set<Clazz> currentClasses = new HashSet<>(foundClasses.values());
+        int recursion = 1;
         while (!currentClasses.isEmpty()) {
             Set<Class<?>> fetchedClass = new HashSet<>();
             for (Clazz currentClass : currentClasses) {
@@ -112,32 +115,42 @@ public class ClassRegistry {
                 try {
                     Class.forName(c.getName());
                     Clazz clazz = new Clazz(c);
-                    foundClasses.put(clazz.classPath, clazz);
+                    clazz.recursionDepth = recursion;
+                    putClass(clazz.classPath, clazz);
                     currentClasses.add(clazz);
                 } catch (Throwable ignore) {
                 }
             }
+            recursion++;
         }
     }
 
     public Collection<Clazz> getFoundClasses() {
-        return foundClasses.values();
+        int allowedDepth = ProbeConfig.INSTANCE.recursionDepth.get();
+        return foundClasses.values()
+                .stream()
+                .filter(clazz -> clazz.recursionDepth <= allowedDepth)
+                .collect(Collectors.toSet());
     }
 
     public void writeTo(Path path) throws IOException {
         try (var writer = Files.newBufferedWriter(path)) {
-            for (ClassPath classPath : foundClasses.keySet()) {
-                writer.write(classPath.getClassPathJava() + "\n");
+            for (Map.Entry<ClassPath, Clazz> entry : foundClasses.entrySet()) {
+                writer.write("%s\t%s\n".formatted(
+                        entry.getKey().getClassPathJava(),
+                        entry.getValue().recursionDepth
+                ));
             }
         }
     }
 
     public void loadFrom(Path path) {
         try (var reader = Files.newBufferedReader(path)) {
-            for (String className : (Iterable<String>) reader.lines()::iterator) {
+            for (String parts : (Iterable<String>) reader.lines()::iterator) {
                 try {
-                    Class<?> loaded = Class.forName(className);
-                    fromClasses(Collections.singleton(loaded));
+                    String[] classRecursion = parts.split("\t");
+                    Class<?> loaded = Class.forName(classRecursion[0]);
+                    fromClasses(Collections.singleton(loaded), Integer.parseInt(classRecursion[1]));
                 } catch (Throwable ignored) {
                 }
             }

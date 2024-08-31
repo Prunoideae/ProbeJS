@@ -24,7 +24,7 @@ import java.util.function.Consumer;
 
 @EventBusSubscriber(value = Dist.CLIENT)
 public class GameEvents {
-    private static final int MOD_LIMIT = 350;
+    private static final int MOD_LIMIT = 200;
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void playerJoined(ClientPlayerNetworkEvent.LoggingIn event) {
@@ -34,6 +34,12 @@ public class GameEvents {
         if (config.enabled.get()) {
             if (config.modHash.get() == -1) {
                 player.sendSystemMessage(Component.translatable("probejs.hello").kjs$gold());
+                if (ModList.get().size() >= MOD_LIMIT) {
+                    player.sendSystemMessage(
+                            Component.translatable("probejs.performance", ModList.get().size())
+                    );
+                    config.classScanning.set(false);
+                }
             }
             if (config.registryHash.get() != GameUtils.registryHash()) {
                 if (!ProbeDumpingThread.exists()) { // Not very possible but anyway
@@ -46,11 +52,7 @@ public class GameEvents {
                                         .kjs$clickSuggestCommand("/probejs disable")
                                         .kjs$aqua()
                                 ));
-                if (ModList.get().size() >= MOD_LIMIT && ProbeConfig.INSTANCE.complete.get()) {
-                    player.sendSystemMessage(
-                            Component.translatable("probejs.performance", ModList.get().size())
-                    );
-                }
+
             }
             player.sendSystemMessage(
                     Component.translatable("probejs.wiki")

@@ -108,4 +108,13 @@ public class ProbeBuiltinDocs extends ProbeJSPlugin {
     public void addJsonSchema(SchemaDump dump) {
         forEach(builtinDoc -> builtinDoc.addJsonSchema(dump));
     }
+
+    @Override
+    public Set<Class<?>> filterScannedClasses(Set<Class<?>> clazz) {
+        Set<Class<?>> allowed = new HashSet<>();
+        for (Supplier<ProbeJSPlugin> builtinDoc : ProbeBuiltinDocs.BUILTIN_DOCS) {
+            allowed.addAll(builtinDoc.get().filterScannedClasses(clazz));
+        }
+        return allowed;
+    }
 }

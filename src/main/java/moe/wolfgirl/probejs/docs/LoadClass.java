@@ -50,9 +50,8 @@ public class LoadClass extends ProbeJSPlugin {
 
         JSObjectType.Builder typeDict = Types.object();
 
-        for (Map.Entry<ClassPath, Clazz> entry : ClassRegistry.REGISTRY.foundClasses.entrySet()) {
-            ClassPath classPath = entry.getKey();
-            Clazz clazz = entry.getValue();
+        for (Clazz clazz : ClassRegistry.REGISTRY.getFoundClasses()) {
+            ClassPath classPath = clazz.classPath;
 
             if (clazz.attribute.isInterface) {
                 typeDict.member(classPath.getClassPathJava(), Types.typeOf(new TSStaticType(classPath)));
