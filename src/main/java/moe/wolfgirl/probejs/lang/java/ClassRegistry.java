@@ -154,7 +154,7 @@ public class ClassRegistry {
                 } catch (Throwable ignored) {
                 }
             }
-        } catch (IOException ignored) {
+        } catch (Exception ignored) {
         }
     }
 }

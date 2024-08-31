@@ -58,6 +58,7 @@ public class ProbeConfig {
         public T get() {
             try {
                 if (changed) fromSetting();
+                changed = false;
             } catch (IOException e) {
                 return defaultValue;
             }
