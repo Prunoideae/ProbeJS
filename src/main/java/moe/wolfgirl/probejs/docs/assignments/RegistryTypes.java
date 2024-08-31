@@ -60,7 +60,7 @@ public class RegistryTypes extends ProbeJSPlugin {
                 if (type == null) continue;
                 assigned = type.baseClass();
             }
-            String typeName = NameUtils.rlToTitle(key.location().getPath());
+            String typeName = NameUtils.registryToName(key);
             scriptDump.assignType(assigned, Types.primitive("Special.%s".formatted(typeName)));
             registryNames.add(Types.literal(key.location().toString()));
         }
@@ -121,7 +121,7 @@ public class RegistryTypes extends ProbeJSPlugin {
         }
 
         BaseType types = enabled ? Types.or(entryNames.stream().map(Types::literal).toArray(BaseType[]::new)) : Types.STRING;
-        String typeName = NameUtils.rlToTitle(key.location().getPath());
+        String typeName = NameUtils.registryToName(key);
 
         TypeDecl typeDecl = new TypeDecl(typeName, types);
         special.addCode(typeDecl);
@@ -161,7 +161,7 @@ public class RegistryTypes extends ProbeJSPlugin {
         ClassDecl classDecl = typeScriptFile.findCode(ClassDecl.class).orElse(null);
         if (classDecl == null) return;
 
-        String typeName = NameUtils.rlToTitle(key.location().getPath());
+        String typeName = NameUtils.registryToName(key);
         String tagName = typeName + "Tag";
 
         var literalField = new FieldDecl(LITERAL_FIELD, Types.primitive("Special.%s".formatted(typeName)));

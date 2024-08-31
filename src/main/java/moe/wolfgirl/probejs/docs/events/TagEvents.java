@@ -45,7 +45,7 @@ public class TagEvents extends ProbeJSPlugin {
             Registry<?> registry = registryAccess.registry(key).orElse(null);
             if (registry == null) continue;
 
-            String typeName = "Special." + NameUtils.rlToTitle(key.location().getPath());
+            String typeName = "Special." + NameUtils.registryToName(key);
             String tagName = typeName + "Tag";
             String extraName = key.location().getNamespace().equals("minecraft") ?
                     key.location().getPath() :

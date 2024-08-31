@@ -1,5 +1,8 @@
 package moe.wolfgirl.probejs.utils;
 
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -52,6 +55,12 @@ public class NameUtils {
 
     public static String rlToTitle(String s) {
         return Arrays.stream(s.split("/")).map(NameUtils::snakeToTitle).collect(Collectors.joining());
+    }
+
+    public static String registryToName(ResourceKey<?> resourceKey) {
+        String name = rlToTitle(resourceKey.location().getPath());
+        if (resourceKey.location().getNamespace().equals("minecraft")) return name;
+        return rlToTitle(resourceKey.location().getNamespace()) + name;
     }
 
     public static boolean isNameSafe(String s) {
