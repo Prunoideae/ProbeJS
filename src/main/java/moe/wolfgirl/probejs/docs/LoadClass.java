@@ -18,6 +18,7 @@ import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 
 public class LoadClass extends ProbeJSPlugin {
     @Override
@@ -76,5 +77,11 @@ public class LoadClass extends ProbeJSPlugin {
         public Collection<ImportInfo> getUsedImports() {
             return type.getUsedImports();
         }
+    }
+
+    @Override
+    public Set<Class<?>> provideJavaClass(ScriptDump scriptDump) {
+        // TODO: Java.loadClass
+        return super.provideJavaClass(scriptDump);
     }
 }

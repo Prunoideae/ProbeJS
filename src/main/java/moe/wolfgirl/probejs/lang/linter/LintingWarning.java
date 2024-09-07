@@ -2,7 +2,8 @@ package moe.wolfgirl.probejs.lang.linter;
 
 import com.google.gson.JsonElement;
 import dev.latvian.mods.kubejs.bindings.ColorWrapper;
-import dev.latvian.mods.kubejs.color.Color;
+
+import dev.latvian.mods.kubejs.color.KubeColor;
 import moe.wolfgirl.probejs.ProbeJS;
 import net.minecraft.network.chat.Component;
 
@@ -14,9 +15,9 @@ public record LintingWarning(Path file, Level level, int line, int column, Strin
         WARNING(ColorWrapper.GOLD),
         ERROR(ColorWrapper.RED);
 
-        public final Color color;
+        public final KubeColor color;
 
-        Level(Color color) {
+        Level(KubeColor color) {
             this.color = color;
         }
     }

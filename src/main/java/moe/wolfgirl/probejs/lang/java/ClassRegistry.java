@@ -130,6 +130,7 @@ public class ClassRegistry {
         return foundClasses.values()
                 .stream()
                 .filter(clazz -> clazz.recursionDepth <= allowedDepth)
+                .filter(clazz -> !clazz.classPath.getName().contains("package-info"))
                 .collect(Collectors.toSet());
     }
 

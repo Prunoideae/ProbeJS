@@ -4,7 +4,7 @@ import dev.latvian.mods.kubejs.bindings.ColorWrapper;
 import dev.latvian.mods.kubejs.block.BlockTintFunction;
 import dev.latvian.mods.kubejs.block.MapColorHelper;
 import dev.latvian.mods.kubejs.block.state.BlockStatePredicate;
-import dev.latvian.mods.kubejs.color.Color;
+import dev.latvian.mods.kubejs.color.KubeColor;
 import dev.latvian.mods.kubejs.core.PlayerSelector;
 import dev.latvian.mods.kubejs.item.ItemTintFunction;
 import dev.latvian.mods.kubejs.recipe.match.ReplacementMatch;
@@ -89,7 +89,7 @@ public class WorldTypes extends ProbeJSPlugin {
                 .param("level", Types.type(BlockAndTintGetter.class))
                 .param("pos", Types.type(BlockPos.class))
                 .param("index", Primitives.INTEGER)
-                .returnType(Types.type(Color.class))
+                .returnType(Types.type(KubeColor.class))
                 .build());
 
         scriptDump.assignType(Component.class, Types.STRING);
@@ -97,7 +97,7 @@ public class WorldTypes extends ProbeJSPlugin {
                 .member("text", true, Types.STRING)
                 .member("translate", true, Types.primitive("Special.LangKey"))
                 .member("with", true, Types.ANY.asArray())
-                .member("color", true, Types.type(Color.class))
+                .member("color", true, Types.type(KubeColor.class))
                 .member("bold", true, Types.BOOLEAN)
                 .member("italic", true, Types.BOOLEAN)
                 .member("underlined", true, Types.BOOLEAN)
@@ -116,7 +116,7 @@ public class WorldTypes extends ProbeJSPlugin {
                 .member("text", true, Types.STRING)
                 .member("translate", true, Types.primitive("Special.LangKey"))
                 .member("with", true, Types.ANY.asArray())
-                .member("color", true, Types.type(Color.class))
+                .member("color", true, Types.type(KubeColor.class))
                 .member("bold", true, Types.BOOLEAN)
                 .member("italic", true, Types.BOOLEAN)
                 .member("underlined", true, Types.BOOLEAN)
@@ -136,9 +136,9 @@ public class WorldTypes extends ProbeJSPlugin {
                 .distinct()
                 .map(Types::literal)
                 .toArray(BaseType[]::new);
-        scriptDump.assignType(Color.class, Types.or(predefinedColors));
-        scriptDump.assignType(Color.class, Types.primitive("`#${string}`"));
-        scriptDump.assignType(Color.class, Primitives.INTEGER);
+        scriptDump.assignType(KubeColor.class, Types.or(predefinedColors));
+        scriptDump.assignType(KubeColor.class, Types.primitive("`#${string}`"));
+        scriptDump.assignType(KubeColor.class, Primitives.INTEGER);
 
         scriptDump.assignType(TextColor.class, Types.or(predefinedColors));
         scriptDump.assignType(TextColor.class, Types.primitive("`#${string}`"));

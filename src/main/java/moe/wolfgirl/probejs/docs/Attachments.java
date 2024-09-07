@@ -28,7 +28,7 @@ public class Attachments extends ProbeJSPlugin {
             String id = entry.getKey();
             BlockEntityAttachmentType attachment = entry.getValue();
 
-            var baseType = converter.convertType(attachment.input());
+            var baseType = converter.convertType(attachment.typeInfo());
             baseType.getUsedImports().forEach(typeScriptFile.declaration::addClass);
 
             classDecl.methods.add(Types.lambda()
@@ -44,10 +44,9 @@ public class Attachments extends ProbeJSPlugin {
     @Override
     public Set<Class<?>> provideJavaClass(ScriptDump scriptDump) {
         HashSet<Class<?>> classes = new HashSet<>();
-        TypeConverter converter = scriptDump.transpiler.typeConverter;
 
         for (BlockEntityAttachmentType value : BlockEntityAttachmentType.ALL.get().values()) {
-            classes.addAll(converter.convertType(value.input()).getClasses());
+            classes.addAll(value.typeInfo().getContainedComponentClasses());
         }
 
         return classes;

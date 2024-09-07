@@ -62,7 +62,7 @@ public class InjectArray implements ClassTransformer {
             BaseType iterType = classDecl.methods.stream()
                     .filter(m -> m.name.equals("iterator") && m.params.isEmpty())
                     .filter(m -> m.returnType instanceof TSParamType)
-                    .map(m -> ((TSParamType) m.returnType).params.get(0))
+                    .map(m -> ((TSParamType) m.returnType).params.getFirst())
                     .findFirst().orElse(null);
             if (iterType == null) return;
             classDecl.bodyCode.add(new FormattedLine("[index: number]: %s", iterType));
