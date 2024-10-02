@@ -1,6 +1,8 @@
 package moe.wolfgirl.probejs.docs;
 
 import dev.latvian.mods.kubejs.bindings.JavaWrapper;
+import dev.latvian.mods.kubejs.script.KubeJSContext;
+import dev.latvian.mods.rhino.NativeJavaClass;
 import moe.wolfgirl.probejs.lang.java.ClassRegistry;
 import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.lang.java.clazz.Clazz;
@@ -19,6 +21,7 @@ import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class LoadClass extends ProbeJSPlugin {
     @Override
@@ -81,7 +84,11 @@ public class LoadClass extends ProbeJSPlugin {
 
     @Override
     public Set<Class<?>> provideJavaClass(ScriptDump scriptDump) {
-        // TODO: Java.loadClass
-        return super.provideJavaClass(scriptDump);
+        return ((KubeJSContext) scriptDump.manager.contextFactory.enter()).getJavaClassCache()
+                .values()
+                .stream()
+                .flatMap(e -> e.left().stream())
+                .map(NativeJavaClass::getClassObject)
+                .collect(Collectors.toSet());
     }
 }

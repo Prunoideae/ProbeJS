@@ -1,5 +1,6 @@
 package moe.wolfgirl.probejs.docs;
 
+import com.mojang.datafixers.util.Pair;
 import moe.wolfgirl.probejs.ProbeJS;
 import moe.wolfgirl.probejs.docs.assignments.*;
 import moe.wolfgirl.probejs.docs.events.ViewerEvents;
@@ -112,9 +113,14 @@ public class ProbeBuiltinDocs extends ProbeJSPlugin {
     @Override
     public Set<Class<?>> filterScannedClasses(Set<Class<?>> clazz) {
         Set<Class<?>> allowed = new HashSet<>();
-        for (Supplier<ProbeJSPlugin> builtinDoc : ProbeBuiltinDocs.BUILTIN_DOCS) {
-            allowed.addAll(builtinDoc.get().filterScannedClasses(clazz));
-        }
+        forEach(builtinDoc -> allowed.addAll(builtinDoc.filterScannedClasses(clazz)));
         return allowed;
+    }
+
+    @Override
+    public Set<Pair<String, String>> disableEventDumps(ScriptDump dump) {
+        Set<Pair<String, String>> disabled = new HashSet<>();
+        forEach(builtinDoc -> disabled.addAll(builtinDoc.disableEventDumps(dump)));
+        return disabled;
     }
 }

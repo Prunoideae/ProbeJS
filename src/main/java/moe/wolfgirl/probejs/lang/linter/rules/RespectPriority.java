@@ -38,14 +38,14 @@ public class RespectPriority extends Rule {
                 if (matcher.matches()) {
                     String dependsOn = ProbeJS.GSON.fromJson(matcher.group(2), String.class);
                     if (dependsOn.startsWith("package")) continue;
-                    depends.add(new Pair<>(i, path.getParent().resolve(dependsOn + ".js").toAbsolutePath().normalize()));
+                    depends.add(Pair.of(i, path.getParent().resolve(dependsOn + ".js").toAbsolutePath().normalize()));
                 }
             } else if (s.contains("require")) {
                 Matcher matcher = NameUtils.MATCH_ANY_REQUIRE.matcher(s);
                 if (matcher.matches()) {
                     String dependsOn = ProbeJS.GSON.fromJson(matcher.group(2), String.class);
                     if (dependsOn.startsWith("package")) continue;
-                    depends.add(new Pair<>(i, path.getParent().resolve(dependsOn + ".js").toAbsolutePath().normalize()));
+                    depends.add(Pair.of(i, path.getParent().resolve(dependsOn + ".js").toAbsolutePath().normalize()));
                 }
             }
         }

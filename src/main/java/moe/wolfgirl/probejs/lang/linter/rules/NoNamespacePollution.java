@@ -33,7 +33,7 @@ public class NoNamespacePollution extends Rule {
                     };
                     if (identifier == null) continue;
                     if (identifier.equals("{") && s.contains("}")) continue;
-                    identifiers.put(identifier, new Pair<>(i, path));
+                    identifiers.put(identifier, Pair.of(i, path));
                 }
             }
         } else {
@@ -50,7 +50,7 @@ public class NoNamespacePollution extends Rule {
                     };
                     if (identifier == null) continue;
                     if (identifier.equals("{") && s.contains("}")) continue;
-                    identifiers.put(identifier, new Pair<>(i, path));
+                    identifiers.put(identifier, Pair.of(i, path));
                 }
             }
         }

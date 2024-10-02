@@ -134,7 +134,7 @@ public class ScriptDump {
         for (Code code : content) {
             global.addCode(code);
         }
-        globals.put(identifier, new Pair<>(excludedNames, global));
+        globals.put(identifier, Pair.of(excludedNames, global));
     }
 
 

@@ -7,6 +7,7 @@ import dev.latvian.mods.kubejs.event.EventGroup;
 import dev.latvian.mods.kubejs.event.EventGroups;
 import dev.latvian.mods.kubejs.event.EventHandler;
 import dev.latvian.mods.kubejs.typings.Info;
+import moe.wolfgirl.probejs.ProbeJS;
 import moe.wolfgirl.probejs.lang.transpiler.transformation.InjectSpecialType;
 import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
 import moe.wolfgirl.probejs.lang.typescript.code.type.TSClassType;
@@ -27,7 +28,6 @@ public class Events extends ProbeJSPlugin {
 
     @Override
     public void addGlobals(ScriptDump scriptDump) {
-
         Multimap<String, EventHandler> availableHandlers = ArrayListMultimap.create();
         Set<Pair<String, String>> disabled = getDisabledEvents(scriptDump);
         TypeConverter converter = scriptDump.transpiler.typeConverter;
@@ -38,7 +38,7 @@ public class Events extends ProbeJSPlugin {
 
             for (EventHandler handler : group.getHandlers().values()) {
                 if (!handler.scriptTypePredicate.test(scriptDump.scriptType)) continue;
-                if (disabled.contains(new Pair<>(groupName, handler.name))) continue;
+                if (disabled.contains(Pair.of(groupName, handler.name))) continue;
                 availableHandlers.put(groupName, handler);
             }
         }

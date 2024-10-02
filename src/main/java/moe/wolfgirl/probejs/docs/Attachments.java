@@ -1,5 +1,6 @@
 package moe.wolfgirl.probejs.docs;
 
+import com.mojang.datafixers.util.Pair;
 import dev.latvian.mods.kubejs.block.entity.BlockEntityAttachmentType;
 import dev.latvian.mods.kubejs.block.entity.BlockEntityInfo;
 import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
@@ -7,12 +8,16 @@ import moe.wolfgirl.probejs.lang.transpiler.TypeConverter;
 import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
 import moe.wolfgirl.probejs.lang.typescript.TypeScriptFile;
 import moe.wolfgirl.probejs.lang.typescript.code.member.ClassDecl;
+import moe.wolfgirl.probejs.lang.typescript.code.member.ParamDecl;
+import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
 import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
 import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
+import moe.wolfgirl.probejs.utils.DocUtils;
 
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class Attachments extends ProbeJSPlugin {
 
@@ -22,23 +27,24 @@ public class Attachments extends ProbeJSPlugin {
         ClassDecl classDecl = typeScriptFile.findCode(ClassDecl.class).orElse(null);
         if (classDecl == null) return;
 
-        classDecl.methods.removeIf(methodDecl -> methodDecl.name.equals("attach"));
         TypeConverter converter = scriptDump.transpiler.typeConverter;
-        for (Map.Entry<String, BlockEntityAttachmentType> entry : BlockEntityAttachmentType.ALL.get().entrySet()) {
-            String id = entry.getKey();
-            BlockEntityAttachmentType attachment = entry.getValue();
 
-            var baseType = converter.convertType(attachment.typeInfo());
-            baseType.getUsedImports().forEach(typeScriptFile.declaration::addClass);
+        DocUtils.generateMappedType("AttachmentMap", "Attachments",
+                BlockEntityAttachmentType.ALL.get()
+                        .entrySet()
+                        .stream()
+                        .map(entry -> Pair.of(entry.getKey(), converter.convertType(entry.getValue().typeInfo())))
+                        .collect(Collectors.toSet()),
+                typeScriptFile);
 
-            classDecl.methods.add(Types.lambda()
-                    .method()
-                    .param("type", Types.literal(id))
-                    .param("input", baseType)
-                    .build()
-                    .asMethod("attach")
-            );
-        }
+        classDecl.methods.stream()
+                .filter(methodDecl -> methodDecl.name.equals("attach"))
+                .findFirst()
+                .ifPresent(attach -> {
+                    attach.variableTypes.add(Types.generic("T", Types.primitive("Attachments")));
+                    attach.params.set(1, new ParamDecl("type", Types.generic("T"), false, false));
+                    attach.params.set(3, new ParamDecl("args", Types.primitive("%s[T]".formatted("AttachmentMap")), false, false));
+                });
     }
 
     @Override

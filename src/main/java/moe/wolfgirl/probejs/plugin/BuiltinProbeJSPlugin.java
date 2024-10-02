@@ -1,5 +1,6 @@
 package moe.wolfgirl.probejs.plugin;
 
+import com.mojang.datafixers.util.Pair;
 import dev.latvian.mods.kubejs.event.EventGroupRegistry;
 import dev.latvian.mods.kubejs.plugin.ClassFilter;
 import dev.latvian.mods.kubejs.script.BindingRegistry;
@@ -112,5 +113,10 @@ public class BuiltinProbeJSPlugin extends ProbeJSPlugin {
     @Override
     public Set<Class<?>> filterScannedClasses(Set<Class<?>> clazz) {
         return ProbeBuiltinDocs.INSTANCE.filterScannedClasses(clazz);
+    }
+
+    @Override
+    public Set<Pair<String, String>> disableEventDumps(ScriptDump dump) {
+        return ProbeBuiltinDocs.INSTANCE.disableEventDumps(dump);
     }
 }

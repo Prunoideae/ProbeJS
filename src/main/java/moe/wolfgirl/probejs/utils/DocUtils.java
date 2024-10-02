@@ -1,12 +1,15 @@
 package moe.wolfgirl.probejs.utils;
 
-import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
+import com.mojang.datafixers.util.Pair;
 import moe.wolfgirl.probejs.lang.typescript.TypeScriptFile;
 import moe.wolfgirl.probejs.lang.typescript.code.ImportInfo;
 import moe.wolfgirl.probejs.lang.typescript.code.member.ClassDecl;
 import moe.wolfgirl.probejs.lang.typescript.code.member.MethodDecl;
 import moe.wolfgirl.probejs.lang.typescript.code.member.ParamDecl;
+import moe.wolfgirl.probejs.lang.typescript.code.member.TypeDecl;
 import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
+import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
+import moe.wolfgirl.probejs.lang.typescript.code.type.js.JSObjectType;
 
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -30,4 +33,14 @@ public class DocUtils {
         }
     }
 
+    public static void generateMappedType(String mapName, String flagName, Iterable<Pair<String, BaseType>> kvPairs, TypeScriptFile typeScriptFile) {
+        JSObjectType.Builder typeDict = Types.object();
+
+        for (Pair<String, BaseType> kvPair : kvPairs) {
+            typeDict.member(kvPair.getFirst(), kvPair.getSecond());
+        }
+
+        typeScriptFile.addCode(new TypeDecl(mapName, typeDict.buildIndexed()));
+        typeScriptFile.addCode(new TypeDecl(flagName, Types.primitive("keyof %s".formatted(mapName))));
+    }
 }
