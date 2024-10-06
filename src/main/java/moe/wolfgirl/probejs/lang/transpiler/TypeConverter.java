@@ -1,6 +1,7 @@
 package moe.wolfgirl.probejs.lang.transpiler;
 
 import dev.latvian.mods.kubejs.script.ScriptManager;
+import dev.latvian.mods.kubejs.util.ClassWrapper;
 import dev.latvian.mods.rhino.type.*;
 import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.lang.java.type.TypeDescriptor;
@@ -14,6 +15,7 @@ import java.util.*;
  * Adapts a TypeDescriptor into a BaseType
  */
 public class TypeConverter {
+    private static final ClassPath WRAPPER = new ClassPath(ClassWrapper.class);
 
     public final Map<ClassPath, BaseType> predefinedTypes = new HashMap<>();
     public final ScriptManager scriptManager;
@@ -38,6 +40,9 @@ public class TypeConverter {
             BaseType base = convertType(paramType.base);
             if (base == Types.ANY) return Types.ANY;
             List<BaseType> params = paramType.params.stream().map(this::convertType).toList();
+            if (base instanceof TSClassType classType && classType.classPath.equals(WRAPPER)) {
+                return Types.typeOf(params.getFirst());
+            }
             return new TSParamType(base, params);
         } else if (descriptor instanceof VariableType variableType) {
             List<TypeDescriptor> desc = variableType.descriptors;
@@ -107,10 +112,14 @@ public class TypeConverter {
                 if (info.rawType() == TypeInfo.RAW_OPTIONAL) {
                     yield Types.optional(convertType(info.param(0)));
                 }
+                BaseType base = convertType(info.rawType());
                 var params = Arrays.stream(info.params())
                         .map(p -> this.convertType(p, false))
                         .toArray(BaseType[]::new);
-                yield Types.parameterized(convertType(info.rawType()), params);
+                if (base instanceof TSClassType classType && classType.classPath.equals(WRAPPER)) {
+                    yield Types.typeOf(params[0]);
+                }
+                yield Types.parameterized(base, params);
             }
             case null, default -> Types.ANY;
         };
