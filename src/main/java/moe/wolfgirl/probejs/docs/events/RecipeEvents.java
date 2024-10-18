@@ -133,7 +133,7 @@ public class RecipeEvents extends ProbeJSPlugin {
      * }
      */
     private static ClassDecl generateSchemaClass(String id, RecipeSchema schema, TypeConverter converter) {
-        ClassDecl.Builder builder = Statements.clazz(NameUtils.rlToTitle(id))
+        ClassDecl.Builder builder = Statements.clazz("$" + NameUtils.rlToTitle(id))
                 .superClass(converter.convertType(schema.recipeFactory.recipeType()));
         for (RecipeKey<?> key : schema.keys) {
             if (key.functionNames == null || key.functionNames.isEmpty()) continue;
@@ -153,9 +153,11 @@ public class RecipeEvents extends ProbeJSPlugin {
 
         for (RecipeKey<?> key : schema.keys) {
             if (key.excluded) continue;
-            builder.param(key.getPreferredBuilderKey(),
-                    converter.convertType(key.component.typeInfo()),
-                    key.optional(), false);
+            if (key.functionNames == null || !key.functionNames.isEmpty()) {
+                builder.param(key.getPreferredBuilderKey(),
+                        converter.convertType(key.component.typeInfo()),
+                        key.optional(), false);
+            }
         }
 
         return builder.build();
