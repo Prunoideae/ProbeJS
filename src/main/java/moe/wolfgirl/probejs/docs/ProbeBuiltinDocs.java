@@ -50,7 +50,8 @@ public class ProbeBuiltinDocs extends ProbeJSPlugin {
             AdditionalTypes::new,
             ViewerEvents::new,
             Attachments::new,
-            LoadClass::new
+            LoadClass::new,
+            ItemComponents::new
     ));
 
     private static void forEach(Consumer<ProbeJSPlugin> consumer) {
