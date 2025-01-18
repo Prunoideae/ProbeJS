@@ -12,10 +12,6 @@ public class ProbeJSKJSPlugin implements KubeJSPlugin {
     @Override
     public void registerBindings(BindingRegistry bindings) {
         bindings.add("require", new Require());
-        if (FMLEnvironment.dist == Dist.CLIENT) {
-            bindings.add("probejs", Probe.INSTANCE);
-        } else {
-            bindings.add("probejs", Undefined.INSTANCE);
-        }
+        bindings.add("probejs", FMLEnvironment.dist == Dist.CLIENT ? Probe.INSTANCE : Undefined.INSTANCE);
     }
 }

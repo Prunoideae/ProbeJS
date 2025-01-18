@@ -3,6 +3,7 @@ package moe.wolfgirl.probejs;
 import dev.latvian.mods.kubejs.KubeJSPaths;
 import dev.latvian.mods.kubejs.util.UtilsJS;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -18,17 +19,19 @@ public class ProbePaths {
     public static Path IMAGES = PROBE.resolve("images");
 
     public static void init() {
-        if (Files.notExists(PROBE)) {
-            UtilsJS.tryIO(() -> Files.createDirectories(PROBE));
-        }
-        if (Files.notExists(WORKSPACE_SETTINGS)) {
-            UtilsJS.tryIO(() -> Files.createDirectories(WORKSPACE_SETTINGS));
-        }
-        if (Files.notExists(DECOMPILED)) {
-            UtilsJS.tryIO(() -> Files.createDirectories(DECOMPILED));
-        }
-        if (Files.notExists(IMAGES)) {
-            UtilsJS.tryIO(() -> Files.createDirectories(IMAGES));
+        createFolders(PROBE);
+        createFolders(WORKSPACE_SETTINGS);
+        createFolders(DECOMPILED);
+        createFolders(IMAGES);
+    }
+
+    private static void createFolders(Path path) {
+        if (Files.notExists(path)) {
+            try {
+                Files.createDirectories(path);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 

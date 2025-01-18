@@ -11,6 +11,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public abstract class JSJoinedType extends BaseType {
+    private static final int MAX_ITEM_THRESHOLD = 8000;
+
     public final String delimiter;
     public final List<BaseType> types;
 
@@ -41,6 +43,11 @@ public abstract class JSJoinedType extends BaseType {
     public static class Union extends JSJoinedType {
         public Union(List<BaseType> types) {
             super("|", types);
+        }
+
+        @Override
+        public List<String> format(Declaration declaration, FormatType input) {
+            return super.format(declaration, input);
         }
     }
 

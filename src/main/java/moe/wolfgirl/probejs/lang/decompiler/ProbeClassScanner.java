@@ -13,6 +13,7 @@ public class ProbeClassScanner {
     private final Set<Class<?>> scannedClasses = new HashSet<>();
 
     public void acceptFile(File file) throws IOException {
+        ClassLoader loader = getClass().getClassLoader();
         try (var jarFile = new ZipFile(file)) {
             var entries = jarFile.entries();
             while (entries.hasMoreElements()) {
@@ -25,7 +26,7 @@ public class ProbeClassScanner {
                 try {
                     // Skipping due to mojang is weird
                     if (name.contains("com.mojang.blaze3d.systems.TimerQuery")) continue;
-                    scannedClasses.add(Class.forName(name));
+                    scannedClasses.add(Class.forName(name, false, loader));
                 } catch (Throwable ignore) {
                 }
             }

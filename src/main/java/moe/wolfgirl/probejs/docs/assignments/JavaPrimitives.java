@@ -4,7 +4,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import dev.latvian.mods.unit.Unit;
 import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
 import moe.wolfgirl.probejs.docs.Primitives;
 import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
@@ -65,8 +64,6 @@ public class JavaPrimitives extends ProbeJSPlugin {
         scriptDump.assignType(JsonElement.class, Types.type(JsonPrimitive.class));
         scriptDump.assignType(Path.class, Types.STRING);
         scriptDump.assignType(File.class, Types.type(Path.class));
-        scriptDump.assignType(Unit.class, Types.STRING);
-        scriptDump.assignType(Unit.class, Types.NUMBER);
         scriptDump.assignType(TemporalAmount.class, Types.STRING);
         scriptDump.assignType(TemporalAmount.class, Types.NUMBER);
         scriptDump.assignType(Duration.class, Types.type(TemporalAmount.class));

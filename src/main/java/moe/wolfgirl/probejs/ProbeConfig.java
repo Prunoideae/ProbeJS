@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -23,8 +24,10 @@ public class ProbeConfig {
     public ConfigEntry<Boolean> classScanning = new ConfigEntry<>("classScanning", false);
     public ConfigEntry<Long> modHash = new ConfigEntry<>("modHash", -1L);
     public ConfigEntry<Long> registryHash = new ConfigEntry<>("registryHash", -1L);
-    public ConfigEntry<Boolean> isolatedScopes = new ConfigEntry<>("isolatedScope", false);
+    // if the dump is complete (including all mods), or some are stripped out
     public ConfigEntry<Boolean> complete = new ConfigEntry<>("complete", true);
+    // what mods are force-included from an incomplete dump, other mods/registry objects are stripped off
+    public ConfigEntry<String> mods = new ConfigEntry<>("forceIncluded", "kubejs,minecraft,neoforge");
 
     public static class ConfigEntry<T> {
         public final String name;
@@ -32,7 +35,6 @@ public class ProbeConfig {
         private T value;
         private final String namespace;
         private boolean changed = true;
-
 
         ConfigEntry(String name, @Nonnull T defaultValue) {
             this(name, defaultValue, "probejs");
@@ -117,5 +119,9 @@ public class ProbeConfig {
             return map.get("%s.%s".formatted(configEntry.namespace, configEntry.name));
         }
         return null;
+    }
+
+    public Set<String> getIncludedMods() {
+        return Set.of(mods.get().split(","));
     }
 }

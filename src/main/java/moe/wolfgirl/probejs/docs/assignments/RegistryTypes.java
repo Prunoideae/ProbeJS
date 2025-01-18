@@ -89,8 +89,6 @@ public class RegistryTypes extends ProbeJSPlugin {
 
     @Override
     public void addGlobals(ScriptDump scriptDump) {
-        boolean enabled = ProbeConfig.INSTANCE.complete.get();
-
         Wrapped.Namespace special = new Wrapped.Namespace("Special");
         MinecraftServer currentServer = ServerLifecycleHooks.getCurrentServer();
         if (currentServer == null) return;
@@ -99,9 +97,9 @@ public class RegistryTypes extends ProbeJSPlugin {
         for (ResourceKey<? extends Registry<?>> key : RegistryUtils.getRegistries(registryAccess)) {
             Registry<?> registry = registryAccess.registry(key).orElse(null);
             if (registry == null) continue;
-            createTypes(special, key, registry, enabled);
+            createTypes(special, key);
         }
-        createTypes(special, BuiltInRegistries.REGISTRY.key(), BuiltInRegistries.REGISTRY, enabled);
+        createTypes(special, BuiltInRegistries.REGISTRY.key());
 
         // Expose LiteralOf<T> and TagOf<T>
         TypeDecl literalOf = new TypeDecl("LiteralOf<T>", Types.primitive(OF_TYPE_DECL.formatted(LITERAL_FIELD)));
@@ -112,27 +110,14 @@ public class RegistryTypes extends ProbeJSPlugin {
         scriptDump.addGlobal("registry_type", special);
     }
 
-    private static void createTypes(Wrapped.Namespace special, ResourceKey<? extends Registry<?>> key, Registry<?> registry, boolean enabled) {
-        List<String> entryNames = new ArrayList<>();
-        for (ResourceLocation entryName : registry.keySet()) {
-            if (entryName.getNamespace().equals("minecraft"))
-                entryNames.add(entryName.getPath());
-            entryNames.add(entryName.toString());
-        }
-
-        BaseType types = enabled ? Types.or(entryNames.stream().map(Types::literal).toArray(BaseType[]::new)) : Types.STRING;
+    private static void createTypes(Wrapped.Namespace special, ResourceKey<? extends Registry<?>> key) {
+        BaseType types = Types.literal("probejs$$object$$%s".formatted(key.location()));
         String typeName = NameUtils.registryToName(key);
 
         TypeDecl typeDecl = new TypeDecl(typeName, types);
         special.addCode(typeDecl);
 
-        BaseType[] tagNames = registry.getTagNames()
-                .map(TagKey::location)
-                .map(ResourceLocation::toString)
-                .map(Types::literal)
-                .toArray(BaseType[]::new);
-
-        BaseType tagTypes = enabled ? Types.or(tagNames) : Types.STRING;
+        BaseType tagTypes = Types.literal("probejs$$tag$$%s".formatted(key.location()));
         String tagName = typeName + "Tag";
 
         TypeDecl tagDecl = new TypeDecl(tagName, tagTypes);

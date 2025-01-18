@@ -11,6 +11,7 @@ import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
 import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class SpecialTypes extends ProbeJSPlugin {
@@ -20,13 +21,10 @@ public class SpecialTypes extends ProbeJSPlugin {
 
         // We define special types regardless of script type
         // because types might be sent to other scripts
-        defineLiteralTypes(special, "LangKey", GlobalStates.LANG_KEYS.get());
-        defineLiteralTypes(special, "RecipeId", GlobalStates.RECIPE_IDS);
+        defineLiteralTypes(special, "LangKey", List.of("probejs$$translation"));
+        defineLiteralTypes(special, "RecipeId", List.of("probejs$$recipeId"));
         defineLiteralTypes(special, "LootTable", GlobalStates.LOOT_TABLES);
-        defineLiteralTypes(special, "RawTexture", GlobalStates.RAW_TEXTURES.get());
-        defineLiteralTypes(special, "Texture", GlobalStates.TEXTURES.get());
-        defineLiteralTypes(special, "Mod", GlobalStates.MODS.get());
-
+        defineLiteralTypes(special, "Mod", List.of("probejs$$mod"));
         scriptDump.addGlobal("special_types", special);
     }
 

@@ -1,6 +1,6 @@
 package moe.wolfgirl.probejs;
 
-import moe.wolfgirl.probejs.features.schema.SchemaDownloader;
+import moe.wolfgirl.probejs.features.SchemaDownloader;
 import moe.wolfgirl.probejs.lang.decompiler.ProbeDecompiler;
 import moe.wolfgirl.probejs.lang.java.ClassRegistry;
 import moe.wolfgirl.probejs.lang.schema.SchemaDump;

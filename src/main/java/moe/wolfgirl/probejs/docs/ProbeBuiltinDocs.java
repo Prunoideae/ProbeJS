@@ -47,6 +47,7 @@ public class ProbeBuiltinDocs extends ProbeJSPlugin {
             ParamFix::new,
             Snippets::new,
             ForgeEventDoc::new,
+            TranslationDoc::new,
             AdditionalTypes::new,
             ViewerEvents::new,
             Attachments::new,

@@ -4,6 +4,7 @@ import dev.latvian.mods.kubejs.util.UtilsJS;
 import dev.latvian.mods.rhino.util.HideFromJS;
 import moe.wolfgirl.probejs.lang.java.ClassRegistry;
 
+import java.io.IOException;
 import java.lang.reflect.TypeVariable;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -77,8 +78,16 @@ public record ClassPath(List<String> parts) {
     public Path makePath(Path base) {
         Path full = getDirPath(base);
         if (Files.notExists(full)) {
-            UtilsJS.tryIO(() -> Files.createDirectories(full));
+            try {
+                Files.createDirectories(full);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
         return full;
+    }
+
+    public String getFileKey() {
+        return String.join(".", parts.subList(0, Math.min(4, parts.size())));
     }
 }

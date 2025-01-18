@@ -4,9 +4,12 @@ import com.mojang.brigadier.Command;
 import dev.latvian.mods.kubejs.KubeJS;
 import moe.wolfgirl.probejs.lang.linter.Linter;
 import moe.wolfgirl.probejs.utils.GameUtils;
+import net.minecraft.client.Minecraft;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -63,6 +66,14 @@ public class GameEvents {
                                     .kjs$hover(Component.literal("https://kubejs.com/wiki/addons/third-party/probejs")))
             );
         }
+
+        // Reload creative mode tabs
+        CreativeModeTabs.CACHED_PARAMETERS = null;
+        CreativeModeTabs.tryRebuildTabContents(
+                player.connection.enabledFeatures(),
+                player.canUseGameMasterBlocks() && Minecraft.getInstance().options.operatorItemsTab().get(),
+                player.level().registryAccess()
+        );
     }
 
     @SubscribeEvent
@@ -96,24 +107,6 @@ public class GameEvents {
                                 .executes(context -> {
                                     ProbeConfig.INSTANCE.enabled.set(true);
                                     context.getSource().sendSystemMessage(Component.translatable("probejs.hello_again").kjs$aqua());
-                                    return Command.SINGLE_SUCCESS;
-                                })
-                        )
-                        .then(Commands.literal("scope_isolation")
-                                .requires(source -> ProbeConfig.INSTANCE.enabled.get() && source.hasPermission(2))
-                                .executes(context -> {
-                                    boolean flag = !ProbeConfig.INSTANCE.isolatedScopes.get();
-                                    ProbeConfig.INSTANCE.isolatedScopes.set(flag);
-                                    context.getSource().sendSystemMessage(flag ?
-                                            Component.translatable("probejs.isolation").kjs$aqua() :
-                                            Component.translatable("probejs.no_isolation").kjs$aqua());
-                                    return Command.SINGLE_SUCCESS;
-                                })
-                        )
-                        .then(Commands.literal("lint")
-                                .requires(source -> ProbeConfig.INSTANCE.enabled.get() && source.hasPermission(2))
-                                .executes(context -> {
-                                    Linter.defaultLint(context.getSource()::sendSystemMessage);
                                     return Command.SINGLE_SUCCESS;
                                 })
                         )

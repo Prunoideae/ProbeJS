@@ -41,6 +41,7 @@ import net.minecraft.world.level.storage.loot.functions.CopyNameFunction;
 public class WorldTypes extends ProbeJSPlugin {
     @Override
     public void assignType(ScriptDump scriptDump) {
+        scriptDump.assignType(BlockState.class, Types.type(Block.class));
         scriptDump.assignType(BlockStatePredicate.class, Types.type(BlockStatePredicate.class).asArray());
         scriptDump.assignType(BlockStatePredicate.class, "BlockStatePredicateObject", Types.object()
                 .member("or", true, Types.type(BlockStatePredicate.class))

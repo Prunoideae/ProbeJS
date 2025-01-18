@@ -11,7 +11,6 @@ public class SnippetGenerationEventJS implements KubeEvent {
     private final SnippetDump dump;
 
     public SnippetGenerationEventJS(SnippetDump dump) {
-
         this.dump = dump;
     }
 

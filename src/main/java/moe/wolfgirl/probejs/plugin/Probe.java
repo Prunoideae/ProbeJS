@@ -1,6 +1,6 @@
 package moe.wolfgirl.probejs.plugin;
 
-import dev.latvian.mods.kubejs.level.BlockContainerJS;
+import dev.latvian.mods.kubejs.level.LevelBlock;
 import dev.latvian.mods.kubejs.script.KubeJSContext;
 import dev.latvian.mods.kubejs.script.ScriptType;
 import dev.latvian.mods.kubejs.typings.Info;
@@ -39,7 +39,7 @@ public class Probe {
         }
     }
 
-    public BlockContainerJS getLastRightClickedBlock(Context context) {
+    public LevelBlock getLastRightClickedBlock(Context context) {
         testSourceFile(context);
         if (GlobalStates.LAST_RIGHTCLICKED == null) return null;
         Player currentPlayer = getCurrentPlayer(context);

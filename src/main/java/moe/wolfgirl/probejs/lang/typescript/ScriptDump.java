@@ -145,7 +145,12 @@ public class ScriptDump {
     public Path ensurePath(String path, boolean script) {
         Path full = (script ? scriptPath : basePath).resolve(path);
         if (Files.notExists(full)) {
-            UtilsJS.tryIO(() -> Files.createDirectories(full));
+            try {
+                Files.createDirectories(full);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+
         }
         return full;
     }
@@ -251,8 +256,7 @@ public class ScriptDump {
                 output.addCode(convertibleType);
                 output.addCode(typeExport);
 
-                var fileKey = "%s.%s".formatted(classPath.parts().get(0), classPath.parts().get(1));
-                BufferedWriter writer = files.computeIfAbsent(fileKey, key -> {
+                BufferedWriter writer = files.computeIfAbsent(classPath.getFileKey(), key -> {
                     try {
                         return Files.newBufferedWriter(getPackageFolder().resolve(key + ".d.ts"));
                     } catch (IOException e) {

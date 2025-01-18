@@ -1,4 +1,4 @@
-package moe.wolfgirl.probejs.features.schema;
+package moe.wolfgirl.probejs.features;
 
 import dev.latvian.mods.kubejs.KubeJSPaths;
 import dev.latvian.mods.kubejs.recipe.schema.RecipeNamespace;

@@ -1,8 +1,6 @@
 package moe.wolfgirl.probejs.lang.linter;
 
 import dev.latvian.mods.kubejs.KubeJSPaths;
-import moe.wolfgirl.probejs.ProbeJS;
-import moe.wolfgirl.probejs.lang.linter.rules.NoNamespacePollution;
 import moe.wolfgirl.probejs.lang.linter.rules.RespectPriority;
 import moe.wolfgirl.probejs.lang.linter.rules.Rule;
 import moe.wolfgirl.probejs.utils.GameUtils;
@@ -36,7 +34,6 @@ public class Linter {
 
     public static final RuleFactory[] RULES = new RuleFactory[]{
             RespectPriority::new,
-            NoNamespacePollution::new
     };
 
     public final Path scriptPath;

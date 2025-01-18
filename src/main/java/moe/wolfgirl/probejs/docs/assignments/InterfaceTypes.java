@@ -1,7 +1,5 @@
 package moe.wolfgirl.probejs.docs.assignments;
 
-import moe.wolfgirl.probejs.ProbeJS;
-import moe.wolfgirl.probejs.lang.java.ClassRegistry;
 import moe.wolfgirl.probejs.lang.java.clazz.Clazz;
 import moe.wolfgirl.probejs.lang.java.clazz.members.MethodInfo;
 import moe.wolfgirl.probejs.lang.java.clazz.members.ParamInfo;
@@ -12,7 +10,6 @@ import moe.wolfgirl.probejs.lang.typescript.code.type.js.JSLambdaType;
 import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
 
 import java.util.Optional;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class InterfaceTypes extends ProbeJSPlugin {
     @Override

@@ -3,7 +3,6 @@ package moe.wolfgirl.probejs.docs.assignments;
 
 import dev.latvian.mods.kubejs.item.ItemPredicate;
 import dev.latvian.mods.kubejs.recipe.filter.RecipeFilter;
-import moe.wolfgirl.probejs.ProbeConfig;
 import moe.wolfgirl.probejs.docs.Primitives;
 import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
 import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
@@ -33,7 +32,7 @@ public class RecipeTypes extends ProbeJSPlugin {
                 .returnType(Types.BOOLEAN)
                 .build());
 
-        scriptDump.assignType(ItemStack.class, Types.type(Item.class));
+        scriptDump.assignType(ItemStack.class, Types.literal("probejs$$itemStack"));
         scriptDump.assignType(ItemStack.class, "ItemWithCount", Types.object()
                 .member("item", Types.primitive("Special.Item"))
                 .member("count", true, Primitives.INTEGER)

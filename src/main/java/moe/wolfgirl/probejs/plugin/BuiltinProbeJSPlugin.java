@@ -4,11 +4,13 @@ import com.mojang.datafixers.util.Pair;
 import dev.latvian.mods.kubejs.event.EventGroupRegistry;
 import dev.latvian.mods.kubejs.plugin.ClassFilter;
 import dev.latvian.mods.kubejs.script.BindingRegistry;
+import dev.latvian.mods.kubejs.web.LocalWebServerRegistry;
 import moe.wolfgirl.probejs.events.ProbeEvents;
 import moe.wolfgirl.probejs.docs.ProbeBuiltinDocs;
 import moe.wolfgirl.probejs.events.SnippetGenerationEventJS;
 import moe.wolfgirl.probejs.events.TypeAssignmentEventJS;
 import moe.wolfgirl.probejs.events.TypingModificationEventJS;
+import moe.wolfgirl.probejs.features.ProbeJSEndpoints;
 import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.lang.schema.SchemaDump;
 import moe.wolfgirl.probejs.lang.snippet.SnippetDump;
@@ -118,5 +120,10 @@ public class BuiltinProbeJSPlugin extends ProbeJSPlugin {
     @Override
     public Set<Pair<String, String>> disableEventDumps(ScriptDump dump) {
         return ProbeBuiltinDocs.INSTANCE.disableEventDumps(dump);
+    }
+
+    @Override
+    public void registerLocalWebServer(LocalWebServerRegistry registry) {
+        ProbeJSEndpoints.register(registry);
     }
 }
