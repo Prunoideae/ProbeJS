@@ -2,7 +2,7 @@ plugins {
     id 'base'
     id 'java'
     id 'maven-publish'
-    id 'net.neoforged.moddev' version "2.0.10-beta"
+    id 'net.neoforged.moddev' version "2.0.75"
 }
 
 version = "${mod_version}"
@@ -12,10 +12,6 @@ neoForge {
     version = project.neoforge_version
     accessTransformers {
         publish(project.file("src/main/resources/META-INF/accesstransformer.cfg"))
-    }
-
-    interfaceInjectionData {
-        from(file("interfaces.json"))
     }
 
     mods {
@@ -83,6 +79,7 @@ repositories {
 dependencies {
     api("dev.latvian.mods:rhino:$rhino_version") { transitive(false) }
     api("dev.latvian.mods:kubejs-neoforge:$kubejs_version")
+    interfaceInjectionData("dev.latvian.mods:kubejs-neoforge:$kubejs_version")
     implementation("dev.latvian.apps:tiny-java-server:$tiny_server_version")
     compileOnly("dev.architectury:architectury-neoforge:$architectury_version")
 

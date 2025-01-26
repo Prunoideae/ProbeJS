@@ -20,4 +20,3 @@ gradle-app.setting
 /.idea/
 ProbeJS_server.launch
 ProbeJS_client.launch
-interfaces.json

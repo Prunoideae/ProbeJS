@@ -1,5 +1,7 @@
 package moe.wolfgirl.probejs.lang.java;
 
+import dev.latvian.mods.rhino.type.TypeInfo;
+import dev.latvian.mods.rhino.type.VariableTypeInfo;
 import dev.latvian.mods.rhino.util.HideFromJS;
 import moe.wolfgirl.probejs.ProbeConfig;
 import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
@@ -8,8 +10,6 @@ import moe.wolfgirl.probejs.lang.java.clazz.members.ConstructorInfo;
 import moe.wolfgirl.probejs.lang.java.clazz.members.FieldInfo;
 import moe.wolfgirl.probejs.lang.java.clazz.members.MethodInfo;
 import moe.wolfgirl.probejs.lang.java.clazz.members.ParamInfo;
-import moe.wolfgirl.probejs.lang.java.type.TypeDescriptor;
-import moe.wolfgirl.probejs.lang.java.type.impl.VariableType;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -37,12 +37,13 @@ public class ClassRegistry {
     }
 
     public void fromClasses(Collection<Class<?>> classes, int recursionDepth) {
+        ClassLoader thisLoader = getClass().getClassLoader();
         for (Class<?> c : classes) {
             try {
                 // We test if the class actually exists from forName
                 // I think some runtime class can have non-existing Class<?> object due to .getSuperClass
                 // or .getInterfaces
-                Class.forName(c.getName());
+                Class.forName(c.getName(), false, thisLoader);
             } catch (Throwable ignore) {
                 continue;
             }
@@ -65,35 +66,35 @@ public class ClassRegistry {
 
         for (ConstructorInfo constructor : clazz.constructors) {
             for (ParamInfo param : constructor.params) {
-                classes.addAll(param.type.getClasses());
+                classes.addAll(param.type.getContainedComponentClasses());
             }
-            for (VariableType variableType : constructor.variableTypes) {
-                classes.addAll(variableType.getClasses());
+            for (VariableTypeInfo variableType : constructor.variableTypes) {
+                classes.addAll(variableType.getContainedComponentClasses());
             }
         }
 
         for (MethodInfo method : clazz.methods) {
             for (ParamInfo param : method.params) {
-                classes.addAll(param.type.getClasses());
+                classes.addAll(param.type.getContainedComponentClasses());
             }
-            for (VariableType variableType : method.variableTypes) {
-                classes.addAll(variableType.getClasses());
+            for (VariableTypeInfo variableType : method.variableTypes) {
+                classes.addAll(variableType.getContainedComponentClasses());
             }
-            classes.addAll(method.returnType.getClasses());
+            classes.addAll(method.returnType.getContainedComponentClasses());
         }
 
         for (FieldInfo field : clazz.fields) {
-            classes.addAll(field.type.getClasses());
+            classes.addAll(field.type.getContainedComponentClasses());
         }
 
-        for (VariableType variableType : clazz.variableTypes) {
-            classes.addAll(variableType.getClasses());
+        for (VariableTypeInfo variableType : clazz.variableTypes) {
+            classes.addAll(variableType.getContainedComponentClasses());
         }
 
         if (clazz.superClass != null)
-            classes.addAll(clazz.superClass.getClasses());
-        for (TypeDescriptor i : clazz.interfaces) {
-            classes.addAll(i.getClasses());
+            classes.addAll(clazz.superClass.getContainedComponentClasses());
+        for (TypeInfo i : clazz.interfaces) {
+            classes.addAll(i.getContainedComponentClasses());
         }
 
         return classes;

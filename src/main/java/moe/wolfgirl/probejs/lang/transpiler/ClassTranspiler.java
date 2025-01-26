@@ -1,10 +1,10 @@
 package moe.wolfgirl.probejs.lang.transpiler;
 
+import dev.latvian.mods.rhino.type.VariableTypeInfo;
 import moe.wolfgirl.probejs.lang.java.clazz.Clazz;
 import moe.wolfgirl.probejs.lang.java.clazz.members.ConstructorInfo;
 import moe.wolfgirl.probejs.lang.java.clazz.members.FieldInfo;
 import moe.wolfgirl.probejs.lang.java.clazz.members.MethodInfo;
-import moe.wolfgirl.probejs.lang.java.type.impl.VariableType;
 import moe.wolfgirl.probejs.lang.transpiler.members.Constructor;
 import moe.wolfgirl.probejs.lang.transpiler.members.Converter;
 import moe.wolfgirl.probejs.lang.transpiler.members.Field;
@@ -34,7 +34,7 @@ public class ClassTranspiler extends Converter<Clazz, ClassDecl> {
     @Override
     public ClassDecl transpile(Clazz input) {
         List<TSVariableType> variableTypes = new ArrayList<>();
-        for (VariableType variableType : input.variableTypes) {
+        for (VariableTypeInfo variableType : input.variableTypes) {
             variableTypes.add((TSVariableType) converter.convertType(variableType));
         }
         BaseType superClass = input.superClass == null ? null : converter.convertType(input.superClass);

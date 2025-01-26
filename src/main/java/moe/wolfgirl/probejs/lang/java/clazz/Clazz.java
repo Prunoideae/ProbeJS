@@ -4,13 +4,13 @@ import dev.latvian.mods.kubejs.KubeJS;
 import dev.latvian.mods.kubejs.script.KubeJSContext;
 import dev.latvian.mods.kubejs.script.ScriptManager;
 import dev.latvian.mods.rhino.JavaMembers;
+import dev.latvian.mods.rhino.type.TypeInfo;
+import dev.latvian.mods.rhino.type.VariableTypeInfo;
 import dev.latvian.mods.rhino.util.HideFromJS;
 import moe.wolfgirl.probejs.lang.java.base.TypeVariableHolder;
 import moe.wolfgirl.probejs.lang.java.clazz.members.ConstructorInfo;
 import moe.wolfgirl.probejs.lang.java.clazz.members.FieldInfo;
 import moe.wolfgirl.probejs.lang.java.clazz.members.MethodInfo;
-import moe.wolfgirl.probejs.lang.java.type.TypeAdapter;
-import moe.wolfgirl.probejs.lang.java.type.TypeDescriptor;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.*;
@@ -26,8 +26,8 @@ public class Clazz extends TypeVariableHolder {
     public final List<FieldInfo> fields;
     public final List<MethodInfo> methods;
     @Nullable
-    public final TypeDescriptor superClass;
-    public final List<TypeDescriptor> interfaces;
+    public final TypeInfo superClass;
+    public final List<TypeInfo> interfaces;
     public final ClassAttribute attribute;
     public int recursionDepth;
 
@@ -51,7 +51,7 @@ public class Clazz extends TypeVariableHolder {
                 // .filter(m -> !m.method.isSynthetic())
                 .filter(m -> !hasIdenticalParentMethodAndEnsureNotDirectlyImplementsInterfaceSinceTypeScriptDoesNotHaveInterfaceAtRuntimeInTypeDeclarationFilesJustBecauseItSucks(m.method, clazz))
                 .map(method -> {
-                    Map<TypeVariable<?>, Type> replacement = getGenericTypeReplacementForParentInterfaceMethodsJustBecauseJavaDoNotKnowToReplaceThemWithGenericArgumentsOfThisClass(clazz, method.method);
+                    Map<String, TypeInfo> replacement = getGenericTypeReplacementForParentInterfaceMethodsJustBecauseJavaDoNotKnowToReplaceThemWithGenericArgumentsOfThisClass(clazz, method.method);
                     return new MethodInfo(method, replacement);
                 })
                 .collect(Collectors.toList());
@@ -63,12 +63,12 @@ public class Clazz extends TypeVariableHolder {
 
 
         if (clazz.getSuperclass() != Object.class) {
-            this.superClass = TypeAdapter.getTypeDescription(clazz.getAnnotatedSuperclass());
+            this.superClass = TypeInfo.of(clazz.getGenericSuperclass());
         } else {
             this.superClass = null;
         }
-        this.interfaces = Arrays.stream(clazz.getAnnotatedInterfaces())
-                .map(TypeAdapter::getTypeDescription)
+        this.interfaces = Arrays.stream(clazz.getGenericInterfaces())
+                .map(TypeInfo::of)
                 .collect(Collectors.toList());
         this.attribute = new ClassAttribute(clazz);
         this.recursionDepth = 0;
@@ -128,23 +128,20 @@ public class Clazz extends TypeVariableHolder {
      * 我不会干什么👁👁
      * 我只是喜欢看着你而已👁👁
      */
-    private static Map<TypeVariable<?>, Type> getGenericTypeReplacementForParentInterfaceMethodsJustBecauseJavaDoNotKnowToReplaceThemWithGenericArgumentsOfThisClass(Class<?> thisClass, Method thatMethod) {
+    private static Map<String, TypeInfo> getGenericTypeReplacementForParentInterfaceMethodsJustBecauseJavaDoNotKnowToReplaceThemWithGenericArgumentsOfThisClass(Class<?> thisClass, Method thatMethod) {
         Class<?> targetClass = thatMethod.getDeclaringClass();
 
-        Map<TypeVariable<?>, Type> replacement = new HashMap<>();
+        Map<String, TypeInfo> replacement = new HashMap<>();
         if (Arrays.stream(thisClass.getInterfaces()).noneMatch(c -> c.equals(targetClass))) {
             Class<?> superInterface = Arrays.stream(thisClass.getInterfaces()).filter(targetClass::isAssignableFrom).findFirst().orElse(null);
             if (superInterface == null) return Map.of();
-            Map<TypeVariable<?>, Type> parentType = getGenericTypeReplacementForParentInterfaceMethodsJustBecauseJavaDoNotKnowToReplaceThemWithGenericArgumentsOfThisClass(superInterface, thatMethod);
-            Map<TypeVariable<?>, Type> parentReplacement = getInterfaceRemap(thisClass, superInterface);
+            Map<String, TypeInfo> parentType = getGenericTypeReplacementForParentInterfaceMethodsJustBecauseJavaDoNotKnowToReplaceThemWithGenericArgumentsOfThisClass(superInterface, thatMethod);
+            Map<String, TypeInfo> parentReplacement = getInterfaceRemap(thisClass, superInterface);
 
-            for (Map.Entry<TypeVariable<?>, Type> entry : parentType.entrySet()) {
-                TypeVariable<?> variable = entry.getKey();
-                Type type = entry.getValue();
-
-                replacement.put(variable,
-                        type instanceof TypeVariable<?> typeVariable ? parentReplacement.getOrDefault(typeVariable, typeVariable) : type
-                );
+            for (Map.Entry<String, TypeInfo> entry : parentType.entrySet()) {
+                String variable = entry.getKey();
+                TypeInfo type = entry.getValue();
+                replacement.put(variable, type instanceof VariableTypeInfo typeVariable ? parentReplacement.getOrDefault(typeVariable.getName(), typeVariable) : type);
             }
         } else {
             return getInterfaceRemap(thisClass, targetClass);
@@ -152,15 +149,15 @@ public class Clazz extends TypeVariableHolder {
         return replacement;
     }
 
-    private static Map<TypeVariable<?>, Type> getInterfaceRemap(Class<?> thisClass, Class<?> thatInterface) {
-        Map<TypeVariable<?>, Type> replacement = new HashMap<>();
+    private static Map<String, TypeInfo> getInterfaceRemap(Class<?> thisClass, Class<?> thatInterface) {
+        Map<String, TypeInfo> replacement = new HashMap<>();
         int indexOfInterface = -1;
         for (Type type : thisClass.getGenericInterfaces()) {
             if (type instanceof ParameterizedType parameterizedType) {
                 if (parameterizedType.getRawType().equals(thatInterface)) {
                     indexOfInterface = 0;
                     for (TypeVariable<?> typeVariable : thatInterface.getTypeParameters()) {
-                        replacement.put(typeVariable, parameterizedType.getActualTypeArguments()[indexOfInterface]);
+                        replacement.put(typeVariable.getName(), TypeInfo.of(parameterizedType.getActualTypeArguments()[indexOfInterface]));
                         indexOfInterface++;
                     }
                 }
@@ -170,7 +167,7 @@ public class Clazz extends TypeVariableHolder {
                     for (TypeVariable<?> typeVariable : thatInterface.getTypeParameters()) {
                         // Raw use of parameterized type, so we fill with Object.class
                         // Very bad programming practice, but we have to prepare for random people coding their stuffs bad
-                        replacement.put(typeVariable, Object.class);
+                        replacement.put(typeVariable.getName(), TypeInfo.OBJECT);
                     }
                 }
             }

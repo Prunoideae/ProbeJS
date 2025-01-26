@@ -1,8 +1,6 @@
 package moe.wolfgirl.probejs.lang.java.clazz;
 
-import dev.latvian.mods.kubejs.util.UtilsJS;
 import dev.latvian.mods.rhino.util.HideFromJS;
-import moe.wolfgirl.probejs.lang.java.ClassRegistry;
 
 import java.io.IOException;
 import java.lang.reflect.TypeVariable;

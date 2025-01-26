@@ -18,7 +18,7 @@ installed by opening the Extensions view (`Ctrl+Shift+X`) and searching for
 `@builtin typescript`. You should see `TypeScript and JavaScript Language Features`
 in the list.
 
-![VSCode TypeScript Extension](./vscode-typescript-extension.png)
+    ![VSCode TypeScript Extension](./vscode-typescript-extension.png)
 
 3. Confirm that your VSCode is able to recognize JavaScript and TypeScript files. You can download a [JS project template](https://static.wolfgirl.moe/object-service/unchecked/probejs/project-template.zip) at here.
     1. Extract the downloaded file to a folder.
@@ -35,7 +35,12 @@ With a correctly configured editor, you can now install ProbeJS to generate typi
 3. Launch the game and load your world, the dump will be executed automatically.
 4. Open the `.minecraft` folder with VSCode and navigate to the `kubejs` folder, you should see `src` and `jsconfig.json` files generated in each script folder.
 
-![Modified KubeJS Folder](./dump_structure.png)
+    ![Minecraft Folder](./minecraft_folder.png)
+    ![Modified KubeJS Folder](./dump_structure.png)
+
+    **STOP TALKING ABOUT OPENING THE KUBEJS FOLDER IN VSCODE, OPEN .MINECRAFT INSTEAD**
+
+    **THIS IS WRONG, AND YOU SHOULD NOT TEACH PEOPLE TO DO THIS**
 
 5. With VSCode properly set up and ProbeJS dumping generated, you should have code completion and type checking for your KubeJS scripts.
 
@@ -51,10 +56,10 @@ Features:
 
 - [x] Insert item and block strings automatically when you trigger `KubeJS Info` in game.
 - [x] Syncing script errors and warnings from the game to the editor.
-- [x] Jumps to the decompiled Java code of the classes you referrenced in your scripts.
 - [x] Reloading scripts from VSCode directly.
 - [x] Evaluate function or variable at runtime.
-- [ ] Decorate item/block/fluid string with their icons.
+- [x] Decorate item/block/fluid string with their icons.
+- [x] Provides completions in JavaScript/TypeScript files.
 
 ### Error Lens
 

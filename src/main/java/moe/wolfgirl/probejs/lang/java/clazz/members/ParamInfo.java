@@ -1,20 +1,19 @@
 package moe.wolfgirl.probejs.lang.java.clazz.members;
 
+import dev.latvian.mods.rhino.type.TypeInfo;
 import moe.wolfgirl.probejs.lang.java.base.AnnotationHolder;
-import moe.wolfgirl.probejs.lang.java.type.TypeAdapter;
-import moe.wolfgirl.probejs.lang.java.type.TypeDescriptor;
 
 import java.lang.reflect.Parameter;
 
 public class ParamInfo extends AnnotationHolder {
     public String name;
-    public TypeDescriptor type;
+    public TypeInfo type;
     public final boolean varArgs;
 
     public ParamInfo(Parameter parameter) {
         super(parameter.getAnnotations());
         this.name = parameter.getName();
-        this.type = TypeAdapter.getTypeDescription(parameter.getAnnotatedType());
+        this.type = TypeInfo.of(parameter.getParameterizedType());
         this.varArgs = parameter.isVarArgs();
     }
 

@@ -1,12 +1,12 @@
 package moe.wolfgirl.probejs.lang.transpiler.transformation;
 
+import dev.latvian.mods.rhino.type.ClassTypeInfo;
+import dev.latvian.mods.rhino.type.ParameterizedTypeInfo;
 import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.lang.java.clazz.Clazz;
 import moe.wolfgirl.probejs.lang.java.clazz.members.ConstructorInfo;
 import moe.wolfgirl.probejs.lang.java.clazz.members.MethodInfo;
 import moe.wolfgirl.probejs.lang.java.clazz.members.ParamInfo;
-import moe.wolfgirl.probejs.lang.java.type.impl.ClassType;
-import moe.wolfgirl.probejs.lang.java.type.impl.ParamType;
 import moe.wolfgirl.probejs.lang.typescript.code.member.ConstructorDecl;
 import moe.wolfgirl.probejs.lang.typescript.code.member.MethodDecl;
 import moe.wolfgirl.probejs.lang.typescript.code.member.ParamDecl;
@@ -66,13 +66,13 @@ public class InjectSpecialType implements ClassTransformer {
     }
 
     public static void modifyLambda(ParamDecl param, ParamInfo info) {
-        if (info.type instanceof ParamType paramType &&
-                paramType.base instanceof ClassType classType &&
-                classType.clazz.isAnnotationPresent(FunctionalInterface.class) &&
+        if (info.type instanceof ParameterizedTypeInfo paramType &&
+                paramType.rawType() instanceof ClassTypeInfo classType &&
+                classType.asClass().isAnnotationPresent(FunctionalInterface.class) &&
                 param.type instanceof TSParamType tsParamType) {
 
             List<BaseType> params = new ArrayList<>(tsParamType.params);
-            int returnIndex = findReturnTypeIndex(classType.clazz);
+            int returnIndex = findReturnTypeIndex(classType.asClass());
             for (int i = 0; i < params.size(); i++) {
                 BaseType p = params.get(i);
                 params.set(i, Types.ignoreContext(p, returnIndex == i ?

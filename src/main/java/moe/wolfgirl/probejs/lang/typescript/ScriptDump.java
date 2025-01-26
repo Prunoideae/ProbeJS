@@ -8,7 +8,6 @@ import dev.latvian.mods.kubejs.KubeJSPaths;
 import dev.latvian.mods.kubejs.script.ScriptManager;
 import dev.latvian.mods.kubejs.script.ScriptType;
 import dev.latvian.mods.kubejs.server.ServerScriptManager;
-import dev.latvian.mods.kubejs.util.UtilsJS;
 import moe.wolfgirl.probejs.ProbeJS;
 import moe.wolfgirl.probejs.ProbePaths;
 import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
@@ -204,7 +203,10 @@ public class ScriptDump {
                 // }
                 String symbol = classPath.getName() + "_";
                 String exportedSymbol = ImportInfo.INPUT_TEMPLATE.formatted(classPath.getName());
+                String originalSymbol = ImportInfo.OUTPUT_TEMPLATE.formatted(classPath.getName());
+
                 BaseType exportedType = Types.type(classPath);
+                BaseType outputType = Types.ignoreContext(exportedType, BaseType.FormatType.RETURN);
                 BaseType thisType = Types.type(classPath);
                 List<String> generics = classDecl.variableTypes.stream().map(v -> v.symbol).toList();
 
@@ -212,8 +214,10 @@ public class ScriptDump {
                     String suffix = "<%s>".formatted(String.join(", ", generics));
                     symbol = symbol + suffix;
                     exportedSymbol = exportedSymbol + suffix;
+                    originalSymbol = originalSymbol + suffix;
                     thisType = Types.parameterized(thisType, generics.stream().map(Types::generic).toArray(BaseType[]::new));
                     exportedType = Types.parameterized(exportedType, generics.stream().map(Types::generic).toArray(BaseType[]::new));
+                    outputType = Types.parameterized(outputType, generics.stream().map(Types::generic).toArray(BaseType[]::new));
                 }
                 exportedType = Types.ignoreContext(exportedType, BaseType.FormatType.INPUT);
                 thisType = Types.ignoreContext(thisType, BaseType.FormatType.RETURN);
@@ -240,6 +244,8 @@ public class ScriptDump {
                         symbol,
                         exportedType
                 );
+                TypeDecl originalType = new TypeDecl(originalSymbol, outputType);
+
                 Wrapped.Global typeExport = new Wrapped.Global();
                 typeExport.addCode(globalType);
                 convertibleType.addComment("""
@@ -250,10 +256,14 @@ public class ScriptDump {
                         Global type exported for convenience, use class-specific
                         types if there's a naming conflict.
                         """);
+                originalType.addComment("""
+                        Original type to represent the class type itself. Use in JSDoc only.
+                        """);
                 for (TypeDecl delegatedType : delegatedTypes) {
                     output.addCode(delegatedType);
                 }
                 output.addCode(convertibleType);
+                output.addCode(originalType);
                 output.addCode(typeExport);
 
                 BufferedWriter writer = files.computeIfAbsent(classPath.getFileKey(), key -> {

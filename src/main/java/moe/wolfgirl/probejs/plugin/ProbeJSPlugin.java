@@ -80,7 +80,7 @@ public class ProbeJSPlugin implements KubeJSPlugin {
     }
 
     /**
-     * Provides Java classes for the class registry to discover.
+     * Provides Java classes for the class registry to discoverContainedTypes.
      */
     @HideFromJS
     public Set<Class<?>> provideJavaClass(ScriptDump scriptDump) {

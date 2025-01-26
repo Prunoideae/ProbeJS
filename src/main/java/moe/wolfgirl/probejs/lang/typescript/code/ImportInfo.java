@@ -7,6 +7,7 @@ import java.util.function.UnaryOperator;
 public record ImportInfo(ClassPath classPath, Type type) {
     public static final UnaryOperator<String> ORIGINAL = s -> s;
     public static final String INPUT_TEMPLATE = "%s$$Type";
+    public static final String OUTPUT_TEMPLATE = "%s$$Original";
     public static final String STATIC_TEMPLATE = "%s$$Static";
 
     public enum Type {

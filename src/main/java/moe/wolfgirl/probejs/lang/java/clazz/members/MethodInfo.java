@@ -1,23 +1,21 @@
 package moe.wolfgirl.probejs.lang.java.clazz.members;
 
 import dev.latvian.mods.rhino.Context;
-import moe.wolfgirl.probejs.ProbeJS;
+import dev.latvian.mods.rhino.type.TypeInfo;
 import moe.wolfgirl.probejs.lang.java.base.TypeVariableHolder;
-import moe.wolfgirl.probejs.lang.java.type.TypeAdapter;
-import moe.wolfgirl.probejs.lang.java.type.TypeDescriptor;
+import moe.wolfgirl.probejs.lang.java.TypeAdapter;
 import dev.latvian.mods.rhino.JavaMembers;
 
 import java.lang.reflect.*;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class MethodInfo extends TypeVariableHolder {
     public final String name;
     public final List<ParamInfo> params;
-    public TypeDescriptor returnType;
+    public TypeInfo returnType;
     public final MethodAttributes attributes;
 
-    public MethodInfo(JavaMembers.MethodInfo methodInfo, Map<TypeVariable<?>, Type> remapper) {
+    public MethodInfo(JavaMembers.MethodInfo methodInfo, Map<String, TypeInfo> remapper) {
         super(methodInfo.method.getTypeParameters(), methodInfo.method.getAnnotations());
         Method method = methodInfo.method;
         this.attributes = new MethodAttributes(method);
@@ -31,16 +29,16 @@ public class MethodInfo extends TypeVariableHolder {
             this.params.add(new ParamInfo(parameter));
         }
 
-        this.returnType = TypeAdapter.getTypeDescription(method.getAnnotatedReturnType());
+        this.returnType = TypeInfo.of(method.getGenericReturnType());
 
-        for (Map.Entry<TypeVariable<?>, Type> entry : remapper.entrySet()) {
-            TypeVariable<?> symbol = entry.getKey();
-            TypeDescriptor replacement = TypeAdapter.getTypeDescription(entry.getValue());
+        for (Map.Entry<String, TypeInfo> entry : remapper.entrySet()) {
+            String symbol = entry.getKey();
+            TypeInfo replacement = entry.getValue();
 
             for (ParamInfo param : this.params) {
-                param.type = TypeAdapter.consolidateType(param.type, symbol.getName(), replacement);
+                param.type = TypeAdapter.consolidateType(param.type, symbol, replacement);
             }
-            this.returnType = TypeAdapter.consolidateType(this.returnType, symbol.getName(), replacement);
+            this.returnType = TypeAdapter.consolidateType(this.returnType, symbol, replacement);
         }
     }
 

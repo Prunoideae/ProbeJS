@@ -33,7 +33,7 @@ public class Attachments extends ProbeJSPlugin {
                 BlockEntityAttachmentType.ALL.get()
                         .entrySet()
                         .stream()
-                        .map(entry -> Pair.of(entry.getKey(), converter.convertType(entry.getValue().typeInfo())))
+                        .map(entry -> Pair.of(entry.getKey().toString(), converter.convertType(entry.getValue().typeInfo())))
                         .collect(Collectors.toSet()),
                 typeScriptFile);
 
