@@ -2,6 +2,7 @@ package moe.wolfgirl.probejs.plugin;
 
 import com.mojang.datafixers.util.Pair;
 
+import dev.latvian.mods.kubejs.neoforge.NativeEventWrapper;
 import dev.latvian.mods.kubejs.plugin.KubeJSPlugin;
 import dev.latvian.mods.kubejs.plugin.KubeJSPlugins;
 import dev.latvian.mods.rhino.util.HideFromJS;
@@ -107,5 +108,9 @@ public class ProbeJSPlugin implements KubeJSPlugin {
      */
     public Set<Class<?>> filterScannedClasses(Set<Class<?>> clazz) {
         return Set.of();
+    }
+
+    protected final TypeScriptFile findClassFile(Map<ClassPath, TypeScriptFile> globalClasses, Class<?> clazz) {
+        return globalClasses.get(new ClassPath(clazz));
     }
 }

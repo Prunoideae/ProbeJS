@@ -82,6 +82,13 @@ public class TypeConverter {
                 }
                 yield Types.parameterized(base, params);
             }
+            case VariableTypeInfo info -> {
+                TypeInfo extendsOn = TypeInfo.of(info.asClass());
+                if (baseType && extendsOn != TypeInfo.OBJECT) {
+                    yield Types.generic(info.getName(), convertType(extendsOn, false));
+                }
+                yield Types.generic(info.getName());
+            }
             case null, default -> Types.ANY;
         };
     }

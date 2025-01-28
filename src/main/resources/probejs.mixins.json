@@ -5,9 +5,12 @@
     "client": [
         "LootTableMixin",
         "RecipeManagerMixin",
-        "TranslatableMixin"
+        "TranslatableMixin",
+        "JavaWrapperMixin"
     ],
-    "mixins": [],
+    "mixins": [
+
+    ],
     "injectors": {
         "defaultRequire": 1
     },

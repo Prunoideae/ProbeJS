@@ -1,6 +1,5 @@
 package moe.wolfgirl.probejs.lang.typescript.code;
 
-import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.lang.typescript.Declaration;
 
 import java.util.Collection;

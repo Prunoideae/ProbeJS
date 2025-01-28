@@ -52,7 +52,8 @@ public class ProbeBuiltinDocs extends ProbeJSPlugin {
             ViewerEvents::new,
             Attachments::new,
             LoadClass::new,
-            ItemComponents::new
+            ItemComponents::new,
+            ObjectIDs::new
     ));
 
     private static void forEach(Consumer<ProbeJSPlugin> consumer) {

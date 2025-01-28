@@ -6,6 +6,7 @@ import dev.latvian.mods.kubejs.plugin.KubeJSPlugins;
 import dev.latvian.mods.kubejs.script.ScriptType;
 import dev.latvian.mods.kubejs.script.TypeDescriptionRegistry;
 import dev.latvian.mods.rhino.type.TypeInfo;
+import moe.wolfgirl.probejs.ProbeJS;
 import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.lang.transpiler.TypeConverter;
 import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
@@ -21,7 +22,13 @@ public class AdditionalTypes extends ProbeJSPlugin {
     @Override
     public void assignType(ScriptDump scriptDump) {
         TypeDescriptions typeDescriptions = new TypeDescriptions(scriptDump.scriptType);
-        KubeJSPlugins.forEachPlugin(plugin -> plugin.registerTypeDescriptions(typeDescriptions));
+        KubeJSPlugins.forEachPlugin(plugin -> {
+            try {
+                plugin.registerTypeDescriptions(typeDescriptions);
+            } catch (Throwable t) {
+                ProbeJS.LOGGER.warn("Plugin %s thrown an error when registering additional types: %s".formatted(plugin.getClass(), t));
+            }
+        });
         TypeConverter typeConverter = scriptDump.transpiler.typeConverter;
 
         for (Map.Entry<Class<?>, TypeInfo> entry : typeDescriptions.registries.entries()) {

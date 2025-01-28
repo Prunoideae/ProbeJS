@@ -1,6 +1,5 @@
 package moe.wolfgirl.probejs.lang.transpiler.transformation;
 
-import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.lang.java.clazz.Clazz;
 import moe.wolfgirl.probejs.lang.typescript.Declaration;
 import moe.wolfgirl.probejs.lang.typescript.code.Code;
