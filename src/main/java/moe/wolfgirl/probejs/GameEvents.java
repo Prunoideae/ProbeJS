@@ -16,11 +16,13 @@ import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
+import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
 import net.neoforged.neoforge.common.util.FakePlayer;
 import net.neoforged.neoforge.event.entity.EntityTravelToDimensionEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 
 
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 @EventBusSubscriber(value = Dist.CLIENT)
@@ -136,19 +138,19 @@ public class GameEvents {
 
     @SubscribeEvent
     public static void rightClickedBlock(PlayerInteractEvent.RightClickBlock event) {
-        if (event.getSide() == LogicalSide.SERVER) GlobalStates.LAST_RIGHTCLICKED = event.getPos();
+        if (event.getSide() == LogicalSide.SERVER) GameStates.LAST_RIGHTCLICKED = event.getPos();
     }
 
     @SubscribeEvent
     public static void rightClickedEntity(PlayerInteractEvent.EntityInteract event) {
-        if (event.getSide() == LogicalSide.SERVER) GlobalStates.LAST_ENTITY = event.getTarget();
+        if (event.getSide() == LogicalSide.SERVER) GameStates.LAST_ENTITY = event.getTarget();
     }
 
     @SubscribeEvent
     public static void changedDimension(EntityTravelToDimensionEvent event) {
         if (event.getEntity() instanceof Player player && !(player instanceof FakePlayer)) {
-            GlobalStates.LAST_RIGHTCLICKED = null;
-            GlobalStates.LAST_ENTITY = null;
+            GameStates.LAST_RIGHTCLICKED = null;
+            GameStates.LAST_ENTITY = null;
         }
     }
 }

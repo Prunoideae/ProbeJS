@@ -2,7 +2,6 @@ package moe.wolfgirl.probejs.plugin;
 
 import com.mojang.datafixers.util.Pair;
 
-import dev.latvian.mods.kubejs.neoforge.NativeEventWrapper;
 import dev.latvian.mods.kubejs.plugin.KubeJSPlugin;
 import dev.latvian.mods.kubejs.plugin.KubeJSPlugins;
 import dev.latvian.mods.rhino.util.HideFromJS;

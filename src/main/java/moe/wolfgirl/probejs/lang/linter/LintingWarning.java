@@ -1,9 +1,9 @@
 package moe.wolfgirl.probejs.lang.linter;
 
 import com.google.gson.JsonElement;
-import dev.latvian.mods.kubejs.bindings.ColorWrapper;
 
 import dev.latvian.mods.kubejs.color.KubeColor;
+import dev.latvian.mods.kubejs.plugin.builtin.wrapper.ColorWrapper;
 import moe.wolfgirl.probejs.ProbeJS;
 import net.minecraft.network.chat.Component;
 

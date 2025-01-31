@@ -1,7 +1,7 @@
 package moe.wolfgirl.probejs.mixins;
 
 import com.google.gson.JsonObject;
-import moe.wolfgirl.probejs.GlobalStates;
+import moe.wolfgirl.probejs.GameStates;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
@@ -19,7 +19,7 @@ public class RecipeManagerMixin {
     private void apply(Map<ResourceLocation, JsonObject> map, ResourceManager resourceManager, ProfilerFiller profiler, CallbackInfo ci) {
         for (ResourceLocation resourceLocation : map.keySet()) {
             if (!resourceLocation.getPath().startsWith("kjs_")) {
-                GlobalStates.RECIPE_IDS.add(resourceLocation.toString());
+                GameStates.RECIPE_IDS.add(resourceLocation.toString());
             }
         }
     }

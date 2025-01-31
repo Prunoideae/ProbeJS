@@ -4,12 +4,15 @@ import dev.latvian.mods.rhino.type.TypeInfo;
 import dev.latvian.mods.rhino.type.VariableTypeInfo;
 import dev.latvian.mods.rhino.util.HideFromJS;
 import moe.wolfgirl.probejs.ProbeConfig;
+import moe.wolfgirl.probejs.ProbeJS;
 import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.lang.java.clazz.Clazz;
 import moe.wolfgirl.probejs.lang.java.clazz.members.ConstructorInfo;
 import moe.wolfgirl.probejs.lang.java.clazz.members.FieldInfo;
 import moe.wolfgirl.probejs.lang.java.clazz.members.MethodInfo;
 import moe.wolfgirl.probejs.lang.java.clazz.members.ParamInfo;
+import moe.wolfgirl.probejs.utils.GameUtils;
+import moe.wolfgirl.probejs.utils.ProbeFileUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -114,12 +117,15 @@ public class ClassRegistry {
             currentClasses.clear();
             for (Class<?> c : fetchedClass) {
                 try {
+                    if (c.isPrimitive()) continue;
                     Class.forName(c.getName());
                     Clazz clazz = new Clazz(c);
                     clazz.recursionDepth = recursion;
                     putClass(clazz.classPath, clazz);
                     currentClasses.add(clazz);
-                } catch (Throwable ignore) {
+                } catch (Throwable err) {
+                    ProbeJS.LOGGER.error("Error occurred when resolving class %s".formatted(c));
+                    GameUtils.logException(err);
                 }
             }
             recursion++;

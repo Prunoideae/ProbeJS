@@ -1,6 +1,7 @@
 package moe.wolfgirl.probejs.docs.events;
 
 import dev.latvian.mods.kubejs.event.EventHandler;
+import dev.latvian.mods.kubejs.plugin.builtin.event.RecipeViewerEvents;
 import dev.latvian.mods.kubejs.recipe.viewer.*;
 import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.lang.transpiler.TypeConverter;

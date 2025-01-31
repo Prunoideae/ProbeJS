@@ -1,12 +1,12 @@
 package moe.wolfgirl.probejs.docs.assignments;
 
-import dev.latvian.mods.kubejs.bindings.ColorWrapper;
 import dev.latvian.mods.kubejs.block.BlockTintFunction;
 import dev.latvian.mods.kubejs.block.MapColorHelper;
 import dev.latvian.mods.kubejs.block.state.BlockStatePredicate;
 import dev.latvian.mods.kubejs.color.KubeColor;
 import dev.latvian.mods.kubejs.core.PlayerSelector;
 import dev.latvian.mods.kubejs.item.ItemTintFunction;
+import dev.latvian.mods.kubejs.plugin.builtin.wrapper.ColorWrapper;
 import dev.latvian.mods.kubejs.recipe.match.ReplacementMatch;
 import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
 import moe.wolfgirl.probejs.docs.Primitives;

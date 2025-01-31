@@ -1,7 +1,7 @@
 package moe.wolfgirl.probejs.docs;
 
 
-import dev.latvian.mods.kubejs.neoforge.NativeEventWrapper;
+import dev.latvian.mods.kubejs.plugin.builtin.wrapper.NativeEventWrapper;
 import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.lang.typescript.code.ImportInfo;
 import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;

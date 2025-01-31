@@ -5,7 +5,7 @@ import dev.latvian.mods.kubejs.script.KubeJSContext;
 import dev.latvian.mods.kubejs.script.ScriptType;
 import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.rhino.Context;
-import moe.wolfgirl.probejs.GlobalStates;
+import moe.wolfgirl.probejs.GameStates;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.Entity;
@@ -41,15 +41,15 @@ public class Probe {
 
     public LevelBlock getLastRightClickedBlock(Context context) {
         testSourceFile(context);
-        if (GlobalStates.LAST_RIGHTCLICKED == null) return null;
+        if (GameStates.LAST_RIGHTCLICKED == null) return null;
         Player currentPlayer = getCurrentPlayer(context);
         if (currentPlayer == null) return null;
-        return currentPlayer.level().kjs$getBlock(GlobalStates.LAST_RIGHTCLICKED);
+        return currentPlayer.level().kjs$getBlock(GameStates.LAST_RIGHTCLICKED);
     }
 
     public Entity getLastRightClickedEntity(Context context) {
         testSourceFile(context);
-        if (GlobalStates.LAST_ENTITY == null) return null;
-        return GlobalStates.LAST_ENTITY;
+        if (GameStates.LAST_ENTITY == null) return null;
+        return GameStates.LAST_ENTITY;
     }
 }

@@ -1,9 +1,7 @@
 package moe.wolfgirl.probejs.lang.java.clazz;
 
-import dev.latvian.mods.kubejs.KubeJS;
-import dev.latvian.mods.kubejs.script.KubeJSContext;
-import dev.latvian.mods.kubejs.script.ScriptManager;
-import dev.latvian.mods.rhino.JavaMembers;
+import dev.latvian.mods.rhino.CachedClassInfo;
+import dev.latvian.mods.rhino.CachedClassStorage;
 import dev.latvian.mods.rhino.type.TypeInfo;
 import dev.latvian.mods.rhino.type.VariableTypeInfo;
 import dev.latvian.mods.rhino.util.HideFromJS;
@@ -34,31 +32,30 @@ public class Clazz extends TypeVariableHolder {
     public Clazz(Class<?> clazz) {
         super(clazz.getTypeParameters(), clazz.getAnnotations());
 
-        ScriptManager manager = KubeJS.getStartupScriptManager();
-        KubeJSContext context = (KubeJSContext) manager.contextFactory.enter();
-        JavaMembers members = JavaMembers.lookupClass(context, context.topLevelScope, clazz, clazz, false);
+        CachedClassInfo classInfo = CachedClassStorage.GLOBAL_PUBLIC.get(clazz);
 
         this.original = clazz;
         this.classPath = new ClassPath(clazz);
-        this.constructors = members.getAccessibleConstructors()
+        this.constructors = classInfo.getConstructors()
                 .stream()
-                .map(ConstructorInfo::new)
+                .map(constructorInfo -> new ConstructorInfo(constructorInfo, constructorInfo.getCached()))
                 .collect(Collectors.toList());
         Set<String> names = new HashSet<>();
-        this.methods = members.getAccessibleMethods(context, false)
+
+        this.methods = classInfo.getAccessibleMethods(false)
                 .stream()
-                .peek(m -> names.add(m.name))
+                .peek(m -> names.add(m.getName()))
                 // .filter(m -> !m.method.isSynthetic())
-                .filter(m -> !hasIdenticalParentMethodAndEnsureNotDirectlyImplementsInterfaceSinceTypeScriptDoesNotHaveInterfaceAtRuntimeInTypeDeclarationFilesJustBecauseItSucks(m.method, clazz))
+                .filter(m -> !hasIdenticalParentMethodAndEnsureNotDirectlyImplementsInterfaceSinceTypeScriptDoesNotHaveInterfaceAtRuntimeInTypeDeclarationFilesJustBecauseItSucks(m.getInfo().getCached(), clazz))
                 .map(method -> {
-                    Map<String, TypeInfo> replacement = getGenericTypeReplacementForParentInterfaceMethodsJustBecauseJavaDoNotKnowToReplaceThemWithGenericArgumentsOfThisClass(clazz, method.method);
-                    return new MethodInfo(method, replacement);
+                    Map<String, TypeInfo> replacement = getGenericTypeReplacementForParentInterfaceMethodsJustBecauseJavaDoNotKnowToReplaceThemWithGenericArgumentsOfThisClass(clazz, method.getInfo().getCached());
+                    return new MethodInfo(method.getName(), method.getInfo(), method.getInfo().getCached(), replacement);
                 })
                 .collect(Collectors.toList());
-        this.fields = members.getAccessibleFields(context, false)
+        this.fields = classInfo.getAccessibleFields(false)
                 .stream()
-                .filter(f -> !names.contains(f.name))
-                .map(FieldInfo::new)
+                .filter(f -> !names.contains(f.getName()))
+                .map(fieldInfo -> new FieldInfo(fieldInfo.getName(), fieldInfo.getInfo(), fieldInfo.getInfo().getCached()))
                 .collect(Collectors.toList());
 
 

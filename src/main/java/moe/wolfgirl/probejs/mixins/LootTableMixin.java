@@ -1,7 +1,7 @@
 package moe.wolfgirl.probejs.mixins;
 
 import com.mojang.serialization.DynamicOps;
-import moe.wolfgirl.probejs.GlobalStates;
+import moe.wolfgirl.probejs.GameStates;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.storage.loot.LootDataType;
 import org.spongepowered.asm.mixin.Mixin;
@@ -15,6 +15,6 @@ import java.util.Optional;
 public abstract class LootTableMixin<T> {
     @Inject(method = "deserialize", at = @At("RETURN"))
     public <V> void apply(ResourceLocation resourceLocation, DynamicOps<V> ops, V value, CallbackInfoReturnable<Optional<T>> cir) {
-        GlobalStates.LOOT_TABLES.add(resourceLocation.toString());
+        GameStates.LOOT_TABLES.add(resourceLocation.toString());
     }
 }

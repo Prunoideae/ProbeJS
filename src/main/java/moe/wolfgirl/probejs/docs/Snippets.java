@@ -1,6 +1,6 @@
 package moe.wolfgirl.probejs.docs;
 
-import moe.wolfgirl.probejs.GlobalStates;
+import moe.wolfgirl.probejs.GameStates;
 import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
 import moe.wolfgirl.probejs.lang.snippet.SnippetDump;
 import moe.wolfgirl.probejs.lang.snippet.parts.Variable;
@@ -44,7 +44,7 @@ public class Snippets extends ProbeJSPlugin {
                 .prefix("#requires")
                 .description("Creates the file header for `requires`.")
                 .literal("// requires: ")
-                .choices(GlobalStates.MODS.get());
+                .choices(GameStates.MODS.get());
 
         dump.snippet("itemstack")
                 .prefix("#itemstack")

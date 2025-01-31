@@ -1,6 +1,6 @@
 package moe.wolfgirl.probejs.docs;
 
-import dev.latvian.mods.kubejs.bindings.JavaWrapper;
+import dev.latvian.mods.kubejs.plugin.builtin.wrapper.JavaWrapper;
 import dev.latvian.mods.kubejs.script.KubeJSContext;
 import dev.latvian.mods.rhino.NativeJavaClass;
 import moe.wolfgirl.probejs.lang.java.ClassRegistry;

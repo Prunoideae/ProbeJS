@@ -1,10 +1,11 @@
 package moe.wolfgirl.probejs.lang.java.clazz.members;
 
+import dev.latvian.mods.rhino.CachedMethodInfo;
+import dev.latvian.mods.rhino.CachedParameters;
 import dev.latvian.mods.rhino.Context;
 import dev.latvian.mods.rhino.type.TypeInfo;
 import moe.wolfgirl.probejs.lang.java.base.TypeVariableHolder;
 import moe.wolfgirl.probejs.lang.java.TypeAdapter;
-import dev.latvian.mods.rhino.JavaMembers;
 
 import java.lang.reflect.*;
 import java.util.*;
@@ -15,21 +16,31 @@ public class MethodInfo extends TypeVariableHolder {
     public TypeInfo returnType;
     public final MethodAttributes attributes;
 
-    public MethodInfo(JavaMembers.MethodInfo methodInfo, Map<String, TypeInfo> remapper) {
-        super(methodInfo.method.getTypeParameters(), methodInfo.method.getAnnotations());
-        Method method = methodInfo.method;
-        this.attributes = new MethodAttributes(method);
-        this.name = methodInfo.name;
+    public MethodInfo(String name, CachedMethodInfo methodInfo, Method original, Map<String, TypeInfo> remapper) {
+        super(original.getTypeParameters(), original.getAnnotations());
 
-        Parameter[] parameters = method.getParameters();
+        this.attributes = new MethodAttributes(original);
+        this.name = name;
+
+        Parameter[] parameters = original.getParameters();
+        CachedParameters cachedParameters = methodInfo.getParameters();
+
         this.params = new ArrayList<>(parameters.length);
-        for (int i = 0; i < parameters.length; i++) {
-            Parameter parameter = parameters[i];
-            if (i == 0 && Context.class.isAssignableFrom(parameter.getType())) continue;
-            this.params.add(new ParamInfo(parameter));
+        if (cachedParameters.firstArgContext()) {
+            for (int i = 1; i < parameters.length; i++) {
+                Parameter parameter = parameters[i];
+                TypeInfo typeInfo = cachedParameters.typeInfos().get(i - 1);
+                this.params.add(new ParamInfo(parameter.getName(), typeInfo, parameter.isVarArgs()));
+            }
+        } else {
+            for (int i = 0; i < parameters.length; i++) {
+                Parameter parameter = parameters[i];
+                TypeInfo typeInfo = cachedParameters.typeInfos().get(i);
+                this.params.add(new ParamInfo(parameter.getName(), typeInfo, parameter.isVarArgs()));
+            }
         }
 
-        this.returnType = TypeInfo.of(method.getGenericReturnType());
+        this.returnType = methodInfo.getReturnType();
 
         for (Map.Entry<String, TypeInfo> entry : remapper.entrySet()) {
             String symbol = entry.getKey();
