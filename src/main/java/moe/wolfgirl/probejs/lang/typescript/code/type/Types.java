@@ -31,8 +31,10 @@ public interface Types {
      * @param content a string, number or boolean
      */
     static JSPrimitiveType literal(Object content) {
-        if (!(content instanceof String || content instanceof Number || content instanceof Boolean))
+        if (!(content instanceof String || content instanceof Number || content instanceof Boolean)) {
+            ProbeJS.LOGGER.warn("Non-literal object passed to literal type, this likes to be an error!");
             return ANY;
+        }
         return new JSPrimitiveType(ProbeJS.GSON.toJson(content));
     }
 

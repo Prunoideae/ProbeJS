@@ -1,7 +1,6 @@
 package moe.wolfgirl.probejs;
 
 import dev.latvian.mods.kubejs.KubeJSPaths;
-import dev.latvian.mods.kubejs.util.UtilsJS;
 
 import java.io.IOException;
 import java.nio.file.Files;

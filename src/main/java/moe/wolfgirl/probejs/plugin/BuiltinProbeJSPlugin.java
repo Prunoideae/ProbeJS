@@ -78,22 +78,22 @@ public class BuiltinProbeJSPlugin extends ProbeJSPlugin {
         transpiler.reject(Void.class);
         transpiler.reject(Void.TYPE);
 
-        transpiler.reject(Long.class);
-        transpiler.reject(Long.TYPE);
-        transpiler.reject(Integer.class);
-        transpiler.reject(Integer.TYPE);
-        transpiler.reject(Short.class);
-        transpiler.reject(Short.TYPE);
-        transpiler.reject(Byte.class);
-        transpiler.reject(Byte.TYPE);
-        transpiler.reject(Number.class);
-        transpiler.reject(Double.class);
-        transpiler.reject(Double.TYPE);
-        transpiler.reject(Float.class);
-        transpiler.reject(Float.TYPE);
+        //   transpiler.reject(Long.class);
+        // transpiler.reject(Long.TYPE);
+        // transpiler.reject(Integer.class);
+        // transpiler.reject(Integer.TYPE);
+        // transpiler.reject(Short.class);
+        // transpiler.reject(Short.TYPE);
+        // transpiler.reject(Byte.class);
+        // transpiler.reject(Byte.TYPE);
+        // transpiler.reject(Number.class);
+        // transpiler.reject(Double.class);
+        // transpiler.reject(Double.TYPE);
+        // transpiler.reject(Float.class);
+        // transpiler.reject(Float.TYPE);
 
-        transpiler.reject(Boolean.class);
-        transpiler.reject(Boolean.TYPE);
+        // transpiler.reject(Boolean.class);
+        // transpiler.reject(Boolean.TYPE);
     }
 
     @Override
