@@ -7,7 +7,7 @@ import moe.wolfgirl.probejs.lang.schema.SchemaDump;
 import moe.wolfgirl.probejs.lang.snippet.SnippetDump;
 import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
 import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
-import moe.wolfgirl.probejs.utils.ProbeFileUtils;
+import moe.wolfgirl.probejs.utils.ConfigUtils;
 import moe.wolfgirl.probejs.utils.GameUtils;
 import net.minecraft.network.chat.Component;
 
@@ -77,10 +77,6 @@ public class ProbeDump {
         }
     }
 
-    private void onRegistryChange() throws IOException {
-
-    }
-
     private void report(Component component) {
         if (progressReport == null) return;
         progressReport.accept(component);
@@ -98,7 +94,7 @@ public class ProbeDump {
         // And schemas
         schemaDump.fromDocs();
         schemaDump.writeTo(ProbePaths.WORKSPACE_SETTINGS);
-        writeVSCodeConfig();
+        ConfigUtils.writeVSCodeConfig(ProbePaths.VSCODE_JSON);
         appendGitIgnore();
 
         report(Component.translatable("probejs.dump.snippets_generated"));
@@ -107,11 +103,6 @@ public class ProbeDump {
             report(Component.translatable("probejs.dump.mod_changed").kjs$aqua());
             onModChange();
             ProbeConfig.INSTANCE.modHash.set(GameUtils.modHash());
-        }
-
-        if (GameUtils.registryHash() != ProbeConfig.INSTANCE.registryHash.get()) {
-            onRegistryChange();
-            ProbeConfig.INSTANCE.registryHash.set(GameUtils.registryHash());
         }
 
         // Fetch classes that will be used in the dump
@@ -156,22 +147,6 @@ public class ProbeDump {
         },
                 "ProbeDumpingThread-report");
         reportingThread.start();
-    }
-
-    private void writeVSCodeConfig() throws IOException {
-        ProbeFileUtils.writeMergedConfig(ProbePaths.VSCODE_JSON, """
-                {
-                    "typescript.tsserver.maxTsServerMemory": 4096,
-                    "json.schemas": [
-                        {
-                            "fileMatch": [
-                                "/recipe_schemas/*.json"
-                            ],
-                            "url": "./.vscode/recipe.json"
-                        }
-                    ]
-                }
-                """);
     }
 
     private void appendGitIgnore() throws IOException {

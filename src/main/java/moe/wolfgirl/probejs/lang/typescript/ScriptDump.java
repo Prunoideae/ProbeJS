@@ -22,8 +22,8 @@ import moe.wolfgirl.probejs.lang.typescript.code.ts.Wrapped;
 import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
 import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
 import moe.wolfgirl.probejs.lang.typescript.code.type.js.JSJoinedType;
+import moe.wolfgirl.probejs.utils.ConfigUtils;
 import moe.wolfgirl.probejs.utils.GameUtils;
-import moe.wolfgirl.probejs.utils.ProbeFileUtils;
 import net.neoforged.api.distmarker.OnlyIn;
 import org.apache.commons.io.FileUtils;
 
@@ -313,50 +313,13 @@ public class ScriptDump {
 
     }
 
-    public void dumpJSConfig() throws IOException {
-        ProbeFileUtils.writeMergedConfig(scriptPath.resolve("jsconfig.json"), """
-                {
-                    "compilerOptions": {
-                        "module": "commonjs",
-                        "target": "ES2015",
-                        "lib": [
-                            "ES5",
-                            "ES2015"
-                        ],
-                        "rootDir": ".",
-                        "typeRoots": [
-                            "../../.probe/%s/probe-types"
-                        ],
-                        "baseUrl": "../../.probe/%s/probe-types",
-                        "skipLibCheck": true
-                    },
-                    "include": [
-                        "./**/*.js",
-                        "./**/*.ts",
-                    ]
-                }
-                """.formatted(basePath.getFileName(), basePath.getFileName())
-        );
-    }
-
     public void removeClasses() throws IOException {
         FileUtils.deleteDirectory(getTypeFolder().toFile());
     }
 
     public void dump() throws IOException, ClassNotFoundException {
-        // getSource();
-        // if (ProbeConfig.INSTANCE.interactive.get()){
-        //     getTest();
-        // }
-
         dumpClasses();
         dumpGlobal();
-        dumpJSConfig();
-    }
-
-    private static void write(Path writeTo, String content) throws IOException {
-        try (BufferedWriter writer = Files.newBufferedWriter(writeTo)) {
-            writer.write(content);
-        }
+        ConfigUtils.writeJSConfig(scriptPath.resolve("jsconfig.json"), basePath.getFileName().toString());
     }
 }

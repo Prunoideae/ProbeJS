@@ -44,7 +44,7 @@ public class GameEvents {
                     config.classScanning.set(false);
                 }
             }
-            if (config.registryHash.get() != GameUtils.registryHash()) {
+            if (config.modHash.get() != GameUtils.modHash()) {
                 if (!ProbeDumpingThread.exists()) { // Not very possible but anyway
                     ProbeDumpingThread.create(player::sendSystemMessage).start();
                 }

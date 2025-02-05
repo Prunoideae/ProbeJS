@@ -171,4 +171,22 @@ public class JsonUtils {
     public static <T> JsonElement forceEncodeAsJson(Codec<T> codec, Object value) {
         return codec.encodeStart(JsonOps.INSTANCE, (T) value).result().orElse(JsonNull.INSTANCE);
     }
+
+    public static JsonObject putObjectIfAbsent(JsonObject jsonObject, String key) {
+        JsonObject object = jsonObject.getAsJsonObject(key);
+        if (object == null) {
+            object = new JsonObject();
+            jsonObject.add(key, object);
+        }
+        return object;
+    }
+
+    public static JsonArray putArrayIfAbsent(JsonObject jsonObject, String key) {
+        JsonArray array = jsonObject.getAsJsonArray(key);
+        if (array == null) {
+            array = new JsonArray();
+            jsonObject.add(key, array);
+        }
+        return array;
+    }
 }

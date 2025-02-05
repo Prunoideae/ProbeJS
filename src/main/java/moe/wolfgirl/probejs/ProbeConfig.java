@@ -23,7 +23,6 @@ public class ProbeConfig {
     public ConfigEntry<Integer> recursionDepth = new ConfigEntry<>("recursionDepth", 5);
     public ConfigEntry<Boolean> classScanning = new ConfigEntry<>("classScanning", false);
     public ConfigEntry<Long> modHash = new ConfigEntry<>("modHash", -1L);
-    public ConfigEntry<Long> registryHash = new ConfigEntry<>("registryHash", -1L);
     // if the dump is complete (including all mods), or some are stripped out
     public ConfigEntry<Boolean> complete = new ConfigEntry<>("complete", true);
     // what mods are force-included from an incomplete dump, other mods/registry objects are stripped off

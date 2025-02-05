@@ -35,7 +35,6 @@ public class ProbeDumpingThread extends Thread {
                     dump.trigger(messageSender);
                 } catch (Throwable e) {
                     GameUtils.logException(e);
-                    throw new RuntimeException(e);
                 }
             },
             "ProbeDumpingThread"
