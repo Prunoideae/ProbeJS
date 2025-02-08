@@ -1,5 +1,8 @@
 package moe.wolfgirl.probejs.features;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
+import com.google.gson.JsonObject;
 import dev.latvian.apps.tinyserver.http.response.HTTPResponse;
 import dev.latvian.mods.kubejs.web.KJSHTTPRequest;
 import dev.latvian.mods.kubejs.web.LocalWebServerRegistry;
@@ -14,7 +17,17 @@ import java.util.Map;
 
 public class ProbeJSEndpoints {
     private static HTTPResponse recipeIds(KJSHTTPRequest req) {
-        return HTTPResponse.ok().json(ProbeJS.GSON.toJson(GameStates.RECIPE_IDS.stream().toList()));
+        Multimap<String, String> typeIds = ArrayListMultimap.create();
+
+        for (Map.Entry<String, JsonObject> entry : GameStates.RECIPE_IDS.entrySet()) {
+            String key = entry.getKey();
+            JsonObject recipeJson = entry.getValue();
+            String recipeType = recipeJson.has("type") ? entry.getValue().get("type").getAsString() : "unknown";
+            if (!recipeType.contains(":")) recipeType = "minecraft:" + recipeType;
+            typeIds.put(recipeType, key);
+        }
+
+        return HTTPResponse.ok().json(ProbeJS.GSON.toJson(typeIds.asMap()));
     }
 
     private static HTTPResponse langKeys(KJSHTTPRequest req) {
@@ -45,9 +58,19 @@ public class ProbeJSEndpoints {
         }
     }
 
+    private static HTTPResponse getRecipeJson(KJSHTTPRequest req) {
+        var recipeId = req.query("recipe-id").value();
+        if (recipeId != null && GameStates.RECIPE_IDS.containsKey(recipeId)) {
+            return HTTPResponse.ok().json(ProbeJS.GSON.toJson(GameStates.RECIPE_IDS.get(recipeId)));
+        } else {
+            return HTTPResponse.noContent();
+        }
+    }
+
     public static void register(LocalWebServerRegistry registry) {
-        registry.get("/api/recipe-ids", ProbeJSEndpoints::recipeIds);
-        registry.get("/api/lang-keys", ProbeJSEndpoints::langKeys);
-        registry.get("/api/missing-lang-keys", ProbeJSEndpoints::getMissingLangKeys);
+        registry.get("/api/probejs/recipe-ids", ProbeJSEndpoints::recipeIds);
+        registry.get("/api/probejs/recipe-id", ProbeJSEndpoints::getRecipeJson);
+        registry.get("/api/probejs/lang-keys", ProbeJSEndpoints::langKeys);
+        registry.get("/api/probejs/missing-lang-keys", ProbeJSEndpoints::getMissingLangKeys);
     }
 }

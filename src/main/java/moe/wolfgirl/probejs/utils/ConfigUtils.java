@@ -69,7 +69,7 @@ public class ConfigUtils {
         if (!schemaExists) {
             JsonObject newSchema = new JsonObject();
             JsonArray fileMatch = new JsonArray();
-            fileMatch.add("/recipe_schemas/*.json");
+            fileMatch.add("/recipe_schema/*.json");
             newSchema.add("fileMatch", fileMatch);
             newSchema.addProperty("url", "./.vscode/recipe.json");
             schemasArray.add(newSchema);

@@ -1,5 +1,7 @@
 package moe.wolfgirl.probejs;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import dev.latvian.mods.kubejs.util.Lazy;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.ClientLanguage;
@@ -12,15 +14,13 @@ import net.minecraft.world.inventory.InventoryMenu;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforgespi.language.IModInfo;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class GameStates {
     public static final Set<String> MIXIN_LANG_KEYS = new HashSet<>();
-    public static final Set<String> RECIPE_IDS = new HashSet<>();
+    public static final Map<String, JsonObject> RECIPE_IDS = new HashMap<>();
     public static final Set<String> LOOT_TABLES = new HashSet<>();
 
     public static final Supplier<Set<String>> LANG_KEYS = () ->

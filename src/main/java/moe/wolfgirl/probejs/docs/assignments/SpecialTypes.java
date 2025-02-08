@@ -31,7 +31,7 @@ public class SpecialTypes extends ProbeJSPlugin {
     @Override
     public void addVSCodeSnippets(SnippetDump dump) {
         defineLiteralSnippets(dump, "lang_key", GameStates.LANG_KEYS.get());
-        defineLiteralSnippets(dump, "recipe_id", GameStates.RECIPE_IDS);
+        defineLiteralSnippets(dump, "recipe_id", GameStates.RECIPE_IDS.keySet());
         defineLiteralSnippets(dump, "loot_table", GameStates.LOOT_TABLES);
         defineLiteralSnippets(dump, "texture", GameStates.TEXTURES.get());
         defineLiteralSnippets(dump, "mod", GameStates.MODS.get());
