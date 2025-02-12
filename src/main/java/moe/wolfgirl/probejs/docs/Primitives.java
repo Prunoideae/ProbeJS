@@ -97,9 +97,10 @@ public class Primitives extends ProbeJSPlugin {
                 new TypeDecl("byte", numberBoth),
                 new TypeDecl("double", numberBoth),
                 new TypeDecl("float", numberBoth),
+                new TypeDecl("StringJS", Types.primitive("{}")),
                 //for CharSequence, we should NOT mark it as a primitive type, because of inheritance
-                JavaPrimitive.of("character", "String"),
-                JavaPrimitive.of("charseq", "String")
+                JavaPrimitive.of("character", "StringJS"),
+                JavaPrimitive.of("charseq", "StringJS")
         );
     }
 }

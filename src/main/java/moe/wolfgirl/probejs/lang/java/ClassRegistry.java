@@ -23,8 +23,13 @@ import java.util.stream.Collectors;
 @HideFromJS
 public class ClassRegistry {
     public static final ClassRegistry REGISTRY = new ClassRegistry();
-
+    public static final Set<String> DENIED_CLASSES = new HashSet<>();
     private final Map<ClassPath, Clazz> foundClasses = new HashMap<>();
+
+    static {
+        DENIED_CLASSES.add("foundry.veil.api.client.imgui.VeilImGuiUtil");
+        DENIED_CLASSES.add("foundry.veil.api.client.imgui.VeilImGui");
+    }
 
     public void putClass(ClassPath classPath, Clazz clazz) {
         if (classPath.getName().contains("-")) return;
@@ -42,6 +47,7 @@ public class ClassRegistry {
     public void fromClasses(Collection<Class<?>> classes, int recursionDepth) {
         ClassLoader thisLoader = getClass().getClassLoader();
         for (Class<?> c : classes) {
+            if (DENIED_CLASSES.contains(c.getName())) continue;
             try {
                 // We test if the class actually exists from forName
                 // I think some runtime class can have non-existing Class<?> object due to .getSuperClass

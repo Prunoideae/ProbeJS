@@ -14,8 +14,11 @@ import net.minecraft.locale.Language;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class ProbeJSEndpoints {
+    private static final UUID IDENTITY = UUID.randomUUID();
+
     private static HTTPResponse recipeIds(KJSHTTPRequest req) {
         Multimap<String, String> typeIds = ArrayListMultimap.create();
 
@@ -67,10 +70,15 @@ public class ProbeJSEndpoints {
         }
     }
 
+    private static HTTPResponse getIdentity(KJSHTTPRequest req) {
+        return HTTPResponse.ok().json(ProbeJS.GSON.toJson(IDENTITY.toString()));
+    }
+
     public static void register(LocalWebServerRegistry registry) {
         registry.get("/api/probejs/recipe-ids", ProbeJSEndpoints::recipeIds);
         registry.get("/api/probejs/recipe-id", ProbeJSEndpoints::getRecipeJson);
         registry.get("/api/probejs/lang-keys", ProbeJSEndpoints::langKeys);
         registry.get("/api/probejs/missing-lang-keys", ProbeJSEndpoints::getMissingLangKeys);
+        registry.get("/api/probejs/identity", ProbeJSEndpoints::getIdentity);
     }
 }

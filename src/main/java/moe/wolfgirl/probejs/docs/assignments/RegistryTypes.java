@@ -52,6 +52,8 @@ public class RegistryTypes extends ProbeJSPlugin {
         RegistryAccess access = currentServer.registryAccess();
 
         for (ResourceKey<? extends Registry<?>> key : RegistryUtils.getRegistries(access)) {
+            if (key.equals(Registries.CUSTOM_STAT)) continue;
+
             Class<?> assigned;
             if (PREDEFINED_TYPES.containsKey(key)) {
                 assigned = PREDEFINED_TYPES.get(key);

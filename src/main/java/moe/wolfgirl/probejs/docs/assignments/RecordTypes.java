@@ -1,6 +1,5 @@
 package moe.wolfgirl.probejs.docs.assignments;
 
-import dev.latvian.mods.rhino.type.ClassTypeInfo;
 import dev.latvian.mods.rhino.type.ParameterizedTypeInfo;
 import dev.latvian.mods.rhino.type.RecordTypeInfo;
 import dev.latvian.mods.rhino.type.TypeInfo;

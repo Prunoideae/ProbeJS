@@ -8,6 +8,7 @@ import dev.latvian.mods.kubejs.recipe.schema.RecipeSchemaType;
 import dev.latvian.mods.kubejs.recipe.schema.UnknownRecipeSchemaType;
 import dev.latvian.mods.kubejs.script.ScriptType;
 import dev.latvian.mods.kubejs.server.ServerScriptManager;
+import dev.latvian.mods.rhino.type.TypeInfo;
 import moe.wolfgirl.probejs.lang.schema.ObjectElement;
 import moe.wolfgirl.probejs.lang.schema.SchemaDump;
 import moe.wolfgirl.probejs.lang.schema.SchemaElement;
@@ -168,12 +169,13 @@ public class RecipeEvents extends ProbeJSPlugin {
         if (scriptDump.scriptType != ScriptType.SERVER) return Set.of();
         Set<Class<?>> classes = new HashSet<>();
         ServerScriptManager manager = (ServerScriptManager) scriptDump.manager;
-        TypeConverter converter = scriptDump.transpiler.typeConverter;
 
         for (RecipeNamespace namespace : manager.recipeSchemaStorage.namespaces.values()) {
             for (RecipeSchemaType schemaType : namespace.values()) {
-                var type = converter.convertType(schemaType.schema.recipeFactory.recipeType());
-                classes.addAll(type.getClasses());
+                for (RecipeKey<?> key : schemaType.schema.keys) {
+                    classes.addAll(key.component.typeInfo().getContainedComponentClasses());
+                }
+                classes.addAll(schemaType.schema.recipeFactory.recipeType().getContainedComponentClasses());
             }
         }
         return classes;
