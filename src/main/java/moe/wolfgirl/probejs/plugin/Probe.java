@@ -6,11 +6,16 @@ import dev.latvian.mods.kubejs.script.ScriptType;
 import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.rhino.Context;
 import moe.wolfgirl.probejs.GameStates;
+import moe.wolfgirl.probejs.lang.java.ClassRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 @Info("Debugging utility for easier check on players, blocks, items, etc.")
 public class Probe {
@@ -25,7 +30,7 @@ public class Probe {
         }
     }
 
-    public Player getCurrentPlayer(Context context) { //TODO: remove placeholder when the context bug is fixed
+    public Player getCurrentPlayer(Context context) {
         KubeJSContext kContext = (KubeJSContext) context;
         testSourceFile(context);
         if (kContext.getType() == ScriptType.CLIENT) {
@@ -37,6 +42,12 @@ public class Probe {
                     .getPlayers()
                     .getFirst();
         }
+    }
+
+    @Info("Capture the class of the object passed in for ProbeJS to dump.")
+    public <T> T captureType(T object) {
+        ClassRegistry.REGISTRY.fromClasses(List.of(object.getClass()), 0);
+        return object;
     }
 
     public LevelBlock getLastRightClickedBlock(Context context) {

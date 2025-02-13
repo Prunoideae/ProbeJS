@@ -38,8 +38,9 @@ import java.util.*;
 public class RegistryTypes extends ProbeJSPlugin {
     public static final String LITERAL_FIELD = "probejsInternal$$Literal";
     public static final String TAG_FIELD = "probejsInternal$$Tag";
-    public static final String OF_TYPE_DECL = "T extends { %s: infer U } ? U : never";
 
+    public static final String OF_LITERAL_DECL = "T extends {%s: infer U} ? U : (T extends `probejs$$object$$${string}` ? T : never)";
+    public static final String OF_TAG_DECL = "T extends {%s: infer U} ? U : (T extends `probejs$$object$$${infer Suffix} ? `probejs$$tag$$${Suffix}` : never)";
     public static Map<ResourceKey<? extends Registry<?>>, Class<?>> PREDEFINED_TYPES = Map.of(
             Registries.DIMENSION, Level.class
     );
@@ -104,8 +105,8 @@ public class RegistryTypes extends ProbeJSPlugin {
         createTypes(special, BuiltInRegistries.REGISTRY.key());
 
         // Expose LiteralOf<T> and TagOf<T>
-        TypeDecl literalOf = new TypeDecl("LiteralOf<T>", Types.primitive(OF_TYPE_DECL.formatted(LITERAL_FIELD)));
-        TypeDecl tagOf = new TypeDecl("TagOf<T>", Types.primitive(OF_TYPE_DECL.formatted(TAG_FIELD)));
+        TypeDecl literalOf = new TypeDecl("LiteralOf<T>", Types.primitive(OF_LITERAL_DECL.formatted(LITERAL_FIELD)));
+        TypeDecl tagOf = new TypeDecl("TagOf<T>", Types.primitive(OF_TAG_DECL.formatted(TAG_FIELD)));
         special.addCode(literalOf);
         special.addCode(tagOf);
 

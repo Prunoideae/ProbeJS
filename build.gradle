@@ -24,6 +24,15 @@ neoForge {
         minecraftVersion = parchment_mc_version
         mappingsVersion = parchment_version
     }
+
+    runs {
+        client {
+            client()
+        }
+        server {
+            server()
+        }
+    }
 }
 
 repositories {
