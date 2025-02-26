@@ -50,6 +50,7 @@ public class RecipeTypes extends ProbeJSPlugin {
         scriptDump.assignType(Ingredient.class, Types.primitive("`%${Special.CreativeModeTab}`"));
 
         scriptDump.assignType(SizedIngredient.class, Types.type(ItemStack.class));
+        scriptDump.assignType(SizedIngredient.class, Types.type(Ingredient.class));
 
         scriptDump.assignType(RecipeFilter.class, Types.primitive("RegExp"));
         scriptDump.assignType(RecipeFilter.class, Types.literal("*"));

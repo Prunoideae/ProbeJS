@@ -167,20 +167,23 @@ public class RegistryTypes extends ProbeJSPlugin {
         if (currentServer == null) return registryObjectClasses;
         RegistryAccess registryAccess = currentServer.registryAccess();
 
-        for (ResourceKey<? extends Registry<?>> value : RegistryUtils.getRegistries(registryAccess)) {
-            Registry<?> registry = registryAccess.registry(value).orElse(null);
-            if (registry == null) continue;
-            try {
-                for (Object o : registry) {
-                    registryObjectClasses.add(o.getClass());
+        if (ProbeConfig.INSTANCE.complete.get()) {
+            for (ResourceKey<? extends Registry<?>> value : RegistryUtils.getRegistries(registryAccess)) {
+                Registry<?> registry = registryAccess.registry(value).orElse(null);
+                if (registry == null) continue;
+                try {
+                    for (Object o : registry) {
+                        registryObjectClasses.add(o.getClass());
+                    }
+                } catch (Throwable t) {
+                    ProbeJS.LOGGER.error("Unable to fetch registry info for %s".formatted(value));
                 }
-            } catch (Throwable t) {
-                ProbeJS.LOGGER.error("Unable to fetch registry info for %s".formatted(value));
+                RegistryType<?> type = RegistryType.ofKey(value);
+                if (type == null) continue;
+                registryObjectClasses.add(type.baseClass());
             }
-            RegistryType<?> type = RegistryType.ofKey(value);
-            if (type == null) continue;
-            registryObjectClasses.add(type.baseClass());
         }
+
         return registryObjectClasses;
     }
 

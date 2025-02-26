@@ -42,6 +42,7 @@ public class GameEvents {
                             Component.translatable("probejs.performance", ModList.get().size())
                     );
                     config.classScanning.set(false);
+                    config.complete.set(false);
                 }
             }
             if (config.modHash.get() != GameUtils.modHash()) {
