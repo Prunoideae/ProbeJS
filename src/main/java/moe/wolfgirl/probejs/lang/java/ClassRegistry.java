@@ -1,5 +1,6 @@
 package moe.wolfgirl.probejs.lang.java;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import dev.latvian.mods.rhino.type.TypeInfo;
 import dev.latvian.mods.rhino.type.VariableTypeInfo;
 import dev.latvian.mods.rhino.util.HideFromJS;
@@ -13,6 +14,7 @@ import moe.wolfgirl.probejs.lang.java.clazz.members.MethodInfo;
 import moe.wolfgirl.probejs.lang.java.clazz.members.ParamInfo;
 import moe.wolfgirl.probejs.utils.GameUtils;
 import moe.wolfgirl.probejs.utils.ProbeFileUtils;
+import org.apache.commons.lang3.mutable.MutableBoolean;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -109,32 +111,46 @@ public class ClassRegistry {
         return classes;
     }
 
+    @SuppressWarnings("BusyWait")
     public void discoverClasses() {
-        // We mark the recursion depth of the class, so a class with depth X
-        // will need X jumps from any found classes to be referenced
-        Set<Clazz> currentClasses = new HashSet<>(foundClasses.values());
-        int recursion = 1;
-        while (!currentClasses.isEmpty()) {
-            Set<Class<?>> fetchedClass = new HashSet<>();
-            for (Clazz currentClass : currentClasses) {
-                fetchedClass.addAll(retrieveClass(currentClass));
-            }
-            fetchedClass.removeIf(clazz -> foundClasses.containsKey(new ClassPath(clazz)));
-            currentClasses.clear();
-            for (Class<?> c : fetchedClass) {
-                try {
-                    if (c.isPrimitive()) continue;
-                    Class.forName(c.getName());
-                    Clazz clazz = new Clazz(c);
-                    clazz.recursionDepth = recursion;
-                    putClass(clazz.classPath, clazz);
-                    currentClasses.add(clazz);
-                } catch (Throwable err) {
-                    ProbeJS.LOGGER.error("Error occurred when resolving class %s".formatted(c));
-                    GameUtils.logException(err);
+        MutableBoolean bool = new MutableBoolean(false);
+
+        RenderSystem.recordRenderCall(() -> {
+            // We mark the recursion depth of the class, so a class with depth X
+            // will need X jumps from any found classes to be referenced
+            Set<Clazz> currentClasses = new HashSet<>(foundClasses.values());
+            int recursion = 1;
+            while (!currentClasses.isEmpty()) {
+                Set<Class<?>> fetchedClass = new HashSet<>();
+                for (Clazz currentClass : currentClasses) {
+                    fetchedClass.addAll(retrieveClass(currentClass));
                 }
+                fetchedClass.removeIf(clazz -> foundClasses.containsKey(new ClassPath(clazz)));
+                currentClasses.clear();
+                for (Class<?> c : fetchedClass) {
+                    try {
+                        if (c.isPrimitive()) continue;
+                        Class.forName(c.getName());
+                        Clazz clazz = new Clazz(c);
+                        clazz.recursionDepth = recursion;
+                        putClass(clazz.classPath, clazz);
+                        currentClasses.add(clazz);
+                    } catch (Throwable err) {
+                        ProbeJS.LOGGER.error("Error occurred when resolving class %s".formatted(c));
+                        GameUtils.logException(err);
+                    }
+                }
+                recursion++;
             }
-            recursion++;
+            bool.setTrue();
+        });
+
+        while (bool.isFalse()) {
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 

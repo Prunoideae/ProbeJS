@@ -37,6 +37,7 @@ public class ProbeDump {
         addScript(ScriptDump.CLIENT_DUMP.get());
         addScript(ScriptDump.SERVER_DUMP.get());
         addScript(ScriptDump.STARTUP_DUMP.get());
+        addScript(ScriptDump.PACKAGE_DUMP.get());
     }
 
     private void onModChange() throws IOException {
@@ -65,7 +66,7 @@ public class ProbeDump {
 
         report(Component.translatable("probejs.dump.cleaning"));
         for (ScriptDump scriptDump : scriptDumps) {
-            scriptDump.removeClasses();
+            scriptDump.destroy();
             report(Component.translatable("probejs.removed_script", scriptDump.manager.scriptType.toString()));
         }
 
@@ -82,6 +83,7 @@ public class ProbeDump {
         progressReport.accept(component);
     }
 
+    @SuppressWarnings("BusyWait")
     public void trigger(Consumer<Component> p) throws IOException {
         progressReport = p;
         report(Component.translatable("probejs.dump.start").kjs$green());
@@ -119,12 +121,17 @@ public class ProbeDump {
         List<Thread> dumpThreads = new ArrayList<>();
         for (ScriptDump scriptDump : scriptDumps) {
             Thread t = new Thread(() -> {
-                scriptDump.acceptClasses(ClassRegistry.REGISTRY.getFoundClasses());
                 try {
-                    scriptDump.dump();
-                    report(Component.translatable("probejs.dump.dump_finished", scriptDump.manager.scriptType.toString()).kjs$green());
+                    if (scriptDump.packageDump) {
+                        scriptDump.acceptClasses(ClassRegistry.REGISTRY.getFoundClasses());
+                        scriptDump.dumpClasses();
+                    } else {
+                        scriptDump.dumpGlobal();
+                        ConfigUtils.writeJSConfig(scriptDump.scriptPath.resolve("jsconfig.json"), scriptDump.basePath.getFileName().toString());
+                    }
+                    report(Component.translatable("probejs.dump.dump_finished", scriptDump.identifier).kjs$green());
                 } catch (Throwable e) {
-                    report(Component.translatable("probejs.dump.dump_error", scriptDump.manager.scriptType.toString()).kjs$red());
+                    report(Component.translatable("probejs.dump.dump_error", scriptDump.identifier).kjs$red());
                     throw new RuntimeException(e);
                 }
             },
@@ -138,7 +145,11 @@ public class ProbeDump {
                 try {
                     Thread.sleep(3000);
                     if (dumpThreads.stream().noneMatch(Thread::isAlive)) return;
-                    String dumpProgress = scriptDumps.stream().filter(sd -> sd.total != 0).map(sd -> "%s/%s".formatted(sd.dumped, sd.total)).collect(Collectors.joining(", "));
+                    String dumpProgress = scriptDumps.stream()
+                            .filter(sd -> sd.packageDump)
+                            .filter(sd -> sd.total != 0)
+                            .map(sd -> "%s/%s".formatted(sd.dumped, sd.total))
+                            .collect(Collectors.joining(", "));
                     report(Component.translatable("probejs.dump.report_progress").append(Component.literal(dumpProgress).kjs$blue()));
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);

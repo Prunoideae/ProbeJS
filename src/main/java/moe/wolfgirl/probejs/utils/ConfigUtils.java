@@ -34,11 +34,15 @@ public class ConfigUtils {
         JsonObject config = Files.exists(path) ? ProbeJS.GSON.fromJson(Files.newBufferedReader(path), JsonObject.class) : new JsonObject();
         if (config == null) config = new JsonObject();
 
-        // Update or add the maxTsServerMemory setting
+        // Update basic settings
         config.addProperty("typescript.tsserver.maxTsServerMemory", 4096);
+        config.addProperty("typescript.disableAutomaticTypeAcquisition", true);
+        config.addProperty("typescript.surveys.enabled", false);
+        config.addProperty("typescript.validate.enable", false);
+
 
         // Handle the json.schemas array
-        JsonArray schemasArray = JsonUtils.putArrayIfAbsent(config, "json.schema");
+        JsonArray schemasArray = JsonUtils.putArrayIfAbsent(config, "json.schemas");
 
         // Check if the required schema already exists
         boolean schemaExists = false;
@@ -100,17 +104,27 @@ public class ConfigUtils {
 
         JsonObject compilerOptions = JsonUtils.putObjectIfAbsent(config, "compilerOptions");
         compilerOptions.addProperty("module", "commonjs");
+        compilerOptions.addProperty("moduleResolution", "classic");
+        compilerOptions.addProperty("isolatedModules", true);
+        compilerOptions.addProperty("composite", true);
+        compilerOptions.addProperty("incremental", true);
+        compilerOptions.addProperty("allowJs", true);
+        compilerOptions.addProperty("checkJs", false);
         compilerOptions.addProperty("target", "ES2015");
+
         compilerOptions.addProperty("rootDir", ".");
-        compilerOptions.addProperty("baseUrl", "../../.probe/%s/probe-types".formatted(baseName));
+        compilerOptions.addProperty("baseUrl", "../../.probe/packages");
         compilerOptions.addProperty("skipLibCheck", true);
+        compilerOptions.addProperty("skipDefaultLibCheck", true);
+
 
         JsonArray lib = JsonUtils.putArrayIfAbsent(compilerOptions, "lib");
         mergeAddArray(lib, new JsonPrimitive("ES5"));
         mergeAddArray(lib, new JsonPrimitive("ES2015"));
 
         JsonArray typeRoots = JsonUtils.putArrayIfAbsent(compilerOptions, "typeRoots");
-        mergeAddArray(typeRoots, new JsonPrimitive("../../.probe/%s/probe-types".formatted(baseName)));
+        mergeAddArray(typeRoots, new JsonPrimitive("../../.probe/packages"));
+        mergeAddArray(typeRoots, new JsonPrimitive("../../.probe/%s".formatted(baseName)));
 
         // Write the updated configuration back to the file
         JsonWriter jsonWriter = ProbeJS.GSON_WRITER.newJsonWriter(Files.newBufferedWriter(path));

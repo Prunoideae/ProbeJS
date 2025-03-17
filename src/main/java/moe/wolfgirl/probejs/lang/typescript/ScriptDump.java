@@ -24,7 +24,6 @@ import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
 import moe.wolfgirl.probejs.lang.typescript.code.type.js.JSJoinedType;
 import moe.wolfgirl.probejs.utils.ConfigUtils;
 import moe.wolfgirl.probejs.utils.GameUtils;
-import net.neoforged.api.distmarker.OnlyIn;
 import org.apache.commons.io.FileUtils;
 
 import java.io.BufferedWriter;
@@ -32,7 +31,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 /**
@@ -48,32 +46,30 @@ public class ScriptDump {
                 scriptManager,
                 ProbePaths.PROBE.resolve("server"),
                 KubeJSPaths.SERVER_SCRIPTS,
-                (clazz -> {
-                    for (OnlyIn annotation : clazz.getAnnotations(OnlyIn.class)) {
-                        if (annotation.value().isClient()) return false;
-                    }
-                    return true;
-                })
+                false
         );
     };
     public static final Supplier<ScriptDump> CLIENT_DUMP = () -> new ScriptDump(
             KubeJS.getClientScriptManager(),
             ProbePaths.PROBE.resolve("client"),
             KubeJSPaths.CLIENT_SCRIPTS,
-            (clazz -> {
-                for (OnlyIn annotation : clazz.getAnnotations(OnlyIn.class)) {
-                    if (annotation.value().isDedicatedServer()) return false;
-                }
-                return true;
-            })
+            false
     );
     public static final Supplier<ScriptDump> STARTUP_DUMP = () -> new ScriptDump(
             KubeJS.getStartupScriptManager(),
             ProbePaths.PROBE.resolve("startup"),
             KubeJSPaths.STARTUP_SCRIPTS,
-            (clazz -> true)
+            false
     );
 
+    public static final Supplier<ScriptDump> PACKAGE_DUMP = () -> new ScriptDump(
+            KubeJS.getStartupScriptManager(),
+            ProbePaths.PROBE.resolve("packages"),
+            KubeJSPaths.STARTUP_SCRIPTS,
+            true
+    );
+
+    public final String identifier;
     public final ScriptType scriptType;
     public final ScriptManager manager;
     public final Path basePath;
@@ -81,25 +77,24 @@ public class ScriptDump {
     public final Map<String, Pair<Collection<String>, Wrapped.Global>> globals;
     public final Transpiler transpiler;
     public final Set<Clazz> recordedClasses = new HashSet<>();
-    private final Predicate<Clazz> accept;
+    public final boolean packageDump;
     private final Multimap<ClassPath, TypeDecl> convertibles = ArrayListMultimap.create();
     public int dumped = 0;
     public int total = 0;
 
-    public ScriptDump(ScriptManager manager, Path basePath, Path scriptPath, Predicate<Clazz> scriptPredicate) {
+    public ScriptDump(ScriptManager manager, Path basePath, Path scriptPath, boolean packageDump) {
         this.scriptType = manager.scriptType;
         this.manager = manager;
         this.basePath = basePath;
         this.scriptPath = scriptPath;
         this.transpiler = new Transpiler(manager);
+        this.packageDump = packageDump;
         this.globals = new HashMap<>();
-        this.accept = scriptPredicate;
+        this.identifier = packageDump ? "package" : scriptType.name;
     }
 
     public void acceptClasses(Collection<Clazz> classes) {
-        for (Clazz clazz : classes) {
-            if (accept.test(clazz)) recordedClasses.add(clazz);
-        }
+        recordedClasses.addAll(classes);
     }
 
     public Set<Class<?>> retrieveClasses() {
@@ -137,41 +132,10 @@ public class ScriptDump {
     }
 
 
-    public Path ensurePath(String path) {
-        return ensurePath(path, false);
-    }
-
-    public Path ensurePath(String path, boolean script) {
-        Path full = (script ? scriptPath : basePath).resolve(path);
-        if (Files.notExists(full)) {
-            try {
-                Files.createDirectories(full);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-
-        }
-        return full;
-    }
-
-    public Path getTypeFolder() {
-        return ensurePath("probe-types");
-    }
-
-    public Path getPackageFolder() {
-        return ensurePath("probe-types/packages");
-    }
-
-    public Path getGlobalFolder() {
-        return ensurePath("probe-types/global");
-    }
-
-    public Path getSource() {
-        return ensurePath("src", true);
-    }
-
-    public Path getTest() {
-        return ensurePath("test", true);
+    public Path ensureDumpFolder() throws IOException {
+        var dumped = basePath.resolve("generated-" + identifier.toLowerCase());
+        Files.createDirectories(dumped);
+        return dumped;
     }
 
     public void dumpClasses() throws IOException {
@@ -268,7 +232,7 @@ public class ScriptDump {
 
                 BufferedWriter writer = files.computeIfAbsent(classPath.getFileKey(), key -> {
                     try {
-                        return Files.newBufferedWriter(getPackageFolder().resolve(key + ".d.ts"));
+                        return Files.newBufferedWriter(ensureDumpFolder().resolve(key + ".d.ts"));
                     } catch (IOException e) {
                         ProbeJS.LOGGER.error("Failed to write %s.d.ts".formatted(key));
                         return null;
@@ -281,7 +245,7 @@ public class ScriptDump {
             }
         }
 
-        try (var writer = Files.newBufferedWriter(getPackageFolder().resolve("index.d.ts"))) {
+        try (var writer = Files.newBufferedWriter(ensureDumpFolder().resolve("index.d.ts"))) {
             for (Map.Entry<String, BufferedWriter> entry : files.entrySet()) {
                 String key = entry.getKey();
                 BufferedWriter value = entry.getValue();
@@ -294,7 +258,7 @@ public class ScriptDump {
     public void dumpGlobal() throws IOException {
         ProbeJSPlugin.forEachPlugin(plugin -> plugin.addGlobals(this));
 
-        try (var writer = Files.newBufferedWriter(getGlobalFolder().resolve("index.d.ts"))) {
+        try (var writer = Files.newBufferedWriter(ensureDumpFolder().resolve("index.d.ts"))) {
             for (Map.Entry<String, Pair<Collection<String>, Wrapped.Global>> entry : globals.entrySet()) {
                 String identifier = entry.getKey();
                 Pair<Collection<String>, Wrapped.Global> pair = entry.getValue();
@@ -306,20 +270,14 @@ public class ScriptDump {
                     globalFile.excludeSymbol(s);
                 }
                 globalFile.addCode(global);
-                globalFile.write(getGlobalFolder().resolve(identifier + ".d.ts"));
+                globalFile.write(ensureDumpFolder().resolve(identifier + ".d.ts"));
                 writer.write("export * from %s\n".formatted(ProbeJS.GSON.toJson("./" + identifier)));
             }
         }
 
     }
 
-    public void removeClasses() throws IOException {
-        FileUtils.deleteDirectory(getTypeFolder().toFile());
-    }
-
-    public void dump() throws IOException, ClassNotFoundException {
-        dumpClasses();
-        dumpGlobal();
-        ConfigUtils.writeJSConfig(scriptPath.resolve("jsconfig.json"), basePath.getFileName().toString());
+    public void destroy() throws IOException {
+        FileUtils.deleteDirectory(ensureDumpFolder().toFile());
     }
 }
