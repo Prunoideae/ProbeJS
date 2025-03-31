@@ -181,36 +181,10 @@ public class RecipeEvents extends ProbeJSPlugin {
         return classes;
     }
 
-    private void populateKeys(Set<String> strings) {
-        Set<String> withArray = new HashSet<>();
-
-        for (String string : strings) {
-            withArray.add(string + "[]");
-            withArray.add(string + "[][]");
-        }
-        strings.addAll(withArray);
-    }
-
     @Override
     public void addJsonSchema(SchemaDump dump) {
         ServerScriptManager scriptManager = GameUtils.getServerScriptManager();
         if (scriptManager == null) return;
-        Set<String> keys = new HashSet<>();
-        keys.addAll(scriptManager.recipeSchemaStorage.simpleComponents.keySet());
-        keys.addAll(scriptManager.recipeSchemaStorage.dynamicComponents.keySet());
-        populateKeys(keys); // because enum is fixed, so we generate [] and [][] types here
-
-        dump.newSchema("recipe",
-                ObjectElement.of()
-                        .object("keys", object -> object
-                                .stringType("name")
-                                .stringType("role", o -> o.enums("input", "output", "other"))
-                                .stringType("type", o -> o.enums(keys.toArray()))
-                                .anyType("optional")
-                                .asArray())
-                        .stringType("unique", SchemaElement::asArray)
-                        .object("constructors", SchemaElement::asArray)
-                        .object("functions")
-        );
+        // TODO: Implement new logic (if lat really did something
     }
 }

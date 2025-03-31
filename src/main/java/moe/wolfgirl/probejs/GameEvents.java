@@ -2,6 +2,7 @@ package moe.wolfgirl.probejs;
 
 import com.mojang.brigadier.Command;
 import dev.latvian.mods.kubejs.KubeJS;
+import dev.latvian.mods.kubejs.client.KubeJSClient;
 import moe.wolfgirl.probejs.utils.GameUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.Commands;
@@ -90,7 +91,7 @@ public class GameEvents {
                                         messageSender.accept(Component.translatable("probejs.already_running"));
                                         return Command.SINGLE_SUCCESS;
                                     }
-                                    KubeJS.PROXY.reloadClientInternal();
+                                    KubeJSClient.reloadClientScripts();
                                     ProbeDumpingThread.create(messageSender).start();
                                     return Command.SINGLE_SUCCESS;
                                 })
