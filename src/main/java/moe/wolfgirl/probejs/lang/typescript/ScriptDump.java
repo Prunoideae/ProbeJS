@@ -165,7 +165,6 @@ public class ScriptDump {
                 // declare global {
                 //     type Type_ = ExportedType
                 // }
-                String symbol = classPath.getName() + "_";
                 String exportedSymbol = ImportInfo.INPUT_TEMPLATE.formatted(classPath.getName());
                 String originalSymbol = ImportInfo.OUTPUT_TEMPLATE.formatted(classPath.getName());
 
@@ -176,14 +175,11 @@ public class ScriptDump {
 
                 if (!generics.isEmpty()) {
                     String suffix = "<%s>".formatted(String.join(", ", generics));
-                    symbol = symbol + suffix;
                     exportedSymbol = exportedSymbol + suffix;
                     originalSymbol = originalSymbol + suffix;
                     thisType = Types.parameterized(thisType, generics.stream().map(Types::generic).toArray(BaseType[]::new));
-                    exportedType = Types.parameterized(exportedType, generics.stream().map(Types::generic).toArray(BaseType[]::new));
                     outputType = Types.parameterized(outputType, generics.stream().map(Types::generic).toArray(BaseType[]::new));
                 }
-                exportedType = Types.ignoreContext(exportedType, BaseType.FormatType.INPUT);
                 thisType = Types.ignoreContext(thisType, BaseType.FormatType.RETURN);
 
                 List<BaseType> allTypes = new ArrayList<>();
@@ -196,30 +192,17 @@ public class ScriptDump {
                     }
                 }
 
-                if (allTypes.isEmpty()) {
-                    allTypes.add(thisType); // Don't add if there are wrapping, for better compatibility with duck typing
-                }
+                // Don't add if there are wrapping, for better compatibility with duck typing
+                if (allTypes.isEmpty()) allTypes.add(thisType);
 
-                TypeDecl convertibleType = new TypeDecl(
-                        exportedSymbol,
-                        new JSJoinedType.Union(allTypes)
-                );
-                TypeDecl globalType = new TypeDecl(
-                        symbol,
-                        exportedType
-                );
+                TypeDecl convertibleType = new TypeDecl(exportedSymbol, new JSJoinedType.Union(allTypes));
                 TypeDecl originalType = new TypeDecl(originalSymbol, outputType);
 
-                Wrapped.Global typeExport = new Wrapped.Global();
-                typeExport.addCode(globalType);
                 convertibleType.addComment("""
                         Class-specific type exported by ProbeJS, use global Type_
                         types for convenience unless there's a naming conflict.
                         """);
-                typeExport.addComment("""
-                        Global type exported for convenience, use class-specific
-                        types if there's a naming conflict.
-                        """);
+
                 originalType.addComment("""
                         Original type to represent the class type itself. Use in JSDoc only.
                         """);
@@ -228,7 +211,6 @@ public class ScriptDump {
                 }
                 output.addCode(convertibleType);
                 output.addCode(originalType);
-                output.addCode(typeExport);
 
                 BufferedWriter writer = files.computeIfAbsent(classPath.getFileKey(), key -> {
                     try {

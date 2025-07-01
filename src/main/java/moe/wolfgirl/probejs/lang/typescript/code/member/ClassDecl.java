@@ -43,7 +43,7 @@ public class ClassDecl extends CommentableCode {
         this.variableTypes = variableTypes;
     }
 
-    public boolean isInterface(){
+    public boolean isInterface() {
         return false;
     }
 
@@ -104,11 +104,13 @@ public class ClassDecl extends CommentableCode {
         for (FieldDecl field : fields) {
             body.addAll(field.format(declaration));
         }
-        body.add("");
+        if (!fields.isEmpty()) body.add("");
+
         for (ConstructorDecl constructor : constructors) {
             body.addAll(constructor.format(declaration));
         }
-        body.add("");
+        if (!constructors.isEmpty()) body.add("");
+
         for (MethodDecl method : methods) {
             body.addAll(method.format(declaration));
         }

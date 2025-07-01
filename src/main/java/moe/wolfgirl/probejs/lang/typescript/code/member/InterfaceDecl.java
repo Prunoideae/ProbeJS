@@ -1,11 +1,8 @@
 package moe.wolfgirl.probejs.lang.typescript.code.member;
 
-import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.lang.typescript.Declaration;
 import moe.wolfgirl.probejs.lang.typescript.code.Code;
 import moe.wolfgirl.probejs.lang.typescript.code.ImportInfo;
-import moe.wolfgirl.probejs.lang.typescript.code.ts.MethodDeclaration;
-import moe.wolfgirl.probejs.lang.typescript.code.ts.Statements;
 import moe.wolfgirl.probejs.lang.typescript.code.ts.VariableDeclaration;
 import moe.wolfgirl.probejs.lang.typescript.code.ts.Wrapped;
 import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
@@ -15,7 +12,6 @@ import org.apache.commons.lang3.mutable.MutableInt;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -49,20 +45,6 @@ public class InterfaceDecl extends ClassDecl {
 
         // Format body - fields, constructors, methods
         List<String> body = new ArrayList<>();
-        Wrapped.Namespace namespace = new Wrapped.Namespace(name);
-
-        for (FieldDecl field : fields) {
-            namespace.addCode(new VariableDeclaration(field.name, field.type));
-        }
-
-        body.add("");
-        for (MethodDecl method : methods) {
-            if (!method.isStatic) body.addAll(method.format(declaration));
-            else namespace.addCode(method.asDeclaration());
-        }
-
-        // Adds a marker in it to prevent VSCode from not recognizing the namespace to import
-        namespace.addCode(new VariableDeclaration("probejs$$marker", Types.NEVER));
 
         // Use hybrid to represent functional interfaces
         // (a: SomeClass<number>, b: SomeClass<string>): void;
@@ -94,7 +76,9 @@ public class InterfaceDecl extends ClassDecl {
         formatted.addAll(body);
         formatted.addAll(tail);
 
-        // Static methods and fields, adds it even if it's empty, so auto import can still discoverContainedTypes it
+        // Adds a marker in it to prevent VSCode from not recognizing the namespace to import
+        Wrapped.Namespace namespace = new Wrapped.Namespace(name);
+        namespace.addCode(new VariableDeclaration("probejs$$marker", Types.NEVER));
         formatted.addAll(namespace.format(declaration));
         formatted.addAll(createStaticClass(name, methods, fields).format(declaration));
         return formatted;
@@ -108,7 +92,6 @@ public class InterfaceDecl extends ClassDecl {
         );
         classDecl.methods.addAll(methodDecls);
         classDecl.fields.addAll(fieldDecls);
-
         return classDecl;
     }
 }

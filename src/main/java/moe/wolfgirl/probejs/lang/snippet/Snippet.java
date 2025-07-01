@@ -3,6 +3,7 @@ package moe.wolfgirl.probejs.lang.snippet;
 import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.ints.IntArraySet;
 import moe.wolfgirl.probejs.lang.snippet.parts.*;
+import moe.wolfgirl.probejs.utils.GameUtils;
 import moe.wolfgirl.probejs.utils.JsonUtils;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
@@ -82,7 +83,7 @@ public class Snippet {
     }
 
     public <T> Snippet registry(ResourceKey<Registry<T>> registry) {
-        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        MinecraftServer server = GameUtils.getCurrentServer();
         if (server == null) return this;
         RegistryAccess access = server.registryAccess();
 

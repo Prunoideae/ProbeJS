@@ -51,9 +51,9 @@ public class RecipeEvents extends ProbeJSPlugin {
 
     @Override
     public void modifyClasses(ScriptDump scriptDump, Map<ClassPath, TypeScriptFile> globalClasses) {
-        if (scriptDump.scriptType != ScriptType.SERVER) return;
         TypeConverter converter = scriptDump.transpiler.typeConverter;
-        ServerScriptManager manager = (ServerScriptManager) scriptDump.manager;
+        ServerScriptManager manager = GameUtils.getServerScriptManager();
+        if (manager == null) return;
 
         // Generate recipe schema classes
         // Also generate the documented recipe class containing all stuffs from everywhere
@@ -95,7 +95,7 @@ public class RecipeEvents extends ProbeJSPlugin {
         ClassDecl recipeEvent = recipeEventFile.findCode(ClassDecl.class).orElse(null);
         if (recipeEvent == null) return; // What???
         recipeEvent.methods.stream()
-                .filter(m -> m.params.isEmpty() && m.name.equals("getRecipes"))
+                .filter(m -> m.name.equals("getRecipes"))
                 .findFirst()
                 .ifPresent(methodDecl -> methodDecl.returnType = Types.type(DOCUMENTED_RECIPES));
         for (Code code : recipeEvent.bodyCode) {
@@ -166,9 +166,9 @@ public class RecipeEvents extends ProbeJSPlugin {
 
     @Override
     public Set<Class<?>> provideJavaClass(ScriptDump scriptDump) {
-        if (scriptDump.scriptType != ScriptType.SERVER) return Set.of();
         Set<Class<?>> classes = new HashSet<>();
-        ServerScriptManager manager = (ServerScriptManager) scriptDump.manager;
+        ServerScriptManager manager = GameUtils.getServerScriptManager();
+        if (manager == null) return Set.of();
 
         for (RecipeNamespace namespace : manager.recipeSchemaStorage.namespaces.values()) {
             for (RecipeSchemaType schemaType : namespace.values()) {

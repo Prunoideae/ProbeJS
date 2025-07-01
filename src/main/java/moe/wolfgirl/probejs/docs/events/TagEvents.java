@@ -13,6 +13,7 @@ import moe.wolfgirl.probejs.lang.typescript.code.ts.Statements;
 import moe.wolfgirl.probejs.lang.typescript.code.ts.Wrapped;
 import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
 import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
+import moe.wolfgirl.probejs.utils.GameUtils;
 import moe.wolfgirl.probejs.utils.NameUtils;
 import moe.wolfgirl.probejs.utils.RegistryUtils;
 import net.minecraft.core.Registry;
@@ -36,7 +37,7 @@ public class TagEvents extends ProbeJSPlugin {
         if (scriptDump.scriptType != ScriptType.SERVER) return;
 
         BaseType eventType = Types.type(TAG_EVENT);
-        MinecraftServer currentServer = ServerLifecycleHooks.getCurrentServer();
+        MinecraftServer currentServer = GameUtils.getCurrentServer();
         if (currentServer == null) return;
         RegistryAccess registryAccess = currentServer.registryAccess();
 
@@ -68,8 +69,6 @@ public class TagEvents extends ProbeJSPlugin {
 
     @Override
     public void modifyClasses(ScriptDump scriptDump, Map<ClassPath, TypeScriptFile> globalClasses) {
-        if (scriptDump.scriptType != ScriptType.SERVER) return;
-
         BaseType wrapperType = Types.type(TAG_WRAPPER);
 
         ClassDecl tagEventProbe = Statements.clazz(TAG_EVENT.getName())

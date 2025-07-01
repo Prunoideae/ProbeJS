@@ -104,13 +104,13 @@ public class ConfigUtils {
 
         JsonObject compilerOptions = JsonUtils.putObjectIfAbsent(config, "compilerOptions");
         compilerOptions.addProperty("module", "commonjs");
-        compilerOptions.addProperty("moduleResolution", "classic");
-        compilerOptions.addProperty("isolatedModules", true);
-        compilerOptions.addProperty("composite", true);
-        compilerOptions.addProperty("incremental", true);
+        compilerOptions.addProperty("moduleResolution", "node");
         compilerOptions.addProperty("allowJs", true);
         compilerOptions.addProperty("checkJs", false);
         compilerOptions.addProperty("target", "ES2015");
+        compilerOptions.addProperty("disableSizeLimit", true);
+        compilerOptions.addProperty("noEmit", true);
+        compilerOptions.addProperty("assumeChangesOnlyAffectDirectDependencies", true);
 
         compilerOptions.addProperty("rootDir", ".");
         compilerOptions.addProperty("baseUrl", "../../.probe/packages");
@@ -119,8 +119,9 @@ public class ConfigUtils {
 
 
         JsonArray lib = JsonUtils.putArrayIfAbsent(compilerOptions, "lib");
-        mergeAddArray(lib, new JsonPrimitive("ES5"));
         mergeAddArray(lib, new JsonPrimitive("ES2015"));
+        mergeAddArray(lib, new JsonPrimitive("ES2016.Array.Include"));
+        mergeAddArray(lib, new JsonPrimitive("ES2017.Object"));
 
         JsonArray typeRoots = JsonUtils.putArrayIfAbsent(compilerOptions, "typeRoots");
         mergeAddArray(typeRoots, new JsonPrimitive("../../.probe/packages"));

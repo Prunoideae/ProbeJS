@@ -7,6 +7,7 @@ import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.rhino.Context;
 import moe.wolfgirl.probejs.GameStates;
 import moe.wolfgirl.probejs.lang.java.ClassRegistry;
+import moe.wolfgirl.probejs.utils.GameUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.Entity;
@@ -36,8 +37,8 @@ public class Probe {
         if (kContext.getType() == ScriptType.CLIENT) {
             return Minecraft.getInstance().player;
         } else {
-            MinecraftServer currentServer = ServerLifecycleHooks.getCurrentServer();
-            if (currentServer == null || !currentServer.isSingleplayer()) return null;
+            MinecraftServer currentServer = GameUtils.getCurrentServer();
+            if (currentServer == null) return null;
             return currentServer.getPlayerList()
                     .getPlayers()
                     .getFirst();

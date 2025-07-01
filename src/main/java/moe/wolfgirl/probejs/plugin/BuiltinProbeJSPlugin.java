@@ -126,4 +126,9 @@ public class BuiltinProbeJSPlugin extends ProbeJSPlugin {
     public void registerLocalWebServer(LocalWebServerRegistry registry) {
         ProbeJSEndpoints.register(registry);
     }
+
+    @Override
+    public void registerLocalWebServerWithAuth(LocalWebServerRegistry registry) {
+        ProbeJSEndpoints.registerWithAuth(registry);
+    }
 }

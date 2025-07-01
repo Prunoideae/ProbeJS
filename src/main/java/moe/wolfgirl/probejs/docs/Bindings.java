@@ -6,7 +6,9 @@ import dev.latvian.mods.rhino.BaseFunction;
 import dev.latvian.mods.rhino.NativeJavaClass;
 import dev.latvian.mods.rhino.Scriptable;
 import dev.latvian.mods.rhino.type.TypeInfo;
+import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
+import moe.wolfgirl.probejs.lang.typescript.code.type.TSStaticType;
 import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
 import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
 import moe.wolfgirl.probejs.lang.transpiler.TypeConverter;
@@ -33,18 +35,14 @@ public class Bindings extends ProbeJSPlugin {
         for (Object o : scope.getIds(context)) {
             if (o instanceof String id) {
                 Object value = scope.get(context, id, scope);
-                if (value instanceof NativeJavaClass javaClass) {
-                    value = javaClass.getClassObject();
-                } else {
-                    value = context.jsToJava(value, TypeInfo.OBJECT);
-                }
+                if (value instanceof NativeJavaClass javaClass) value = javaClass.getClassObject();
+                else value = context.jsToJava(value, TypeInfo.OBJECT);
 
                 if (value.getClass() == Class.class) {
-                    if (((Class<?>) value).isInterface()) {
-                        reexported.put(id, converter.convertType(TypeInfo.of((Class<?>) value)));
-                    } else {
-                        exported.put(id, Types.typeOf(converter.convertType(TypeInfo.of((Class<?>) value))));
-                    }
+                    var clazz = (Class<?>) value;
+                    var classPath = new ClassPath(clazz);
+                    if (clazz.isInterface()) exported.put(id, Types.typeOf(new TSStaticType(classPath)));
+                    else exported.put(id, Types.typeOf(clazz));
                 } else if (!(value instanceof BaseFunction || value instanceof EventGroupWrapper)) {
                     exported.put(id, converter.convertType(TypeInfo.of(value.getClass())));
                 }
@@ -56,11 +54,6 @@ public class Bindings extends ProbeJSPlugin {
             String symbol = entry.getKey();
             BaseType type = entry.getValue();
             codes.add(new VariableDeclaration(symbol, type));
-        }
-        for (Map.Entry<String, BaseType> entry : reexported.entrySet()) {
-            String symbol = entry.getKey();
-            BaseType type = entry.getValue();
-            codes.add(new ReexportDeclaration(symbol, type));
         }
         scriptDump.addGlobal("bindings", exported.keySet(), codes.toArray(Code[]::new));
     }

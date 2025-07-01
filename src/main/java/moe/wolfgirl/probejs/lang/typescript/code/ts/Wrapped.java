@@ -40,7 +40,6 @@ public abstract class Wrapped extends CommentableCode {
         this.codes.addAll(other.codes);
     }
 
-
     public static class Global extends Wrapped {
         @Override
         public List<String> formatRaw(Declaration declaration) {
@@ -62,6 +61,11 @@ public abstract class Wrapped extends CommentableCode {
         @Override
         public List<String> formatRaw(Declaration declaration) {
             List<String> lines = new ArrayList<>();
+            if (codes.isEmpty()) {
+                lines.add("export namespace %s {}".formatted(nameSpace));
+                return lines;
+            }
+
             lines.add("export namespace %s {".formatted(nameSpace));
             lines.addAll(super.formatRaw(declaration));
             lines.add("}");

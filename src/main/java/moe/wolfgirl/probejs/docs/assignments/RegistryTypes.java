@@ -15,6 +15,7 @@ import moe.wolfgirl.probejs.lang.typescript.code.ts.Wrapped;
 import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
 import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
 import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
+import moe.wolfgirl.probejs.utils.GameUtils;
 import moe.wolfgirl.probejs.utils.NameUtils;
 import moe.wolfgirl.probejs.utils.RegistryUtils;
 import net.minecraft.core.Holder;
@@ -28,7 +29,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import java.util.*;
 
@@ -48,7 +48,7 @@ public class RegistryTypes extends ProbeJSPlugin {
     @Override
     public void assignType(ScriptDump scriptDump) {
         List<BaseType> registryNames = new ArrayList<>();
-        MinecraftServer currentServer = ServerLifecycleHooks.getCurrentServer();
+        MinecraftServer currentServer = GameUtils.getCurrentServer();
         if (currentServer == null) return;
         RegistryAccess access = currentServer.registryAccess();
 
@@ -93,7 +93,7 @@ public class RegistryTypes extends ProbeJSPlugin {
     @Override
     public void addGlobals(ScriptDump scriptDump) {
         Wrapped.Namespace special = new Wrapped.Namespace("Special");
-        MinecraftServer currentServer = ServerLifecycleHooks.getCurrentServer();
+        MinecraftServer currentServer = GameUtils.getCurrentServer();
         if (currentServer == null) return;
         RegistryAccess registryAccess = currentServer.registryAccess();
 
@@ -129,7 +129,7 @@ public class RegistryTypes extends ProbeJSPlugin {
 
     @Override
     public void modifyClasses(ScriptDump scriptDump, Map<ClassPath, TypeScriptFile> globalClasses) {
-        MinecraftServer currentServer = ServerLifecycleHooks.getCurrentServer();
+        MinecraftServer currentServer = GameUtils.getCurrentServer();
         if (currentServer == null) return;
         RegistryAccess registryAccess = currentServer.registryAccess();
 
@@ -163,7 +163,7 @@ public class RegistryTypes extends ProbeJSPlugin {
     @Override
     public Set<Class<?>> provideJavaClass(ScriptDump scriptDump) {
         Set<Class<?>> registryObjectClasses = new HashSet<>();
-        MinecraftServer currentServer = ServerLifecycleHooks.getCurrentServer();
+        MinecraftServer currentServer = GameUtils.getCurrentServer();
         if (currentServer == null) return registryObjectClasses;
         RegistryAccess registryAccess = currentServer.registryAccess();
 
@@ -189,7 +189,7 @@ public class RegistryTypes extends ProbeJSPlugin {
 
     @Override
     public void addVSCodeSnippets(SnippetDump dump) {
-        MinecraftServer currentServer = ServerLifecycleHooks.getCurrentServer();
+        MinecraftServer currentServer = GameUtils.getCurrentServer();
         if (currentServer == null) return;
         RegistryAccess registryAccess = currentServer.registryAccess();
 
