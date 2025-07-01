@@ -7,19 +7,20 @@ import moe.wolfgirl.probejs.lang.typescript.code.ImportInfo;
 import java.util.Collection;
 import java.util.List;
 
-public class TSStaticType extends TSClassType {
-    public TSStaticType(ClassPath classPath) {
+public class TSInterfaceType extends TSClassType {
+
+    public TSInterfaceType(ClassPath classPath) {
         super(classPath);
     }
 
     @Override
     public Collection<ImportInfo> getUsedImports() {
-        return List.of(ImportInfo.importStatic(classPath));
+        return List.of(ImportInfo.itf(classPath));
     }
 
     @Override
     public List<String> format(Declaration declaration, FormatType input) {
         var name = declaration.getSymbol(classPath);
-        return List.of(ImportInfo.STATIC_TEMPLATE.formatted(name));
+        return List.of(ImportInfo.INTERFACE_TEMPLATE.formatted(name));
     }
 }

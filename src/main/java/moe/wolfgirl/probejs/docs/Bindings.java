@@ -6,14 +6,11 @@ import dev.latvian.mods.rhino.BaseFunction;
 import dev.latvian.mods.rhino.NativeJavaClass;
 import dev.latvian.mods.rhino.Scriptable;
 import dev.latvian.mods.rhino.type.TypeInfo;
-import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
-import moe.wolfgirl.probejs.lang.typescript.code.type.TSStaticType;
 import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
 import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
 import moe.wolfgirl.probejs.lang.transpiler.TypeConverter;
 import moe.wolfgirl.probejs.lang.typescript.code.Code;
-import moe.wolfgirl.probejs.lang.typescript.code.ts.ReexportDeclaration;
 import moe.wolfgirl.probejs.lang.typescript.code.ts.VariableDeclaration;
 import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
 
@@ -30,7 +27,6 @@ public class Bindings extends ProbeJSPlugin {
         Scriptable scope = context.topLevelScope;
         TypeConverter converter = scriptDump.transpiler.typeConverter;
         Map<String, BaseType> exported = new HashMap<>();
-        Map<String, BaseType> reexported = new HashMap<>(); // Namespaces
 
         for (Object o : scope.getIds(context)) {
             if (o instanceof String id) {
@@ -38,12 +34,8 @@ public class Bindings extends ProbeJSPlugin {
                 if (value instanceof NativeJavaClass javaClass) value = javaClass.getClassObject();
                 else value = context.jsToJava(value, TypeInfo.OBJECT);
 
-                if (value.getClass() == Class.class) {
-                    var clazz = (Class<?>) value;
-                    var classPath = new ClassPath(clazz);
-                    if (clazz.isInterface()) exported.put(id, Types.typeOf(new TSStaticType(classPath)));
-                    else exported.put(id, Types.typeOf(clazz));
-                } else if (!(value instanceof BaseFunction || value instanceof EventGroupWrapper)) {
+                if (value.getClass() == Class.class) exported.put(id, Types.typeOf((Class<?>) value));
+                else if (!(value instanceof BaseFunction || value instanceof EventGroupWrapper)) {
                     exported.put(id, converter.convertType(TypeInfo.of(value.getClass())));
                 }
             }

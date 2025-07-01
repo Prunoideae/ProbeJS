@@ -9,11 +9,13 @@ public record ImportInfo(ClassPath classPath, Type type) {
     public static final String INPUT_TEMPLATE = "%s$$Type";
     public static final String OUTPUT_TEMPLATE = "%s$$Original";
     public static final String STATIC_TEMPLATE = "%s$$Static";
+    public static final String INTERFACE_TEMPLATE = "%s$$Interface";
 
     public enum Type {
         ORIGINAL(ImportInfo.ORIGINAL),
         TYPE(INPUT_TEMPLATE::formatted),
-        STATIC(STATIC_TEMPLATE::formatted);
+        STATIC(STATIC_TEMPLATE::formatted),
+        INTERFACE(INTERFACE_TEMPLATE::formatted);
 
         private final UnaryOperator<String> formatter;
 
@@ -36,6 +38,10 @@ public record ImportInfo(ClassPath classPath, Type type) {
 
     public static ImportInfo importStatic(ClassPath path) {
         return new ImportInfo(path, Type.STATIC);
+    }
+
+    public static ImportInfo itf(ClassPath path) {
+        return new ImportInfo(path, Type.INTERFACE);
     }
 
     public ImportInfo asType(Type type) {

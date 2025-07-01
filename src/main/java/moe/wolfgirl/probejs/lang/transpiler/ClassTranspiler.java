@@ -11,9 +11,7 @@ import moe.wolfgirl.probejs.lang.transpiler.members.Field;
 import moe.wolfgirl.probejs.lang.transpiler.members.Method;
 import moe.wolfgirl.probejs.lang.transpiler.transformation.ClassTransformer;
 import moe.wolfgirl.probejs.lang.typescript.code.member.*;
-import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
-import moe.wolfgirl.probejs.lang.typescript.code.type.TSVariableType;
-import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
+import moe.wolfgirl.probejs.lang.typescript.code.type.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +29,19 @@ public class ClassTranspiler extends Converter<Clazz, ClassDecl> {
         this.constructor = new Constructor(converter);
     }
 
+    private static BaseType dissectForInterface(BaseType baseType) {
+        // Because we need to replace normal type to $$Interface
+        if (baseType instanceof TSClassType tsClassType) {
+            return new TSInterfaceType(tsClassType.classPath);
+        } else if (baseType instanceof TSParamType tsParamType) {
+            return Types.parameterized(
+                    dissectForInterface(tsParamType.baseType),
+                    tsParamType.params.toArray(BaseType[]::new)
+            );
+        }
+        return baseType;
+    }
+
     @Override
     public ClassDecl transpile(Clazz input) {
         List<TSVariableType> variableTypes = new ArrayList<>();
@@ -45,6 +56,7 @@ public class ClassTranspiler extends Converter<Clazz, ClassDecl> {
                                 input.interfaces.stream()
                                         .map(converter::convertType)
                                         .filter(t -> t != Types.ANY)
+                                        .map(ClassTranspiler::dissectForInterface)
                                         .toList(),
                                 variableTypes) :
                         new ClassDecl(input.classPath.getName(),
@@ -52,6 +64,7 @@ public class ClassTranspiler extends Converter<Clazz, ClassDecl> {
                                 input.interfaces.stream()
                                         .map(converter::convertType)
                                         .filter(t -> t != Types.ANY)
+                                        .map(ClassTranspiler::dissectForInterface)
                                         .toList(),
                                 variableTypes
                         );

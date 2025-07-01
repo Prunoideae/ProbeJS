@@ -51,7 +51,6 @@ public class ProbeBuiltinDocs extends ProbeJSPlugin {
             AdditionalTypes::new,
             ViewerEvents::new,
             Attachments::new,
-            LoadClass::new,
             ItemComponents::new,
             ObjectIDs::new
     ));
