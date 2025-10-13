@@ -74,7 +74,10 @@ public class ProbeBuiltinDocs extends ProbeJSPlugin {
 
     @Override
     public void modifyClasses(ScriptDump scriptDump, Map<ClassPath, TypeScriptFile> globalClasses) {
-        forEach(builtinDoc -> builtinDoc.modifyClasses(scriptDump, globalClasses));
+        forEach(builtinDoc -> {
+            ProbeJS.LOGGER.info("Builtin plugin %s is patching classes...".formatted(builtinDoc.getClass()));
+            builtinDoc.modifyClasses(scriptDump, globalClasses);
+        });
 
     }
 

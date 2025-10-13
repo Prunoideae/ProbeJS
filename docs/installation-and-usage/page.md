@@ -1,10 +1,6 @@
-ProbeJS is not an editor, all it does is to generate typings for KubeJS scripts. Thus, you need to use an editor that supports TypeScript / JavaScript to be able to get the benefits of ProbeJS.
+ProbeJS is not an editor, all it does is to generate information file so other IDEs, especially VSCode, can use to provide autocompletions etc.
 
-The mod is designed to work with [Visual Studio Code](https://code.visualstudio.com/), so you need to install
-it to get all features implemented in ProbeJS. However, since TypeScript language
-definition is a widely used standard, other editors like IntelliJ IDEA, WebStorm,
-and Sublime Text can also provide some level of support for ProbeJS typings,
-but you may have some functionality missing.
+The mod is designed to work with [Visual Studio Code](https://code.visualstudio.com/), so you need to install it to get all features implemented in ProbeJS. However, since TypeScript language definition is a widely used standard, other editors like IntelliJ IDEA, WebStorm, and Sublime Text can also provide some level of support for ProbeJS typings. However, VSCode becomes almost mandatory now, as a large part of the ProbeJS features are implemented as VSCode plugin, which is not available for other editors.
 
 ## Installation - VSCode
 
@@ -20,11 +16,13 @@ in the list.
 
     ![VSCode TypeScript Extension](./vscode-typescript-extension.png)
 
-3. Confirm that your VSCode is able to recognize JavaScript and TypeScript files. You can download a [JS project template](https://static.wolfgirl.moe/object-service/unchecked/probejs/project-template.zip) at here.
+3. Confirm that your VSCode is able to recognize JavaScript and TypeScript files. You can download a [JS project template](https://static.wolfgirl.moe/files/probejs/project-template.zip) at here.
     1. Extract the downloaded file to a folder.
     2. Open the folder in VSCode by right-clicking on the folder and selecting `Open with Code`.
     3. Open the `src/example.js` file and check if the editor is able to provide autocompletion and type checking for the `example.js` file.
-4. Congratulations! Your VSCode will be able to recognize ProbeJS typings in your KubeJS scripts. However, depending on the mod you are using, the performance of the autocompletion and type checking may vary.
+4. Install the ProbeJS extension for VSCode. You can find it by searching for `ProbeJS` in the Extensions view.
+
+    ![ProbeJS VSCode Extension](./probejs-vscode-extension.png)
 
 ## Installation - ProbeJS
 
@@ -32,34 +30,32 @@ With a correctly configured editor, you can now install ProbeJS to generate typi
 
 1. Download the latest version of ProbeJS from [CurseForge](https://www.curseforge.com/minecraft/mc-mods/probejs) or [Modrinth](https://modrinth.com/mod/probejs).
 2. Install ProbeJS on your Minecraft client.
-3. Launch the game and load your world, the dump will be executed automatically.
-4. Open the `.minecraft` folder with VSCode and navigate to the `kubejs` folder, you should see `src` and `jsconfig.json` files generated in each script folder.
+3. Launch the game and load your world, the dump will be executed automatically. You will be notified when the dump is complete, or you can use `/probejs dump` command to trigger the dump manually.
 
-    ![Minecraft Folder](./minecraft_folder.png)
-    ![Modified KubeJS Folder](./dump_structure.png)
+## Usage
 
-    **STOP TALKING ABOUT OPENING THE KUBEJS FOLDER IN VSCODE, OPEN .MINECRAFT INSTEAD**
+Open the `.minecraft` folder (or the parent folder of `kubejs`) with VSCode and navigate to the `kubejs` folder, you should see `src` and `jsconfig.json` files generated in each script folder.
 
-    **THIS IS WRONG, AND YOU SHOULD NOT TEACH PEOPLE TO DO THIS**
+![Minecraft Folder](./minecraft_folder.png)
+![Modified KubeJS Folder](./dump_structure.png)
 
-5. With VSCode properly set up and ProbeJS dumping generated, you should have code completion and type checking for your KubeJS scripts.
+**NOTE: STOP TALKING ABOUT OPENING THE KUBEJS FOLDER IN VSCODE, OPEN .MINECRAFT INSTEAD, THIS IS WRONG, AND YOU SHOULD NOT TEACH PEOPLE TO DO THIS**
+
+The extension will automatically activate when you:
+    1. Had a running Minecraft instance with ProbeJS installed, and in a singleplayer world.
+    2. Opened a `.js` or `.d.ts` file in VSCode.
+
+Depending on the mod count you have in your pack, the loading time will vary from 10 seconds to maybe 5 minutes. Loading status will be indicated by the status bar at the bottom of the VSCode window:
+
+![Status Bar](./activating.png)
+
+After the loading is complete, you can check if the functionality is working by triggering autocompletions in a `.js` file, like typing `ServerEvents.`:
+
+![Autocompletion](./autocompletion.png)
 
 ## Plugin Recommendations
 
-To enhance your experience with ProbeJS, you can install some plugins for Visual Studio Code. Here are some recommendations:
-
-### ProbeJS
-
-ProbeJS also provides a plugin for Visual Studio Code that adds some features to the editor. You can install it from the plugin marketplace by searching for `ProbeJS`.
-
-Features:
-
-- [x] Insert item and block strings automatically when you trigger `KubeJS Info` in game.
-- [x] Syncing script errors and warnings from the game to the editor.
-- [x] Reloading scripts from VSCode directly.
-- [x] Evaluate function or variable at runtime.
-- [x] Decorate item/block/fluid string with their icons.
-- [x] Provides completions in JavaScript/TypeScript files.
+To enhance your experience with ProbeJS, you can install some plugins for Visual Studio Code other than the ProbeJS plugin. Here are some recommendations:
 
 ### Error Lens
 

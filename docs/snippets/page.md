@@ -1,5 +1,3 @@
-*Note: this only works with VSCode*
-
 Snippets are small pieces of text that can be inserted into a document. They are often used to provide examples of code, commands, or configuration options.
 
 To facilitate your writing, ProbeJS has a set of snippets that you can use to quickly insert useful strings like item or block names, tags, and other things like a stub for recipe events.

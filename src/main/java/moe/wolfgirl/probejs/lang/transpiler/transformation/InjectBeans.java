@@ -1,11 +1,13 @@
 package moe.wolfgirl.probejs.lang.transpiler.transformation;
 
+import moe.wolfgirl.probejs.ProbeConfig;
 import moe.wolfgirl.probejs.ProbeJS;
 import moe.wolfgirl.probejs.lang.java.clazz.Clazz;
 import moe.wolfgirl.probejs.lang.typescript.Declaration;
 import moe.wolfgirl.probejs.lang.typescript.code.Code;
 import moe.wolfgirl.probejs.lang.typescript.code.ImportInfo;
 import moe.wolfgirl.probejs.lang.typescript.code.member.ClassDecl;
+import moe.wolfgirl.probejs.lang.typescript.code.member.FieldDecl;
 import moe.wolfgirl.probejs.lang.typescript.code.member.MethodDecl;
 import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
 import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
@@ -13,28 +15,40 @@ import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
 import java.util.*;
 
 public class InjectBeans implements ClassTransformer {
+    private static final String GET_STRING = "get %s(): %s";
+    private static final String SET_STRING = "set %s(value: %s)";
+
     @Override
     public void transform(Clazz clazz, ClassDecl classDecl) {
+        if (!ProbeConfig.INSTANCE.beans.get()) return;
+
         Set<String> names = new HashSet<>();
         for (MethodDecl method : classDecl.methods) {
             names.add(method.name);
         }
+        for (FieldDecl field : classDecl.fields) {
+            names.add(field.name);
+        }
         for (MethodDecl method : classDecl.methods) {
-            if (method.isStatic) continue;
+
             if (!isBean(method.name)) continue;
 
             if (method.name.startsWith("set") && method.params.size() == 1) {
                 String beanName = getBeanName(method.name);
                 if (names.contains(beanName)) continue;
                 classDecl.bodyCode.add(new BeanDecl(
-                        "set %s(value: %s)",
+                        method.isStatic ? "public static " + SET_STRING : SET_STRING,
                         beanName,
                         Types.ignoreContext(method.params.getFirst().type, BaseType.FormatType.INPUT)
                 ));
             } else if (method.params.isEmpty()) {
                 String beanName = getBeanName(method.name);
                 if (names.contains(beanName)) continue;
-                classDecl.bodyCode.add(new BeanDecl("get %s(): %s", beanName, beanName.startsWith("is") ? Types.BOOLEAN : method.returnType));
+                classDecl.bodyCode.add(new BeanDecl(
+                        method.isStatic ? "public static " + GET_STRING : GET_STRING,
+                        beanName,
+                        beanName.startsWith("is") ? Types.BOOLEAN : method.returnType
+                ));
             }
         }
     }

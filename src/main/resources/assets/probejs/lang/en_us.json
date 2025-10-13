@@ -24,5 +24,7 @@
     "probejs.no_complete": "ProbeJS will disable some types in dump now, so your VSCode should run faster. Use snippets for those types missing.",
     "probejs.performance": "You installed %s mods! Some functions are disabled for the sake of performance, but probably not much. Toggle with /probejs config complete_dump if you want a complete (but slow) dump!",
     "probejs.decompile": "ProbeJS will decompile mod sources at next dump, decompilation will also trigger when mod list changed.",
-    "probejs.no_decompile": "ProbeJS will not decompile mod sources now."
+    "probejs.no_decompile": "ProbeJS will not decompile mod sources now.",
+    "probejs.generate_beans": "ProbeJS will generate beans for getXX, isXX and setXX methods now.",
+    "probejs.no_generate_beans": "ProbeJS will not generate beans now."
 }

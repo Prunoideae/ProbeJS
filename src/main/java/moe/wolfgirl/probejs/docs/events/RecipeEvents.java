@@ -1,14 +1,18 @@
 package moe.wolfgirl.probejs.docs.events;
 
+import dev.latvian.mods.kubejs.recipe.RecipeFunction;
 import dev.latvian.mods.kubejs.recipe.RecipeKey;
 import dev.latvian.mods.kubejs.recipe.RecipesKubeEvent;
+import dev.latvian.mods.kubejs.recipe.component.RecipeComponent;
 import dev.latvian.mods.kubejs.recipe.schema.RecipeNamespace;
 import dev.latvian.mods.kubejs.recipe.schema.RecipeSchema;
 import dev.latvian.mods.kubejs.recipe.schema.RecipeSchemaType;
 import dev.latvian.mods.kubejs.recipe.schema.UnknownRecipeSchemaType;
+import dev.latvian.mods.kubejs.recipe.schema.function.RecipeFunctionInstance;
 import dev.latvian.mods.kubejs.script.ScriptType;
 import dev.latvian.mods.kubejs.server.ServerScriptManager;
 import dev.latvian.mods.rhino.type.TypeInfo;
+import moe.wolfgirl.probejs.ProbeJS;
 import moe.wolfgirl.probejs.lang.schema.ObjectElement;
 import moe.wolfgirl.probejs.lang.schema.SchemaDump;
 import moe.wolfgirl.probejs.lang.schema.SchemaElement;
@@ -51,6 +55,7 @@ public class RecipeEvents extends ProbeJSPlugin {
 
     @Override
     public void modifyClasses(ScriptDump scriptDump, Map<ClassPath, TypeScriptFile> globalClasses) {
+        ProbeJS.LOGGER.info("Patching recipe events...");
         TypeConverter converter = scriptDump.transpiler.typeConverter;
         ServerScriptManager manager = GameUtils.getServerScriptManager();
         if (manager == null) return;
@@ -137,12 +142,24 @@ public class RecipeEvents extends ProbeJSPlugin {
         ClassDecl.Builder builder = Statements.clazz("$" + NameUtils.rlToTitle(id))
                 .superClass(converter.convertType(schema.recipeFactory.recipeType()));
         for (RecipeKey<?> key : schema.keys) {
-            if (key.functionNames == null || key.functionNames.isEmpty()) continue;
-            builder.method(key.getPreferredBuilderKey(), method -> {
+            var name = key.getPrimaryFunctionName();
+            if (!RecipeFunction.isValidIdentifier(name.toCharArray())) continue;
+            builder.method(name, method -> {
                         method.returnType(Types.THIS);
-                        method.param(key.getPreferredBuilderKey(), converter.convertType(key.component.typeInfo()));
+                        method.param(name, converter.convertType(key.component.typeInfo()));
                     }
             );
+        }
+
+        for (RecipeFunctionInstance value : schema.functions.values()) {
+            builder.method(value.name(), method -> {
+                var args = value.function().arguments();
+                for (int i = 0; i < args.size(); i++) {
+                    var argument = args.get(i);
+                    method.param("arg" + i, converter.convertType(argument.typeInfo()));
+                }
+                method.returnType(Types.THIS);
+            });
         }
         return builder.build();
     }
@@ -155,7 +172,7 @@ public class RecipeEvents extends ProbeJSPlugin {
         for (RecipeKey<?> key : schema.keys) {
             if (key.excluded) continue;
             if (key.functionNames == null || !key.functionNames.isEmpty()) {
-                builder.param(key.getPreferredBuilderKey(),
+                builder.param(key.getPrimaryFunctionName(),
                         converter.convertType(key.component.typeInfo()),
                         key.optional(), false);
             }

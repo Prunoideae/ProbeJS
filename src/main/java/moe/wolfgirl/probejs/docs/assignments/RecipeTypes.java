@@ -61,7 +61,7 @@ public class RecipeTypes extends ProbeJSPlugin {
                 .member("or", true, Types.type(RecipeFilter.class))
                 .member("not", true, Types.type(RecipeFilter.class))
                 .member("id", true, Types.primitive("Special.RecipeId"))
-                .member("type", true, Types.primitive("Special.RecipeType"))
+                .member("type", true, Types.primitive("Special.RecipeSerializer"))
                 .member("group", true, Types.STRING)
                 .member("mod", true, Types.primitive("Special.Mod"))
                 .member("input", true, Types.type(Ingredient.class))

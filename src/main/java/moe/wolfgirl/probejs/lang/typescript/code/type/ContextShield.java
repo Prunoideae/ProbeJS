@@ -1,6 +1,5 @@
 package moe.wolfgirl.probejs.lang.typescript.code.type;
 
-import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.lang.typescript.Declaration;
 import moe.wolfgirl.probejs.lang.typescript.code.ImportInfo;
 
@@ -18,7 +17,11 @@ public class ContextShield extends BaseType {
 
     @Override
     public Collection<ImportInfo> getUsedImports() {
-        return inner.getUsedImports();
+        return switch (formatType) {
+            case INPUT -> inner.getUsedImportsAs(ImportInfo.Type.TYPE);
+            case RETURN -> inner.getUsedImportsAs(ImportInfo.Type.ORIGINAL);
+            case VARIABLE -> inner.getUsedImports();
+        };
     }
 
     @Override

@@ -86,6 +86,7 @@ public record ClassPath(List<String> parts) {
     }
 
     public String getFileKey() {
-        return String.join(".", parts.subList(0, Math.min(4, parts.size())));
+        if (parts.size() == 1) return getClassPath();
+        return String.join(".", parts.subList(0, Math.min(4, parts.size() - 1)));
     }
 }

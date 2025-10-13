@@ -82,7 +82,7 @@ public class ConfigUtils {
         // Write the updated configuration back to the file
         JsonWriter jsonWriter = ProbeJS.GSON_WRITER.newJsonWriter(Files.newBufferedWriter(path));
         jsonWriter.setIndent("    ");
-        ProbeJS.GSON_WRITER.toJson(config, JsonObject.class, jsonWriter);
+        ProbeJS.GSON_WRITER.toJson(config, jsonWriter);
         jsonWriter.close();
     }
 
@@ -103,7 +103,7 @@ public class ConfigUtils {
         mergeAddArray(include, new JsonPrimitive("./**/*.ts"));
 
         JsonObject compilerOptions = JsonUtils.putObjectIfAbsent(config, "compilerOptions");
-        compilerOptions.addProperty("module", "commonjs");
+        compilerOptions.addProperty("module", "none");
         compilerOptions.addProperty("moduleResolution", "node");
         compilerOptions.addProperty("allowJs", true);
         compilerOptions.addProperty("checkJs", false);

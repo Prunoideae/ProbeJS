@@ -7,6 +7,7 @@ import moe.wolfgirl.probejs.utils.JsonUtils;
 import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -27,6 +28,8 @@ public class ProbeConfig {
     public ConfigEntry<Boolean> complete = new ConfigEntry<>("complete", true);
     // what mods are force-included from an incomplete dump, other mods/registry objects are stripped off
     public ConfigEntry<String> mods = new ConfigEntry<>("forceIncluded", "kubejs,minecraft,neoforge");
+    public ConfigEntry<Boolean> beans = new ConfigEntry<>("generateBeans", true);
+    public ConfigEntry<List<String>> excludedPaths = new ConfigEntry<>("excludedClassPaths", List.of());
 
     public static class ConfigEntry<T> {
         public final String name;

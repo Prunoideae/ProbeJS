@@ -116,6 +116,7 @@ public class ClassRegistry {
         MutableBoolean bool = new MutableBoolean(false);
 
         RenderSystem.recordRenderCall(() -> {
+            var loader = getClass().getClassLoader();
             // We mark the recursion depth of the class, so a class with depth X
             // will need X jumps from any found classes to be referenced
             Set<Clazz> currentClasses = new HashSet<>(foundClasses.values());
@@ -130,7 +131,7 @@ public class ClassRegistry {
                 for (Class<?> c : fetchedClass) {
                     try {
                         if (c.isPrimitive()) continue;
-                        Class.forName(c.getName());
+                        Class.forName(c.getName(), false, loader);
                         Clazz clazz = new Clazz(c);
                         clazz.recursionDepth = recursion;
                         putClass(clazz.classPath, clazz);

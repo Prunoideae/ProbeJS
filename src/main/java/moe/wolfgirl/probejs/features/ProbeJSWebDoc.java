@@ -3,10 +3,11 @@ package moe.wolfgirl.probejs.features;
 import com.google.common.collect.Iterables;
 import com.google.gson.JsonArray;
 import com.mojang.brigadier.tree.CommandNode;
+import dev.latvian.mods.kubejs.recipe.RecipeFunction;
 import dev.latvian.mods.kubejs.recipe.RecipeKey;
-import dev.latvian.mods.kubejs.recipe.component.IngredientComponent;
 import dev.latvian.mods.kubejs.recipe.component.RecipeComponent;
 import dev.latvian.mods.kubejs.recipe.schema.*;
+import dev.latvian.mods.kubejs.recipe.schema.function.RecipeFunctionInstance;
 import dev.latvian.mods.kubejs.server.ServerScriptManager;
 import dev.latvian.mods.rhino.type.EnumTypeInfo;
 import moe.wolfgirl.probejs.ProbeJS;
@@ -50,17 +51,19 @@ public class ProbeJSWebDoc {
         var schema = scriptManager.recipeSchemaStorage.namespace(recipeType.getNamespace()).get(recipeType.getPath());
         if (schema == null) throw new RuntimeException("Invalid recipe type: %s".formatted(recipeType));
         List<String> formattedMethods = new ArrayList<>();
-        var decl = new Declaration();
         for (RecipeConstructor value : schema.schema.constructors().values()) {
-            JSLambdaType.Builder builder = Types.lambda()
-                    .method()
-                    .returnType(Types.VOID);
-            for (RecipeKey<?> key : value.keys) {
-                builder.param(key.name, Types.primitive(transformComponent(key.component)), key.optional());
+            formattedMethods.add("    event.recipes.%s.%s%s".formatted(recipeType.getNamespace(), recipeType.getPath(), value.toString()));
+        }
+        for (RecipeKey<?> key : schema.schema.keys) {
+            var name = key.getPrimaryFunctionName();
+            if (RecipeFunction.isValidIdentifier(name.toCharArray())) {
+                formattedMethods.add("        .%s(%s)".formatted(name, key.component));
             }
-            var methodType = builder.build();
-            String body = ParamDecl.formatParams(methodType.params, decl, BaseType.FormatType.INPUT);
-            formattedMethods.add("    event.recipes.%s.%s%s".formatted(recipeType.getNamespace(), recipeType.getPath(), body));
+        }
+        for (RecipeFunctionInstance value : schema.schema.functions.values()) {
+            if (RecipeFunction.isValidIdentifier(value.name().toCharArray())) {
+                formattedMethods.add("        ." + value);
+            }
         }
         return formattedMethods;
     }
@@ -88,9 +91,6 @@ public class ProbeJSWebDoc {
     }
 
     private static String transformComponent(RecipeComponent<?> type) {
-        if (type.type() == IngredientComponent.UNWRAPPED_INGREDIENT_LIST) {
-            return "ingredient[]";
-        }
         if (type.typeInfo() instanceof EnumTypeInfo enumTypeInfo) {
             List<String> enums = new ArrayList<>();
             for (Object object : enumTypeInfo.enumConstants()) {

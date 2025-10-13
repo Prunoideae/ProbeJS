@@ -5,6 +5,7 @@ import com.mojang.datafixers.util.Pair;
 import dev.latvian.mods.kubejs.plugin.KubeJSPlugin;
 import dev.latvian.mods.kubejs.plugin.KubeJSPlugins;
 import dev.latvian.mods.rhino.util.HideFromJS;
+import moe.wolfgirl.probejs.lang.schema.ComponentSchema;
 import moe.wolfgirl.probejs.lang.schema.SchemaDump;
 import moe.wolfgirl.probejs.lang.snippet.SnippetDump;
 import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
@@ -99,6 +100,13 @@ public class ProbeJSPlugin implements KubeJSPlugin {
     }
 
     public void addJsonSchema(SchemaDump dump) {
+
+    }
+
+    /**
+     * Register the schema of a recipe component.
+     */
+    public void registerRecipeComponentSchema(ComponentSchema componentSchema) {
 
     }
 

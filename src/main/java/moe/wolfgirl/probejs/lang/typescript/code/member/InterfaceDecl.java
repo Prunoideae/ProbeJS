@@ -2,14 +2,14 @@ package moe.wolfgirl.probejs.lang.typescript.code.member;
 
 import moe.wolfgirl.probejs.lang.typescript.Declaration;
 import moe.wolfgirl.probejs.lang.typescript.code.Code;
+import moe.wolfgirl.probejs.lang.typescript.code.ImportInfo;
 import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
 import moe.wolfgirl.probejs.lang.typescript.code.type.TSVariableType;
 import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class InterfaceDecl extends ClassDecl {
@@ -21,6 +21,48 @@ public class InterfaceDecl extends ClassDecl {
     @Override
     public boolean isInterface() {
         return true;
+    }
+
+    @Override
+    public Collection<ImportInfo> getUsedImports() {
+        boolean seen = false;
+        for (MethodDecl method : methods) {
+            if (!method.isStatic && method.isAbstract) {
+                if (seen) return super.getUsedImports();
+                seen = true;
+            }
+        }
+        if (!seen) return super.getUsedImports();
+
+
+        Set<ImportInfo> paths = new HashSet<>();
+        for (FieldDecl field : fields) {
+            paths.addAll(field.getUsedImports());
+        }
+        for (ConstructorDecl constructor : constructors) {
+            paths.addAll(constructor.getUsedImports());
+        }
+        for (MethodDecl method : methods) {
+            if (method.isAbstract && !method.isStatic) {
+                for (ImportInfo usedImport : method.getUsedImports()) {
+                    paths.add(usedImport.asType(ImportInfo.Type.ORIGINAL));
+                }
+            } else {
+                paths.addAll(method.getUsedImports());
+            }
+        }
+        for (BaseType anInterface : interfaces) {
+            paths.addAll(anInterface.getUsedImports());
+        }
+        for (TSVariableType variableType : variableTypes) {
+            paths.addAll(variableType.getUsedImports());
+        }
+        for (Code code : bodyCode) {
+            paths.addAll(code.getUsedImports());
+        }
+        if (superClass != null) paths.addAll(superClass.getUsedImports());
+
+        return paths;
     }
 
     /**
@@ -84,7 +126,7 @@ public class InterfaceDecl extends ClassDecl {
     }
 
     public ClassDecl createStaticClass(String name, List<MethodDecl> methodDecls, List<FieldDecl> fieldDecls) {
-        ClassDecl classDecl = new ClassDecl(name, null, List.of(Types.primitive(name)), this.variableTypes);
+        ClassDecl classDecl = new ClassDecl(name, null, List.of(Types.primitive(ImportInfo.INTERFACE_TEMPLATE.formatted(name))), this.variableTypes);
         classDecl.methods.addAll(methodDecls);
         classDecl.fields.addAll(fieldDecls);
         return classDecl;

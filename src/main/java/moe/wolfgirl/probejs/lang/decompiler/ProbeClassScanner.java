@@ -1,5 +1,7 @@
 package moe.wolfgirl.probejs.lang.decompiler;
 
+import moe.wolfgirl.probejs.ProbeConfig;
+import moe.wolfgirl.probejs.ProbeJS;
 import org.jetbrains.java.decompiler.main.extern.IContextSource;
 
 import java.io.File;
@@ -11,6 +13,27 @@ import java.util.zip.ZipFile;
 
 public class ProbeClassScanner {
     private final Set<Class<?>> scannedClasses = new HashSet<>();
+
+    private static boolean isRejectedFile(String name) {
+        if (name.contains("com.mojang.blaze3d.systems.TimerQuery")) return true;
+        var paths = name.split("\\.");
+
+        // Mixin class in a mixin package
+        // You must be a very terrible person if you don't name things like this.
+        boolean mixinPackage = false;
+        for (String path : paths) {
+            if (path.equals("mixin")) {
+                mixinPackage = true;
+                break;
+            }
+        }
+        if (paths[paths.length - 1].contains("Mixin") || mixinPackage) return true;
+
+        for (String prefix : ProbeConfig.INSTANCE.excludedPaths.get()) {
+            if (name.startsWith(prefix)) return true;
+        }
+        return false;
+    }
 
     public void acceptFile(File file) throws IOException {
         ClassLoader loader = getClass().getClassLoader();
@@ -25,9 +48,10 @@ public class ProbeClassScanner {
                 name = name.replace("/", ".");
                 try {
                     // Skipping due to mojang is weird
-                    if (name.contains("com.mojang.blaze3d.systems.TimerQuery")) continue;
+                    if (isRejectedFile(name)) continue;
                     scannedClasses.add(Class.forName(name, false, loader));
                 } catch (Throwable ignore) {
+                    ProbeJS.LOGGER.error("Error while loading class %s, consider add it to excluded classpaths.".formatted(name));
                 }
             }
         }

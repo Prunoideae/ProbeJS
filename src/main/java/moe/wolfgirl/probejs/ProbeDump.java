@@ -1,5 +1,6 @@
 package moe.wolfgirl.probejs;
 
+import moe.wolfgirl.probejs.features.RegistryBackups;
 import moe.wolfgirl.probejs.features.SchemaDownloader;
 import moe.wolfgirl.probejs.lang.decompiler.ProbeDecompiler;
 import moe.wolfgirl.probejs.lang.java.ClassRegistry;
@@ -98,6 +99,7 @@ public class ProbeDump {
         schemaDump.writeTo(ProbePaths.WORKSPACE_SETTINGS);
         ConfigUtils.writeVSCodeConfig(ProbePaths.VSCODE_JSON);
         appendGitIgnore();
+        RegistryBackups.dump(ProbePaths.REGISTRY_BACKUPS);
 
         report(Component.translatable("probejs.dump.snippets_generated"));
 

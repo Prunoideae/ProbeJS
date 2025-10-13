@@ -10,6 +10,7 @@ import dev.latvian.mods.kubejs.typings.Info;
 import moe.wolfgirl.probejs.ProbeJS;
 import moe.wolfgirl.probejs.lang.transpiler.transformation.InjectSpecialType;
 import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
+import moe.wolfgirl.probejs.lang.typescript.code.ImportInfo;
 import moe.wolfgirl.probejs.lang.typescript.code.type.TSClassType;
 import moe.wolfgirl.probejs.lang.typescript.code.type.TSParamType;
 import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
@@ -83,6 +84,7 @@ public class Events extends ProbeJSPlugin {
                     paramType.params.size() == 1 &&
                     paramType.baseType instanceof TSClassType classType) {
                 if (InjectSpecialType.NO_WRAPPING.contains(classType.classPath)) {
+                    paramType.baseType = Types.ignoreImport(paramType.baseType, ImportInfo.Type.TYPE);
                     paramType.params.set(0, Types.ignoreContext(paramType.params.getFirst(), BaseType.FormatType.RETURN));
                 }
             }

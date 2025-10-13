@@ -3,6 +3,9 @@ package moe.wolfgirl.probejs;
 import com.mojang.brigadier.Command;
 import dev.latvian.mods.kubejs.KubeJS;
 import dev.latvian.mods.kubejs.client.KubeJSClient;
+import dev.latvian.mods.kubejs.script.ScriptType;
+import moe.wolfgirl.probejs.events.CodeGenerationEventJS;
+import moe.wolfgirl.probejs.events.ProbeEvents;
 import moe.wolfgirl.probejs.utils.GameUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.Commands;
@@ -23,6 +26,9 @@ import net.neoforged.neoforge.event.entity.EntityTravelToDimensionEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
@@ -105,7 +111,7 @@ public class GameEvents {
                                 })
                         )
                         .then(Commands.literal("enable")
-                                .requires(source -> source.hasPermission(2))
+                                .requires(source -> !ProbeConfig.INSTANCE.enabled.get() && source.hasPermission(2))
                                 .executes(context -> {
                                     ProbeConfig.INSTANCE.enabled.set(true);
                                     context.getSource().sendSystemMessage(Component.translatable("probejs.hello_again").kjs$aqua());
@@ -123,6 +129,17 @@ public class GameEvents {
                                     return Command.SINGLE_SUCCESS;
                                 })
                         )
+                        .then(Commands.literal("toggle_beans")
+                                .requires(source -> ProbeConfig.INSTANCE.enabled.get() && source.hasPermission(2))
+                                .executes(context -> {
+                                    boolean flag = !ProbeConfig.INSTANCE.beans.get();
+                                    ProbeConfig.INSTANCE.beans.set(flag);
+                                    context.getSource().sendSystemMessage(flag ?
+                                            Component.translatable("probejs.generate_beans") :
+                                            Component.translatable("probejs.no_generate_beans"));
+                                    return Command.SINGLE_SUCCESS;
+                                })
+                        )
                         .then(Commands.literal("decompile")
                                 .requires(source -> ProbeConfig.INSTANCE.enabled.get() && source.hasPermission(2))
                                 .executes(context -> {
@@ -134,6 +151,22 @@ public class GameEvents {
                                     if (flag) ProbeConfig.INSTANCE.modHash.set(-2L);
                                     return Command.SINGLE_SUCCESS;
                                 })
+                        )
+                        .then(Commands.literal("generate")
+                                // I found it might be not that useful, maybe later
+                                .requires(source -> false && ProbeConfig.INSTANCE.enabled.get() && source.hasPermission(2))
+                                .then(Commands.argument("script", new CodeGenerationEventJS.ScriptArgument())
+                                        .executes(context -> {
+                                            var scriptTarget = context.getArgument("script", String.class);
+                                            var codegenEvent = new CodeGenerationEventJS();
+                                            ProbeEvents.CODEGEN.post(ScriptType.CLIENT, scriptTarget, codegenEvent);
+                                            try (BufferedWriter bufferedWriter = Files.newBufferedWriter(ProbePaths.GENERATED_CODE.resolve("%s.js".formatted(scriptTarget)))) {
+                                                bufferedWriter.write(String.join("\n", codegenEvent.getContent()));
+                                            } catch (IOException e) {
+                                                context.getSource().sendFailure(Component.literal("Unable to open file..."));
+                                            }
+                                            return Command.SINGLE_SUCCESS;
+                                        }))
                         )
         );
     }

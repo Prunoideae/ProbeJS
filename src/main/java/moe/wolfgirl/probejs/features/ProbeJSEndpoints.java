@@ -99,9 +99,10 @@ public class ProbeJSEndpoints {
             }
 
             recipes.addFirst("    // map<, > => {k: v,...}");
-            recipes.addFirst("    // \"fluid_stack\" => \"nx fluid_string\", e.g. 1000x minecraft:water");
-            recipes.addFirst("    // \"ingredient\" => \"item_string\" or \"#item_tag\", e.g. \"#c:ores\"");
-            recipes.addFirst("    // \"item_stack\" => \"nx item_string\", e.g. 1x minecraft:apple");
+            recipes.addFirst("    // fluid_stack => \"nx fluid_string\", e.g. \"1000x minecraft:water\"");
+            recipes.addFirst("    // ingredient => \"item_string\" or \"#item_tag\", e.g. \"#c:ores\"");
+            recipes.addFirst("    // item_stack => \"nx item_string\", e.g. 1x minecraft:apple");
+            recipes.addFirst("    // Chained functions are all optional");
             recipes.addFirst("ServerEvents.recipes(event => {");
             recipes.addLast("})");
             return HTTPResponse.ok().json(ProbeJS.GSON.toJson(String.join("\n", recipes)));
