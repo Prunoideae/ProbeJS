@@ -51,7 +51,7 @@ public class ComponentSchema {
      *
      * @return a JsonObject representing the string schema.
      */
-    public JsonObject str() {
+    public JsonObject string() {
         JsonObject schema = new JsonObject();
         schema.addProperty("type", "string");
         return schema;
@@ -101,7 +101,7 @@ public class ComponentSchema {
      * @return a JsonObject representing the enum schema.
      */
     public JsonObject enumOf(String... values) {
-        JsonObject schema = str(); // Start with a basic string schema
+        JsonObject schema = string(); // Start with a basic string schema
         JsonArray enumValues = new JsonArray();
         for (String value : values) {
             enumValues.add(new JsonPrimitive(value));

@@ -1,6 +1,8 @@
 ProbeJS is not an editor, all it does is to generate information file so other IDEs, especially VSCode, can use to provide autocompletions etc.
 
-The mod is designed to work with [Visual Studio Code](https://code.visualstudio.com/), so you need to install it to get all features implemented in ProbeJS. However, since TypeScript language definition is a widely used standard, other editors like IntelliJ IDEA, WebStorm, and Sublime Text can also provide some level of support for ProbeJS typings. However, VSCode becomes almost mandatory now, as a large part of the ProbeJS features are implemented as VSCode plugin, which is not available for other editors.
+The mod is designed to work with [Visual Studio Code](https://code.visualstudio.com/), so you need to install it to get all features implemented in ProbeJS. However, since TypeScript language definition is a widely used standard, other editors like IntelliJ IDEA, WebStorm, and Sublime Text can also provide some level of support for ProbeJS typings.
+
+For current ProbeJS, VSCode becomes almost mandatory, as a large part of the ProbeJS features are implemented as VSCode extension, which is not available for other editors.
 
 ## Installation - VSCode
 
