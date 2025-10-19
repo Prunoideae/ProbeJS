@@ -11,6 +11,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.EventPriority;
@@ -76,12 +77,22 @@ public class GameEvents {
         }
 
         // Reload creative mode tabs
-        CreativeModeTabs.CACHED_PARAMETERS = null;
-        CreativeModeTabs.tryRebuildTabContents(
+        // CreativeModeTabs.CACHED_PARAMETERS = null;
+        // CreativeModeTabs.tryRebuildTabContents(
+        //     player.connection.enabledFeatures(),
+        //     player.canUseGameMasterBlocks() && Minecraft.getInstance().options.operatorItemsTab().get(),
+        //     player.level().registryAccess()
+        //);
+
+        var params = new CreativeModeTab.ItemDisplayParameters(
                 player.connection.enabledFeatures(),
                 player.canUseGameMasterBlocks() && Minecraft.getInstance().options.operatorItemsTab().get(),
                 player.level().registryAccess()
         );
+
+        CreativeModeTabs.tabs().stream()
+                .filter(t -> t.getType() != CreativeModeTab.Type.CATEGORY && t.getType() != CreativeModeTab.Type.SEARCH)
+                .forEach(t -> t.buildContents(params));
     }
 
     @SubscribeEvent
