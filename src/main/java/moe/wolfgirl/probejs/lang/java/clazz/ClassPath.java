@@ -12,7 +12,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-public record ClassPath(List<String> parts) {
+public record ClassPath(List<String> parts) implements Comparable<ClassPath> {
     public static final ClassPath EMPTY = new ClassPath(List.of());
 
     private static List<String> transformJavaClass(Class<?> clazz) {
@@ -125,5 +125,21 @@ public record ClassPath(List<String> parts) {
             }
         }
         return common;
+    }
+
+    @Override
+    public int compareTo(ClassPath o) {
+        var a = this.parts;
+        var b = o.parts;
+
+        int sizeCompare = Integer.min(a.size(), b.size());
+        for (int i = 0; i < sizeCompare; i++) {
+            int compared = a.get(i).compareTo(b.get(i));
+            if (compared != 0) {
+                return compared;
+            }
+        }
+
+        return a.size() - b.size();
     }
 }
