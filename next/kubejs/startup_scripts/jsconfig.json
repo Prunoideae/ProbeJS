@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+        "checkJs": false,
+        "skipLibCheck": false,
+        "target": "ES2022",
+        "module": "nodenext",
+        "moduleResolution": "nodenext",
+        "paths": {
+            "@package": [
+                "../../.probe/@package"
+            ],
+            "@package/*": [
+                "../../.probe/@package/*"
+            ]
+        },
+    },
+    "include": [
+        "./**/*.js",
+        "../../.probe/@package/**/*.d.ts",
+        "../../.probe/@side-specific/startup/**/*.d.ts"
+    ]
+}

@@ -1,0 +1,9 @@
+{
+  "name": "fake-js-project-no-node-modules",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "start": "node -e \"console.log('Typing PoC only.')\""
+  }
+}

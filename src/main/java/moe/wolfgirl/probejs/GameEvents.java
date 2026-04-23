@@ -42,7 +42,7 @@ public class GameEvents {
         var player = event.getPlayer();
         ProbeConfig config = ProbeConfig.INSTANCE;
 
-        if (config.enabled.get()) {
+        if (config.enabled.get() && Minecraft.getInstance().isLocalServer()) {
             if (config.modHash.get() == -1) {
                 player.sendSystemMessage(Component.translatable("probejs.hello").kjs$gold());
                 if (ModList.get().size() >= MOD_LIMIT) {
@@ -74,25 +74,25 @@ public class GameEvents {
                                     .kjs$clickOpenUrl("https://kubejs.com/wiki/addons/third-party/probejs")
                                     .kjs$hover(Component.literal("https://kubejs.com/wiki/addons/third-party/probejs")))
             );
+
+            // Reload creative mode tabs
+            var params = new CreativeModeTab.ItemDisplayParameters(
+                    player.connection.enabledFeatures(),
+                    player.canUseGameMasterBlocks() && Minecraft.getInstance().options.operatorItemsTab().get(),
+                    player.level().registryAccess()
+            );
+
+            CreativeModeTabs.tabs().stream()
+                    .filter(t -> t.getType() != CreativeModeTab.Type.CATEGORY && t.getType() != CreativeModeTab.Type.SEARCH)
+                    .forEach(t -> t.buildContents(params));
         }
 
-        // Reload creative mode tabs
         // CreativeModeTabs.CACHED_PARAMETERS = null;
         // CreativeModeTabs.tryRebuildTabContents(
         //     player.connection.enabledFeatures(),
         //     player.canUseGameMasterBlocks() && Minecraft.getInstance().options.operatorItemsTab().get(),
         //     player.level().registryAccess()
         //);
-
-        var params = new CreativeModeTab.ItemDisplayParameters(
-                player.connection.enabledFeatures(),
-                player.canUseGameMasterBlocks() && Minecraft.getInstance().options.operatorItemsTab().get(),
-                player.level().registryAccess()
-        );
-
-        CreativeModeTabs.tabs().stream()
-                .filter(t -> t.getType() != CreativeModeTab.Type.CATEGORY && t.getType() != CreativeModeTab.Type.SEARCH)
-                .forEach(t -> t.buildContents(params));
     }
 
     @SubscribeEvent

@@ -54,6 +54,11 @@ public class Snippets extends ProbeJSPlugin {
                 .literal("x ")
                 .registry(Registries.ITEM)
                 .literal("\"");
+
+        dump.snippet("recipe_id")
+                .prefix("#recipe_id")
+                .description("Insert a recipe ID")
+                .choices(GameStates.RECIPE_IDS.keySet());
     }
 
     private static void defineHeader(SnippetDump dump, String symbol, String defaultValue) {
