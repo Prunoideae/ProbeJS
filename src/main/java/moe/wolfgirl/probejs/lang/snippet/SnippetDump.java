@@ -3,7 +3,8 @@ package moe.wolfgirl.probejs.lang.snippet;
 import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonWriter;
 import moe.wolfgirl.probejs.ProbeJS;
-import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
+import moe.wolfgirl.probejs.next.plugin.ProbeJSPlugin;
+import moe.wolfgirl.probejs.next.snippet.Snippet;
 
 import java.io.IOException;
 import java.nio.file.Files;

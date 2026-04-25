@@ -1,4 +1,4 @@
-package moe.wolfgirl.probejs.lang.snippet.parts;
+package moe.wolfgirl.probejs.next.snippet.parts;
 
 import java.util.Collection;
 import java.util.stream.Collectors;

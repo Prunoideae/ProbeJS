@@ -14,7 +14,7 @@ import moe.wolfgirl.probejs.lang.typescript.code.ts.Statements;
 import moe.wolfgirl.probejs.lang.typescript.code.ts.Wrapped;
 import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
 import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
-import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
+import moe.wolfgirl.probejs.next.plugin.ProbeJSPlugin;
 
 import java.util.Map;
 import java.util.function.Consumer;

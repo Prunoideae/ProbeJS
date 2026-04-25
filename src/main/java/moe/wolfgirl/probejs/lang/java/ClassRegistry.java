@@ -13,7 +13,6 @@ import moe.wolfgirl.probejs.lang.java.clazz.members.FieldInfo;
 import moe.wolfgirl.probejs.lang.java.clazz.members.MethodInfo;
 import moe.wolfgirl.probejs.lang.java.clazz.members.ParamInfo;
 import moe.wolfgirl.probejs.utils.GameUtils;
-import moe.wolfgirl.probejs.utils.ProbeFileUtils;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 
 import java.io.IOException;

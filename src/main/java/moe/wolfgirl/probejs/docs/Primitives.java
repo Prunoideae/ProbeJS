@@ -2,9 +2,8 @@ package moe.wolfgirl.probejs.docs;
 
 import dev.latvian.mods.kubejs.util.KubeResourceLocation;
 import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
-import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.lang.typescript.code.ImportInfo;
-import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
+import moe.wolfgirl.probejs.next.plugin.ProbeJSPlugin;
 import moe.wolfgirl.probejs.lang.transpiler.TypeConverter;
 import moe.wolfgirl.probejs.lang.typescript.Declaration;
 import moe.wolfgirl.probejs.lang.typescript.code.Code;

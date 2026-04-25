@@ -13,7 +13,7 @@ import moe.wolfgirl.probejs.lang.typescript.code.type.TSParamType;
 import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
 import moe.wolfgirl.probejs.lang.typescript.code.type.js.JSArrayType;
 import moe.wolfgirl.probejs.lang.typescript.code.type.js.JSObjectType;
-import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
+import moe.wolfgirl.probejs.next.plugin.ProbeJSPlugin;
 
 public class RecordTypes extends ProbeJSPlugin {
 

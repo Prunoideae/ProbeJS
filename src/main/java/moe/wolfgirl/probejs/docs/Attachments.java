@@ -9,9 +9,8 @@ import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
 import moe.wolfgirl.probejs.lang.typescript.TypeScriptFile;
 import moe.wolfgirl.probejs.lang.typescript.code.member.ClassDecl;
 import moe.wolfgirl.probejs.lang.typescript.code.member.ParamDecl;
-import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
 import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
-import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
+import moe.wolfgirl.probejs.next.plugin.ProbeJSPlugin;
 import moe.wolfgirl.probejs.utils.DocUtils;
 
 import java.util.HashSet;

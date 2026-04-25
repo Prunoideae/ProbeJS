@@ -8,7 +8,7 @@ import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
 import moe.wolfgirl.probejs.docs.Primitives;
 import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
 import moe.wolfgirl.probejs.lang.typescript.code.type.js.JSArrayType;
-import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
+import moe.wolfgirl.probejs.next.plugin.ProbeJSPlugin;
 import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CollectionTag;

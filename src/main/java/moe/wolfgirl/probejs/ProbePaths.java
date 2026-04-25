@@ -19,12 +19,21 @@ public class ProbePaths {
 
     public static Path IMAGES = PROBE.resolve("images");
 
+    // ProbeJS-Next
+    public static Path PACKAGES = PROBE.resolve("@package");
+    public static Path SIDE_SPECIFIC = PROBE.resolve("@side_specific");
+    public static Path SPECIAL = PROBE.resolve("@special");
+
     public static void init() {
         createFolders(PROBE);
         createFolders(WORKSPACE_SETTINGS);
         createFolders(DECOMPILED);
         createFolders(IMAGES);
         createFolders(GENERATED_CODE);
+
+        createFolders(PACKAGES);
+        createFolders(SIDE_SPECIFIC);
+        createFolders(SPECIAL);
     }
 
     private static void createFolders(Path path) {

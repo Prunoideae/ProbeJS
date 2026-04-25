@@ -1,4 +1,4 @@
-package moe.wolfgirl.probejs.lang.java.base;
+package moe.wolfgirl.probejs.lang.java.clazz.members;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;

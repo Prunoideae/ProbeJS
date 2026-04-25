@@ -1,4 +1,4 @@
-package moe.wolfgirl.probejs.lang.snippet.parts;
+package moe.wolfgirl.probejs.next.snippet.parts;
 
 public class Literal implements SnippetPart {
     private final String content;

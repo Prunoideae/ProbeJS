@@ -8,7 +8,7 @@ import dev.latvian.mods.rhino.Scriptable;
 import dev.latvian.mods.rhino.type.TypeInfo;
 import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
 import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
-import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
+import moe.wolfgirl.probejs.next.plugin.ProbeJSPlugin;
 import moe.wolfgirl.probejs.lang.transpiler.TypeConverter;
 import moe.wolfgirl.probejs.lang.typescript.code.Code;
 import moe.wolfgirl.probejs.lang.typescript.code.ts.VariableDeclaration;

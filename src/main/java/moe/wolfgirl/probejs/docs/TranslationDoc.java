@@ -7,7 +7,7 @@ import moe.wolfgirl.probejs.lang.typescript.TypeScriptFile;
 import moe.wolfgirl.probejs.lang.typescript.code.member.ClassDecl;
 import moe.wolfgirl.probejs.lang.typescript.code.member.MethodDecl;
 import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
-import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
+import moe.wolfgirl.probejs.next.plugin.ProbeJSPlugin;
 
 import java.util.Map;
 

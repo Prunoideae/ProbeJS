@@ -13,7 +13,7 @@ import moe.wolfgirl.probejs.ProbePaths;
 import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.lang.java.clazz.Clazz;
 import moe.wolfgirl.probejs.lang.typescript.code.ImportInfo;
-import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
+import moe.wolfgirl.probejs.next.plugin.ProbeJSPlugin;
 import moe.wolfgirl.probejs.lang.transpiler.Transpiler;
 import moe.wolfgirl.probejs.lang.typescript.code.Code;
 import moe.wolfgirl.probejs.lang.typescript.code.member.ClassDecl;
@@ -22,7 +22,6 @@ import moe.wolfgirl.probejs.lang.typescript.code.ts.Wrapped;
 import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
 import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
 import moe.wolfgirl.probejs.lang.typescript.code.type.js.JSJoinedType;
-import moe.wolfgirl.probejs.utils.ConfigUtils;
 import moe.wolfgirl.probejs.utils.GameUtils;
 import org.apache.commons.io.FileUtils;
 

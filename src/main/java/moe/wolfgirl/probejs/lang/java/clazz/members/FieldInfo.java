@@ -2,7 +2,6 @@ package moe.wolfgirl.probejs.lang.java.clazz.members;
 
 import dev.latvian.mods.rhino.CachedFieldInfo;
 import dev.latvian.mods.rhino.type.TypeInfo;
-import moe.wolfgirl.probejs.lang.java.base.AnnotationHolder;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;

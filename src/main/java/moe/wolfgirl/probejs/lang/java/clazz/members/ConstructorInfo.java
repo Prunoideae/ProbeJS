@@ -3,7 +3,6 @@ package moe.wolfgirl.probejs.lang.java.clazz.members;
 import dev.latvian.mods.rhino.CachedConstructorInfo;
 import dev.latvian.mods.rhino.CachedParameters;
 import dev.latvian.mods.rhino.type.TypeInfo;
-import moe.wolfgirl.probejs.lang.java.base.TypeVariableHolder;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Parameter;

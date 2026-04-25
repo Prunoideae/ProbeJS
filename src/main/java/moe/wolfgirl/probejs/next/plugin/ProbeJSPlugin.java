@@ -1,4 +1,4 @@
-package moe.wolfgirl.probejs.plugin;
+package moe.wolfgirl.probejs.next.plugin;
 
 import com.mojang.datafixers.util.Pair;
 

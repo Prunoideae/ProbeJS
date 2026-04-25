@@ -19,6 +19,7 @@ import moe.wolfgirl.probejs.lang.transpiler.TypeConverter;
 import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
 import moe.wolfgirl.probejs.lang.typescript.TypeScriptFile;
 import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
+import moe.wolfgirl.probejs.next.plugin.ProbeJSPlugin;
 
 import java.util.Map;
 import java.util.Set;

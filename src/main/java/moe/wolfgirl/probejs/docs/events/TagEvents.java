@@ -4,7 +4,7 @@ import dev.latvian.mods.kubejs.script.ScriptType;
 import dev.latvian.mods.kubejs.server.tag.TagKubeEvent;
 import dev.latvian.mods.kubejs.server.tag.TagWrapper;
 import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
-import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
+import moe.wolfgirl.probejs.next.plugin.ProbeJSPlugin;
 import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
 import moe.wolfgirl.probejs.lang.typescript.TypeScriptFile;
 import moe.wolfgirl.probejs.lang.typescript.code.member.ClassDecl;
@@ -20,7 +20,6 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
-import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import java.util.Map;
 

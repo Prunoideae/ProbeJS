@@ -6,6 +6,8 @@ import dev.latvian.mods.kubejs.client.KubeJSClient;
 import dev.latvian.mods.kubejs.script.ScriptType;
 import moe.wolfgirl.probejs.events.CodeGenerationEventJS;
 import moe.wolfgirl.probejs.events.ProbeEvents;
+import moe.wolfgirl.probejs.next.PackageDump;
+import moe.wolfgirl.probejs.next.java.ClassRegistry;
 import moe.wolfgirl.probejs.utils.GameUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.Commands;
@@ -13,6 +15,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.world.item.HoeItem;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -178,6 +181,26 @@ public class GameEvents {
                                             }
                                             return Command.SINGLE_SUCCESS;
                                         }))
+                        )
+                        .then(Commands.literal("test")
+                                .requires(source -> true)
+                                .executes(context -> {
+                                    new Thread(() -> {
+                                        ClassRegistry.INSTANCE.putClass(HoeItem.class, 0);
+                                        ClassRegistry.INSTANCE.discover();
+                                        var tree = ClassRegistry.INSTANCE.resolveTree();
+                                        for (var node : tree.traverse()) {
+                                            ProbeJS.LOGGER.info("%s -> %s".formatted(
+                                                    node.getClassPath(),
+                                                    node.getSubPackages()
+                                            ));
+                                        }
+
+                                        PackageDump dump = new PackageDump(ProbePaths.PACKAGES);
+                                        dump.dump();
+                                    }).start();
+                                    return Command.SINGLE_SUCCESS;
+                                })
                         )
         );
     }

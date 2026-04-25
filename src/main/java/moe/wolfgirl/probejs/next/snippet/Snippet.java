@@ -1,8 +1,8 @@
-package moe.wolfgirl.probejs.lang.snippet;
+package moe.wolfgirl.probejs.next.snippet;
 
 import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.ints.IntArraySet;
-import moe.wolfgirl.probejs.lang.snippet.parts.*;
+import moe.wolfgirl.probejs.next.snippet.parts.*;
 import moe.wolfgirl.probejs.utils.GameUtils;
 import moe.wolfgirl.probejs.utils.JsonUtils;
 import net.minecraft.core.Registry;
@@ -10,7 +10,6 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
-import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import java.util.ArrayList;
 import java.util.Collection;

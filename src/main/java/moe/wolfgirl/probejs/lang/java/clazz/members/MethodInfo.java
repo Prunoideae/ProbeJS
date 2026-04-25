@@ -2,9 +2,7 @@ package moe.wolfgirl.probejs.lang.java.clazz.members;
 
 import dev.latvian.mods.rhino.CachedMethodInfo;
 import dev.latvian.mods.rhino.CachedParameters;
-import dev.latvian.mods.rhino.Context;
 import dev.latvian.mods.rhino.type.TypeInfo;
-import moe.wolfgirl.probejs.lang.java.base.TypeVariableHolder;
 import moe.wolfgirl.probejs.lang.java.TypeAdapter;
 
 import java.lang.reflect.*;
@@ -13,7 +11,7 @@ import java.util.*;
 public class MethodInfo extends TypeVariableHolder {
     public final String name;
     public final List<ParamInfo> params;
-    public TypeInfo returnType;
+    public final TypeInfo returnType;
     public final MethodAttributes attributes;
 
     public MethodInfo(String name, CachedMethodInfo methodInfo, Method original, Map<String, TypeInfo> remapper) {
@@ -40,7 +38,7 @@ public class MethodInfo extends TypeVariableHolder {
             }
         }
 
-        this.returnType = methodInfo.getReturnType();
+        var returnType = methodInfo.getReturnType();
 
         for (Map.Entry<String, TypeInfo> entry : remapper.entrySet()) {
             String symbol = entry.getKey();
@@ -49,8 +47,10 @@ public class MethodInfo extends TypeVariableHolder {
             for (ParamInfo param : this.params) {
                 param.type = TypeAdapter.consolidateType(param.type, symbol, replacement);
             }
-            this.returnType = TypeAdapter.consolidateType(this.returnType, symbol, replacement);
+            returnType = TypeAdapter.consolidateType(returnType, symbol, replacement);
         }
+
+        this.returnType = returnType;
     }
 
     public static class MethodAttributes {

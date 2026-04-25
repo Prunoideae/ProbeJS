@@ -1,0 +1,49 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "request": "launch",
+      "name": "Client",
+      "presentation": {
+        "group": "Mod Development - ProbeJS",
+        "order": 0
+      },
+      "projectName": "ProbeJS",
+      "mainClass": "net.neoforged.devlaunch.Main",
+      "args": [
+        "@E:\\Desktop\\ProgramRelated\\ForgeDeveloping\\1.18.1\\ProbeJS\\build\\moddev\\clientRunProgramArgs.txt"
+      ],
+      "vmArgs": [
+        "@E:\\Desktop\\ProgramRelated\\ForgeDeveloping\\1.18.1\\ProbeJS\\build\\moddev\\clientRunVmArgs.txt",
+        "-Dfml.modFolders\u003dprobejs%%E:\\Desktop\\ProgramRelated\\ForgeDeveloping\\1.18.1\\ProbeJS\\bin\\main"
+      ],
+      "cwd": "${workspaceFolder}\\run",
+      "env": {},
+      "console": "internalConsole",
+      "shortenCommandLine": "none"
+    },
+    {
+      "type": "java",
+      "request": "launch",
+      "name": "Server",
+      "presentation": {
+        "group": "Mod Development - ProbeJS",
+        "order": 1
+      },
+      "projectName": "ProbeJS",
+      "mainClass": "net.neoforged.devlaunch.Main",
+      "args": [
+        "@E:\\Desktop\\ProgramRelated\\ForgeDeveloping\\1.18.1\\ProbeJS\\build\\moddev\\serverRunProgramArgs.txt"
+      ],
+      "vmArgs": [
+        "@E:\\Desktop\\ProgramRelated\\ForgeDeveloping\\1.18.1\\ProbeJS\\build\\moddev\\serverRunVmArgs.txt",
+        "-Dfml.modFolders\u003dprobejs%%E:\\Desktop\\ProgramRelated\\ForgeDeveloping\\1.18.1\\ProbeJS\\bin\\main"
+      ],
+      "cwd": "${workspaceFolder}\\run",
+      "env": {},
+      "console": "internalConsole",
+      "shortenCommandLine": "none"
+    }
+  ]
+}

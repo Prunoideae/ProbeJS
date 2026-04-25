@@ -1,4 +1,4 @@
-package moe.wolfgirl.probejs.lang.java.base;
+package moe.wolfgirl.probejs.lang.java.clazz.members;
 
 import dev.latvian.mods.rhino.type.TypeInfo;
 import dev.latvian.mods.rhino.type.VariableTypeInfo;
@@ -16,7 +16,6 @@ public abstract class TypeVariableHolder extends AnnotationHolder {
         super(annotations);
         this.variableTypes = Arrays.stream(variables)
                 .map(TypeInfo::of)
-                .map(t -> (VariableTypeInfo) t)
                 .collect(Collectors.toList());
     }
 }

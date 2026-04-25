@@ -1,4 +1,3 @@
-export { };
 import { Object, String } from "@package/java/lang";
 
 declare module "@package/java/util" {

@@ -48,4 +48,14 @@ public class ProbeFileUtils {
         if (base == null) return null;
         return base.resolve(parts[1]);
     }
+
+    public static void createDirectories(Path path) {
+        if (Files.notExists(path)) {
+            try {
+                Files.createDirectories(path);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
 }

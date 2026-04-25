@@ -5,7 +5,7 @@ import dev.latvian.mods.rhino.CachedClassStorage;
 import dev.latvian.mods.rhino.type.TypeInfo;
 import dev.latvian.mods.rhino.type.VariableTypeInfo;
 import dev.latvian.mods.rhino.util.HideFromJS;
-import moe.wolfgirl.probejs.lang.java.base.TypeVariableHolder;
+import moe.wolfgirl.probejs.lang.java.clazz.members.TypeVariableHolder;
 import moe.wolfgirl.probejs.lang.java.clazz.members.ConstructorInfo;
 import moe.wolfgirl.probejs.lang.java.clazz.members.FieldInfo;
 import moe.wolfgirl.probejs.lang.java.clazz.members.MethodInfo;
