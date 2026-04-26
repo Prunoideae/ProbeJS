@@ -10,10 +10,7 @@ import moe.wolfgirl.probejs.next.java.members.other.ParamInfo;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.TypeVariable;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public record MethodInfo(String name,
                          List<ParamInfo> params,
@@ -22,16 +19,14 @@ public record MethodInfo(String name,
                          Annotation[] annotations,
                          TypeVariable<?>[] typeVariables
 ) implements HasAnnotation, HasTypeVariable, ClassProvider {
-    public MethodInfo(CachedMethodInfo methodInfo) {
-        this(
-                methodInfo.getName(),
-                ParamInfo.resolve(methodInfo),
+    public static MethodInfo resolve(CachedMethodInfo methodInfo, Map<String, TypeInfo> typeRemap) {
+        return new MethodInfo(methodInfo.getName(),
+                ParamInfo.resolve(methodInfo, typeRemap),
                 methodInfo.getReturnType(),
                 methodInfo.isStatic,
                 Modifier.isAbstract(methodInfo.modifiers),
                 methodInfo.getCached().getAnnotations(),
-                methodInfo.getCached().getTypeParameters()
-        );
+                methodInfo.getCached().getTypeParameters());
     }
 
     @Override

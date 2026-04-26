@@ -47,7 +47,7 @@ public class MethodDecl extends CommentableCode {
     @Override
     public List<String> format(int indent) {
         var indentStr = " ".repeat(indent);
-        var staticStr = isStatic ? isInterface ? "function " : "static " : "";
+        var staticStr = isStatic ? "static " : "";
         var typeParamsStr = typeParams.isEmpty() ? "" : "<%s>".formatted(String.join(", ", typeParams.stream().map(VariableType::formatWithBound).toList()));
         var paramsStr = String.join(", ", params.stream().map(Code::first).toList());
         var returnTypeStr = returnType == null ? "" : ": %s".formatted(returnType.first());

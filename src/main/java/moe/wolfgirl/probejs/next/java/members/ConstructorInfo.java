@@ -9,17 +9,14 @@ import moe.wolfgirl.probejs.next.java.members.other.ParamInfo;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.TypeVariable;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public record ConstructorInfo(List<ParamInfo> params,
                               Annotation[] annotations,
                               TypeVariable<?>[] typeVariables
 ) implements HasAnnotation, HasTypeVariable, ClassProvider {
-    public ConstructorInfo(CachedConstructorInfo constructorInfo) {
-        this(ParamInfo.resolve(constructorInfo),
+    public ConstructorInfo(CachedConstructorInfo constructorInfo, Map<String, TypeInfo> typeRemap) {
+        this(ParamInfo.resolve(constructorInfo, typeRemap),
                 constructorInfo.getCached().getAnnotations(),
                 constructorInfo.getCached().getTypeParameters()
         );

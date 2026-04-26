@@ -68,64 +68,43 @@ public class ClassDecl extends CommentableCode {
         String typeParamsStr = typeParams.isEmpty() ? "" : "<%s>".formatted(String.join(", ", typeParams.stream().map(VariableType::formatWithBound).toList()));
         String extendsStr = extendsType == Types.NEVER ? "" : " extends %s".formatted(extendsType.first());
         String implementsStr = implementsTypes.isEmpty() ? "" : " implements %s".formatted(String.join(", ", implementsTypes.stream().map(Code::first).toList()));
-        formatted.add("%s%s%s %s%s%s%s {".formatted(indentStr, exportStr, kindStr(), identifier, typeParamsStr, extendsStr, implementsStr));
+        formatted.add("%s%sclass %s%s%s%s {".formatted(indentStr, exportStr, identifier, typeParamsStr, extendsStr, implementsStr));
         // members
         for (Code member : members) {
-            if (member instanceof CommentableCode commentableMember) {
-                formatted.addAll(commentableMember.formatSlashStar(indent + 4));
-            } else {
-                formatted.addAll(member.format(indent + 4));
-            }
+            formatted.addAll(CommentableCode.format(member, indent + 4));
         }
         formatted.add("%s}".formatted(" ".repeat(indent)));
         return formatted;
     }
 
     // Java interface is a real thing, but TS one disappears at runtime
-    // We need to export both a namespace and an interface to make it work,
-    // static members go to the namespace, others go to the interface
+    // We need to export both a class that implements the interface and
+    // an interface to make it work with instanceof checks.
+    // static members go to the class, others go to the interface
     private List<String> formatAsInterface(int indent) {
+
         List<String> formatted = new ArrayList<>();
-        // (export) namespace Identifier {
+
+        // (export) class Identifier {
         String indentStr = " ".repeat(indent);
         String exportStr = export ? "export " : "";
-        formatted.add("%s%snamespace %s {".formatted(indentStr, exportStr, identifier));
-        // static members
-        List<Code> staticMembers = new ArrayList<>();
-        List<Code> instanceMembers = new ArrayList<>();
+        String typeParamsStr = typeParams.isEmpty() ? "" : "<%s>".formatted(String.join(", ", typeParams.stream().map(VariableType::formatWithBound).toList()));
+        formatted.add("%s%sclass %s%s {".formatted(indentStr, exportStr, identifier, typeParamsStr));
         for (Code member : members) {
-            switch (member) {
-                case FieldDecl fieldDecl -> {
-                    if (fieldDecl.isStatic) staticMembers.add(member);
-                    else instanceMembers.add(member);
-                }
-                case MethodDecl methodDecl -> {
-                    if (methodDecl.isStatic) staticMembers.add(member);
-                    else instanceMembers.add(member);
-                }
-                default -> instanceMembers.add(member);
-            }
-        }
-
-        for (Code member : staticMembers) {
-            if (member instanceof CommentableCode commentableMember) {
-                formatted.addAll(commentableMember.formatSlashStar(indent + 4));
-            } else {
-                formatted.addAll(member.format(indent + 4));
-            }
+            if (member instanceof FieldDecl fieldDecl && !fieldDecl.isStatic) continue;
+            if (member instanceof MethodDecl methodDecl && !methodDecl.isStatic) continue;
+            formatted.addAll(CommentableCode.format(member, indent + 4));
         }
         formatted.add("%s}".formatted(" ".repeat(indent)));
 
         // (export) interface Identifier(<T1, T2>) (extends Interface1, Interface2) {
-        String typeParamsStr = typeParams.isEmpty() ? "" : "<%s>".formatted(String.join(", ", typeParams.stream().map(Code::first).toList()));
         String extendsInterfaceStr = implementsTypes.isEmpty() ? "" : " extends %s".formatted(String.join(", ", implementsTypes.stream().map(Code::first).toList()));
+
         formatted.add("%s%sinterface %s%s%s {".formatted(indentStr, exportStr, identifier, typeParamsStr, extendsInterfaceStr));
-        for (Code member : instanceMembers) {
-            if (member instanceof CommentableCode commentableMember) {
-                formatted.addAll(commentableMember.formatSlashStar(indent + 4));
-            } else {
-                formatted.addAll(member.format(indent + 4));
-            }
+        for (Code member : members) {
+            if (member instanceof FieldDecl fieldDecl && fieldDecl.isStatic) continue;
+            if (member instanceof MethodDecl methodDecl && methodDecl.isStatic) continue;
+            formatted.addAll(CommentableCode.format(member, indent + 4));
         }
         formatted.add("%s}".formatted(" ".repeat(indent)));
 
@@ -134,7 +113,20 @@ public class ClassDecl extends CommentableCode {
 
     // Why do I need this?
     private List<String> formatAsNamespace(int indent) {
-        return formatAsClass(indent);
+        List<String> formatted = new ArrayList<>();
+        // (export) (class/interface/namespace) Identifier(<T1, T2>) (extends Base) (implements Interface1, Interface2) {
+        String indentStr = " ".repeat(indent);
+        String exportStr = export ? "export " : "";
+        String typeParamsStr = typeParams.isEmpty() ? "" : "<%s>".formatted(String.join(", ", typeParams.stream().map(VariableType::formatWithBound).toList()));
+        String extendsStr = extendsType == Types.NEVER ? "" : " extends %s".formatted(extendsType.first());
+        String implementsStr = implementsTypes.isEmpty() ? "" : " implements %s".formatted(String.join(", ", implementsTypes.stream().map(Code::first).toList()));
+        formatted.add("%s%snamespace %s%s%s%s {".formatted(indentStr, exportStr, identifier, typeParamsStr, extendsStr, implementsStr));
+        // members
+        for (Code member : members) {
+            formatted.addAll(CommentableCode.format(member, indent + 4));
+        }
+        formatted.add("%s}".formatted(" ".repeat(indent)));
+        return formatted;
     }
 
     private void sanitize() {
@@ -146,14 +138,6 @@ public class ClassDecl extends CommentableCode {
         if (kind == Kind.INTERFACE) {
             if (extendsType != Types.NEVER) throw new IllegalStateException("Interface cannot have extends type");
         }
-    }
-
-    private String kindStr() {
-        return switch (kind) {
-            case CLASS -> "class";
-            case INTERFACE -> "interface";
-            case NAMESPACE -> "namespace";
-        };
     }
 
     public enum Kind {

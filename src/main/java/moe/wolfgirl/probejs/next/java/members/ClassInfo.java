@@ -4,7 +4,10 @@ import dev.latvian.mods.rhino.CachedClassInfo;
 import dev.latvian.mods.rhino.CachedClassStorage;
 import dev.latvian.mods.rhino.CachedFieldInfo;
 import dev.latvian.mods.rhino.CachedMethodInfo;
+import dev.latvian.mods.rhino.type.ArrayTypeInfo;
+import dev.latvian.mods.rhino.type.ParameterizedTypeInfo;
 import dev.latvian.mods.rhino.type.TypeInfo;
+import dev.latvian.mods.rhino.type.VariableTypeInfo;
 import moe.wolfgirl.probejs.next.ClassPath;
 import moe.wolfgirl.probejs.next.java.members.other.ClassProvider;
 import moe.wolfgirl.probejs.next.java.members.other.HasAnnotation;
@@ -13,6 +16,8 @@ import moe.wolfgirl.probejs.next.java.members.other.HasTypeVariable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.*;
 
@@ -35,44 +40,47 @@ public record ClassInfo(
             superClass = TypeInfo.NONE;
         }
 
+        Map<String, TypeInfo> variableRemaps = getVariableRemaps(clazz);
+
         return new ClassInfo(
                 new ClassPath(clazz),
                 clazz,
-                findConstructors(clazz),
-                findFields(clazz),
-                findMethods(clazz),
+                findConstructors(clazz, variableRemaps),
+                findFields(clazz, variableRemaps),
+                findMethods(clazz, variableRemaps),
                 superClass,
                 Arrays.stream(clazz.getGenericInterfaces()).map(TypeInfo::of).toList(),
                 new ClassAttributes(clazz)
         );
     }
 
-    private static List<MethodInfo> findMethods(Class<?> clazz) {
+    private static List<ConstructorInfo> findConstructors(Class<?> clazz, Map<String, TypeInfo> variableRemaps) {
+        CachedClassInfo classInfo = CachedClassStorage.GLOBAL_PUBLIC.get(clazz);
+        return classInfo.getConstructors()
+                .stream()
+                .map(c -> new ConstructorInfo(c, variableRemaps))
+                .toList();
+    }
+
+    private static List<FieldInfo> findFields(Class<?> clazz, Map<String, TypeInfo> variableRemaps) {
+        CachedClassInfo classInfo = CachedClassStorage.GLOBAL_PUBLIC.get(clazz);
+        return classInfo.getAccessibleFields(false)
+                .stream()
+                .map(CachedFieldInfo.Accessible::getInfo)
+                .map(f -> new FieldInfo(f, variableRemaps))
+                .toList();
+    }
+
+    private static List<MethodInfo> findMethods(Class<?> clazz, Map<String, TypeInfo> variableRemaps) {
         CachedClassInfo classInfo = CachedClassStorage.GLOBAL_PUBLIC.get(clazz);
         return classInfo.getAccessibleMethods(false)
                 .stream()
                 .map(CachedMethodInfo.Accessible::getInfo)
                 .filter(m -> shouldIncludeMethod(m.getCached(), clazz))
-                .map(MethodInfo::new)
+                .map(m -> MethodInfo.resolve(m, variableRemaps))
                 .toList();
     }
 
-    private static List<ConstructorInfo> findConstructors(Class<?> clazz) {
-        CachedClassInfo classInfo = CachedClassStorage.GLOBAL_PUBLIC.get(clazz);
-        return classInfo.getConstructors()
-                .stream()
-                .map(ConstructorInfo::new)
-                .toList();
-    }
-
-    private static List<FieldInfo> findFields(Class<?> clazz) {
-        CachedClassInfo classInfo = CachedClassStorage.GLOBAL_PUBLIC.get(clazz);
-        return classInfo.getAccessibleFields(false)
-                .stream()
-                .map(CachedFieldInfo.Accessible::getInfo)
-                .map(FieldInfo::new)
-                .toList();
-    }
 
     // Find methods that:
     // Not inherited from superclass (or overrides superclass method), as we can reuse the type
@@ -95,6 +103,96 @@ public record ClassInfo(
         }
 
         return !clazz.isInterface() && method.isDefault() && method.getDeclaringClass().isInterface();
+    }
+
+    // Since Java's Method can belong to superclass/superinterface, we need to remap the type variables in the method
+    // signature to the ones in the current class.
+    // example:
+    // Collection<E> implements Iterable<E>, but in definition of Iterable, it's Iterable<T>, so forEach(Consumer<T>)
+    // will be dumped, we need to find that the T->E and remap the method signature to forEach(Consumer<E>) in the dump
+    private static Map<String, TypeInfo> getVariableRemaps(Class<?> clazz) {
+        Map<String, TypeInfo> remaps = new LinkedHashMap<>();
+        collectVariableRemaps(clazz, Map.of(), remaps);
+        return remaps;
+    }
+
+    private static void collectVariableRemaps(
+            Class<?> currentClass,
+            Map<String, TypeInfo> currentTypeArguments,
+            Map<String, TypeInfo> remaps
+    ) {
+        Type genericSuperClass = currentClass.getGenericSuperclass();
+        if (genericSuperClass != null) {
+            collectParentVariableRemaps(genericSuperClass, currentTypeArguments, remaps);
+        }
+
+        for (Type genericInterface : currentClass.getGenericInterfaces()) {
+            collectParentVariableRemaps(genericInterface, currentTypeArguments, remaps);
+        }
+    }
+
+    private static void collectParentVariableRemaps(
+            Type parentType,
+            Map<String, TypeInfo> currentTypeArguments,
+            Map<String, TypeInfo> remaps
+    ) {
+        Class<?> parentClass = TypeInfo.of(parentType).asClass();
+        if (parentClass == null || parentClass == Object.class) {
+            return;
+        }
+
+        Map<String, TypeInfo> parentTypeArguments = resolveTypeArguments(parentType, parentClass, currentTypeArguments);
+        parentTypeArguments.forEach(remaps::putIfAbsent);
+        collectVariableRemaps(parentClass, parentTypeArguments, remaps);
+    }
+
+    private static Map<String, TypeInfo> resolveTypeArguments(
+            Type inheritedType,
+            Class<?> inheritedClass,
+            Map<String, TypeInfo> currentTypeArguments
+    ) {
+        TypeVariable<?>[] typeParameters = inheritedClass.getTypeParameters();
+        if (typeParameters.length == 0) {
+            return Map.of();
+        }
+
+        Map<String, TypeInfo> remaps = new LinkedHashMap<>(typeParameters.length);
+        if (inheritedType instanceof ParameterizedType parameterizedType) {
+            Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
+            for (int index = 0; index < typeParameters.length; index++) {
+                remaps.put(typeParameters[index].getName(), resolveType(actualTypeArguments[index], currentTypeArguments));
+            }
+            return remaps;
+        }
+
+        for (TypeVariable<?> typeParameter : typeParameters) {
+            remaps.put(typeParameter.getName(), TypeInfo.OBJECT);
+        }
+        return remaps;
+    }
+
+    private static TypeInfo resolveType(Type type, Map<String, TypeInfo> currentTypeArguments) {
+        TypeInfo resolved = TypeInfo.of(type);
+        for (Map.Entry<String, TypeInfo> entry : currentTypeArguments.entrySet()) {
+            resolved = remapTypeVariable(resolved, entry.getKey(), entry.getValue());
+        }
+        return resolved;
+    }
+
+    private static TypeInfo remapTypeVariable(TypeInfo typeInfo, String variable, TypeInfo replacement) {
+        return switch (typeInfo) {
+            case VariableTypeInfo variableTypeInfo ->
+                    variableTypeInfo.getName().equals(variable) ? replacement : typeInfo;
+            case ArrayTypeInfo arrayTypeInfo ->
+                    remapTypeVariable(arrayTypeInfo.componentType(), variable, replacement).asArray();
+            case ParameterizedTypeInfo parameterizedTypeInfo -> parameterizedTypeInfo.rawType().withParams(
+                    Arrays.stream(parameterizedTypeInfo.params())
+                            .map(parameter -> remapTypeVariable(parameter, variable, replacement))
+                            .toArray(TypeInfo[]::new)
+            );
+            case null, default -> typeInfo;
+        };
+
     }
 
     @Override
@@ -124,6 +222,21 @@ public record ClassInfo(
             classes.addAll(i.getContainedComponentClasses());
         }
         return classes;
+    }
+
+    public static TypeInfo remapType(TypeInfo typeInfo, Map<String, TypeInfo> typeRemap) {
+        return switch (typeInfo) {
+            case VariableTypeInfo variableTypeInfo -> typeRemap.getOrDefault(variableTypeInfo.getName(), typeInfo);
+            case ArrayTypeInfo arrayTypeInfo -> remapType(arrayTypeInfo.componentType(), typeRemap).asArray();
+            case ParameterizedTypeInfo paramTypeInfo -> {
+                TypeInfo baseType = paramTypeInfo.rawType(); // Variable can't be base of parameterized type, so no remap
+                List<TypeInfo> remappedParams = Arrays.stream(paramTypeInfo.params())
+                        .map(param -> remapType(param, typeRemap))
+                        .toList();
+                yield baseType.withParams(remappedParams.toArray(new TypeInfo[0]));
+            }
+            case null, default -> typeInfo;
+        };
     }
 
 

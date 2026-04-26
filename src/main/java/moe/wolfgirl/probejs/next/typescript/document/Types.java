@@ -7,10 +7,7 @@ import moe.wolfgirl.probejs.next.typescript.document.types.ArrayType;
 import moe.wolfgirl.probejs.next.typescript.document.types.ClassType;
 import moe.wolfgirl.probejs.next.typescript.document.types.ParamType;
 import moe.wolfgirl.probejs.next.typescript.document.types.VariableType;
-import moe.wolfgirl.probejs.next.typescript.document.types.special.LiteralType;
-import moe.wolfgirl.probejs.next.typescript.document.types.special.OptionalType;
-import moe.wolfgirl.probejs.next.typescript.document.types.special.RawType;
-import moe.wolfgirl.probejs.next.typescript.document.types.special.TypeOfType;
+import moe.wolfgirl.probejs.next.typescript.document.types.special.*;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -66,5 +63,13 @@ public interface Types {
 
     static TypeOfType typeOf(Type type) {
         return new TypeOfType(type);
+    }
+
+    static JoinedType.UnionType union(Type... types) {
+        return new JoinedType.UnionType(List.of(types));
+    }
+
+    static JoinedType.UnionType union(List<Type> types) {
+        return new JoinedType.UnionType(types);
     }
 }

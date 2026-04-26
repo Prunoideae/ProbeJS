@@ -2,6 +2,7 @@ package moe.wolfgirl.probejs.next.plugin;
 
 
 import moe.wolfgirl.probejs.ProbeJS;
+import moe.wolfgirl.probejs.next.plugin.builtins.alias.EnumTypes;
 import moe.wolfgirl.probejs.utils.GameUtils;
 
 import java.util.ArrayList;
@@ -12,9 +13,9 @@ import java.util.function.Supplier;
 public class ProbeBuiltinDocs extends ProbeJSPlugin {
     public static final ProbeBuiltinDocs INSTANCE = new ProbeBuiltinDocs();
 
-    public static final List<Supplier<ProbeJSPlugin>> BUILTIN_DOCS = new ArrayList<>(
-            List.of()
-    );
+    public static final List<Supplier<ProbeJSPlugin>> BUILTIN_DOCS = new ArrayList<>(List.of(
+            EnumTypes::new
+    ));
 
     //TODO: Make this static once we have plugins finalized
     public static void forEach(Consumer<ProbeJSPlugin> consumer) {

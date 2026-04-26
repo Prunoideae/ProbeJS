@@ -7,14 +7,15 @@ import moe.wolfgirl.probejs.next.java.members.other.HasAnnotation;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
+import java.util.Map;
 
 public record FieldInfo(String name, TypeInfo type,
                         boolean isStatic, boolean isFinal,
                         Annotation[] annotations
 ) implements HasAnnotation, ClassProvider {
 
-    public FieldInfo(CachedFieldInfo fieldInfo) {
-        this(fieldInfo.getName(), fieldInfo.getType(),
+    public FieldInfo(CachedFieldInfo fieldInfo, Map<String, TypeInfo> typeRemap) {
+        this(fieldInfo.getName(), ClassInfo.remapType(fieldInfo.getType(), typeRemap),
                 fieldInfo.isStatic, fieldInfo.isFinal,
                 fieldInfo.getCached().getAnnotations()
         );

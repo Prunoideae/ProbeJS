@@ -195,7 +195,6 @@ public class GameEvents {
                                                     node.getSubPackages()
                                             ));
                                         }
-
                                         PackageDump dump = new PackageDump(ProbePaths.PACKAGES);
                                         dump.dump();
                                     }).start();

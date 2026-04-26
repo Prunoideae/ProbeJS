@@ -28,6 +28,6 @@ public class FieldDecl extends CommentableCode {
 
     @Override
     public List<String> format(int indent) {
-        return List.of("%s%s%s: %s;".formatted(" ".repeat(indent), isStatic ? isInterface ? "let " : "static " : "", name, typeInfo.first()));
+        return List.of("%s%s%s: %s;".formatted(" ".repeat(indent), isStatic ? "static " : "", name, typeInfo.first()));
     }
 }

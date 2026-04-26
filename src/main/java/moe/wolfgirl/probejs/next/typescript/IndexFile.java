@@ -5,6 +5,7 @@ import com.google.common.collect.Multimap;
 import moe.wolfgirl.probejs.next.ClassPath;
 import moe.wolfgirl.probejs.next.java.PackageTree;
 import moe.wolfgirl.probejs.next.typescript.document.base.Code;
+import moe.wolfgirl.probejs.next.typescript.document.base.CommentableCode;
 import moe.wolfgirl.probejs.utils.ProbeFileUtils;
 
 import java.nio.file.Path;
@@ -83,7 +84,7 @@ public class IndexFile {
             // declare module ${packageNode.asTypePath} {\n");
             indexWriter.write("declare module \"%s\" {\n".formatted(classPath.asTypePath()));
             for (var code : moduleDumps) {
-                for (String line : code.format(4)) {
+                for (String line : CommentableCode.format(code, 4)) {
                     indexWriter.write(line);
                     indexWriter.write("\n");
                 }

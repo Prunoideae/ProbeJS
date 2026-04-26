@@ -37,4 +37,12 @@ public abstract class CommentableCode extends Code {
         formatted.addAll(format(indent));
         return formatted;
     }
+
+    public static List<String> format(Code code, int indent) {
+        if (code instanceof CommentableCode commentableCode) {
+            return commentableCode.formatSlashStar(indent);
+        } else {
+            return code.format(indent);
+        }
+    }
 }

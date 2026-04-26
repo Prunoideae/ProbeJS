@@ -1,19 +1,18 @@
 package moe.wolfgirl.probejs.next.typescript.document;
 
 import moe.wolfgirl.probejs.next.ClassPath;
-import moe.wolfgirl.probejs.next.typescript.document.base.Code;
 import moe.wolfgirl.probejs.next.typescript.document.base.CommentableCode;
-import moe.wolfgirl.probejs.next.typescript.document.base.InputAliased;
+import moe.wolfgirl.probejs.next.typescript.document.base.Type;
 
 import java.util.List;
 import java.util.Set;
 
 // export Identifier_ = TypeInfo;
 public class AliasDecl extends CommentableCode {
-    public final String identifier;
-    public final Code typeInfo;
+    public final ClassPath identifier;
+    public final Type typeInfo;
 
-    public AliasDecl(String identifier, InputAliased typeInfo) {
+    public AliasDecl(ClassPath identifier, Type typeInfo) {
         this.identifier = identifier;
         this.typeInfo = typeInfo;
     }
@@ -26,6 +25,6 @@ public class AliasDecl extends CommentableCode {
 
     @Override
     public List<String> format(int indent) {
-        return List.of("%sexport %s = %s;".formatted(" ".repeat(indent), identifier, typeInfo.first()));
+        return List.of("%sexport type %s_ = %s;".formatted(" ".repeat(indent), identifier.getClassName(), typeInfo.first()));
     }
 }

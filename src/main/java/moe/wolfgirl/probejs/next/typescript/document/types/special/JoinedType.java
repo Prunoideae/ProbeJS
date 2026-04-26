@@ -10,9 +10,13 @@ import java.util.List;
 import java.util.Set;
 
 public abstract class JoinedType extends Type {
-    public List<Code> types;
+    public List<Type> types;
 
     protected abstract String operator();
+
+    public JoinedType(List<Type> types) {
+        this.types = types;
+    }
 
     @Override
     public List<String> format(int indent) {
@@ -34,6 +38,10 @@ public abstract class JoinedType extends Type {
     }
 
     public static class UnionType extends JoinedType {
+        public UnionType(List<Type> types) {
+            super(types);
+        }
+
         @Override
         protected String operator() {
             return " | ";
@@ -41,6 +49,10 @@ public abstract class JoinedType extends Type {
     }
 
     public static class IntersectionType extends JoinedType {
+        public IntersectionType(List<Type> types) {
+            super(types);
+        }
+
         @Override
         protected String operator() {
             return " & ";
