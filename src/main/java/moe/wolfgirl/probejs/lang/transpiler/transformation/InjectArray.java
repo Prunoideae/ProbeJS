@@ -52,8 +52,6 @@ public class InjectArray implements ClassTransformer {
             if (iterType == null) return;
 
             classDecl.bodyCode.add(new FormattedLine("[Symbol.iterator](): IterableIterator<%s>;", iterType));
-
-
         }
 
         // AbstractCollection is not a List, and AbstractList is not directly implementing Iterable

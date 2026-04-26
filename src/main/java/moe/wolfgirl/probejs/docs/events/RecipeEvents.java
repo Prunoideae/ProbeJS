@@ -14,7 +14,7 @@ import moe.wolfgirl.probejs.lang.schema.SchemaDump;
 import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
 import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.lang.typescript.code.ImportInfo;
-import moe.wolfgirl.probejs.next.plugin.ProbeJSPlugin;
+import moe.wolfgirl.probejs.docs.ProbeJSPlugin;
 import moe.wolfgirl.probejs.lang.transpiler.TypeConverter;
 import moe.wolfgirl.probejs.lang.transpiler.transformation.InjectBeans;
 import moe.wolfgirl.probejs.lang.typescript.TypeScriptFile;

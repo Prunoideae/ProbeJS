@@ -63,7 +63,7 @@ public class ClassPath {
 
     @HideFromJS
     public Class<?> loadClass() throws ClassNotFoundException {
-        return Class.forName(asJavaPath());
+        return Class.forName(asJavaPath(), false, Thread.currentThread().getContextClassLoader());
     }
 
     @Override

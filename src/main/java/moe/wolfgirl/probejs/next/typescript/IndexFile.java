@@ -5,14 +5,10 @@ import com.google.common.collect.Multimap;
 import moe.wolfgirl.probejs.next.ClassPath;
 import moe.wolfgirl.probejs.next.java.PackageTree;
 import moe.wolfgirl.probejs.next.typescript.document.base.Code;
-import moe.wolfgirl.probejs.next.typescript.transpiler.Documents;
 import moe.wolfgirl.probejs.utils.ProbeFileUtils;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 // Represents an index.d.ts under a package
 // import { A } from "@package/xxx";
@@ -23,7 +19,7 @@ import java.util.Map;
 // }
 public class IndexFile {
     private final ClassPath classPath;
-    private final List<ClassPath> imports = new ArrayList<>();
+    private final Set<ClassPath> imports = new HashSet<>();
     private final List<ClassPath> subpackages = new ArrayList<>();
     private final List<ClassPath> classes = new ArrayList<>();
     private final List<Code> moduleDumps = new ArrayList<>();
@@ -64,15 +60,17 @@ public class IndexFile {
             loadClasses();
 
             // import { A, B } from "@package/xxx";
-            Multimap<String, String> packageToClasses = ArrayListMultimap.create();
+            Multimap<ClassPath, String> packageToClasses = ArrayListMultimap.create();
             for (var importPath : imports) {
+                if (importPath.getPackage() != null && importPath.getPackage().equals(classPath))
+                    continue; // Don't import from the same package
                 // indexWriter.write("import { %s } from \"%s\";\n".formatted(importPath.getClassName(), importPath.asTypePath()));
-                packageToClasses.put(importPath.asTypePath(), importPath.getClassName());
+                packageToClasses.put(importPath.getPackage(), importPath.getClassName());
             }
             for (var entry : packageToClasses.asMap().entrySet()) {
-                String packagePath = entry.getKey();
+                ClassPath packagePath = entry.getKey();
                 String classList = String.join(", ", entry.getValue());
-                indexWriter.write("import { %s } from \"%s\";\n".formatted(classList, packagePath));
+                indexWriter.write("import { %s } from \"%s\";\n".formatted(classList, packagePath.asTypePath()));
             }
 
             // export * as subpackage from "@package/xxx/subpackage";
@@ -100,6 +98,9 @@ public class IndexFile {
         // java.lang.String -> String
         // java.lang.String + foo.bar.String -> String, String$1
         Multimap<String, ClassPath> nameToClassPaths = ArrayListMultimap.create();
+        for (var classPath : classes) {
+            nameToClassPaths.put(classPath.getClassName(), classPath);
+        }
         for (var importPath : imports) {
             nameToClassPaths.put(importPath.getClassName(), importPath);
         }
@@ -112,13 +113,27 @@ public class IndexFile {
         for (var entry : nameToClassPaths.asMap().entrySet()) {
             String name = entry.getKey();
             List<ClassPath> classPaths = new ArrayList<>(entry.getValue());
+
+            var localSymbol = classPaths.stream()
+                    .filter(cp -> cp.getPackage() != null && cp.getPackage().equals(classPath))
+                    .findFirst()
+                    .orElse(null);
+
+            int marker = 0;
+            if (localSymbol != null) {
+                resolvedSymbols.put(localSymbol, name);
+                classPaths.remove(localSymbol);
+                marker = 1;
+            }
+
             for (int i = 0; i < classPaths.size(); i++) {
                 ClassPath classPath = classPaths.get(i);
-                if (i == 0) {
+                if (marker == 0) {
                     resolvedSymbols.put(classPath, name);
                 } else {
                     resolvedSymbols.put(classPath, name + "$" + i);
                 }
+                marker++;
             }
         }
 

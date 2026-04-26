@@ -6,7 +6,7 @@ import dev.latvian.mods.kubejs.recipe.filter.RecipeFilter;
 import moe.wolfgirl.probejs.docs.Primitives;
 import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
 import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
-import moe.wolfgirl.probejs.next.plugin.ProbeJSPlugin;
+import moe.wolfgirl.probejs.docs.ProbeJSPlugin;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;

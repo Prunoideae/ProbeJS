@@ -4,7 +4,6 @@ package moe.wolfgirl.probejs.docs;
 import dev.latvian.mods.kubejs.plugin.builtin.wrapper.NativeEventWrapper;
 import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
 import moe.wolfgirl.probejs.lang.typescript.code.ImportInfo;
-import moe.wolfgirl.probejs.next.plugin.ProbeJSPlugin;
 import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
 import moe.wolfgirl.probejs.lang.typescript.TypeScriptFile;
 import moe.wolfgirl.probejs.lang.typescript.code.member.ClassDecl;

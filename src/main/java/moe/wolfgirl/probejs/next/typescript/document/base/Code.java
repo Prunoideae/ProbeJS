@@ -5,11 +5,12 @@ import moe.wolfgirl.probejs.next.ClassPath;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public abstract class Code {
     protected final Map<ClassPath, String> resolvedSymbols = new HashMap<>();
 
-    public abstract List<ClassPath> getImports();
+    public abstract Set<ClassPath> getImports();
 
     public void setResolvedSymbols(Map<ClassPath, String> resolvedSymbols) {
         this.resolvedSymbols.clear();

@@ -1,10 +1,6 @@
 package moe.wolfgirl.probejs.utils;
 
 import com.mojang.datafixers.util.Pair;
-import dev.latvian.mods.rhino.type.JSFixedArrayTypeInfo;
-import dev.latvian.mods.rhino.type.JSOptionalParam;
-import dev.latvian.mods.rhino.type.JSOrTypeInfo;
-import dev.latvian.mods.rhino.type.TypeInfo;
 import moe.wolfgirl.probejs.lang.typescript.TypeScriptFile;
 import moe.wolfgirl.probejs.lang.typescript.code.ImportInfo;
 import moe.wolfgirl.probejs.lang.typescript.code.member.ClassDecl;
@@ -13,11 +9,8 @@ import moe.wolfgirl.probejs.lang.typescript.code.member.ParamDecl;
 import moe.wolfgirl.probejs.lang.typescript.code.member.TypeDecl;
 import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
 import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
-import moe.wolfgirl.probejs.lang.typescript.code.type.js.JSArrayType;
 import moe.wolfgirl.probejs.lang.typescript.code.type.js.JSObjectType;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 

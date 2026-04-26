@@ -1,30 +1,16 @@
 package moe.wolfgirl.probejs.next.plugin;
 
-import com.mojang.datafixers.util.Pair;
-
 import dev.latvian.mods.kubejs.plugin.KubeJSPlugin;
 import dev.latvian.mods.kubejs.plugin.KubeJSPlugins;
 import dev.latvian.mods.rhino.util.HideFromJS;
-import moe.wolfgirl.probejs.lang.schema.ComponentSchema;
-import moe.wolfgirl.probejs.lang.schema.SchemaDump;
-import moe.wolfgirl.probejs.lang.snippet.SnippetDump;
-import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
-import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
-import moe.wolfgirl.probejs.lang.transpiler.Transpiler;
-import moe.wolfgirl.probejs.lang.transpiler.TypeConverter;
-import moe.wolfgirl.probejs.lang.typescript.TypeScriptFile;
+import moe.wolfgirl.probejs.lang.typescript.code.member.ClassDecl;
+import moe.wolfgirl.probejs.next.ClassPath;
+import moe.wolfgirl.probejs.next.java.members.ClassInfo;
+import moe.wolfgirl.probejs.next.typescript.Documents;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Consumer;
 
-/**
- * A plugin for ProbeJS that is able to alter how ProbeJS works.
- * <br>
- * Different method calls might have same parameter/controller,
- * but it is advised to call different methods and their own stage
- * in order to prevent unexpected behavior.
- */
 public class ProbeJSPlugin implements KubeJSPlugin {
 
     @HideFromJS
@@ -36,88 +22,26 @@ public class ProbeJSPlugin implements KubeJSPlugin {
     }
 
     /**
-     * Used to add forcefully-converted types in order to prevent transient types
-     * like boolean / string from showing up.
+     * Called right after a class is transpiled into TypeScript declaration, but before
+     * all the classes are transpiled. This is used to apply a general transformation to
+     * the class. E.g. setting input/output types, beans, etc.
      */
-    public void addPredefinedTypes(TypeConverter converter) {
+    public void transformClass(ClassInfo classInfo, ClassDecl classDecl) {
 
     }
 
     /**
-     * Used to prevent some types from showing up in the dump, e.g. primitives.
+     * Called when all the classes are transpiled into TypeScript declaration. Supports
+     * adding / removing classes by mutating the globalDecls.
      */
-    public void denyTypes(Transpiler transpiler) {
+    public void modifyClasses(Map<ClassPath, ClassInfo> globalClasses, Map<ClassPath, ClassDecl> globalDecls) {
 
     }
 
     /**
-     * Used to modify the classes that will be dumped to a certain script type.
-     * <br>
-     * Can add / remove dumps by mutating the globalClasses.
+     * Add a type alias to the classPath.
      */
-    public void modifyClasses(ScriptDump scriptDump, Map<ClassPath, TypeScriptFile> globalClasses) {
+    public void addTypeAlias(Documents.AliasRegistrar registrar) {
 
-    }
-
-    /**
-     * Used to add code to global namespace.
-     * <br>
-     * Globals are available without any imports, so it must be ensured that the
-     * added code is either:
-     * 1. a type
-     * 2. a binding (though it's not very needed for most people)
-     */
-    public void addGlobals(ScriptDump scriptDump) {
-
-    }
-
-    /**
-     * Adds a convertible type to a classPath.
-     * <br>
-     * e.g. Item can be assigned with any item name string.
-     */
-    public void assignType(ScriptDump scriptDump) {
-
-    }
-
-    /**
-     * Provides Java classes for the class registry to discoverContainedTypes.
-     */
-    @HideFromJS
-    public Set<Class<?>> provideJavaClass(ScriptDump scriptDump) {
-        return Set.of();
-    }
-
-    /**
-     * Provides events that should be disabled for custom support.
-     */
-    public Set<Pair<String, String>> disableEventDumps(ScriptDump dump) {
-        return Set.of();
-    }
-
-    public void addVSCodeSnippets(SnippetDump dump) {
-
-    }
-
-    public void addJsonSchema(SchemaDump dump) {
-
-    }
-
-    /**
-     * Register the schema of a recipe component.
-     */
-    public void registerRecipeComponentSchema(ComponentSchema componentSchema) {
-
-    }
-
-    /**
-     * Marks a class to be forcefully loaded even if class scanning is turned off
-     */
-    public Set<Class<?>> filterScannedClasses(Set<Class<?>> clazz) {
-        return Set.of();
-    }
-
-    protected final TypeScriptFile findClassFile(Map<ClassPath, TypeScriptFile> globalClasses, Class<?> clazz) {
-        return globalClasses.get(new ClassPath(clazz));
     }
 }

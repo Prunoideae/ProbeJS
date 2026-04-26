@@ -2,6 +2,7 @@ package moe.wolfgirl.probejs.next;
 
 import moe.wolfgirl.probejs.next.java.ClassRegistry;
 import moe.wolfgirl.probejs.next.java.PackageTree;
+import moe.wolfgirl.probejs.next.typescript.Documents;
 import moe.wolfgirl.probejs.next.typescript.IndexFile;
 
 import java.nio.file.Path;
@@ -15,6 +16,7 @@ public class PackageDump {
 
     public void dump() {
         PackageTree packageTree = ClassRegistry.INSTANCE.resolveTree();
+        Documents.INSTANCE.transpile();
         for (var packageNode : packageTree.traverse()) {
             IndexFile indexFile = new IndexFile(packageNode);
             indexFile.dumpTo(baseDir);

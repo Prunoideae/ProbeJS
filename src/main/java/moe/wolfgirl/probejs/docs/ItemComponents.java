@@ -12,7 +12,6 @@ import moe.wolfgirl.probejs.lang.typescript.code.member.clazz.MethodBuilder;
 import moe.wolfgirl.probejs.lang.typescript.code.type.BaseType;
 import moe.wolfgirl.probejs.lang.typescript.code.type.Types;
 import moe.wolfgirl.probejs.lang.typescript.code.type.js.JSObjectType;
-import moe.wolfgirl.probejs.next.plugin.ProbeJSPlugin;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;

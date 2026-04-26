@@ -11,7 +11,6 @@ import moe.wolfgirl.probejs.docs.events.RecipeEvents;
 import moe.wolfgirl.probejs.docs.events.RegistryEvents;
 import moe.wolfgirl.probejs.docs.events.TagEvents;
 import moe.wolfgirl.probejs.lang.java.clazz.ClassPath;
-import moe.wolfgirl.probejs.next.plugin.ProbeJSPlugin;
 import moe.wolfgirl.probejs.lang.transpiler.Transpiler;
 import moe.wolfgirl.probejs.lang.transpiler.TypeConverter;
 import moe.wolfgirl.probejs.lang.typescript.TypeScriptFile;

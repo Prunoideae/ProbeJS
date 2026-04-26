@@ -12,7 +12,6 @@ import moe.wolfgirl.probejs.lang.typescript.ScriptDump;
 import moe.wolfgirl.probejs.lang.typescript.code.ImportInfo;
 import moe.wolfgirl.probejs.lang.typescript.code.type.TSClassType;
 import moe.wolfgirl.probejs.lang.typescript.code.type.TSParamType;
-import moe.wolfgirl.probejs.next.plugin.ProbeJSPlugin;
 import moe.wolfgirl.probejs.lang.transpiler.TypeConverter;
 import moe.wolfgirl.probejs.lang.typescript.code.Code;
 import moe.wolfgirl.probejs.lang.typescript.code.ts.MethodDeclaration;

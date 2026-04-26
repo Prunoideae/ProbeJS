@@ -5,4 +5,36 @@ import java.util.List;
 
 public abstract class CommentableCode extends Code {
     public final List<String> comments = new ArrayList<>();
+
+    public void addComments(String... comments) {
+        this.comments.addAll(List.of(comments));
+    }
+
+    // //...
+    // //...
+    public List<String> formatDoubleDash(int indent) {
+        List<String> formatted = new ArrayList<>();
+        for (String comment : comments) {
+            formatted.add("%s// %s".formatted(" ".repeat(indent), comment));
+        }
+        formatted.addAll(format(indent));
+        return formatted;
+    }
+
+    // /**
+    //  * ...
+    //  * ...
+    //  */
+    public List<String> formatSlashStar(int indent) {
+        List<String> formatted = new ArrayList<>();
+        if (!comments.isEmpty()) {
+            formatted.add("%s/**".formatted(" ".repeat(indent)));
+            for (String comment : comments) {
+                formatted.add("%s * %s".formatted(" ".repeat(indent), comment));
+            }
+            formatted.add("%s */".formatted(" ".repeat(indent)));
+        }
+        formatted.addAll(format(indent));
+        return formatted;
+    }
 }

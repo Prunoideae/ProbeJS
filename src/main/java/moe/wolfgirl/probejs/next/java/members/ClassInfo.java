@@ -30,13 +30,18 @@ public record ClassInfo(
 ) implements HasAnnotation, HasTypeVariable, ClassProvider {
 
     public static ClassInfo resolve(Class<?> clazz) {
+        var superClass = TypeInfo.of(clazz.getGenericSuperclass());
+        if (superClass.asClass().equals(Object.class)) {
+            superClass = TypeInfo.NONE;
+        }
+
         return new ClassInfo(
                 new ClassPath(clazz),
                 clazz,
                 findConstructors(clazz),
                 findFields(clazz),
                 findMethods(clazz),
-                TypeInfo.of(clazz.getGenericSuperclass()),
+                superClass,
                 Arrays.stream(clazz.getGenericInterfaces()).map(TypeInfo::of).toList(),
                 new ClassAttributes(clazz)
         );

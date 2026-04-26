@@ -47,7 +47,10 @@ public class MethodDecl extends CommentableCode {
         // Format head - public static "name"<T, U extends A>
         List<String> modifiers = new ArrayList<>();
         if (!isInterface) modifiers.add("public");
-        if (isStatic) modifiers.add("static");
+        if (isStatic) { // static in interface goes to namespace, which we need function
+            if (isInterface) modifiers.add("function");
+            else modifiers.add("static");
+        }
 
         String head = String.join(" ", modifiers);
         head = "%s %s".formatted(head, ProbeJS.GSON.toJson(name));
