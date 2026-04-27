@@ -165,24 +165,31 @@ public class ClassRegistry {
 
     public void writeTo(Path path) throws IOException {
         try (var writer = Files.newBufferedWriter(path)) {
-            for (Map.Entry<ClassPath, Clazz> entry : foundClasses.entrySet()) {
+            var lastPath = ClassPath.EMPTY;
+            for (Map.Entry<ClassPath, Clazz> entry : new TreeMap<>(foundClasses).entrySet()) {
+                var classPath = entry.getKey();
                 writer.write("%s\t%s\n".formatted(
-                        entry.getKey().getClassPathJava(),
+                        classPath.toDiff(lastPath),
                         entry.getValue().recursionDepth
                 ));
+                lastPath = classPath;
             }
         }
     }
 
     public void loadFrom(Path path) {
         try (var reader = Files.newBufferedReader(path)) {
+            var lastPath = ClassPath.EMPTY;
             for (String parts : (Iterable<String>) reader.lines()::iterator) {
+                ClassPath classPath = lastPath;
                 try {
                     String[] classRecursion = parts.split("\t");
-                    Class<?> loaded = Class.forName(classRecursion[0]);
+                    classPath = lastPath.fromDiff(classRecursion[0]);
+                    Class<?> loaded = classPath.forName();
                     fromClasses(Collections.singleton(loaded), Integer.parseInt(classRecursion[1]));
                 } catch (Throwable ignored) {
                 }
+                lastPath = classPath;
             }
         } catch (Exception ignored) {
         }
