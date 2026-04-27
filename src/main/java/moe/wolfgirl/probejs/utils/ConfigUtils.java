@@ -101,6 +101,8 @@ public class ConfigUtils {
         JsonArray include = JsonUtils.putArrayIfAbsent(config, "include");
         mergeAddArray(include, new JsonPrimitive("./**/*.js"));
         mergeAddArray(include, new JsonPrimitive("./**/*.ts"));
+        mergeAddArray(include, new JsonPrimitive("../../.probe/packages/generated-package/*.d.ts"));
+        mergeAddArray(include, new JsonPrimitive("../../.probe/%s/generated-%s/*.d.ts".formatted(baseName)));
 
         JsonObject compilerOptions = JsonUtils.putObjectIfAbsent(config, "compilerOptions");
         compilerOptions.addProperty("module", "none");
