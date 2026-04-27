@@ -7,10 +7,10 @@ import moe.wolfgirl.probejs.next.typescript.document.base.Type;
 import java.util.*;
 
 public class ParamType extends Type {
-    public Code baseType;
-    public List<Code> typeArgs;
+    public Type baseType;
+    public List<Type> typeArgs;
 
-    public ParamType(Code baseType, List<Code> typeArgs) {
+    public ParamType(Type baseType, List<Type> typeArgs) {
         this.baseType = baseType;
         this.typeArgs = typeArgs;
     }

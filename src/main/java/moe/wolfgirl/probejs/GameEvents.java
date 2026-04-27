@@ -6,6 +6,7 @@ import dev.latvian.mods.kubejs.client.KubeJSClient;
 import dev.latvian.mods.kubejs.script.ScriptType;
 import moe.wolfgirl.probejs.events.CodeGenerationEventJS;
 import moe.wolfgirl.probejs.events.ProbeEvents;
+import moe.wolfgirl.probejs.next.OtherDump;
 import moe.wolfgirl.probejs.next.PackageDump;
 import moe.wolfgirl.probejs.next.java.ClassRegistry;
 import moe.wolfgirl.probejs.utils.GameUtils;
@@ -195,8 +196,10 @@ public class GameEvents {
                                                     node.getSubPackages()
                                             ));
                                         }
-                                        PackageDump dump = new PackageDump(ProbePaths.PACKAGES);
+                                        PackageDump dump = new PackageDump(ProbePaths.PROBE);
                                         dump.dump();
+                                        OtherDump otherDump = new OtherDump(ProbePaths.PROBE);
+                                        otherDump.dump();
                                     }).start();
                                     return Command.SINGLE_SUCCESS;
                                 })

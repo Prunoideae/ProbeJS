@@ -5,7 +5,7 @@ import dev.latvian.mods.rhino.type.TypeInfo;
 import moe.wolfgirl.probejs.next.java.ClassRegistry;
 import moe.wolfgirl.probejs.next.java.members.ClassInfo;
 import moe.wolfgirl.probejs.next.plugin.ProbeJSPlugin;
-import moe.wolfgirl.probejs.next.typescript.Documents;
+import moe.wolfgirl.probejs.next.typescript.base.AliasRegistrar;
 import moe.wolfgirl.probejs.next.typescript.document.Types;
 
 import java.util.concurrent.locks.ReentrantLock;
@@ -14,7 +14,7 @@ public class EnumTypes extends ProbeJSPlugin {
     private static final ReentrantLock LOCK = new ReentrantLock();
 
     @Override
-    public void addTypeAlias(Documents.AliasRegistrar registrar) {
+    public void addTypeAlias(AliasRegistrar registrar) {
         LOCK.lock();
         for (ClassInfo classInfo : ClassRegistry.INSTANCE.getAllClasses().values()) {
             try {
@@ -25,7 +25,7 @@ public class EnumTypes extends ProbeJSPlugin {
                         .map(EnumTypeInfo::getName)
                         .map(String::toLowerCase)
                         .map(Types::literal)
-                        .forEach(alias -> registrar.addAlias(classInfo.clazz(), alias));
+                        .forEach(alias -> registrar.addInputAlias(classInfo.clazz(), alias));
             } catch (Throwable ignore) {
             }
         }

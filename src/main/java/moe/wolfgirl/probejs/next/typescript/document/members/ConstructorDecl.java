@@ -3,7 +3,6 @@ package moe.wolfgirl.probejs.next.typescript.document.members;
 import moe.wolfgirl.probejs.next.ClassPath;
 import moe.wolfgirl.probejs.next.typescript.document.base.Code;
 import moe.wolfgirl.probejs.next.typescript.document.base.CommentableCode;
-import moe.wolfgirl.probejs.next.typescript.document.base.Type;
 import moe.wolfgirl.probejs.next.typescript.document.types.VariableType;
 
 import java.util.HashSet;

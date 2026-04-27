@@ -2,6 +2,7 @@ package moe.wolfgirl.probejs.next.typescript.document.members;
 
 import moe.wolfgirl.probejs.next.ClassPath;
 import moe.wolfgirl.probejs.next.typescript.document.base.CommentableCode;
+import moe.wolfgirl.probejs.next.typescript.document.base.KindAware;
 import moe.wolfgirl.probejs.next.typescript.document.base.Type;
 
 import java.util.List;
@@ -9,11 +10,11 @@ import java.util.Set;
 
 // Represents a field declaration in a TypeScript class.
 // fieldName: type;
-public class FieldDecl extends CommentableCode {
+public class FieldDecl extends CommentableCode implements KindAware {
     public String name;
     public Type typeInfo;
     public boolean isStatic;
-    public boolean isInterface;
+    private KindAware.Kind kind;
 
     public FieldDecl(String name, Type typeInfo, boolean isStatic) {
         this.name = name;
@@ -22,12 +23,21 @@ public class FieldDecl extends CommentableCode {
     }
 
     @Override
+    public void setKind(Kind kind) {
+        this.kind = kind;
+    }
+
+    @Override
     public Set<ClassPath> getImports() {
         return typeInfo.getImports();
     }
 
+    public String getPrefix() {
+        return kind == KindAware.Kind.NAMESPACE ? "let " : isStatic ? "static " : "";
+    }
+
     @Override
     public List<String> format(int indent) {
-        return List.of("%s%s%s: %s;".formatted(" ".repeat(indent), isStatic ? "static " : "", name, typeInfo.first()));
+        return List.of("%s%s%s: %s;".formatted(" ".repeat(indent), getPrefix(), name, typeInfo.first()));
     }
 }

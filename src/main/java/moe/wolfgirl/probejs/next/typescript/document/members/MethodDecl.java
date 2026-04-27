@@ -3,6 +3,7 @@ package moe.wolfgirl.probejs.next.typescript.document.members;
 import moe.wolfgirl.probejs.next.ClassPath;
 import moe.wolfgirl.probejs.next.typescript.document.base.Code;
 import moe.wolfgirl.probejs.next.typescript.document.base.CommentableCode;
+import moe.wolfgirl.probejs.next.typescript.document.base.KindAware;
 import moe.wolfgirl.probejs.next.typescript.document.types.VariableType;
 import org.jetbrains.annotations.Nullable;
 
@@ -12,14 +13,13 @@ import java.util.Set;
 
 // Represents a method declaration in a TypeScript class or interface.
 // (static) methodName<T1, T2>(param1: Type1, param2: Type2): ReturnType
-public class MethodDecl extends CommentableCode {
+public class MethodDecl extends CommentableCode implements KindAware {
     public String name;
     public List<VariableType> typeParams;
     public List<ParamDecl> params;
-    @Nullable
     public Code returnType;
     public boolean isStatic;
-    public boolean isInterface = false;
+    private KindAware.Kind kind;
 
     public MethodDecl(String name, List<VariableType> typeParams, List<ParamDecl> params, @Nullable Code returnType, boolean isStatic) {
         this.name = name;
@@ -27,6 +27,11 @@ public class MethodDecl extends CommentableCode {
         this.params = params;
         this.returnType = returnType;
         this.isStatic = isStatic;
+    }
+
+    @Override
+    public void setKind(Kind kind) {
+        this.kind = kind;
     }
 
     @Override
@@ -38,19 +43,19 @@ public class MethodDecl extends CommentableCode {
         for (ParamDecl param : params) {
             imports.addAll(param.getImports());
         }
-        if (returnType != null) {
-            imports.addAll(returnType.getImports());
-        }
+        imports.addAll(returnType.getImports());
         return imports;
+    }
+
+    public String getPrefix() {
+        return kind == KindAware.Kind.NAMESPACE ? "let " : isStatic ? "static " : "";
     }
 
     @Override
     public List<String> format(int indent) {
         var indentStr = " ".repeat(indent);
-        var staticStr = isStatic ? "static " : "";
         var typeParamsStr = typeParams.isEmpty() ? "" : "<%s>".formatted(String.join(", ", typeParams.stream().map(VariableType::formatWithBound).toList()));
         var paramsStr = String.join(", ", params.stream().map(Code::first).toList());
-        var returnTypeStr = returnType == null ? "" : ": %s".formatted(returnType.first());
-        return List.of("%s%s%s%s(%s)%s;".formatted(indentStr, staticStr, name, typeParamsStr, paramsStr, returnTypeStr));
+        return List.of("%s%s%s%s(%s): %s;".formatted(indentStr, getPrefix(), name, typeParamsStr, paramsStr, returnType.first()));
     }
 }

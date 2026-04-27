@@ -3,6 +3,7 @@ package moe.wolfgirl.probejs.next.typescript.transpiler;
 import moe.wolfgirl.probejs.next.java.members.ClassInfo;
 import moe.wolfgirl.probejs.next.typescript.document.ClassDecl;
 import moe.wolfgirl.probejs.next.typescript.document.base.Code;
+import moe.wolfgirl.probejs.next.typescript.document.base.KindAware;
 import moe.wolfgirl.probejs.next.typescript.document.base.Type;
 import moe.wolfgirl.probejs.next.typescript.document.types.VariableType;
 import moe.wolfgirl.probejs.next.typescript.transpiler.members.ConstructorConverter;
@@ -39,7 +40,7 @@ public class Transpiler extends Converter<ClassInfo, ClassDecl> {
         List<Code> members = new ArrayList<>();
         for (var field : source.fields()) {
             var fieldDecl = this.field.convert(field);
-            fieldDecl.isInterface = isInterface;
+            fieldDecl.setKind(isInterface ? KindAware.Kind.INTERFACE : KindAware.Kind.CLASS);
             members.add(fieldDecl);
         }
         for (var constructor : source.constructors()) {
@@ -47,13 +48,13 @@ public class Transpiler extends Converter<ClassInfo, ClassDecl> {
         }
         for (var method : source.methods()) {
             var methodDecl = this.method.convert(method);
-            methodDecl.isInterface = isInterface;
+            methodDecl.setKind(isInterface ? KindAware.Kind.INTERFACE : KindAware.Kind.CLASS);
             members.add(methodDecl);
         }
 
         return new ClassDecl(
                 true,
-                source.attributes().isInterface() ? ClassDecl.Kind.INTERFACE : ClassDecl.Kind.CLASS,
+                source.attributes().isInterface() ? KindAware.Kind.INTERFACE : KindAware.Kind.CLASS,
                 source.classPath().getClassName(),
                 superClass,
                 interfaces,

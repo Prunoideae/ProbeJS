@@ -2,9 +2,10 @@ package moe.wolfgirl.probejs.next;
 
 import moe.wolfgirl.probejs.next.java.ClassRegistry;
 import moe.wolfgirl.probejs.next.java.PackageTree;
-import moe.wolfgirl.probejs.next.plugin.ProbeBuiltinDocs;
+import moe.wolfgirl.probejs.next.plugin.ProbeJSPlugin;
 import moe.wolfgirl.probejs.next.typescript.Documents;
 import moe.wolfgirl.probejs.next.typescript.IndexFile;
+import moe.wolfgirl.probejs.next.typescript.base.AliasRegistrar;
 
 import java.nio.file.Path;
 
@@ -16,14 +17,15 @@ public class PackageDump {
     }
 
     public void dump() {
-        PackageTree packageTree = ClassRegistry.INSTANCE.resolveTree();
-        ProbeBuiltinDocs.forEach(plugin -> plugin.addTypeAlias(Documents.INSTANCE::addInputAlias));
+        Documents.INSTANCE.clear();
         Documents.INSTANCE.transpile();
+        ProbeJSPlugin.forEachPlugin(plugin -> plugin.addTypeAlias(new AliasRegistrar.Proxy(Documents.INSTANCE)));
+        PackageTree packageTree = ClassRegistry.INSTANCE.resolveTree();
         for (var packageNode : packageTree.traverse()) {
-            IndexFile indexFile = new IndexFile(packageNode);
+            IndexFile indexFile = new IndexFile(packageNode, Documents.INSTANCE);
             indexFile.dumpTo(baseDir);
         }
-        IndexFile rootIndex = new IndexFile(packageTree.getRoot());
-        rootIndex.dumpTo(baseDir);
+        IndexFile rootIndex = new IndexFile(packageTree.getRoot(), Documents.INSTANCE);
+        rootIndex.dumpTo(baseDir.resolve("@package"));
     }
 }

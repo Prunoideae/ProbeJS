@@ -10,13 +10,13 @@ import java.util.stream.Stream;
 
 public interface TypeDocument {
     default ArrayType asArray() {
-        if (this instanceof Code thisCode) {
+        if (this instanceof Type thisCode) {
             return new ArrayType(thisCode);
         } else throw new RuntimeException("Cannot convert to ArrayType: " + this.getClass().getName());
     }
 
-    default ParamType withParams(Code... paramTypes) {
-        if (this instanceof Code thisCode) {
+    default ParamType withParams(Type... paramTypes) {
+        if (this instanceof Type thisCode) {
             if (this instanceof VariableType) {
                 throw new RuntimeException("Cannot convert to ParamType: VariableType cannot be used as a function type");
             }

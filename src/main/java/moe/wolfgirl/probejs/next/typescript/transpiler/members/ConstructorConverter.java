@@ -27,7 +27,7 @@ public class ConstructorConverter extends Converter<ConstructorInfo, Constructor
 
         return new ConstructorDecl(
                 variableTypes,
-                source.params().stream().map(paramConverter::convert).toList()
+                new ArrayList<>(source.params().stream().map(paramConverter::convert).toList())
         );
     }
 }

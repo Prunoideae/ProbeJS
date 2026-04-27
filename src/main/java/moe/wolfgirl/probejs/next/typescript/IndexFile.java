@@ -4,10 +4,12 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import moe.wolfgirl.probejs.next.ClassPath;
 import moe.wolfgirl.probejs.next.java.PackageTree;
+import moe.wolfgirl.probejs.next.typescript.base.DocumentRegistry;
 import moe.wolfgirl.probejs.next.typescript.document.base.Code;
 import moe.wolfgirl.probejs.next.typescript.document.base.CommentableCode;
 import moe.wolfgirl.probejs.utils.ProbeFileUtils;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -24,11 +26,14 @@ public class IndexFile {
     private final List<ClassPath> subpackages = new ArrayList<>();
     private final List<ClassPath> classes = new ArrayList<>();
     private final List<Code> moduleDumps = new ArrayList<>();
+    private final List<Code> globals = new ArrayList<>();
+    private final DocumentRegistry registry;
 
-    public IndexFile(PackageTree.Node packageNode) {
+    public IndexFile(PackageTree.Node packageNode, DocumentRegistry registry) {
         this.classPath = packageNode.getClassPath();
         subpackages.addAll(packageNode.getSubPackages());
         classes.addAll(packageNode.getClasses());
+        this.registry = registry;
     }
 
     public void addCode(Code code) {
@@ -36,14 +41,19 @@ public class IndexFile {
         moduleDumps.add(code);
     }
 
+    public void addGlobal(Code code) {
+        imports.addAll(code.getImports());
+        globals.add(code);
+    }
+
     private void loadClasses() {
         for (var clazz : classes) {
-            Code classDecl = Documents.INSTANCE.getDocument(clazz);
-            if (classDecl == null) continue;
-            addCode(classDecl);
-            Code classAlias = Documents.INSTANCE.getInputAlias(clazz);
-            if (classAlias == null) continue;
-            addCode(classAlias);
+            Code classDecl = registry.getDocument(clazz);
+            if (classDecl != null) addCode(classDecl);
+            Code classAlias = registry.getInputAlias(clazz);
+            if (classAlias != null) addCode(classAlias);
+            Code global = registry.getGlobal(clazz);
+            if (global != null) addGlobal(global);
         }
 
         var resolvedSymbols = getResolvedSymbols();
@@ -57,7 +67,7 @@ public class IndexFile {
         ProbeFileUtils.createDirectories(dirPath);
 
         var indexPath = dirPath.resolve("index.d.ts");
-        try (var indexWriter = java.nio.file.Files.newBufferedWriter(indexPath)) {
+        try (var indexWriter = Files.newBufferedWriter(indexPath)) {
             loadClasses();
 
             // import { A, B } from "@package/xxx";
@@ -79,17 +89,32 @@ public class IndexFile {
                 indexWriter.write("export * as %s from \"%s\";\n".formatted(subPackage.getClassName(), subPackage.asTypePath()));
             }
 
-            if (classes.isEmpty() || classPath == null) return;
-            indexWriter.write("\n");
-            // declare module ${packageNode.asTypePath} {\n");
-            indexWriter.write("declare module \"%s\" {\n".formatted(classPath.asTypePath()));
-            for (var code : moduleDumps) {
-                for (String line : CommentableCode.format(code, 4)) {
-                    indexWriter.write(line);
-                    indexWriter.write("\n");
+            // declare module ${packageNode.asTypePath} {
+            if (!classes.isEmpty() && classPath != null) {
+                indexWriter.write("\n");
+                indexWriter.write("declare module \"%s\" {\n".formatted(classPath.asTypePath()));
+                for (var code : moduleDumps) {
+                    for (String line : CommentableCode.format(code, 4)) {
+                        indexWriter.write(line);
+                        indexWriter.write("\n");
+                    }
                 }
+                indexWriter.write("}\n");
             }
-            indexWriter.write("}\n");
+
+            // declare global {
+            if (!globals.isEmpty()) {
+                // Augmentations for the global scope can only be directly nested in external modules or ambient module declarations
+                indexWriter.write("\nexport {};\n\n");
+                indexWriter.write("declare global {\n");
+                for (var code : globals) {
+                    for (String line : CommentableCode.format(code, 4)) {
+                        indexWriter.write(line);
+                        indexWriter.write("\n");
+                    }
+                }
+                indexWriter.write("}\n");
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

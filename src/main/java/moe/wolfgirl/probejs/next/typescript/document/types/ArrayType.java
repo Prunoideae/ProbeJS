@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.Set;
 
 public class ArrayType extends Type {
-    public Code componentType;
+    public Type componentType;
 
-    public ArrayType(Code componentType) {
+    public ArrayType(Type componentType) {
         this.componentType = componentType;
     }
 

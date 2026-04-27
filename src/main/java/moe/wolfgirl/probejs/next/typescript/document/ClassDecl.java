@@ -3,6 +3,7 @@ package moe.wolfgirl.probejs.next.typescript.document;
 import moe.wolfgirl.probejs.next.ClassPath;
 import moe.wolfgirl.probejs.next.typescript.document.base.Code;
 import moe.wolfgirl.probejs.next.typescript.document.base.CommentableCode;
+import moe.wolfgirl.probejs.next.typescript.document.base.KindAware;
 import moe.wolfgirl.probejs.next.typescript.document.base.Type;
 import moe.wolfgirl.probejs.next.typescript.document.members.FieldDecl;
 import moe.wolfgirl.probejs.next.typescript.document.members.MethodDecl;
@@ -19,14 +20,14 @@ import java.util.Set;
 // }
 public class ClassDecl extends CommentableCode {
     public boolean export;
-    public Kind kind;
+    public KindAware.Kind kind;
     public String identifier;
     public Type extendsType;
     public List<Type> implementsTypes;
     public List<VariableType> typeParams;
     public List<Code> members;
 
-    public ClassDecl(boolean export, Kind kind, String identifier, Type extendsType, List<Type> implementsTypes, List<VariableType> typeParams, List<Code> members) {
+    public ClassDecl(boolean export, KindAware.Kind kind, String identifier, Type extendsType, List<Type> implementsTypes, List<VariableType> typeParams, List<Code> members) {
         this.export = export;
         this.kind = kind;
         this.identifier = identifier;
@@ -54,9 +55,9 @@ public class ClassDecl extends CommentableCode {
     @Override
     public List<String> format(int indent) {
         sanitize();
-        if (kind == Kind.CLASS) return formatAsClass(indent);
-        else if (kind == Kind.INTERFACE) return formatAsInterface(indent);
-        else if (kind == Kind.NAMESPACE) return formatAsNamespace(indent);
+        if (kind == KindAware.Kind.CLASS) return formatAsClass(indent);
+        else if (kind == KindAware.Kind.INTERFACE) return formatAsInterface(indent);
+        else if (kind == KindAware.Kind.NAMESPACE) return formatAsNamespace(indent);
         else throw new IllegalStateException("Unknown kind: %s".formatted(kind));
     }
 
@@ -130,17 +131,14 @@ public class ClassDecl extends CommentableCode {
     }
 
     private void sanitize() {
-        if (kind == Kind.NAMESPACE) {
+        if (kind == KindAware.Kind.NAMESPACE) {
             if (extendsType != Types.NEVER) throw new IllegalStateException("Namespace cannot have extends type");
             if (!implementsTypes.isEmpty()) throw new IllegalStateException("Namespace cannot have implements types");
         }
 
-        if (kind == Kind.INTERFACE) {
+        if (kind == KindAware.Kind.INTERFACE) {
             if (extendsType != Types.NEVER) throw new IllegalStateException("Interface cannot have extends type");
         }
     }
 
-    public enum Kind {
-        CLASS, INTERFACE, NAMESPACE
-    }
 }

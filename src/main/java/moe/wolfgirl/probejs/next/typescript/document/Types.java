@@ -37,7 +37,7 @@ public interface Types {
         return new ArrayType(new ClassType(classPath));
     }
 
-    static ParamType parameterized(Code base, Code... typeArgs) {
+    static ParamType parameterized(Type base, Type... typeArgs) {
         return new ParamType(base, List.of(typeArgs));
     }
 

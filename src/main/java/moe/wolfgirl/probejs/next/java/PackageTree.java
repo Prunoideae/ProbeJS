@@ -22,7 +22,7 @@ public class PackageTree {
         for (int i = 0; i < segments.size() - 1; i++) {
             final int depth = i + 1;
             current = current.children.computeIfAbsent(segments.get(i),
-                    k -> new Node(new ClassPath(segments.subList(0, depth)), true));
+                    k -> new Node(new ClassPath(classPath.getBaseName(), segments.subList(0, depth)), true));
         }
         // Last segment is a class node
         String last = segments.getLast();

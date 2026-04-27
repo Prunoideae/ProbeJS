@@ -28,7 +28,7 @@ public class MethodConverter extends Converter<MethodInfo, MethodDecl> {
         return new MethodDecl(
                 source.name(),
                 variableTypes,
-                source.params().stream().map(paramConverter::convert).toList(),
+                new ArrayList<>(source.params().stream().map(paramConverter::convert).toList()),
                 converter.convertType(source.returnType()),
                 source.isStatic()
         );

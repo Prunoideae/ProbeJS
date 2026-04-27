@@ -5,7 +5,6 @@ import dev.latvian.mods.kubejs.util.KubeResourceLocation;
 import dev.latvian.mods.rhino.type.*;
 import moe.wolfgirl.probejs.next.ClassPath;
 import moe.wolfgirl.probejs.next.typescript.document.Types;
-import moe.wolfgirl.probejs.next.typescript.document.base.Code;
 import moe.wolfgirl.probejs.next.typescript.document.base.Type;
 import moe.wolfgirl.probejs.next.typescript.document.types.ClassType;
 import net.minecraft.resources.ResourceLocation;
@@ -46,7 +45,7 @@ public class TypeConverter {
                 if (predefinedTypes.containsKey(classPath)) yield predefinedTypes.get(classPath);
                 ClassType classType = new ClassType(classPath);
                 if (clazz.getTypeParameters().length != 0 && canHaveParams) {
-                    Code[] params = Collections.nCopies(clazz.getTypeParameters().length, Types.ANY).toArray(new Code[0]);
+                    Type[] params = Collections.nCopies(clazz.getTypeParameters().length, Types.ANY).toArray(new Type[0]);
                     yield classType.withParams(params);
                 } else yield classType;
             }
@@ -67,7 +66,7 @@ public class TypeConverter {
                 Type baseType = convertType(base, false, seenVariables);
                 var params = Arrays.stream(info.params())
                         .map(param -> convertType(param, true, seenVariables))
-                        .toArray(Code[]::new);
+                        .toArray(Type[]::new);
                 yield baseType.withParams(params);
             }
             case null, default -> Types.ANY;
