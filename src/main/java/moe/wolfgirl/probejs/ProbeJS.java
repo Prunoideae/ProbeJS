@@ -2,7 +2,7 @@ package moe.wolfgirl.probejs;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import moe.wolfgirl.probejs.utils.JsonUtils;
+import moe.wolfgirl.probejs.legacy.utils.JsonUtils;
 import net.neoforged.fml.common.Mod;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

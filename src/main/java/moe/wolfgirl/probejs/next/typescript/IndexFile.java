@@ -2,12 +2,13 @@ package moe.wolfgirl.probejs.next.typescript;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import moe.wolfgirl.probejs.ProbeJS;
 import moe.wolfgirl.probejs.next.ClassPath;
 import moe.wolfgirl.probejs.next.java.PackageTree;
 import moe.wolfgirl.probejs.next.typescript.base.DocumentRegistry;
 import moe.wolfgirl.probejs.next.typescript.document.base.Code;
 import moe.wolfgirl.probejs.next.typescript.document.base.CommentableCode;
-import moe.wolfgirl.probejs.utils.ProbeFileUtils;
+import moe.wolfgirl.probejs.legacy.utils.ProbeFileUtils;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -46,7 +47,7 @@ public class IndexFile {
         globals.add(code);
     }
 
-    private void loadClasses() {
+    private Map<ClassPath, String> loadClasses() {
         for (var clazz : classes) {
             Code classDecl = registry.getDocument(clazz);
             if (classDecl != null) addCode(classDecl);
@@ -60,6 +61,8 @@ public class IndexFile {
         for (var code : moduleDumps) {
             code.setResolvedSymbols(resolvedSymbols);
         }
+
+        return resolvedSymbols;
     }
 
     public void dumpTo(Path baseDir) {
@@ -68,7 +71,7 @@ public class IndexFile {
 
         var indexPath = dirPath.resolve("index.d.ts");
         try (var indexWriter = Files.newBufferedWriter(indexPath)) {
-            loadClasses();
+            var resolvedSymbols = loadClasses();
 
             // import { A, B } from "@package/xxx";
             Multimap<ClassPath, String> packageToClasses = ArrayListMultimap.create();
@@ -76,7 +79,12 @@ public class IndexFile {
                 if (importPath.getPackage() != null && importPath.getPackage().equals(classPath))
                     continue; // Don't import from the same package
                 // indexWriter.write("import { %s } from \"%s\";\n".formatted(importPath.getClassName(), importPath.asTypePath()));
-                packageToClasses.put(importPath.getPackage(), importPath.getClassName());
+                var symbolName = resolvedSymbols.getOrDefault(importPath, importPath.getClassName());
+                if (symbolName.equals(importPath.getClassName())) {
+                    packageToClasses.put(importPath.getPackage(), symbolName);
+                } else {
+                    packageToClasses.put(importPath.getPackage(), "%s as %s".formatted(importPath.getClassName(), resolvedSymbols.get(importPath)));
+                }
             }
             for (var entry : packageToClasses.asMap().entrySet()) {
                 ClassPath packagePath = entry.getKey();
@@ -138,7 +146,8 @@ public class IndexFile {
         Map<ClassPath, String> resolvedSymbols = new HashMap<>();
         for (var entry : nameToClassPaths.asMap().entrySet()) {
             String name = entry.getKey();
-            List<ClassPath> classPaths = new ArrayList<>(entry.getValue());
+            // deduplicate class paths to avoid unnecessary renaming
+            List<ClassPath> classPaths = new ArrayList<>(new HashSet<>(entry.getValue()));
 
             var localSymbol = classPaths.stream()
                     .filter(cp -> cp.getPackage() != null && cp.getPackage().equals(classPath))
@@ -154,12 +163,11 @@ public class IndexFile {
 
             for (int i = 0; i < classPaths.size(); i++) {
                 ClassPath classPath = classPaths.get(i);
-                if (marker == 0) {
+                if (i + marker == 0) {
                     resolvedSymbols.put(classPath, name);
                 } else {
-                    resolvedSymbols.put(classPath, name + "$" + i);
+                    resolvedSymbols.put(classPath, name + "$" + (i + marker));
                 }
-                marker++;
             }
         }
 

@@ -37,4 +37,16 @@ public interface TSPathProvider<T extends TSPathProvider<T>> {
         newSegments.set(lastIndex, newSegments.get(lastIndex) + suffix);
         return create(getBaseName(), newSegments);
     }
+
+    default T append(String... segments) {
+        List<String> newSegments = new java.util.ArrayList<>(segments());
+        newSegments.addAll(List.of(segments));
+        return create(getBaseName(), newSegments);
+    }
+
+    default T prepend(String... segments) {
+        List<String> newSegments = new java.util.ArrayList<>(List.of(segments));
+        newSegments.addAll(segments());
+        return create(getBaseName(), newSegments);
+    }
 }

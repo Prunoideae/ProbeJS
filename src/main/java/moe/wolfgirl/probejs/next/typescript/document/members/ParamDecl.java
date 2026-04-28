@@ -5,6 +5,7 @@ import moe.wolfgirl.probejs.next.typescript.document.base.Code;
 import moe.wolfgirl.probejs.next.typescript.document.base.Type;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 // A parameter declaration in method or constructor
@@ -42,5 +43,11 @@ public class ParamDecl extends Code {
             name = "_" + name;
         }
         return List.of("%s%s: %s".formatted(isRest ? "..." : "", name, typeInfo.first()));
+    }
+
+    @Override
+    public void setResolvedSymbols(Map<ClassPath, String> resolvedSymbols) {
+        super.setResolvedSymbols(resolvedSymbols);
+        typeInfo.setResolvedSymbols(resolvedSymbols);
     }
 }

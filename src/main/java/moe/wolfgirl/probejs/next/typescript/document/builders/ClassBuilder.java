@@ -18,7 +18,7 @@ public class ClassBuilder {
     private boolean export = true;
     private KindAware.Kind kind = KindAware.Kind.CLASS;
     private final String identifier;
-    private Type extendsType = null;
+    private Type extendsType = Types.NEVER;
     private final List<Type> implementsTypes = new ArrayList<>();
     private final List<VariableType> typeParams = new ArrayList<>();
     private final List<Code> members = new ArrayList<>();

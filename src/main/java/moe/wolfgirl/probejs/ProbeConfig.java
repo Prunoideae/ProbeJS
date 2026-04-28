@@ -2,7 +2,7 @@ package moe.wolfgirl.probejs;
 
 import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonWriter;
-import moe.wolfgirl.probejs.utils.JsonUtils;
+import moe.wolfgirl.probejs.legacy.utils.JsonUtils;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;

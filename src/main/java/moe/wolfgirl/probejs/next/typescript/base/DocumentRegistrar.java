@@ -27,8 +27,8 @@ public interface DocumentRegistrar extends AliasRegistrar {
         }
 
         @Override
-        public void addInputAlias(Class<?> clazz, Type type) {
-            delegate.addInputAlias(clazz, type);
+        public void addInputAlias(ClassPath classPath, Type type) {
+            delegate.addInputAlias(classPath, type);
         }
     }
 }

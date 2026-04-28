@@ -8,4 +8,6 @@ declare module "@package/moe/wolfgirl/networking" {
         connect(host: string, port: number): void;
         woof(): void;
     }
+
+    
 }

@@ -1,4 +1,7 @@
 import { Object, String } from "@package/java/lang";
+import { Bar } from "@package/moe/wolfgirl";
+import { Foo } from "@package/moe/wolfgirl";
+import { MarkerCarrier } from "@package/moe/wolfgirl";
 
 declare module "@package/java/util" {
     export interface Iterator<T> {
@@ -32,4 +35,10 @@ declare module "@package/java/util" {
         get(index: number): T;
         toString(): String;
     }
+
+    export type ResolveTag<T> = T extends MarkerCarrier<infer M1, any> ? M1 : never;
+    export type ResolveObject<T> = T extends MarkerCarrier<any, infer M2> ? M2 : never;
+
+    export type FooMarker = ResolveTag<Foo>; // 1 | 2 | 3
+    export type BarMarker = ResolveObject<Bar>;
 }

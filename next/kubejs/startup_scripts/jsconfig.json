@@ -16,7 +16,8 @@
     },
     "include": [
         "./**/*.js",
+        "./**/*.d.ts",
         "../../.probe/@package/**/*.d.ts",
-        "../../.probe/@side-specific/startup/**/*.d.ts"
+        "../../.probe/@side-specific/startup/**/*.d.ts",
     ]
 }

@@ -4,13 +4,11 @@ package moe.wolfgirl.probejs.mixins;
 import dev.latvian.mods.kubejs.plugin.builtin.wrapper.JavaWrapper;
 import dev.latvian.mods.kubejs.script.KubeJSContext;
 import dev.latvian.mods.rhino.NativeJavaClass;
-import moe.wolfgirl.probejs.lang.java.ClassRegistry;
+import moe.wolfgirl.probejs.next.plugin.builtins.discovery.JavaLoaded;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import java.util.List;
 
 @Mixin(value = JavaWrapper.class, remap = false)
 public interface JavaWrapperMixin {
@@ -18,7 +16,7 @@ public interface JavaWrapperMixin {
     private static void pjs$getClassLoaded(KubeJSContext cx, String className, CallbackInfoReturnable<Object> cir) {
         Object object = cir.getReturnValue();
         if (object instanceof NativeJavaClass njc) {
-            ClassRegistry.REGISTRY.fromClasses(List.of(njc.getClassObject()), 0);
+            JavaLoaded.ALL_LOADED.add(njc.getClassObject());
         }
     }
 
@@ -26,7 +24,7 @@ public interface JavaWrapperMixin {
     private static void pjs$tryGetClassLoaded(KubeJSContext cx, String className, CallbackInfoReturnable<Object> cir) {
         Object object = cir.getReturnValue();
         if (object instanceof NativeJavaClass njc) {
-            ClassRegistry.REGISTRY.fromClasses(List.of(njc.getClassObject()), 0);
+            JavaLoaded.ALL_LOADED.add(njc.getClassObject());
         }
     }
 }

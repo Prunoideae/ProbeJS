@@ -63,8 +63,9 @@ public class SpecialDocuments implements DocumentRegistry, DocumentRegistrar {
         return tree;
     }
 
+
     @Override
-    public void addInputAlias(Class<?> clazz, Type type) {
-        throw new UnsupportedOperationException("SpecialDocuments does not support input aliases");
+    public void addInputAlias(ClassPath classPath, Type type) {
+        throw new UnsupportedOperationException("Input aliases are not supported in SpecialDocuments. Define directly or use Documents instead.");
     }
 }

@@ -7,6 +7,7 @@ import moe.wolfgirl.probejs.next.typescript.base.AliasRegistrar;
 import moe.wolfgirl.probejs.next.typescript.Documents;
 import moe.wolfgirl.probejs.next.typescript.base.DocumentRegistrar;
 
+import java.util.Set;
 import java.util.function.Consumer;
 
 public class ProbeJSPlugin implements KubeJSPlugin {
@@ -56,5 +57,12 @@ public class ProbeJSPlugin implements KubeJSPlugin {
      */
     public void addSidedDocuments(DocumentRegistrar registrar) {
 
+    }
+
+    /**
+     * Expose more classes so that ProbeJS will try to generate TypeScript declaration for them (and classes referenced by them).
+     */
+    public Set<Class<?>> provideClassForDiscovery() {
+        return Set.of();
     }
 }

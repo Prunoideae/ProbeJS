@@ -5,7 +5,8 @@ import moe.wolfgirl.probejs.ProbeConfig;
 import moe.wolfgirl.probejs.ProbeJS;
 import moe.wolfgirl.probejs.next.ClassPath;
 import moe.wolfgirl.probejs.next.java.members.ClassInfo;
-import moe.wolfgirl.probejs.utils.GameUtils;
+import moe.wolfgirl.probejs.legacy.utils.GameUtils;
+import moe.wolfgirl.probejs.next.plugin.ProbeJSPlugin;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.BufferedReader;
@@ -116,6 +117,14 @@ public class ClassRegistry {
         if (!classMap.containsKey(classPath)) {
             classMap.put(classPath, new ClassRecord(ClassInfo.resolve(clazz), recursionDepth));
         }
+    }
+
+    public void fetchInitialClasses() {
+        ProbeJSPlugin.forEachPlugin(plugin -> {
+            for (Class<?> clazz : plugin.provideClassForDiscovery()) {
+                putClass(clazz, 0);
+            }
+        });
     }
 
     public void clear() {

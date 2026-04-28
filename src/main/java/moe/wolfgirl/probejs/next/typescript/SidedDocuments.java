@@ -33,8 +33,8 @@ public class SidedDocuments implements DocumentRegistry, DocumentRegistrar {
     }
 
     @Override
-    public void addInputAlias(Class<?> clazz, Type type) {
-        throw new UnsupportedOperationException("SidedDocuments does not support input aliases");
+    public void addInputAlias(ClassPath classPath, Type type) {
+            throw new UnsupportedOperationException("Input aliases are not supported in SidedDocuments. Define directly or use Documents instead.");
     }
 
     @Override

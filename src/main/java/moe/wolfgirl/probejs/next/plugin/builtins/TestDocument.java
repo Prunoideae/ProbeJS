@@ -1,30 +1,20 @@
 package moe.wolfgirl.probejs.next.plugin.builtins;
 
-import dev.latvian.mods.kubejs.script.ScriptType;
+import dev.architectury.fluid.FluidStack;
 import moe.wolfgirl.probejs.next.ClassPath;
 import moe.wolfgirl.probejs.next.plugin.ProbeJSPlugin;
-import moe.wolfgirl.probejs.next.typescript.Documents;
+import moe.wolfgirl.probejs.next.typescript.base.AliasRegistrar;
 import moe.wolfgirl.probejs.next.typescript.base.DocumentRegistrar;
 import moe.wolfgirl.probejs.next.typescript.document.Types;
 import moe.wolfgirl.probejs.next.typescript.document.base.Code;
-import moe.wolfgirl.probejs.next.typescript.document.members.MethodDecl;
-import moe.wolfgirl.probejs.next.typescript.document.members.ParamDecl;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
 
 import java.util.List;
 import java.util.Set;
 
 public class TestDocument extends ProbeJSPlugin {
-    @Override
-    public void transformClass(Documents.ClassDocument document) {
-        var params = document.document().members.stream()
-                .filter(c -> c instanceof MethodDecl)
-                .map(c -> (MethodDecl) c)
-                .findFirst()
-                .map(methodDecl -> methodDecl.params)
-                .orElse(null);
-        if (params == null || params.isEmpty()) return;
-        params.set(0, new ParamDecl("foo", Types.clazz(ClassPath.special("foo.Foo"))));
-    }
 
     @Override
     public void addSpecialDocuments(DocumentRegistrar registrar) {
@@ -32,6 +22,17 @@ public class TestDocument extends ProbeJSPlugin {
         registrar.addGlobal(ClassPath.special("bar.Bar"), new Bar());
     }
 
+    @Override
+    public void addTypeAlias(AliasRegistrar registrar) {
+        registrar.addInputAlias(ItemStack.class, Types.lambda(builder -> {
+            builder.param("item", Types.clazz(Item.class));
+        }));
+    }
+
+    @Override
+    public Set<Class<?>> provideClassForDiscovery() {
+        return Set.of(Item.class, FluidStack.class, Block.class);
+    }
 
     static class Foo extends Code {
 

@@ -11,6 +11,7 @@ import moe.wolfgirl.probejs.next.typescript.document.types.special.*;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 public interface Types {
     RawType ANY = raw("any");
@@ -20,6 +21,7 @@ public interface Types {
     RawType BOOLEAN = raw("boolean");
     RawType NUMBER = raw("number");
     RawType STRING = raw("string");
+    RawType THIS = raw("this");
 
     static ClassType clazz(ClassPath classPath) {
         return new ClassType(classPath);
@@ -71,5 +73,27 @@ public interface Types {
 
     static JoinedType.UnionType union(List<Type> types) {
         return new JoinedType.UnionType(types);
+    }
+
+    static ObjectType object(Consumer<ObjectType.Builder> builder) {
+        ObjectType.Builder b = new ObjectType.Builder();
+        builder.accept(b);
+        return b.build();
+    }
+
+    static FixedArrayType fixedArray(Consumer<ObjectType.Builder> builder) {
+        ObjectType.Builder b = new ObjectType.Builder();
+        builder.accept(b);
+        return b.build().asFixedArray();
+    }
+
+    static LambdaType lambda(Consumer<LambdaType.Builder> builder) {
+        LambdaType.Builder b = new LambdaType.Builder();
+        builder.accept(b);
+        return b.build();
+    }
+
+    static NamespacedType namespaced(ClassPath namespace, String typeName) {
+        return new NamespacedType(namespace, typeName);
     }
 }

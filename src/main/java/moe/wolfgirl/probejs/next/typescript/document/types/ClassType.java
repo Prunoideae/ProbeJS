@@ -3,6 +3,7 @@ package moe.wolfgirl.probejs.next.typescript.document.types;
 import moe.wolfgirl.probejs.next.ClassPath;
 import moe.wolfgirl.probejs.next.typescript.document.base.Code;
 import moe.wolfgirl.probejs.next.typescript.document.base.InputAliased;
+import moe.wolfgirl.probejs.next.typescript.document.types.special.NamespacedType;
 
 import java.util.Collection;
 import java.util.List;
@@ -28,5 +29,9 @@ public class ClassType extends InputAliased {
     @Override
     public Collection<Code> getContainedTypes() {
         return List.of();
+    }
+
+    public NamespacedType inner(String typeName) {
+        return new NamespacedType(classPath, typeName);
     }
 }

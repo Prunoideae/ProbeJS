@@ -6,6 +6,7 @@ import moe.wolfgirl.probejs.next.typescript.document.base.Type;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class OptionalType extends Type {

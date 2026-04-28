@@ -2,7 +2,6 @@ package moe.wolfgirl.probejs.next.typescript.document.base;
 
 import moe.wolfgirl.probejs.next.ClassPath;
 
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 

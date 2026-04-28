@@ -6,6 +6,7 @@ import moe.wolfgirl.probejs.next.typescript.document.base.KindAware;
 import moe.wolfgirl.probejs.next.typescript.document.base.Type;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 // Represents a field declaration in a TypeScript class.
@@ -39,5 +40,18 @@ public class FieldDecl extends CommentableCode implements KindAware {
     @Override
     public List<String> format(int indent) {
         return List.of("%s%s%s: %s;".formatted(" ".repeat(indent), getPrefix(), name, typeInfo.first()));
+    }
+
+    @Override
+    public void setResolvedSymbols(Map<ClassPath, String> resolvedSymbols) {
+        super.setResolvedSymbols(resolvedSymbols);
+        typeInfo.setResolvedSymbols(resolvedSymbols);
+    }
+
+    @Override
+    public boolean shouldAppear(Kind kind) {
+        if (this.kind == Kind.INTERFACE && kind == Kind.CLASS) return isStatic;
+        else if (this.kind == kind && kind == Kind.INTERFACE) return !isStatic;
+        return true;
     }
 }

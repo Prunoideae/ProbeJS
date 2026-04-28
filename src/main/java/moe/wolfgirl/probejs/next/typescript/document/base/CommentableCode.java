@@ -4,10 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class CommentableCode extends Code {
-    public final List<String> comments = new ArrayList<>();
+    private final List<String> comments = new ArrayList<>();
 
     public void addComments(String... comments) {
         this.comments.addAll(List.of(comments));
+    }
+
+    public boolean hasComments() {
+        return !comments.isEmpty();
     }
 
     // //...

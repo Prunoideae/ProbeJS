@@ -1,15 +1,15 @@
 package moe.wolfgirl.probejs;
 
 import com.mojang.brigadier.Command;
-import dev.latvian.mods.kubejs.KubeJS;
 import dev.latvian.mods.kubejs.client.KubeJSClient;
 import dev.latvian.mods.kubejs.script.ScriptType;
-import moe.wolfgirl.probejs.events.CodeGenerationEventJS;
-import moe.wolfgirl.probejs.events.ProbeEvents;
+import moe.wolfgirl.probejs.legacy.ProbeDumpingThread;
+import moe.wolfgirl.probejs.legacy.events.CodeGenerationEventJS;
+import moe.wolfgirl.probejs.legacy.events.ProbeEvents;
 import moe.wolfgirl.probejs.next.OtherDump;
 import moe.wolfgirl.probejs.next.PackageDump;
 import moe.wolfgirl.probejs.next.java.ClassRegistry;
-import moe.wolfgirl.probejs.utils.GameUtils;
+import moe.wolfgirl.probejs.legacy.utils.GameUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
@@ -25,7 +25,6 @@ import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
-import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
 import net.neoforged.neoforge.common.util.FakePlayer;
 import net.neoforged.neoforge.event.entity.EntityTravelToDimensionEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
@@ -34,7 +33,6 @@ import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 @EventBusSubscriber(value = Dist.CLIENT)
@@ -187,7 +185,7 @@ public class GameEvents {
                                 .requires(source -> true)
                                 .executes(context -> {
                                     new Thread(() -> {
-                                        ClassRegistry.INSTANCE.putClass(HoeItem.class, 0);
+                                        ClassRegistry.INSTANCE.fetchInitialClasses();
                                         ClassRegistry.INSTANCE.discover();
                                         var tree = ClassRegistry.INSTANCE.resolveTree();
                                         for (var node : tree.traverse()) {

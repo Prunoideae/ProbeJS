@@ -1,10 +1,24 @@
 package moe.wolfgirl.probejs.next.typescript.base;
 
+import moe.wolfgirl.probejs.next.ClassPath;
+import moe.wolfgirl.probejs.next.typescript.document.Types;
 import moe.wolfgirl.probejs.next.typescript.document.base.Type;
 
 @FunctionalInterface
 public interface AliasRegistrar {
-    void addInputAlias(Class<?> clazz, Type type);
+    void addInputAlias(ClassPath classPath, Type type);
+
+    default void addInputAlias(Class<?> from, Type to) {
+        addInputAlias(new ClassPath(from), to);
+    }
+
+    default void addInputAlias(ClassPath from, Class<?> to) {
+        addInputAlias(from, Types.clazz(to));
+    }
+
+    default void addInputAlias(Class<?> from, Class<?> to) {
+        addInputAlias(new ClassPath(from), Types.clazz(to));
+    }
 
     // Prevent accidental messing up
     class Proxy implements AliasRegistrar {
@@ -15,8 +29,8 @@ public interface AliasRegistrar {
         }
 
         @Override
-        public void addInputAlias(Class<?> clazz, Type type) {
-            delegate.addInputAlias(clazz, type);
+        public void addInputAlias(ClassPath classPath, Type type) {
+            delegate.addInputAlias(classPath, type);
         }
     }
 }

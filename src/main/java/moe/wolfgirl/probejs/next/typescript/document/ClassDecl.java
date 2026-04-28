@@ -1,18 +1,14 @@
 package moe.wolfgirl.probejs.next.typescript.document;
 
 import moe.wolfgirl.probejs.next.ClassPath;
+import moe.wolfgirl.probejs.next.java.members.other.HasAnnotation;
 import moe.wolfgirl.probejs.next.typescript.document.base.Code;
 import moe.wolfgirl.probejs.next.typescript.document.base.CommentableCode;
 import moe.wolfgirl.probejs.next.typescript.document.base.KindAware;
 import moe.wolfgirl.probejs.next.typescript.document.base.Type;
-import moe.wolfgirl.probejs.next.typescript.document.members.FieldDecl;
-import moe.wolfgirl.probejs.next.typescript.document.members.MethodDecl;
 import moe.wolfgirl.probejs.next.typescript.document.types.VariableType;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 // Represents a class/ declaration in TypeScript.
 // (export) (class/interface/namespace) Identifier(<T1, T2>) (extends Base) (implements Interface1, Interface2) {
@@ -92,8 +88,7 @@ public class ClassDecl extends CommentableCode {
         String typeParamsStr = typeParams.isEmpty() ? "" : "<%s>".formatted(String.join(", ", typeParams.stream().map(VariableType::formatWithBound).toList()));
         formatted.add("%s%sclass %s%s {".formatted(indentStr, exportStr, identifier, typeParamsStr));
         for (Code member : members) {
-            if (member instanceof FieldDecl fieldDecl && !fieldDecl.isStatic) continue;
-            if (member instanceof MethodDecl methodDecl && !methodDecl.isStatic) continue;
+            if (member instanceof KindAware kindAware && !kindAware.shouldAppear(KindAware.Kind.CLASS)) continue;
             formatted.addAll(CommentableCode.format(member, indent + 4));
         }
         formatted.add("%s}".formatted(" ".repeat(indent)));
@@ -103,8 +98,7 @@ public class ClassDecl extends CommentableCode {
 
         formatted.add("%s%sinterface %s%s%s {".formatted(indentStr, exportStr, identifier, typeParamsStr, extendsInterfaceStr));
         for (Code member : members) {
-            if (member instanceof FieldDecl fieldDecl && fieldDecl.isStatic) continue;
-            if (member instanceof MethodDecl methodDecl && methodDecl.isStatic) continue;
+            if (member instanceof KindAware kindAware && !kindAware.shouldAppear(KindAware.Kind.INTERFACE)) continue;
             formatted.addAll(CommentableCode.format(member, indent + 4));
         }
         formatted.add("%s}".formatted(" ".repeat(indent)));
@@ -141,4 +135,18 @@ public class ClassDecl extends CommentableCode {
         }
     }
 
+    @Override
+    public void setResolvedSymbols(Map<ClassPath, String> resolvedSymbols) {
+        super.setResolvedSymbols(resolvedSymbols);
+        extendsType.setResolvedSymbols(resolvedSymbols);
+        for (Type implementsType : implementsTypes) {
+            implementsType.setResolvedSymbols(resolvedSymbols);
+        }
+        for (VariableType typeParam : typeParams) {
+            typeParam.setResolvedSymbols(resolvedSymbols);
+        }
+        for (Code member : members) {
+            member.setResolvedSymbols(resolvedSymbols);
+        }
+    }
 }

@@ -9,6 +9,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 // Represents a method declaration in a TypeScript class or interface.
@@ -35,6 +36,13 @@ public class MethodDecl extends CommentableCode implements KindAware {
     }
 
     @Override
+    public boolean shouldAppear(Kind kind) {
+        if (this.kind == Kind.INTERFACE && kind == Kind.CLASS) return isStatic;
+        else if (this.kind == kind && kind == Kind.INTERFACE) return !isStatic;
+        return true;
+    }
+
+    @Override
     public Set<ClassPath> getImports() {
         Set<ClassPath> imports = new HashSet<>();
         for (Code typeParam : typeParams) {
@@ -57,5 +65,17 @@ public class MethodDecl extends CommentableCode implements KindAware {
         var typeParamsStr = typeParams.isEmpty() ? "" : "<%s>".formatted(String.join(", ", typeParams.stream().map(VariableType::formatWithBound).toList()));
         var paramsStr = String.join(", ", params.stream().map(Code::first).toList());
         return List.of("%s%s%s%s(%s): %s;".formatted(indentStr, getPrefix(), name, typeParamsStr, paramsStr, returnType.first()));
+    }
+
+    @Override
+    public void setResolvedSymbols(Map<ClassPath, String> resolvedSymbols) {
+        super.setResolvedSymbols(resolvedSymbols);
+        for (Code typeParam : typeParams) {
+            typeParam.setResolvedSymbols(resolvedSymbols);
+        }
+        for (ParamDecl param : params) {
+            param.setResolvedSymbols(resolvedSymbols);
+        }
+        returnType.setResolvedSymbols(resolvedSymbols);
     }
 }

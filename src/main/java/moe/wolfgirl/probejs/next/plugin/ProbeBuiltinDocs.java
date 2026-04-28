@@ -2,16 +2,23 @@ package moe.wolfgirl.probejs.next.plugin;
 
 
 import moe.wolfgirl.probejs.ProbeJS;
+import moe.wolfgirl.probejs.next.plugin.builtins.InjectAnnotations;
+import moe.wolfgirl.probejs.next.plugin.builtins.InjectBeans;
 import moe.wolfgirl.probejs.next.plugin.builtins.InjectInputs;
 import moe.wolfgirl.probejs.next.plugin.builtins.TestDocument;
 import moe.wolfgirl.probejs.next.plugin.builtins.alias.EnumTypes;
+import moe.wolfgirl.probejs.next.plugin.builtins.alias.RecordTypes;
+import moe.wolfgirl.probejs.next.plugin.builtins.alias.RegistryTypes;
+import moe.wolfgirl.probejs.next.plugin.builtins.discovery.JavaLoaded;
 import moe.wolfgirl.probejs.next.typescript.base.AliasRegistrar;
 import moe.wolfgirl.probejs.next.typescript.Documents;
 import moe.wolfgirl.probejs.next.typescript.base.DocumentRegistrar;
-import moe.wolfgirl.probejs.utils.GameUtils;
+import moe.wolfgirl.probejs.legacy.utils.GameUtils;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -24,8 +31,18 @@ public class ProbeBuiltinDocs extends ProbeJSPlugin {
     public static final ProbeBuiltinDocs INSTANCE = new ProbeBuiltinDocs();
 
     public static final List<Supplier<ProbeJSPlugin>> BUILTIN_DOCS = new ArrayList<>(List.of(
+            // discovery
+            JavaLoaded::new,
+
+            // alias
             EnumTypes::new,
+            RecordTypes::new,
+            RegistryTypes::new,
+
+            // transformations
             InjectInputs::new,
+            InjectAnnotations::new,
+            InjectBeans::new,
             TestDocument::new
     ));
 
@@ -64,5 +81,12 @@ public class ProbeBuiltinDocs extends ProbeJSPlugin {
     @Override
     public void addSidedDocuments(DocumentRegistrar registrar) {
         forEach(plugin -> plugin.addSidedDocuments(registrar));
+    }
+
+    @Override
+    public Set<Class<?>> provideClassForDiscovery() {
+        Set<Class<?>> result = new HashSet<>();
+        forEach(plugin -> result.addAll(plugin.provideClassForDiscovery()));
+        return result;
     }
 }
