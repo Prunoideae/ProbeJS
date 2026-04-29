@@ -12,6 +12,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 public interface Types {
     RawType ANY = raw("any");
@@ -22,6 +24,7 @@ public interface Types {
     RawType NUMBER = raw("number");
     RawType STRING = raw("string");
     RawType THIS = raw("this");
+    RawType REGEXP = raw("RegExp");
 
     static ClassType clazz(ClassPath classPath) {
         return new ClassType(classPath);
@@ -43,7 +46,7 @@ public interface Types {
         return new ParamType(base, List.of(typeArgs));
     }
 
-    static VariableType variable(String name, @Nullable Code type) {
+    static VariableType variable(String name, @Nullable Type type) {
         return new VariableType(name, type);
     }
 
@@ -95,5 +98,18 @@ public interface Types {
 
     static NamespacedType namespaced(ClassPath namespace, String typeName) {
         return new NamespacedType(namespace, typeName);
+    }
+
+    static Type remapType(Predicate<Type> matcher, Function<Type, Type> remapper, Type inputType) {
+        if (matcher.test(inputType)) {
+            return remapper.apply(inputType);
+        } else return switch (inputType) {
+            case ArrayType arrayType -> new ArrayType(remapType(matcher, remapper, arrayType.componentType));
+            case ParamType paramType ->
+                    new ParamType(remapType(matcher, remapper, paramType.baseType), paramType.typeArgs.stream().map(type -> remapType(matcher, remapper, type)).toList());
+            case VariableType variableType ->
+                    new VariableType(variableType.name, variableType.typeInfo == null ? null : remapType(matcher, remapper, variableType.typeInfo));
+            default -> inputType;
+        };
     }
 }

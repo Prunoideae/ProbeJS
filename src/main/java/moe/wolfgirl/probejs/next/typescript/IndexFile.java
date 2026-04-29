@@ -10,6 +10,7 @@ import moe.wolfgirl.probejs.next.typescript.document.base.Code;
 import moe.wolfgirl.probejs.next.typescript.document.base.CommentableCode;
 import moe.wolfgirl.probejs.legacy.utils.ProbeFileUtils;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -49,6 +50,7 @@ public class IndexFile {
 
     private Map<ClassPath, String> loadClasses() {
         for (var clazz : classes) {
+            if (clazz.getClassName().equals("package-info")) continue; // Skip package-info.java
             Code classDecl = registry.getDocument(clazz);
             if (classDecl != null) addCode(classDecl);
             Code classAlias = registry.getInputAlias(clazz);
@@ -123,8 +125,8 @@ public class IndexFile {
                 }
                 indexWriter.write("}\n");
             }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (IOException e) {
+            ProbeJS.LOGGER.error("Failed to write index.d.ts for package %s: %s".formatted(classPath, e.getMessage()));
         }
     }
 

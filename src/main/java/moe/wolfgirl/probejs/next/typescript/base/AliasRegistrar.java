@@ -4,9 +4,10 @@ import moe.wolfgirl.probejs.next.ClassPath;
 import moe.wolfgirl.probejs.next.typescript.document.Types;
 import moe.wolfgirl.probejs.next.typescript.document.base.Type;
 
-@FunctionalInterface
+
 public interface AliasRegistrar {
     void addInputAlias(ClassPath classPath, Type type);
+
 
     default void addInputAlias(Class<?> from, Type to) {
         addInputAlias(new ClassPath(from), to);
@@ -17,7 +18,7 @@ public interface AliasRegistrar {
     }
 
     default void addInputAlias(Class<?> from, Class<?> to) {
-        addInputAlias(new ClassPath(from), Types.clazz(to));
+        addInputAlias(new ClassPath(from), Types.clazz(to).asInput());
     }
 
     // Prevent accidental messing up

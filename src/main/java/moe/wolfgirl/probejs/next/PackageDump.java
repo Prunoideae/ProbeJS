@@ -18,8 +18,8 @@ public class PackageDump {
 
     public void dump() {
         Documents.INSTANCE.clear();
-        Documents.INSTANCE.transpile();
         ProbeJSPlugin.forEachPlugin(plugin -> plugin.addTypeAlias(new AliasRegistrar.Proxy(Documents.INSTANCE)));
+        Documents.INSTANCE.transpile();
         PackageTree packageTree = ClassRegistry.INSTANCE.resolveTree();
         for (var packageNode : packageTree.traverse()) {
             IndexFile indexFile = new IndexFile(packageNode, Documents.INSTANCE);

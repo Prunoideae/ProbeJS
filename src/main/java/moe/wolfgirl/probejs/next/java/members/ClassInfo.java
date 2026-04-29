@@ -56,29 +56,41 @@ public record ClassInfo(
 
     private static List<ConstructorInfo> findConstructors(Class<?> clazz, Map<String, TypeInfo> variableRemaps) {
         CachedClassInfo classInfo = CachedClassStorage.GLOBAL_PUBLIC.get(clazz);
-        return classInfo.getConstructors()
-                .stream()
-                .map(c -> new ConstructorInfo(c, variableRemaps))
-                .toList();
+        try {
+            return classInfo.getConstructors()
+                    .stream()
+                    .map(c -> new ConstructorInfo(c, variableRemaps))
+                    .toList();
+        } catch (Throwable t) {
+            return List.of();
+        }
     }
 
     private static List<FieldInfo> findFields(Class<?> clazz, Map<String, TypeInfo> variableRemaps) {
         CachedClassInfo classInfo = CachedClassStorage.GLOBAL_PUBLIC.get(clazz);
-        return classInfo.getAccessibleFields(false)
-                .stream()
-                .map(CachedFieldInfo.Accessible::getInfo)
-                .map(f -> new FieldInfo(f, variableRemaps))
-                .toList();
+        try {
+            return classInfo.getAccessibleFields(false)
+                    .stream()
+                    .map(CachedFieldInfo.Accessible::getInfo)
+                    .map(f -> new FieldInfo(f, variableRemaps))
+                    .toList();
+        } catch (Throwable t) {
+            return List.of();
+        }
     }
 
     private static List<MethodInfo> findMethods(Class<?> clazz, Map<String, TypeInfo> variableRemaps) {
         CachedClassInfo classInfo = CachedClassStorage.GLOBAL_PUBLIC.get(clazz);
-        return classInfo.getAccessibleMethods(false)
-                .stream()
-                .map(CachedMethodInfo.Accessible::getInfo)
-                .filter(m -> shouldIncludeMethod(m.getCached(), clazz))
-                .map(m -> MethodInfo.resolve(m, variableRemaps))
-                .toList();
+        try {
+            return classInfo.getAccessibleMethods(false)
+                    .stream()
+                    .map(CachedMethodInfo.Accessible::getInfo)
+                    .filter(m -> shouldIncludeMethod(m.getCached(), clazz))
+                    .map(m -> MethodInfo.resolve(m, variableRemaps))
+                    .toList();
+        } catch (Throwable t) {
+            return List.of();
+        }
     }
 
 

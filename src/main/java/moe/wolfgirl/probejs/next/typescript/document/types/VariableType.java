@@ -3,18 +3,18 @@ package moe.wolfgirl.probejs.next.typescript.document.types;
 import moe.wolfgirl.probejs.next.ClassPath;
 import moe.wolfgirl.probejs.next.typescript.document.base.Code;
 import moe.wolfgirl.probejs.next.typescript.document.base.InputAliased;
+import moe.wolfgirl.probejs.next.typescript.document.base.Type;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 public class VariableType extends InputAliased {
     public final String name;
-    public Code typeInfo;
+    public Type typeInfo;
 
-    public VariableType(String name, @Nullable Code typeInfo) {
+    public VariableType(String name, @Nullable Type typeInfo) {
         this.name = name;
         this.typeInfo = typeInfo;
     }

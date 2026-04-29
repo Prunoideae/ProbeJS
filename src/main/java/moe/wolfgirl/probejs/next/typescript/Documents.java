@@ -17,10 +17,12 @@ import moe.wolfgirl.probejs.next.typescript.document.TypeDecl;
 import moe.wolfgirl.probejs.next.typescript.document.ClassDecl;
 import moe.wolfgirl.probejs.next.typescript.document.Types;
 import moe.wolfgirl.probejs.next.typescript.document.base.Code;
+import moe.wolfgirl.probejs.next.typescript.document.base.InputAliased;
 import moe.wolfgirl.probejs.next.typescript.document.base.Type;
 import moe.wolfgirl.probejs.next.typescript.document.members.ConstructorDecl;
 import moe.wolfgirl.probejs.next.typescript.document.members.FieldDecl;
 import moe.wolfgirl.probejs.next.typescript.document.members.MethodDecl;
+import moe.wolfgirl.probejs.next.typescript.document.types.VariableType;
 import moe.wolfgirl.probejs.next.typescript.transpiler.Transpiler;
 import moe.wolfgirl.probejs.next.typescript.transpiler.TypeConverter;
 import org.jetbrains.annotations.Nullable;
@@ -70,11 +72,14 @@ public class Documents implements DocumentRegistry, DocumentRegistrar {
     public Code getInputAlias(ClassPath classPath) {
         var allAlias = inputAlias.get(classPath);
         if (allAlias.isEmpty()) return null;
+        var document = documents.get(classPath);
+        if (document == null) return null;
         List<Type> aliasList = new ArrayList<>(allAlias);
         // Blame TypeScript's structural typing, if I include the original class as an alias, members of the original
         // class will show up in the suggestion when I type {
         // aliasList.add(Types.clazz(classPath));
-        var aliasDecl = new TypeDecl(classPath.withSuffix("_"), Types.union(aliasList));
+        List<VariableType> classVariables = document instanceof ClassDecl classDecl ? classDecl.typeParams : List.of();
+        var aliasDecl = new TypeDecl(classPath.withSuffix("_"), classVariables, Types.union(aliasList), true);
         aliasDecl.addComments("Values that may be interpreted as {@link %s}.".formatted(classPath.getClassName()));
         return aliasDecl;
     }

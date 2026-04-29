@@ -22,7 +22,7 @@ public record MethodInfo(String name,
     public static MethodInfo resolve(CachedMethodInfo methodInfo, Map<String, TypeInfo> typeRemap) {
         return new MethodInfo(methodInfo.getName(),
                 ParamInfo.resolve(methodInfo, typeRemap),
-                methodInfo.getReturnType(),
+                ClassInfo.remapType(methodInfo.getReturnType(), typeRemap),
                 methodInfo.isStatic,
                 Modifier.isAbstract(methodInfo.modifiers),
                 methodInfo.getCached().getAnnotations(),

@@ -1,6 +1,5 @@
 package moe.wolfgirl.probejs.next.plugin.builtins;
 
-import dev.architectury.fluid.FluidStack;
 import moe.wolfgirl.probejs.next.ClassPath;
 import moe.wolfgirl.probejs.next.plugin.ProbeJSPlugin;
 import moe.wolfgirl.probejs.next.typescript.base.AliasRegistrar;
@@ -31,7 +30,7 @@ public class TestDocument extends ProbeJSPlugin {
 
     @Override
     public Set<Class<?>> provideClassForDiscovery() {
-        return Set.of(Item.class, FluidStack.class, Block.class);
+        return Set.of(Item.class, Block.class);
     }
 
     static class Foo extends Code {

@@ -10,14 +10,14 @@ import java.util.stream.Collectors;
 public abstract class InputAliased extends Type {
     protected boolean input = false;
 
-    public boolean markAsInput() {
+    public InputAliased asInput() {
         this.input = true;
-        return true;
+        return this;
     }
 
-    public boolean markAsOutput() {
+    public InputAliased asOutput() {
         this.input = false;
-        return true;
+        return this;
     }
 
     public abstract Set<ClassPath> getOriginalImports();

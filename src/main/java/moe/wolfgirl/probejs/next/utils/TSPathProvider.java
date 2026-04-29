@@ -1,6 +1,7 @@
 package moe.wolfgirl.probejs.next.utils;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 public interface TSPathProvider<T extends TSPathProvider<T>> {
@@ -25,27 +26,27 @@ public interface TSPathProvider<T extends TSPathProvider<T>> {
     }
 
     default T withPrefix(String prefix) {
-        List<String> newSegments = new java.util.ArrayList<>(segments());
+        List<String> newSegments = new ArrayList<>(segments());
         int lastIndex = newSegments.size() - 1;
         newSegments.set(lastIndex, prefix + newSegments.get(lastIndex));
         return create(getBaseName(), newSegments);
     }
 
     default T withSuffix(String suffix) {
-        List<String> newSegments = new java.util.ArrayList<>(segments());
+        List<String> newSegments = new ArrayList<>(segments());
         int lastIndex = newSegments.size() - 1;
         newSegments.set(lastIndex, newSegments.get(lastIndex) + suffix);
         return create(getBaseName(), newSegments);
     }
 
     default T append(String... segments) {
-        List<String> newSegments = new java.util.ArrayList<>(segments());
+        List<String> newSegments = new ArrayList<>(segments());
         newSegments.addAll(List.of(segments));
         return create(getBaseName(), newSegments);
     }
 
     default T prepend(String... segments) {
-        List<String> newSegments = new java.util.ArrayList<>(List.of(segments));
+        List<String> newSegments = new ArrayList<>(List.of(segments));
         newSegments.addAll(segments());
         return create(getBaseName(), newSegments);
     }

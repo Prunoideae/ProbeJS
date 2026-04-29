@@ -5,6 +5,7 @@ import moe.wolfgirl.probejs.legacy.utils.NameUtils;
 import moe.wolfgirl.probejs.legacy.utils.RegistryUtils;
 import moe.wolfgirl.probejs.next.ClassPath;
 import moe.wolfgirl.probejs.next.plugin.ProbeJSPlugin;
+import moe.wolfgirl.probejs.next.typescript.Documents;
 import moe.wolfgirl.probejs.next.typescript.base.AliasRegistrar;
 import moe.wolfgirl.probejs.next.typescript.base.DocumentRegistrar;
 import moe.wolfgirl.probejs.next.typescript.document.Members;
@@ -21,6 +22,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.Level;
 
 import java.util.HashSet;
@@ -34,14 +36,22 @@ public class RegistryTypes extends ProbeJSPlugin {
             Registries.DIMENSION, Level.class
     );
 
+    public static NamespacedType tag(String name) {
+        return Types.namespaced(REGISTRY_TYPES, name + "Tag");
+    }
+
+    public static NamespacedType object(String name) {
+        return Types.namespaced(REGISTRY_TYPES, name);
+    }
+
     public static final String TAG_MARKER = "probejs$tag_marker";
     public static final String OBJECT_MARKER = "probejs$object_marker";
     public static final String TAG_RESOLVER = "T extends {%s: infer M} ? M : never".formatted(TAG_MARKER);
     public static final String OBJECT_RESOLVER = "T extends {%s: infer M} ? M : never".formatted(OBJECT_MARKER);
 
     @Override
-    public void addTypeAlias(AliasRegistrar registrar) {
-        super.addTypeAlias(registrar);
+    public void modifyClasses(Documents.ClassAccessor classDocuments) {
+        super.modifyClasses(classDocuments);
     }
 
     @Override
@@ -57,6 +67,7 @@ public class RegistryTypes extends ProbeJSPlugin {
             var registry = registryAccess.registry(key).orElse(null);
             if (registry == null) continue;
             registryTypes.member(makeType(key, registry));
+            registryTypes.member(makeTagType(key, registry));
         }
 
         registrar.addDocument(REGISTRY_TYPES, registryTypes.build());
@@ -72,6 +83,23 @@ public class RegistryTypes extends ProbeJSPlugin {
         } else {
             return new TypeDecl(
                     REGISTRY_TYPES.append(typeName),
+                    Types.union(entries.stream().map(Types::literal).map(t -> (Type) t).toList()),
+                    false
+            );
+        }
+    }
+
+    private TypeDecl makeTagType(ResourceKey<? extends Registry<?>> key, Registry<?> registry) {
+        String typeName = NameUtils.registryToName(key);
+        List<String> entries = registry.getTagNames()
+                .map(TagKey::location)
+                .map(ResourceLocation::toString)
+                .toList();
+        if (entries.isEmpty()) {
+            return new TypeDecl(REGISTRY_TYPES.append(typeName + "Tag"), Types.NEVER, false);
+        } else {
+            return new TypeDecl(
+                    REGISTRY_TYPES.append(typeName + "Tag"),
                     Types.union(entries.stream().map(Types::literal).map(t -> (Type) t).toList()),
                     false
             );

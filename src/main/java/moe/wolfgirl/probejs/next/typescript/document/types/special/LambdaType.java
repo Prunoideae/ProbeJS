@@ -3,6 +3,7 @@ package moe.wolfgirl.probejs.next.typescript.document.types.special;
 import moe.wolfgirl.probejs.next.ClassPath;
 import moe.wolfgirl.probejs.next.typescript.document.Types;
 import moe.wolfgirl.probejs.next.typescript.document.base.Code;
+import moe.wolfgirl.probejs.next.typescript.document.base.InputAliased;
 import moe.wolfgirl.probejs.next.typescript.document.base.Type;
 
 import java.util.*;

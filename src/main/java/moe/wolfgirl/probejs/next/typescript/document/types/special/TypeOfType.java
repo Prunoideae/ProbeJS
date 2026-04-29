@@ -6,7 +6,6 @@ import moe.wolfgirl.probejs.next.typescript.document.base.Type;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 public class TypeOfType extends Type {
@@ -23,7 +22,7 @@ public class TypeOfType extends Type {
 
     @Override
     public List<String> format(int indent) {
-        return List.of();
+        return List.of("typeof %s".formatted(type.first()));
     }
 
     @Override

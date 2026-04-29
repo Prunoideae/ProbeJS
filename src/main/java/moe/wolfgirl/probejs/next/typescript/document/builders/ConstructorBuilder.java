@@ -14,7 +14,7 @@ public class ConstructorBuilder {
     private final List<VariableType> typeParams = new ArrayList<>();
     private final List<ParamDecl> params = new ArrayList<>();
 
-    public ConstructorBuilder typeParam(String name, @Nullable VariableType bound) {
+    public ConstructorBuilder typeParam(String name, @Nullable Type bound) {
         this.typeParams.add(Types.variable(name, bound));
         return this;
     }

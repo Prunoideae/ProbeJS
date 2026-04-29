@@ -9,6 +9,8 @@ import moe.wolfgirl.probejs.next.plugin.builtins.TestDocument;
 import moe.wolfgirl.probejs.next.plugin.builtins.alias.EnumTypes;
 import moe.wolfgirl.probejs.next.plugin.builtins.alias.RecordTypes;
 import moe.wolfgirl.probejs.next.plugin.builtins.alias.RegistryTypes;
+import moe.wolfgirl.probejs.next.plugin.builtins.alias.WorldTypes;
+import moe.wolfgirl.probejs.next.plugin.builtins.discovery.ClassScanning;
 import moe.wolfgirl.probejs.next.plugin.builtins.discovery.JavaLoaded;
 import moe.wolfgirl.probejs.next.typescript.base.AliasRegistrar;
 import moe.wolfgirl.probejs.next.typescript.Documents;
@@ -32,12 +34,14 @@ public class ProbeBuiltinDocs extends ProbeJSPlugin {
 
     public static final List<Supplier<ProbeJSPlugin>> BUILTIN_DOCS = new ArrayList<>(List.of(
             // discovery
+            ClassScanning::new,
             JavaLoaded::new,
 
             // alias
             EnumTypes::new,
             RecordTypes::new,
             RegistryTypes::new,
+            WorldTypes::new,
 
             // transformations
             InjectInputs::new,

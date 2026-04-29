@@ -1,5 +1,6 @@
 package moe.wolfgirl.probejs.next.plugin.builtins;
 
+import moe.wolfgirl.probejs.ProbeJS;
 import moe.wolfgirl.probejs.next.plugin.ProbeJSPlugin;
 import moe.wolfgirl.probejs.next.typescript.Documents;
 import moe.wolfgirl.probejs.next.typescript.document.base.Code;
@@ -19,7 +20,12 @@ public class InjectInputs extends ProbeJSPlugin {
     public void transformClass(Documents.ClassDocument document) {
         var classDocument = document.document();
         for (Code member : classDocument.members) {
-            if (member instanceof MethodDecl methodDecl) patchParams(methodDecl.params);
+            if (member instanceof MethodDecl methodDecl) {
+                if (methodDecl.name.equals("black") && methodDecl.isStatic){
+                    ProbeJS.LOGGER.info("Found black method");
+                }
+                patchParams(methodDecl.params);
+            }
             if (member instanceof ConstructorDecl constructorDecl) patchParams(constructorDecl.params);
         }
     }
@@ -52,8 +58,8 @@ public class InjectInputs extends ProbeJSPlugin {
             var classPath = classType.classPath;
             // If we have alias, alias will refer to the original type as input, so we don't need to check
             // for functional interface
-            if (Documents.INSTANCE.hasAlias(classPath)) classType.markAsInput();
-            // if (isFunctionalInterface(type)) classType.markAsOutput();
+            if (Documents.INSTANCE.hasAlias(classPath)) classType.asInput();
+            // if (isFunctionalInterface(type)) classType.asOutput();
         } else if (type instanceof ArrayType arrayType) {
             markTypeAsInput(arrayType.componentType);
         } else if (type instanceof ParamType paramType) {
