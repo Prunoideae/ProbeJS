@@ -57,9 +57,9 @@ public class SpecialDocuments implements DocumentRegistry, DocumentRegistrar {
         for (var entry : documents.entrySet()) {
             tree.addClassPath(entry.getKey());
         }
-        for (var entry : globals.entrySet()) {
-            tree.addClassPath(entry.getKey());
-        }
+        // for (var entry : globals.entrySet()) {
+        //     tree.addClassPath(entry.getKey());
+        // }
         return tree;
     }
 

@@ -79,7 +79,7 @@ public class Transpiler extends Converter<ClassInfo, ClassDecl> {
                 members
         );
 
-        ProbeJSPlugin.forEachPlugin(plugin -> plugin.transformClass(new Documents.ClassDocument(
+        ProbeJSPlugin.forEachWithPriority("transformClass", plugin -> plugin.transformClass(new Documents.ClassDocument(
                 source, classDecl, converter,
                 fieldPairs, constructorPairs, methodPairs
         )));

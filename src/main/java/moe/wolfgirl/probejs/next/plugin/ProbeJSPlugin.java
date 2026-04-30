@@ -3,24 +3,16 @@ package moe.wolfgirl.probejs.next.plugin;
 import dev.latvian.mods.kubejs.plugin.KubeJSPlugin;
 import dev.latvian.mods.kubejs.plugin.KubeJSPlugins;
 import dev.latvian.mods.rhino.util.HideFromJS;
+import moe.wolfgirl.probejs.ProbeJS;
+import moe.wolfgirl.probejs.legacy.utils.GameUtils;
 import moe.wolfgirl.probejs.next.typescript.base.AliasRegistrar;
 import moe.wolfgirl.probejs.next.typescript.Documents;
 import moe.wolfgirl.probejs.next.typescript.base.DocumentRegistrar;
 
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class ProbeJSPlugin implements KubeJSPlugin {
-
-    @HideFromJS
-    public static void forEachPlugin(Consumer<ProbeJSPlugin> consumer) {
-        consumer.accept(ProbeBuiltinDocs.INSTANCE);
-        KubeJSPlugins.forEachPlugin(plugin -> {
-            if (plugin instanceof ProbeJSPlugin probePlugin)
-                consumer.accept(probePlugin);
-        });
-    }
-
     /**
      * Called right after a class is transpiled into TypeScript declaration, but before
      * all the classes are transpiled. This is used to apply a general transformation to
@@ -64,5 +56,34 @@ public class ProbeJSPlugin implements KubeJSPlugin {
      */
     public Set<Class<?>> provideClassForDiscovery() {
         return Set.of();
+    }
+
+    private static int getPriorityFor(ProbeJSPlugin plugin, String methodName) {
+        Class<?> clazz = plugin.getClass();
+        try {
+            var method = Arrays.stream(clazz.getMethods()).filter(m -> m.getName().equals(methodName)).findFirst().orElseThrow();
+            Priority priority = method.getAnnotation(Priority.class);
+            return priority == null ? 0 : priority.value();
+        } catch (Throwable t) {
+            return 0;
+        }
+    }
+
+    @HideFromJS
+    public static void forEachWithPriority(String methodName, Consumer<ProbeJSPlugin> consumer) {
+        List<ProbeJSPlugin> plugins = new ArrayList<>(ProbeBuiltinDocs.getAll());
+        KubeJSPlugins.forEachPlugin(plugin -> {
+            if (plugin instanceof ProbeJSPlugin probePlugin) plugins.add(probePlugin);
+        });
+        plugins.sort(Comparator.comparingInt(plugin -> -getPriorityFor(plugin, methodName)));
+        for (ProbeJSPlugin plugin : plugins) {
+            try {
+                consumer.accept(plugin);
+            } catch (Throwable t) {
+                ProbeJS.LOGGER.error("Error when applying plugin: %s.%s".formatted(plugin.getClass(), methodName));
+                GameUtils.logException(t);
+                ProbeJS.LOGGER.error("If you found severe problem in generated docs (e.g. largely missing types), please report to ProbeJS's github!");
+            }
+        }
     }
 }

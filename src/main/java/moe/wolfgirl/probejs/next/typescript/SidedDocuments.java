@@ -21,7 +21,7 @@ public class SidedDocuments implements DocumentRegistry, DocumentRegistrar {
         if (notSided(classPath)) {
             throw new IllegalArgumentException("SidedDocuments only accepts class paths created by ClassPath.sided");
         }
-        documents.put(classPath, code);
+        globals.put(classPath, code);
     }
 
     @Override
@@ -34,7 +34,7 @@ public class SidedDocuments implements DocumentRegistry, DocumentRegistrar {
 
     @Override
     public void addInputAlias(ClassPath classPath, Type type) {
-            throw new UnsupportedOperationException("Input aliases are not supported in SidedDocuments. Define directly or use Documents instead.");
+        throw new UnsupportedOperationException("Input aliases are not supported in SidedDocuments. Define directly or use Documents instead.");
     }
 
     @Override
@@ -58,9 +58,12 @@ public class SidedDocuments implements DocumentRegistry, DocumentRegistrar {
         for (var entry : documents.entrySet()) {
             tree.addClassPath(entry.getKey());
         }
-        for (var entry : globals.entrySet()) {
-            tree.addClassPath(entry.getKey());
-        }
+
+        // Need only export documents, globals are automatically included in the global scope without
+        // the need of re-exporting and importing. (as long as the file is included)
+        // for (var entry : globals.entrySet()) {
+        //     tree.addClassPath(entry.getKey());
+        // }
         return tree;
     }
 

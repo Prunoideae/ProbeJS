@@ -7,13 +7,9 @@ import dev.latvian.mods.kubejs.color.KubeColor;
 import dev.latvian.mods.kubejs.item.ItemTintFunction;
 import dev.latvian.mods.kubejs.plugin.builtin.wrapper.ColorWrapper;
 import dev.latvian.mods.kubejs.recipe.match.ReplacementMatch;
-import moe.wolfgirl.probejs.next.ClassPath;
 import moe.wolfgirl.probejs.next.plugin.ProbeJSPlugin;
 import moe.wolfgirl.probejs.next.typescript.base.AliasRegistrar;
 import moe.wolfgirl.probejs.next.typescript.document.Types;
-import moe.wolfgirl.probejs.next.typescript.document.base.Code;
-import moe.wolfgirl.probejs.next.typescript.document.base.Type;
-import moe.wolfgirl.probejs.next.typescript.document.types.special.NamespacedType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.particles.ParticleOptions;
@@ -38,10 +34,6 @@ import net.minecraft.world.level.levelgen.placement.BiomeFilter;
 import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.functions.CopyNameFunction;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
 
 public class WorldTypes extends ProbeJSPlugin {
 
@@ -153,25 +145,7 @@ public class WorldTypes extends ProbeJSPlugin {
         }));
 
         registrar.addInputAlias(DataComponentMap.class, Types.STRING);
-        registrar.addInputAlias(ItemEnchantments.class, new EnchantmentType());
+        registrar.addInputAlias(ItemEnchantments.class, Types.wrapped("{[key in %s]?: number}", RegistryTypes.object("Enchantment")));
     }
 
-    private static class EnchantmentType extends Type {
-        private final static NamespacedType ENCHANTMENT = RegistryTypes.object("Enchantment");
-
-        @Override
-        public Set<ClassPath> getImports() {
-            return ENCHANTMENT.getImports();
-        }
-
-        @Override
-        public List<String> format(int indent) {
-            return List.of("{[key in %s]?: number}".formatted(ENCHANTMENT.first()));
-        }
-
-        @Override
-        public Collection<Code> getContainedTypes() {
-            return List.of();
-        }
-    }
 }

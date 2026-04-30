@@ -112,4 +112,8 @@ public interface Types {
             default -> inputType;
         };
     }
+
+    static Type wrapped(String formatter, Type wrapped) {
+        return new WrappedType(formatter, wrapped);
+    }
 }

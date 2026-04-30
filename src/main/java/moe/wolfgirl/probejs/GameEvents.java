@@ -198,6 +198,8 @@ public class GameEvents {
                                         dump.dump();
                                         OtherDump otherDump = new OtherDump(ProbePaths.PROBE);
                                         otherDump.dump();
+
+                                        context.getSource().sendSystemMessage(Component.literal("Done!").kjs$green());
                                     }).start();
                                     return Command.SINGLE_SUCCESS;
                                 })

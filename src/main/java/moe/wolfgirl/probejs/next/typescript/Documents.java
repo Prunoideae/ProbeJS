@@ -17,7 +17,6 @@ import moe.wolfgirl.probejs.next.typescript.document.TypeDecl;
 import moe.wolfgirl.probejs.next.typescript.document.ClassDecl;
 import moe.wolfgirl.probejs.next.typescript.document.Types;
 import moe.wolfgirl.probejs.next.typescript.document.base.Code;
-import moe.wolfgirl.probejs.next.typescript.document.base.InputAliased;
 import moe.wolfgirl.probejs.next.typescript.document.base.Type;
 import moe.wolfgirl.probejs.next.typescript.document.members.ConstructorDecl;
 import moe.wolfgirl.probejs.next.typescript.document.members.FieldDecl;
@@ -60,7 +59,7 @@ public class Documents implements DocumentRegistry, DocumentRegistrar {
             addDocument(classPath, document);
         }
 
-        ProbeJSPlugin.forEachPlugin(plugin -> plugin.modifyClasses(new ClassAccessor(documents, ClassRegistry.INSTANCE.getAllClasses(), typeConverter)));
+        ProbeJSPlugin.forEachWithPriority("modifyClasses", plugin -> plugin.modifyClasses(new ClassAccessor(documents, ClassRegistry.INSTANCE.getAllClasses(), typeConverter)));
     }
 
     @Nullable
@@ -99,7 +98,7 @@ public class Documents implements DocumentRegistry, DocumentRegistrar {
     }
 
     public boolean hasAlias(ClassPath classPath) {
-        return inputAlias.containsKey(classPath);
+        return inputAlias.containsKey(classPath) && !inputAlias.get(classPath).isEmpty();
     }
 
     public void clear() {

@@ -1,6 +1,5 @@
 package moe.wolfgirl.probejs.next;
 
-import moe.wolfgirl.probejs.next.java.ClassRegistry;
 import moe.wolfgirl.probejs.next.java.PackageTree;
 import moe.wolfgirl.probejs.next.plugin.ProbeJSPlugin;
 import moe.wolfgirl.probejs.next.typescript.Documents;
@@ -18,9 +17,9 @@ public class PackageDump {
 
     public void dump() {
         Documents.INSTANCE.clear();
-        ProbeJSPlugin.forEachPlugin(plugin -> plugin.addTypeAlias(new AliasRegistrar.Proxy(Documents.INSTANCE)));
+        ProbeJSPlugin.forEachWithPriority("addTypeAlias", plugin -> plugin.addTypeAlias(new AliasRegistrar.Proxy(Documents.INSTANCE)));
         Documents.INSTANCE.transpile();
-        PackageTree packageTree = ClassRegistry.INSTANCE.resolveTree();
+        PackageTree packageTree = Documents.INSTANCE.resolveTree();
         for (var packageNode : packageTree.traverse()) {
             IndexFile indexFile = new IndexFile(packageNode, Documents.INSTANCE);
             indexFile.dumpTo(baseDir);

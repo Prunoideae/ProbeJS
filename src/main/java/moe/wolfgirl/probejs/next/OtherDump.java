@@ -18,7 +18,7 @@ public class OtherDump {
 
     public void dump() {
         SpecialDocuments.INSTANCE.clear();
-        ProbeJSPlugin.forEachPlugin(plugin -> plugin.addSpecialDocuments(new DocumentRegistrar.Proxy(SpecialDocuments.INSTANCE)));
+        ProbeJSPlugin.forEachWithPriority("addSpecialDocuments", plugin -> plugin.addSpecialDocuments(new DocumentRegistrar.Proxy(SpecialDocuments.INSTANCE)));
         PackageTree packageTree = SpecialDocuments.INSTANCE.resolveTree();
         for (var packageNode : packageTree.traverse()) {
             IndexFile indexFile = new IndexFile(packageNode, SpecialDocuments.INSTANCE);
@@ -28,7 +28,7 @@ public class OtherDump {
         rootIndex.dumpTo(baseDir.resolve("@special"));
 
         SidedDocuments.INSTANCE.clear();
-        ProbeJSPlugin.forEachPlugin(plugin -> plugin.addSidedDocuments(new DocumentRegistrar.Proxy(SidedDocuments.INSTANCE)));
+        ProbeJSPlugin.forEachWithPriority("addSidedDocuments", plugin -> plugin.addSidedDocuments(new DocumentRegistrar.Proxy(SidedDocuments.INSTANCE)));
         packageTree = SidedDocuments.INSTANCE.resolveTree();
         for (var packageNode : packageTree.traverse()) {
             IndexFile indexFile = new IndexFile(packageNode, SidedDocuments.INSTANCE);

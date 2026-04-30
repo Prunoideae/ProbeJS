@@ -43,7 +43,6 @@ public class ProbeBuiltinDocs extends ProbeJSPlugin {
             TagEvents::new,
             RecipeEvents::new,
             RegistryEvents::new,
-            ParamFix::new,
             Snippets::new,
             ForgeEventDoc::new,
             TranslationDoc::new,

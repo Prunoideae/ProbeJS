@@ -1,11 +1,14 @@
 package moe.wolfgirl.probejs.next.typescript.document.types;
 
 import moe.wolfgirl.probejs.next.ClassPath;
+import moe.wolfgirl.probejs.next.typescript.document.Types;
 import moe.wolfgirl.probejs.next.typescript.document.base.Code;
 import moe.wolfgirl.probejs.next.typescript.document.base.InputAliased;
+import moe.wolfgirl.probejs.next.typescript.document.base.Type;
 import moe.wolfgirl.probejs.next.typescript.document.types.special.NamespacedType;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -33,5 +36,19 @@ public class ClassType extends InputAliased {
 
     public NamespacedType inner(String typeName) {
         return new NamespacedType(classPath, typeName);
+    }
+
+    public Type asMaybeGeneric() {
+        try {
+            var variables = classPath.loadClass().getTypeParameters();
+            if (variables.length == 0) return this;
+            else {
+                // Fill with any
+                Type[] anyArgs = Collections.nCopies(variables.length, Types.ANY).toArray(new Type[0]);
+                return this.withParams(anyArgs);
+            }
+        } catch (ClassNotFoundException e) {
+            return this;
+        }
     }
 }

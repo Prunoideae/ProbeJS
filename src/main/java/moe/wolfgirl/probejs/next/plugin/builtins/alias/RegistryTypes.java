@@ -1,5 +1,6 @@
 package moe.wolfgirl.probejs.next.plugin.builtins.alias;
 
+import dev.latvian.mods.kubejs.registry.RegistryType;
 import moe.wolfgirl.probejs.legacy.utils.GameUtils;
 import moe.wolfgirl.probejs.legacy.utils.NameUtils;
 import moe.wolfgirl.probejs.legacy.utils.RegistryUtils;
@@ -16,6 +17,8 @@ import moe.wolfgirl.probejs.next.typescript.document.base.KindAware;
 import moe.wolfgirl.probejs.next.typescript.document.base.Type;
 import moe.wolfgirl.probejs.next.typescript.document.builders.ClassBuilder;
 import moe.wolfgirl.probejs.next.typescript.document.types.special.NamespacedType;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
@@ -24,17 +27,30 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class RegistryTypes extends ProbeJSPlugin {
     public static final ClassPath REGISTRY_TYPES = ClassPath.special("types.RegistryTypes");
+    public static final ClassPath REGISTRY_MARKED = ClassPath.special("types.RegistryMarked");
+    public static final Type RESOLVE_TAG = Types.namespaced(REGISTRY_TYPES, "ResolveTag").withParams(Types.variable("T"));
+    public static final Type RESOLVE_OBJECT = Types.namespaced(REGISTRY_TYPES, "ResolveObject").withParams(Types.variable("T"));
+
     public static Map<ResourceKey<? extends Registry<?>>, Class<?>> PREDEFINED_TYPES = Map.of(
             Registries.DIMENSION, Level.class
     );
+
+    public static final Set<ClassPath> HOLDER_TYPES = Set.of(
+            new ClassPath(Holder.class),
+            new ClassPath(TagKey.class),
+            new ClassPath(ResourceKey.class),
+            new ClassPath(HolderSet.class)
+    );
+
+    static {
+        RecordTypes.SKIP_RECORDS.add(TagKey.class);
+    }
 
     public static NamespacedType tag(String name) {
         return Types.namespaced(REGISTRY_TYPES, name + "Tag");
@@ -44,15 +60,53 @@ public class RegistryTypes extends ProbeJSPlugin {
         return Types.namespaced(REGISTRY_TYPES, name);
     }
 
-    public static final String TAG_MARKER = "probejs$tag_marker";
-    public static final String OBJECT_MARKER = "probejs$object_marker";
-    public static final String TAG_RESOLVER = "T extends {%s: infer M} ? M : never".formatted(TAG_MARKER);
-    public static final String OBJECT_RESOLVER = "T extends {%s: infer M} ? M : never".formatted(OBJECT_MARKER);
+    @Override
+    public void addTypeAlias(AliasRegistrar registrar) {
+        registrar.addInputAlias(TagKey.class, RESOLVE_TAG);
+        registrar.addInputAlias(Holder.class, RESOLVE_OBJECT);
+        registrar.addInputAlias(ResourceKey.class, RESOLVE_OBJECT);
+        registrar.addInputAlias(HolderSet.class, Types.union(RESOLVE_OBJECT).asArray());
+
+        // Base class to registry type
+        MinecraftServer currentServer = GameUtils.getCurrentServer();
+        if (currentServer == null) return;
+        RegistryAccess registryAccess = currentServer.registryAccess();
+
+        for (ResourceKey<? extends Registry<?>> registry : RegistryUtils.getRegistries(registryAccess)) {
+            ClassPath baseClass = findRegistryBaseClass(registry);
+            if (baseClass == null) continue;
+            String typeName = NameUtils.registryToName(registry);
+            registrar.addInputAlias(baseClass, object(typeName));
+        }
+    }
 
     @Override
     public void modifyClasses(Documents.ClassAccessor classDocuments) {
-        super.modifyClasses(classDocuments);
+        MinecraftServer currentServer = GameUtils.getCurrentServer();
+        if (currentServer == null) return;
+        RegistryAccess registryAccess = currentServer.registryAccess();
+
+        for (ResourceKey<? extends Registry<?>> registry : RegistryUtils.getRegistries(registryAccess)) {
+            ClassPath baseClass = findRegistryBaseClass(registry);
+            if (baseClass == null) continue;
+            String typeName = NameUtils.registryToName(registry);
+            ClassPath mixinPath = baseClass.withSuffix("$$RegistryTypeMixin");
+            classDocuments.addClassDocument(mixinPath, new InterfaceMixin(baseClass, tag(typeName), object(typeName)));
+        }
     }
+
+    @Nullable
+    private ClassPath findRegistryBaseClass(ResourceKey<? extends Registry<?>> registryKey) {
+        if (registryKey.equals(Registries.CUSTOM_STAT)) return null;
+        if (PREDEFINED_TYPES.containsKey(registryKey)) {
+            return new ClassPath(PREDEFINED_TYPES.get(registryKey));
+        } else {
+            RegistryType<?> registryType = RegistryType.ofKey(registryKey);
+            if (registryType == null) return null;
+            return new ClassPath(registryType.baseClass());
+        }
+    }
+
 
     @Override
     public void addSpecialDocuments(DocumentRegistrar registrar) {
@@ -70,7 +124,23 @@ public class RegistryTypes extends ProbeJSPlugin {
             registryTypes.member(makeTagType(key, registry));
         }
 
+        // export type Resolve(Tag/Object)<T> = T extends RegistryMarked<Infer O, infer T> ? O/T : never;
+        // Use any for O/T to avoid inferring both types
+        registryTypes.member(new TypeDecl(
+                REGISTRY_TYPES.append("ResolveTag"),
+                List.of(Types.variable("T")),
+                Types.raw("T extends RegistryMarked<infer O, any> ? O : never"),
+                false
+        ));
+        registryTypes.member(new TypeDecl(
+                REGISTRY_TYPES.append("ResolveObject"),
+                List.of(Types.variable("T")),
+                Types.raw("T extends RegistryMarked<any, infer O> ? O : never"),
+                false
+        ));
+
         registrar.addDocument(REGISTRY_TYPES, registryTypes.build());
+        registrar.addDocument(REGISTRY_MARKED, new RegistryMarked());
     }
 
     private TypeDecl makeType(ResourceKey<? extends Registry<?>> key, Registry<?> registry) {
@@ -107,8 +177,9 @@ public class RegistryTypes extends ProbeJSPlugin {
     }
 
     // export interface Name extends RegistryMarked<Object, Tag> {}
+    // In reality this should take a class path of ${original}$$RegistryMixin to avoid conflict
     static class InterfaceMixin extends Code {
-        private static final NamespacedType REGISTRY_MARKED = Types.namespaced(REGISTRY_TYPES, "RegistryMarked");
+        private static final Type REGISTRY_MARKED_TYPE = Types.clazz(REGISTRY_MARKED);
         private final ClassPath classPath;
         private final Type tagType;
         private final Type objectType;
@@ -122,7 +193,7 @@ public class RegistryTypes extends ProbeJSPlugin {
         @Override
         public Set<ClassPath> getImports() {
             Set<ClassPath> imports = new HashSet<>();
-            imports.addAll(REGISTRY_MARKED.getImports());
+            imports.addAll(REGISTRY_MARKED_TYPE.getImports());
             imports.addAll(tagType.getImports());
             imports.addAll(objectType.getImports());
             return imports;
@@ -130,7 +201,7 @@ public class RegistryTypes extends ProbeJSPlugin {
 
         @Override
         public List<String> format(int indent) {
-            var extendsType = REGISTRY_MARKED.withParams(objectType, tagType);
+            var extendsType = REGISTRY_MARKED_TYPE.withParams(tagType, objectType);
             return List.of("%sexport interface %s extends %s {}".formatted(
                     " ".repeat(indent),
                     classPath.getClassName(),
@@ -138,4 +209,32 @@ public class RegistryTypes extends ProbeJSPlugin {
             ));
         }
     }
+
+    // const registryTag$$marker: unique symbol;
+    // const registryObject$$marker: unique symbol;
+    // export interface MarkerCarrier<M1, M2> {
+    //     readonly [registryTag$$marker]: M1;
+    //     readonly [registryObject$$marker]: M2;
+    // }
+    static class RegistryMarked extends Code {
+
+        @Override
+        public Set<ClassPath> getImports() {
+            return Set.of();
+        }
+
+        @Override
+        public List<String> format(int indent) {
+            List<String> lines = new ArrayList<>();
+            lines.add("%sconst registryTag$$marker: unique symbol;".formatted(" ".repeat(indent)));
+            lines.add("%sconst registryObject$$marker: unique symbol;".formatted(" ".repeat(indent)));
+            lines.add("%sexport interface %s<M1, M2> {".formatted(" ".repeat(indent), REGISTRY_MARKED.getClassName()));
+            lines.add("%sreadonly [registryTag$$marker]: M1;".formatted(" ".repeat(indent + 4)));
+            lines.add("%sreadonly [registryObject$$marker]: M2;".formatted(" ".repeat(indent + 4)));
+            lines.add("%s}".formatted(" ".repeat(indent)));
+            return lines;
+        }
+    }
+
+
 }

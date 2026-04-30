@@ -1,7 +1,7 @@
 package moe.wolfgirl.probejs.next.plugin.builtins;
 
-import moe.wolfgirl.probejs.ProbeJS;
 import moe.wolfgirl.probejs.next.plugin.ProbeJSPlugin;
+import moe.wolfgirl.probejs.next.plugin.builtins.alias.RegistryTypes;
 import moe.wolfgirl.probejs.next.typescript.Documents;
 import moe.wolfgirl.probejs.next.typescript.document.base.Code;
 import moe.wolfgirl.probejs.next.typescript.document.base.Type;
@@ -16,16 +16,12 @@ import java.lang.reflect.Modifier;
 import java.util.List;
 
 public class InjectInputs extends ProbeJSPlugin {
+
     @Override
     public void transformClass(Documents.ClassDocument document) {
         var classDocument = document.document();
         for (Code member : classDocument.members) {
-            if (member instanceof MethodDecl methodDecl) {
-                if (methodDecl.name.equals("black") && methodDecl.isStatic){
-                    ProbeJS.LOGGER.info("Found black method");
-                }
-                patchParams(methodDecl.params);
-            }
+            if (member instanceof MethodDecl methodDecl) patchParams(methodDecl.params);
             if (member instanceof ConstructorDecl constructorDecl) patchParams(constructorDecl.params);
         }
     }
@@ -36,7 +32,7 @@ public class InjectInputs extends ProbeJSPlugin {
         }
     }
 
-    private boolean isFunctionalInterface(Type type) {
+    private static boolean isFunctionalInterface(Type type) {
         if (type instanceof ClassType classType) {
             try {
                 Class<?> clazz = classType.classPath.loadClass();
@@ -53,7 +49,7 @@ public class InjectInputs extends ProbeJSPlugin {
         } else return false;
     }
 
-    private void markTypeAsInput(Type type) {
+    public static void markTypeAsInput(Type type) {
         if (type instanceof ClassType classType) {
             var classPath = classType.classPath;
             // If we have alias, alias will refer to the original type as input, so we don't need to check
@@ -63,11 +59,16 @@ public class InjectInputs extends ProbeJSPlugin {
         } else if (type instanceof ArrayType arrayType) {
             markTypeAsInput(arrayType.componentType);
         } else if (type instanceof ParamType paramType) {
-            markTypeAsInput(paramType.baseType);
             // If the type is a functional interface, we don't mark the params as input, as they are likely
             // to be callback and we want original types (so we can get types)
-            markTypeAsInput(paramType.baseType);
             if (isFunctionalInterface(paramType.baseType)) return;
+            markTypeAsInput(paramType.baseType);
+
+            // Special handling for RegistryTypes, we don't mark the params as input
+            if (paramType.baseType instanceof ClassType classType && RegistryTypes.HOLDER_TYPES.contains(classType.classPath)) {
+                return;
+            }
+
             for (Type typeArg : paramType.typeArgs) {
                 markTypeAsInput(typeArg);
             }

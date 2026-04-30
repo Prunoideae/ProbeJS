@@ -56,7 +56,7 @@ public class MethodDecl extends CommentableCode implements KindAware {
     }
 
     public String getPrefix() {
-        return kind == KindAware.Kind.NAMESPACE ? "let " : isStatic ? "static " : "";
+        return kind == KindAware.Kind.NAMESPACE ? "function " : isStatic ? "static " : "";
     }
 
     @Override

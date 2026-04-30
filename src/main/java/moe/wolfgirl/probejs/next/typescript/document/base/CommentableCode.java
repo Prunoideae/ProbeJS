@@ -7,7 +7,9 @@ public abstract class CommentableCode extends Code {
     private final List<String> comments = new ArrayList<>();
 
     public void addComments(String... comments) {
-        this.comments.addAll(List.of(comments));
+        for (String comment : comments) {
+            this.comments.addAll(List.of(comment.strip().split("\\n")));
+        }
     }
 
     public boolean hasComments() {

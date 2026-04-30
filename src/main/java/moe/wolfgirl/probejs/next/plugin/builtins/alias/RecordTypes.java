@@ -5,26 +5,28 @@ import dev.latvian.mods.rhino.type.TypeInfo;
 import moe.wolfgirl.probejs.next.ClassPath;
 import moe.wolfgirl.probejs.next.java.ClassRegistry;
 import moe.wolfgirl.probejs.next.java.members.ClassInfo;
+import moe.wolfgirl.probejs.next.plugin.Priority;
 import moe.wolfgirl.probejs.next.plugin.ProbeJSPlugin;
+import moe.wolfgirl.probejs.next.plugin.builtins.InjectInputs;
 import moe.wolfgirl.probejs.next.typescript.base.AliasRegistrar;
 import moe.wolfgirl.probejs.next.typescript.document.Types;
 import moe.wolfgirl.probejs.next.typescript.document.base.Type;
 import moe.wolfgirl.probejs.next.typescript.document.types.VariableType;
 import moe.wolfgirl.probejs.next.typescript.document.types.special.ObjectType;
 import moe.wolfgirl.probejs.next.typescript.transpiler.TypeConverter;
-import net.minecraft.tags.TagKey;
 
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 public class RecordTypes extends ProbeJSPlugin {
-    private static final Set<Class<?>> SKIP_RECORDS = Set.of(
-            TagKey.class
-    );
+    public static final Set<Class<?>> SKIP_RECORDS = new HashSet<>();
 
+    // This should run after all others alias are added, as it relies on other alias to mark types inside the object
     @Override
+    @Priority(-1000)
     public void addTypeAlias(AliasRegistrar registrar) {
         Map<ClassPath, ObjectType> recordTypes = new HashMap<>();
         TypeConverter converter = new TypeConverter(); // FIXME: We might need a way to keep only one instance of TypeConverter instead of creating a new one here.
@@ -39,6 +41,7 @@ public class RecordTypes extends ProbeJSPlugin {
                         var variableType = (VariableType) v;
                         return variableType.typeInfo == null ? Types.ANY : variableType.typeInfo;
                     }, type);
+                    InjectInputs.markTypeAsInput(type);
                     builder.param(component.name(), true, type);
                 }
             });

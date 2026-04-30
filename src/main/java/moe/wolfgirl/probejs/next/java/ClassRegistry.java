@@ -120,7 +120,7 @@ public class ClassRegistry {
     }
 
     public void fetchInitialClasses() {
-        ProbeJSPlugin.forEachPlugin(plugin -> {
+        ProbeJSPlugin.forEachWithPriority("provideClassForDiscovery", plugin -> {
             for (Class<?> clazz : plugin.provideClassForDiscovery()) {
                 putClass(clazz, 0);
             }
