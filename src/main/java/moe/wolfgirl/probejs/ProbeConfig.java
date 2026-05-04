@@ -30,7 +30,7 @@ public class ProbeConfig {
     public ConfigEntry<String> mods = new ConfigEntry<>("forceIncluded", "kubejs,minecraft,neoforge");
     public ConfigEntry<Boolean> beans = new ConfigEntry<>("generateBeans", true);
     public ConfigEntry<List<String>> excludedPaths = new ConfigEntry<>("excludedClassPaths", List.of());
-
+    public ConfigEntry<List<String>> fullScanMods = new ConfigEntry<>("fullScanMods", List.of("minecraft", "kubejs", "neoforge"));
     public static class ConfigEntry<T> {
         public final String name;
         public final T defaultValue;

@@ -81,7 +81,7 @@ public class RegistryEvents extends ProbeJSPlugin {
             BuilderTypeRegistryHandler.Info<?> info = BuilderTypeRegistryHandler.info(RegistryUtils.castKey(key));
             if (info == null) continue;
             if (info.defaultType() == null && info.types().isEmpty()) continue;
-            RegistryType<?> type = RegistryType.ofKey(key);
+            RegistryType<?> type = RegistryType.ofKey(RegistryUtils.castKey(key));
             if (type == null) continue;
 
             ClassPath registryPath = getRegistryClassPath(key.location().getNamespace(), key.location().getPath());

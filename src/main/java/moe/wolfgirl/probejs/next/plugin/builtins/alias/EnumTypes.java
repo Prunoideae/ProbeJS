@@ -2,16 +2,20 @@ package moe.wolfgirl.probejs.next.plugin.builtins.alias;
 
 import dev.latvian.mods.rhino.type.EnumTypeInfo;
 import dev.latvian.mods.rhino.type.TypeInfo;
+import moe.wolfgirl.probejs.next.ClassPath;
 import moe.wolfgirl.probejs.next.java.ClassRegistry;
 import moe.wolfgirl.probejs.next.java.members.ClassInfo;
 import moe.wolfgirl.probejs.next.plugin.ProbeJSPlugin;
+import moe.wolfgirl.probejs.next.typescript.Documents;
 import moe.wolfgirl.probejs.next.typescript.base.AliasRegistrar;
 import moe.wolfgirl.probejs.next.typescript.document.Types;
+import moe.wolfgirl.probejs.next.typescript.document.members.MethodDecl;
 
 import java.util.concurrent.locks.ReentrantLock;
 
 public class EnumTypes extends ProbeJSPlugin {
     private static final ReentrantLock LOCK = new ReentrantLock();
+    private static final ClassPath ENUM = new ClassPath(Enum.class);
 
     @Override
     public void addTypeAlias(AliasRegistrar registrar) {
@@ -30,5 +34,11 @@ public class EnumTypes extends ProbeJSPlugin {
             }
         }
         LOCK.unlock();
+    }
+
+    @Override
+    public void transformClass(Documents.ClassDocument document) {
+        if (!document.classInfo().classPath().equals(ENUM)) return;
+        document.document().members.removeIf(code -> code instanceof MethodDecl methodDecl && methodDecl.name.equals("valueOf") && methodDecl.isStatic);
     }
 }

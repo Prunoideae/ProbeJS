@@ -58,6 +58,18 @@ public class ProbeJSPlugin implements KubeJSPlugin {
         return Set.of();
     }
 
+    /**
+     * Allows a class in class scanning to be added to the discovery list.
+     * <p>
+     * This is useful when the class is not directly referenced by any other classes, but you still want to generate declaration for it.
+     * For example, Neoforge event classes.
+     *
+     * @return
+     */
+    public boolean allowClassInDiscovery(Class<?> clazz) {
+        return false;
+    }
+
     private static int getPriorityFor(ProbeJSPlugin plugin, String methodName) {
         Class<?> clazz = plugin.getClass();
         try {

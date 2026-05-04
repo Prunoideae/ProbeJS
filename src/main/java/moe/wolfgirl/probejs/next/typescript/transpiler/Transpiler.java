@@ -21,7 +21,9 @@ import moe.wolfgirl.probejs.next.typescript.transpiler.members.FieldConverter;
 import moe.wolfgirl.probejs.next.typescript.transpiler.members.MethodConverter;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Transpiler extends Converter<ClassInfo, ClassDecl> {
     private final FieldConverter field;
@@ -51,8 +53,19 @@ public class Transpiler extends Converter<ClassInfo, ClassDecl> {
         List<Pair<ConstructorInfo, ConstructorDecl>> constructorPairs = new ArrayList<>();
 
         List<Code> members = new ArrayList<>();
+        // We have to hide the fields or the methods will be inaccessible
+        // super class methods considered too
+        Set<String> usedNames = source.getMethodNames();
+        for (var method : source.methods()) {
+            var methodDecl = this.method.convert(method);
+            methodDecl.setKind(isInterface ? KindAware.Kind.INTERFACE : KindAware.Kind.CLASS);
+            members.add(methodDecl);
+            methodPairs.add(Pair.of(method, methodDecl));
+        }
         for (var field : source.fields()) {
             var fieldDecl = this.field.convert(field);
+
+            if (usedNames.contains(fieldDecl.name)) continue;
             fieldDecl.setKind(isInterface ? KindAware.Kind.INTERFACE : KindAware.Kind.CLASS);
             members.add(fieldDecl);
             fieldPairs.add(Pair.of(field, fieldDecl));
@@ -62,12 +75,7 @@ public class Transpiler extends Converter<ClassInfo, ClassDecl> {
             members.add(constructorDecl);
             constructorPairs.add(Pair.of(constructor, constructorDecl));
         }
-        for (var method : source.methods()) {
-            var methodDecl = this.method.convert(method);
-            methodDecl.setKind(isInterface ? KindAware.Kind.INTERFACE : KindAware.Kind.CLASS);
-            members.add(methodDecl);
-            methodPairs.add(Pair.of(method, methodDecl));
-        }
+
 
         var classDecl = new ClassDecl(
                 true,
@@ -75,7 +83,7 @@ public class Transpiler extends Converter<ClassInfo, ClassDecl> {
                 source.classPath().getClassName(),
                 superClass,
                 interfaces,
-                variableTypes,
+                new ArrayList<>(variableTypes),
                 members
         );
 

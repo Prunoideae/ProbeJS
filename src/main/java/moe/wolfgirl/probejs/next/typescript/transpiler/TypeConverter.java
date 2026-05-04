@@ -31,15 +31,13 @@ public class TypeConverter {
         if (typeInfo == TypeInfo.NONE) return Types.NEVER;
 
         return switch (typeInfo) {
-            case PrimitiveClassTypeInfo info -> {
+            case ClassTypeInfo info -> {
                 if (info.isVoid()) yield Types.VOID;
                 else if (info.isBoolean()) yield Types.BOOLEAN;
                 else if (info.isByte() || info.isShort() || info.isInt() || info.isLong() || info.isFloat() || info.isDouble())
                     yield Types.NUMBER;
                 else if (info.isCharacter()) yield Types.STRING;
-                else throw new IllegalStateException("Unknown primitive type: " + info);
-            }
-            case ClassTypeInfo info -> {
+
                 Class<?> clazz = info.asClass();
                 ClassPath classPath = new ClassPath(clazz);
                 if (predefinedTypes.containsKey(classPath)) yield predefinedTypes.get(classPath);

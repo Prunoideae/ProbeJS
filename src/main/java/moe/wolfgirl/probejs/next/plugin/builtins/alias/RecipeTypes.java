@@ -14,6 +14,8 @@ import net.neoforged.neoforge.common.crafting.SizedIngredient;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.crafting.FluidIngredient;
 
+import java.util.Set;
+
 public class RecipeTypes extends ProbeJSPlugin {
 
     @Override
@@ -30,7 +32,7 @@ public class RecipeTypes extends ProbeJSPlugin {
 
         registrar.addInputAlias(ItemStack.class, Item.class);
         registrar.addInputAlias(ItemStack.class, Types.object(builder -> {
-            builder.param("item", RegistryTypes.object("Item"));
+            builder.param("id", RegistryTypes.object("Item"));
             builder.param("count", true, Types.NUMBER);
         }));
 
@@ -40,8 +42,8 @@ public class RecipeTypes extends ProbeJSPlugin {
         registrar.addInputAlias(Ingredient.class, Types.literal("*"));
         registrar.addInputAlias(Ingredient.class, Types.literal("-"));
         registrar.addInputAlias(Ingredient.class, Types.wrapped("`#${%s}`", RegistryTypes.tag("Item")));
-        // scriptDump.assignType(Ingredient.class, Types.primitive("`@${Special.Mod}`"));
-        // scriptDump.assignType(Ingredient.class, Types.primitive("`%${Special.CreativeModeTab}`"));
+        registrar.addInputAlias(Ingredient.class, Types.wrapped("`@${%s}`", SpecialTypes.MOD_ID));
+        registrar.addInputAlias(Ingredient.class, Types.wrapped("`%%${%s}`", RegistryTypes.object("CreativeModeTab")));
 
         registrar.addInputAlias(SizedIngredient.class, ItemStack.class);
         registrar.addInputAlias(SizedIngredient.class, Ingredient.class);
@@ -54,10 +56,10 @@ public class RecipeTypes extends ProbeJSPlugin {
         registrar.addInputAlias(RecipeFilter.class, Types.object(builder -> {
             builder.param("or", true, Types.clazz(RecipeFilter.class).asInput().asArray());
             builder.param("not", true, Types.clazz(RecipeFilter.class).asInput());
-            builder.param("id", true, Types.STRING); // TODO: RecipeId
+            builder.param("id", true, SpecialTypes.RECIPE_ID);
             builder.param("type", true, RegistryTypes.object("RecipeSerializer"));
             builder.param("group", true, Types.STRING);
-            builder.param("mod", true, Types.STRING); // TODO: ModId
+            builder.param("mod", true, SpecialTypes.MOD_ID);
             builder.param("input", true, Types.clazz(Ingredient.class).asInput());
             builder.param("output", true, Types.clazz(ItemStack.class).asInput());
         }));
@@ -72,6 +74,20 @@ public class RecipeTypes extends ProbeJSPlugin {
         registrar.addInputAlias(FluidIngredient.class, Fluid.class);
         registrar.addInputAlias(FluidIngredient.class, Types.REGEXP);
         registrar.addInputAlias(FluidIngredient.class, Types.wrapped("`#${%s}`", RegistryTypes.tag("Fluid")));
-        // scriptDump.assignType(FluidIngredient.class, Types.primitive("`@${Special.Mod}`"));
+        registrar.addInputAlias(FluidIngredient.class,Types.wrapped("`@${%s}`", SpecialTypes.MOD_ID));
+    }
+
+    @Override
+    public Set<Class<?>> provideClassForDiscovery() {
+        return Set.of(
+                ItemLike.class,
+                ItemPredicate.class,
+                ItemStack.class,
+                Ingredient.class,
+                SizedIngredient.class,
+                RecipeFilter.class,
+                FluidStack.class,
+                FluidIngredient.class
+        );
     }
 }

@@ -3,6 +3,7 @@ package moe.wolfgirl.probejs.next.plugin.builtins;
 import com.mojang.datafixers.util.Pair;
 import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.kubejs.typings.Param;
+import dev.latvian.mods.kubejs.typings.ThisIs;
 import dev.latvian.mods.rhino.util.HideFromJS;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
 import moe.wolfgirl.probejs.next.ClassPath;
@@ -15,9 +16,12 @@ import moe.wolfgirl.probejs.next.typescript.Documents;
 import moe.wolfgirl.probejs.next.typescript.document.Types;
 import moe.wolfgirl.probejs.next.typescript.document.base.Code;
 import moe.wolfgirl.probejs.next.typescript.document.base.CommentableCode;
+import moe.wolfgirl.probejs.next.typescript.document.base.Type;
 import moe.wolfgirl.probejs.next.typescript.document.members.ConstructorDecl;
 import moe.wolfgirl.probejs.next.typescript.document.members.FieldDecl;
 import moe.wolfgirl.probejs.next.typescript.document.members.MethodDecl;
+import moe.wolfgirl.probejs.next.typescript.document.types.ClassType;
+import moe.wolfgirl.probejs.next.typescript.document.types.ParamType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +36,23 @@ public class InjectAnnotations extends ProbeJSPlugin {
             return;
         }
 
+        if (classInfo.hasAnnotation(ReturnsSelf.class)) {
+            for (Code member : classDocument.members) {
+                if (member instanceof MethodDecl methodDecl) {
+                    ClassPath classPath = null;
+                    if (methodDecl.returnType instanceof ClassType classType) {
+                        classPath = classType.classPath;
+                    } else if (methodDecl.returnType instanceof ParamType paramType && paramType.baseType instanceof ClassType baseType) {
+                        classPath = baseType.classPath;
+                    }
+
+                    if (classPath != null && classPath.equals(document.classInfo().classPath())) {
+                        methodDecl.returnType = Types.THIS;
+                    }
+                }
+            }
+        }
+
         applyDeprecation(classInfo, classDocument);
 
         List<Code> toRemove = new ArrayList<>();
@@ -44,6 +65,7 @@ public class InjectAnnotations extends ProbeJSPlugin {
             if (markedHidden(methodDoc.getFirst())) toRemove.add(methodDoc.getSecond());
             applyDeprecation(methodDoc.getFirst(), methodDoc.getSecond());
             applyReturnThis(methodDoc.getFirst(), methodDoc.getSecond());
+            applyThisIs(methodDoc.getFirst(), methodDoc.getSecond());
             applyInfo(methodDoc.getFirst(), methodDoc.getSecond());
         }
 
@@ -67,6 +89,31 @@ public class InjectAnnotations extends ProbeJSPlugin {
     private void applyReturnThis(HasAnnotation hasAnnotation, MethodDecl methodDecl) {
         if (hasAnnotation.hasAnnotation(ReturnsSelf.class)) {
             methodDecl.returnType = Types.THIS;
+        }
+    }
+
+    private void applyThisIs(HasAnnotation hasAnnotation, MethodDecl methodDecl) {
+        if (hasAnnotation.hasAnnotation(ThisIs.class)) {
+            ThisIs annotation = hasAnnotation.getAnnotation(ThisIs.class);
+            if (annotation == null) return;
+            List<ClassPath> classPaths = new ArrayList<>();
+
+            for (Class<?> typeClass : annotation.value()) {
+                classPaths.add(new ClassPath(typeClass));
+            }
+
+            for (Class<?> typeClass : annotation.classes()) {
+                classPaths.add(new ClassPath(typeClass));
+            }
+
+            for (String className : annotation.classNames()) {
+                classPaths.add(new ClassPath(className));
+            }
+
+            if (classPaths.isEmpty()) return;
+            var innerType = classPaths.size() == 1 ? Types.clazz(classPaths.getFirst())
+                    : Types.union(classPaths.stream().map(Types::clazz).toArray(Type[]::new));
+            methodDecl.returnType = Types.wrapped("this is %s", innerType);
         }
     }
 

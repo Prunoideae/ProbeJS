@@ -85,6 +85,7 @@ public record ClassInfo(
             return classInfo.getAccessibleMethods(false)
                     .stream()
                     .map(CachedMethodInfo.Accessible::getInfo)
+                    .filter(m -> !m.getCached().isSynthetic())
                     .filter(m -> shouldIncludeMethod(m.getCached(), clazz))
                     .map(m -> MethodInfo.resolve(m, variableRemaps))
                     .toList();
@@ -102,8 +103,9 @@ public record ClassInfo(
     private static boolean shouldIncludeMethod(Method method, Class<?> clazz) {
         for (Class<?> parent = clazz.getSuperclass(); parent != null; parent = parent.getSuperclass()) {
             try {
-                Method parentMethod = parent.getMethod(method.getName(), method.getParameterTypes());
-                if (parentMethod.equals(method)) {
+                // Find if the method is declared in the parent class
+                Method sm = parent.getMethod(method.getName(), method.getParameterTypes());
+                if (sm.getReturnType().equals(method.getReturnType())) {
                     return false;
                 }
             } catch (NoSuchMethodException ignored) {
@@ -205,6 +207,18 @@ public record ClassInfo(
             case null, default -> typeInfo;
         };
 
+    }
+
+    public Set<String> getMethodNames() {
+        Set<String> methodNames = new HashSet<>();
+        CachedClassInfo classInfo = CachedClassStorage.GLOBAL_PUBLIC.get(clazz);
+        try {
+            for (CachedMethodInfo.Accessible m : classInfo.getAccessibleMethods(false)) {
+                methodNames.add(m.getName());
+            }
+        } catch (Throwable ignore) {
+        }
+        return methodNames;
     }
 
     @Override

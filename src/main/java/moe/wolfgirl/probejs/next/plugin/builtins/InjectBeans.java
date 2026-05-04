@@ -1,12 +1,15 @@
 package moe.wolfgirl.probejs.next.plugin.builtins;
 
 import moe.wolfgirl.probejs.next.ClassPath;
+import moe.wolfgirl.probejs.next.plugin.Priority;
 import moe.wolfgirl.probejs.next.plugin.ProbeJSPlugin;
 import moe.wolfgirl.probejs.next.typescript.Documents;
+import moe.wolfgirl.probejs.next.typescript.document.Types;
 import moe.wolfgirl.probejs.next.typescript.document.base.Code;
 import moe.wolfgirl.probejs.next.typescript.document.base.KindAware;
 import moe.wolfgirl.probejs.next.typescript.document.members.FieldDecl;
 import moe.wolfgirl.probejs.next.typescript.document.members.MethodDecl;
+import moe.wolfgirl.probejs.next.typescript.document.types.special.WrappedType;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -14,8 +17,11 @@ import java.util.*;
 public class InjectBeans extends ProbeJSPlugin {
 
     @Override
+    // After all plugins have modified the classes, then beans are injected to reflect changes in beans
+    @Priority(-1000)
     public void transformClass(Documents.ClassDocument document) {
         var classDocument = document.document();
+        var classInfo = document.classInfo();
         Set<String> memberNames = new HashSet<>();
         for (Code member : classDocument.members) {
             if (member instanceof MethodDecl methodDecl) memberNames.add(methodDecl.name);
@@ -23,11 +29,21 @@ public class InjectBeans extends ProbeJSPlugin {
         }
 
         List<Bean> beans = new ArrayList<>();
+        Set<String> allBeanNames = new HashSet<>();
+        Set<String> duplicatedNames = new HashSet<>(classInfo.getMethodNames());
+        for (Code member : classDocument.members) {
+            if (member instanceof MethodDecl methodDecl) {
+                var beanName = getBeanName(methodDecl.name);
+                if (beanName == null) continue;
+                if (!allBeanNames.add(beanName)) duplicatedNames.add(beanName);
+            }
+        }
+
         for (Code member : classDocument.members) {
             if (member instanceof MethodDecl methodDecl) {
                 var beanType = getBeanType(methodDecl.name);
                 var beanName = getBeanName(methodDecl.name);
-                if (beanName == null) continue;
+                if (beanName == null || beanType == null || duplicatedNames.contains(beanName)) continue;
                 if (memberNames.contains(beanName)) continue;
                 var bean = switch (beanType) {
                     case IS, GETTER -> {
@@ -104,7 +120,12 @@ public class InjectBeans extends ProbeJSPlugin {
         public List<String> format(int indent) {
             return List.of(" ".repeat(indent) + (isStatic ? "static " : "") +
                     switch (beanType) {
-                        case GETTER, IS -> "get %s(): %s;".formatted(name, type.first());
+                        case GETTER, IS -> "get %s(): %s;".formatted(
+                                name, type instanceof WrappedType wrappedType &&
+                                        wrappedType.formatter.startsWith("this is ") ?
+                                        Types.BOOLEAN.first() :
+                                        type.first()
+                        );
                         case SETTER -> "set %s(value: %s);".formatted(name, type.first());
                     }
             );

@@ -7,7 +7,6 @@ import moe.wolfgirl.probejs.next.java.ClassRegistry;
 import moe.wolfgirl.probejs.next.java.members.ClassInfo;
 import moe.wolfgirl.probejs.next.plugin.Priority;
 import moe.wolfgirl.probejs.next.plugin.ProbeJSPlugin;
-import moe.wolfgirl.probejs.next.plugin.builtins.InjectInputs;
 import moe.wolfgirl.probejs.next.typescript.base.AliasRegistrar;
 import moe.wolfgirl.probejs.next.typescript.document.Types;
 import moe.wolfgirl.probejs.next.typescript.document.base.Type;
@@ -41,7 +40,7 @@ public class RecordTypes extends ProbeJSPlugin {
                         var variableType = (VariableType) v;
                         return variableType.typeInfo == null ? Types.ANY : variableType.typeInfo;
                     }, type);
-                    InjectInputs.markTypeAsInput(type);
+                    Types.markAsInput(type);
                     builder.param(component.name(), true, type);
                 }
             });

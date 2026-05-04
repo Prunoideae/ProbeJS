@@ -35,6 +35,8 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.functions.CopyNameFunction;
 
+import java.util.Set;
+
 public class WorldTypes extends ProbeJSPlugin {
 
     @Override
@@ -76,11 +78,6 @@ public class WorldTypes extends ProbeJSPlugin {
         registrar.addInputAlias(ParticleOptions.class, Types.STRING);
         registrar.addInputAlias(ItemTintFunction.class, Types.clazz(ItemTintFunction.class).asInput().asArray());
         registrar.addInputAlias(ItemTintFunction.class, Types.STRING);
-        registrar.addInputAlias(ItemTintFunction.class, Types.lambda(builder -> {
-            builder.param("stack", Types.clazz(Item.class));
-            builder.param("index", Types.NUMBER);
-            builder.returns(Types.clazz(KubeColor.class).asInput());
-        }));
         registrar.addInputAlias(BlockTintFunction.class, Types.clazz(BlockTintFunction.class).asInput().asArray());
         registrar.addInputAlias(BlockTintFunction.class, Types.STRING);
         registrar.addInputAlias(BlockTintFunction.class, Types.lambda(builder -> {
@@ -94,7 +91,7 @@ public class WorldTypes extends ProbeJSPlugin {
         registrar.addInputAlias(Component.class, Types.STRING);
         registrar.addInputAlias(Component.class, Types.object(builder -> {
             builder.param("text", true, Types.STRING);
-            builder.param("translate", true, Types.STRING); // TODO: Add lang key type
+            builder.param("translate", true, SpecialTypes.TRANSLATION_KEY);
             builder.param("with", true, Types.ANY.asArray());
             builder.param("color", true, Types.clazz(KubeColor.class).asInput());
             builder.param("bold", true, Types.BOOLEAN);
@@ -113,7 +110,7 @@ public class WorldTypes extends ProbeJSPlugin {
         registrar.addInputAlias(MutableComponent.class, Types.STRING);
         registrar.addInputAlias(MutableComponent.class, Types.object(builder -> {
             builder.param("text", true, Types.STRING);
-            builder.param("translate", true, Types.STRING); // TODO: Add lang key type
+            builder.param("translate", true, SpecialTypes.TRANSLATION_KEY);
             builder.param("with", true, Types.ANY.asArray());
             builder.param("color", true, Types.clazz(KubeColor.class).asInput());
             builder.param("bold", true, Types.BOOLEAN);
@@ -148,4 +145,32 @@ public class WorldTypes extends ProbeJSPlugin {
         registrar.addInputAlias(ItemEnchantments.class, Types.wrapped("{[key in %s]?: number}", RegistryTypes.object("Enchantment")));
     }
 
+    @Override
+    public Set<Class<?>> provideClassForDiscovery() {
+        return Set.of(
+                BlockState.class,
+                BlockStatePredicate.class,
+                RuleTest.class,
+                MobCategory.class,
+                LootContext.EntityTarget.class,
+                CopyNameFunction.NameSource.class,
+                BiomeFilter.class,
+                Tier.class,
+                ArmorMaterial.class,
+                EntitySelector.class,
+                ReplacementMatch.class,
+                Stat.class,
+                MapColorHelper.class,
+                SoundType.class,
+                ParticleOptions.class,
+                ItemTintFunction.class,
+                BlockTintFunction.class,
+                Component.class,
+                MutableComponent.class,
+                TextColor.class,
+                ClickEvent.class,
+                DataComponentMap.class,
+                ItemEnchantments.class
+        );
+    }
 }

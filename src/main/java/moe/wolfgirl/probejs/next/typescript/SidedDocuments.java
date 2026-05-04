@@ -59,11 +59,9 @@ public class SidedDocuments implements DocumentRegistry, DocumentRegistrar {
             tree.addClassPath(entry.getKey());
         }
 
-        // Need only export documents, globals are automatically included in the global scope without
-        // the need of re-exporting and importing. (as long as the file is included)
-        // for (var entry : globals.entrySet()) {
-        //     tree.addClassPath(entry.getKey());
-        // }
+        for (var entry : globals.entrySet()) {
+            tree.addClassPath(entry.getKey());
+        }
         return tree;
     }
 

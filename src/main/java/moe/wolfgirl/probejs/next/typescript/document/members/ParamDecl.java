@@ -21,11 +21,19 @@ public class ParamDecl extends Code {
     public String name;
     public Type typeInfo;
     public boolean isRest;
+    public boolean optional = false;
 
     public ParamDecl(String name, Type typeInfo, boolean isRest) {
         this.name = name;
         this.typeInfo = typeInfo;
         this.isRest = isRest;
+    }
+
+    public ParamDecl(String name, Type typeInfo, boolean isRest, boolean optional) {
+        this.name = name;
+        this.typeInfo = typeInfo;
+        this.isRest = isRest;
+        this.optional = optional;
     }
 
     public ParamDecl(String name, Type typeInfo) {
@@ -42,7 +50,7 @@ public class ParamDecl extends Code {
         if (RESERVED_NAMES.contains(name)) {
             name = "_" + name;
         }
-        return List.of("%s%s: %s".formatted(isRest ? "..." : "", name, typeInfo.first()));
+        return List.of("%s%s%s: %s".formatted(isRest ? "..." : "", name, optional ? "?" : "", typeInfo.first()));
     }
 
     @Override

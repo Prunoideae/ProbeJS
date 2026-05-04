@@ -27,20 +27,25 @@ public class RecordTypes extends ProbeJSPlugin {
             JSObjectType.Builder objectType = Types.object();
             JSArrayType.Builder arrayType = Types.arrayOf();
 
-            for (RecordTypeInfo.Component component : typeWrapper.recordComponents().values()) {
-                BaseType type = converter.convertType(component.type());
+            try {
+                for (RecordTypeInfo.Component component : typeWrapper.recordComponents().values()) {
+                    BaseType type = converter.convertType(component.type());
 
-                if (component.type() instanceof ParameterizedTypeInfo parameterizedTypeInfo) {
-                    if (InjectSpecialType.NO_WRAPPING.contains(new ClassPath(parameterizedTypeInfo.rawType().asClass()))) {
-                        if (type instanceof TSParamType paramType) {
-                            paramType.params.replaceAll(baseType -> Types.ignoreContext(baseType, BaseType.FormatType.RETURN));
+                    if (component.type() instanceof ParameterizedTypeInfo parameterizedTypeInfo) {
+                        if (InjectSpecialType.NO_WRAPPING.contains(new ClassPath(parameterizedTypeInfo.rawType().asClass()))) {
+                            if (type instanceof TSParamType paramType) {
+                                paramType.params.replaceAll(baseType -> Types.ignoreContext(baseType, BaseType.FormatType.RETURN));
+                            }
                         }
                     }
-                }
 
-                objectType.member(component.name(), true, type);
-                arrayType.member(component.name(), true, type);
+                    objectType.member(component.name(), true, type);
+                    arrayType.member(component.name(), true, type);
+                }
+            } catch (Throwable t) {
+                throw new RuntimeException("Failed to convert record type: " + recordedClass.classPath, t);
             }
+
 
             scriptDump.assignType(recordedClass.classPath, objectType.build());
             scriptDump.assignType(recordedClass.classPath, arrayType.build());

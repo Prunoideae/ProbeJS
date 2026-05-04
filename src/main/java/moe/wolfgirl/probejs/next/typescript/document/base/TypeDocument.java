@@ -1,5 +1,6 @@
 package moe.wolfgirl.probejs.next.typescript.document.base;
 
+import moe.wolfgirl.probejs.next.typescript.document.Types;
 import moe.wolfgirl.probejs.next.typescript.document.types.ArrayType;
 import moe.wolfgirl.probejs.next.typescript.document.types.ParamType;
 import moe.wolfgirl.probejs.next.typescript.document.types.VariableType;
@@ -13,6 +14,13 @@ public interface TypeDocument {
         if (this instanceof Type thisCode) {
             return new ArrayType(thisCode);
         } else throw new RuntimeException("Cannot convert to ArrayType: " + this.getClass().getName());
+    }
+
+    default Type markSelfAsInput() {
+        if (this instanceof Type thisCode) {
+            Types.markAsInput(thisCode);
+            return thisCode;
+        } else throw new RuntimeException("Cannot mark as input: " + this.getClass().getName());
     }
 
     default ParamType withParams(Type... paramTypes) {

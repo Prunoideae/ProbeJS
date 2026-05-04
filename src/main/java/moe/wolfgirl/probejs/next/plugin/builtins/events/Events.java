@@ -5,11 +5,11 @@ import com.mojang.datafixers.util.Pair;
 import dev.latvian.mods.kubejs.event.EventGroup;
 import dev.latvian.mods.kubejs.event.EventGroups;
 import dev.latvian.mods.kubejs.event.EventHandler;
+import dev.latvian.mods.kubejs.event.KubeEvent;
 import dev.latvian.mods.kubejs.script.ScriptType;
 import dev.latvian.mods.kubejs.typings.Info;
 import moe.wolfgirl.probejs.next.ClassPath;
 import moe.wolfgirl.probejs.next.plugin.ProbeJSPlugin;
-import moe.wolfgirl.probejs.next.plugin.builtins.InjectInputs;
 import moe.wolfgirl.probejs.next.typescript.base.DocumentRegistrar;
 import com.google.common.collect.Multimap;
 import moe.wolfgirl.probejs.next.typescript.document.ClassDecl;
@@ -65,7 +65,7 @@ public class Events extends ProbeJSPlugin {
                 case STARTUP -> STARTUP_EVENTS;
             };
 
-            registrar.addGlobal(writeTo.append(namespace) , generateEventNamespace(writeTo, namespace, handlers, converter));
+            registrar.addGlobal(writeTo.append(namespace), generateEventNamespace(writeTo, namespace, handlers, converter));
         }
     }
 
@@ -88,13 +88,12 @@ public class Events extends ProbeJSPlugin {
 
         if (useExtra) {
             var extraType = converter.convertType(handler.target.describeType);
-            InjectInputs.markTypeAsInput(extraType);
+            Types.markAsInput(extraType);
             methodBuilder.param("extra", extraType);
         }
 
         Class<?> eventClass = handler.eventType.get();
         methodBuilder.param("handler", Types.lambda(builder -> {
-
             builder.param("event", Types.clazz(eventClass).asMaybeGeneric());
         }));
 
@@ -103,5 +102,10 @@ public class Events extends ProbeJSPlugin {
             methodDecl.addComments(info.value());
         }
         return methodDecl;
+    }
+
+    @Override
+    public boolean allowClassInDiscovery(Class<?> clazz) {
+        return KubeEvent.class.isAssignableFrom(clazz);
     }
 }

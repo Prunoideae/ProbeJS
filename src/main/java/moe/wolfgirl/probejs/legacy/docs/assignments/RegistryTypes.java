@@ -59,7 +59,7 @@ public class RegistryTypes extends ProbeJSPlugin {
             if (PREDEFINED_TYPES.containsKey(key)) {
                 assigned = PREDEFINED_TYPES.get(key);
             } else {
-                RegistryType<?> type = RegistryType.ofKey(key);
+                RegistryType<?> type = RegistryType.ofKey(RegistryUtils.castKey(key));
                 if (type == null) continue;
                 assigned = type.baseClass();
             }
@@ -135,7 +135,7 @@ public class RegistryTypes extends ProbeJSPlugin {
 
         // We inject literal and tag into registry types
         for (ResourceKey<? extends Registry<?>> key : RegistryUtils.getRegistries(registryAccess)) {
-            RegistryType<?> type = RegistryType.ofKey(key);
+            RegistryType<?> type = RegistryType.ofKey(RegistryUtils.castKey(key));
             if (type == null) continue;
             makeClassModifications(globalClasses, key, type.baseClass());
         }
@@ -178,7 +178,7 @@ public class RegistryTypes extends ProbeJSPlugin {
                 } catch (Throwable t) {
                     ProbeJS.LOGGER.error("Unable to fetch registry info for %s".formatted(value));
                 }
-                RegistryType<?> type = RegistryType.ofKey(value);
+                RegistryType<?> type = RegistryType.ofKey(RegistryUtils.castKey(value));
                 if (type == null) continue;
                 registryObjectClasses.add(type.baseClass());
             }

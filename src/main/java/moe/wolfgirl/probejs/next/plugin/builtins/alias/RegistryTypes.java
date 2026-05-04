@@ -1,6 +1,7 @@
 package moe.wolfgirl.probejs.next.plugin.builtins.alias;
 
 import dev.latvian.mods.kubejs.registry.RegistryType;
+import moe.wolfgirl.probejs.ProbeConfig;
 import moe.wolfgirl.probejs.legacy.utils.GameUtils;
 import moe.wolfgirl.probejs.legacy.utils.NameUtils;
 import moe.wolfgirl.probejs.legacy.utils.RegistryUtils;
@@ -81,6 +82,31 @@ public class RegistryTypes extends ProbeJSPlugin {
     }
 
     @Override
+    public Set<Class<?>> provideClassForDiscovery() {
+        Set<Class<?>> classes = new HashSet<>(Set.of(
+                TagKey.class,
+                Holder.class,
+                ResourceKey.class,
+                HolderSet.class
+        ));
+
+        MinecraftServer currentServer = GameUtils.getCurrentServer();
+        if (currentServer == null) return classes;
+        RegistryAccess registryAccess = currentServer.registryAccess();
+
+        for (ResourceKey<? extends Registry<?>> registry : RegistryUtils.getRegistries(registryAccess)) {
+            ClassPath baseClass = findRegistryBaseClass(registry);
+            if (baseClass == null) continue;
+            try {
+                classes.add(Class.forName(baseClass.toString()));
+            } catch (Throwable ignore) {
+            }
+        }
+
+        return classes;
+    }
+
+    @Override
     public void modifyClasses(Documents.ClassAccessor classDocuments) {
         MinecraftServer currentServer = GameUtils.getCurrentServer();
         if (currentServer == null) return;
@@ -96,12 +122,12 @@ public class RegistryTypes extends ProbeJSPlugin {
     }
 
     @Nullable
-    private ClassPath findRegistryBaseClass(ResourceKey<? extends Registry<?>> registryKey) {
+    public static ClassPath findRegistryBaseClass(ResourceKey<? extends Registry<?>> registryKey) {
         if (registryKey.equals(Registries.CUSTOM_STAT)) return null;
         if (PREDEFINED_TYPES.containsKey(registryKey)) {
             return new ClassPath(PREDEFINED_TYPES.get(registryKey));
         } else {
-            RegistryType<?> registryType = RegistryType.ofKey(registryKey);
+            RegistryType<?> registryType = RegistryType.ofKey(RegistryUtils.castKey(registryKey));
             if (registryType == null) return null;
             return new ClassPath(registryType.baseClass());
         }
@@ -114,8 +140,7 @@ public class RegistryTypes extends ProbeJSPlugin {
         if (currentServer == null) return;
         RegistryAccess registryAccess = currentServer.registryAccess();
 
-        ClassBuilder registryTypes = Members.clazz(REGISTRY_TYPES)
-                .kind(KindAware.Kind.NAMESPACE);
+        ClassBuilder registryTypes = Members.clazz(REGISTRY_TYPES).kind(KindAware.Kind.NAMESPACE);
 
         for (ResourceKey<? extends Registry<?>> key : RegistryUtils.getRegistries(registryAccess)) {
             var registry = registryAccess.registry(key).orElse(null);

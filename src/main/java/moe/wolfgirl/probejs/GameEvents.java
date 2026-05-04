@@ -57,7 +57,7 @@ public class GameEvents {
             }
             if (config.modHash.get() != GameUtils.modHash()) {
                 if (!ProbeDumpingThread.exists()) { // Not very possible but anyway
-                    ProbeDumpingThread.create(player::sendSystemMessage).start();
+                    // TODO: Make the dumping pipeline for Probe-Next
                 }
             } else {
                 player.sendSystemMessage(

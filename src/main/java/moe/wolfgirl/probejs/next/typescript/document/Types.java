@@ -1,6 +1,8 @@
 package moe.wolfgirl.probejs.next.typescript.document;
 
 import moe.wolfgirl.probejs.next.ClassPath;
+import moe.wolfgirl.probejs.next.plugin.builtins.alias.RegistryTypes;
+import moe.wolfgirl.probejs.next.typescript.Documents;
 import moe.wolfgirl.probejs.next.typescript.document.base.Code;
 import moe.wolfgirl.probejs.next.typescript.document.base.Type;
 import moe.wolfgirl.probejs.next.typescript.document.types.ArrayType;
@@ -8,6 +10,7 @@ import moe.wolfgirl.probejs.next.typescript.document.types.ClassType;
 import moe.wolfgirl.probejs.next.typescript.document.types.ParamType;
 import moe.wolfgirl.probejs.next.typescript.document.types.VariableType;
 import moe.wolfgirl.probejs.next.typescript.document.types.special.*;
+import moe.wolfgirl.probejs.next.utils.TypeUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -18,6 +21,7 @@ import java.util.function.Predicate;
 public interface Types {
     RawType ANY = raw("any");
     RawType NEVER = raw("never");
+    RawType OBJECT = raw("object");
     RawType UNKNOWN = raw("unknown");
     RawType VOID = raw("void");
     RawType BOOLEAN = raw("boolean");
@@ -116,4 +120,28 @@ public interface Types {
     static Type wrapped(String formatter, Type wrapped) {
         return new WrappedType(formatter, wrapped);
     }
+
+    static void markAsInput(Type type) {
+        if (type instanceof ClassType classType) {
+            var classPath = classType.classPath;
+            // If we have alias, alias will refer to the original type as input, so we don't need to check
+            // for functional interface
+            if (Documents.INSTANCE.hasAlias(classPath)) classType.asInput();
+            // if (isFunctionalInterface(type)) classType.asOutput();
+        } else if (type instanceof ArrayType arrayType) {
+            markAsInput(arrayType.componentType);
+        } else if (type instanceof ParamType paramType) {
+            markAsInput(paramType.baseType);
+            if (TypeUtils.isFunctionalInterface(paramType.baseType)) return;
+            // Special handling for RegistryTypes, we don't mark the params as input
+            if (paramType.baseType instanceof ClassType classType && RegistryTypes.HOLDER_TYPES.contains(classType.classPath)) {
+                return;
+            }
+            for (Type typeArg : paramType.typeArgs) {
+                markAsInput(typeArg);
+            }
+        }
+    }
+
+
 }

@@ -42,6 +42,12 @@ public class MethodBuilder {
         return this;
     }
 
+    public MethodBuilder param(String name, Type type, boolean varArgs, boolean optional) {
+        var param = new ParamDecl(name, type, varArgs, optional);
+        this.params.add(param);
+        return this;
+    }
+
     public MethodBuilder param(String name, Type type) {
         return param(name, type, false);
     }
