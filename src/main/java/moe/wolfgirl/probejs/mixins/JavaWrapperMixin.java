@@ -4,7 +4,7 @@ package moe.wolfgirl.probejs.mixins;
 import dev.latvian.mods.kubejs.plugin.builtin.wrapper.JavaWrapper;
 import dev.latvian.mods.kubejs.script.KubeJSContext;
 import dev.latvian.mods.rhino.NativeJavaClass;
-import moe.wolfgirl.probejs.next.plugin.builtins.discovery.JavaLoaded;
+import moe.wolfgirl.probejs.plugin.builtins.discovery.JavaLoaded;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

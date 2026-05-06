@@ -2,7 +2,7 @@ package moe.wolfgirl.probejs;
 
 import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonWriter;
-import moe.wolfgirl.probejs.legacy.utils.JsonUtils;
+import moe.wolfgirl.probejs.utils.JsonUtils;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
@@ -31,6 +31,7 @@ public class ProbeConfig {
     public ConfigEntry<Boolean> beans = new ConfigEntry<>("generateBeans", true);
     public ConfigEntry<List<String>> excludedPaths = new ConfigEntry<>("excludedClassPaths", List.of());
     public ConfigEntry<List<String>> fullScanMods = new ConfigEntry<>("fullScanMods", List.of("minecraft", "kubejs", "neoforge"));
+
     public static class ConfigEntry<T> {
         public final String name;
         public final T defaultValue;
@@ -83,6 +84,8 @@ public class ProbeConfig {
                 if (typeClass == Double.class) configValue = number.doubleValue();
                 if (typeClass == Short.class) configValue = number.shortValue();
                 value = (T) configValue;
+            } else if (configValue instanceof List<?> list && List.class.isAssignableFrom(typeClass)) {
+                value = (T) list;
             } else if (typeClass.isInstance(configValue)) {
                 value = (T) configValue;
             }

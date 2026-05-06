@@ -1,0 +1,45 @@
+{
+    "compilerOptions": {
+        "plugins": [],
+        "checkJs": false,
+        // Fully TS-compatible typing generation is not possible,
+        // but turning off skipLibCheck can help debugging
+        "skipLibCheck": false,
+        "target": "ES2022",
+        "lib": [
+            "ES2022"
+        ],
+        "module": "nodenext",
+        "moduleResolution": "nodenext",
+        "paths": {
+            "@package": [
+                "../../.probe/@package"
+            ],
+            "@package/*": [
+                "../../.probe/@package/*"
+            ],
+            "@side-only/$side$": [
+                "../../.probe/@side-only/$side$"
+            ],
+            "@side-only/$side$/*": [
+                "../../.probe/@side-only/$side$/*"
+            ],
+            "@special": [
+                "../../.probe/@special"
+            ],
+            "@special/*": [
+                "../../.probe/@special/*"
+            ]
+        },
+    },
+    "typeAcquisition": {
+        "enable": false
+    },
+    "include": [
+        "./**/*.js",
+        "./**/*.d.ts",
+        "../../.probe/@package/**/*.d.ts",
+        "../../.probe/@side-only/$side$/**/*.d.ts",
+        "../../.probe/@special/**/*.d.ts"
+    ]
+}

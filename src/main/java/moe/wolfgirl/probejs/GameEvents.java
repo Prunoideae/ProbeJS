@@ -1,39 +1,23 @@
 package moe.wolfgirl.probejs;
 
 import com.mojang.brigadier.Command;
-import dev.latvian.mods.kubejs.client.KubeJSClient;
-import dev.latvian.mods.kubejs.script.ScriptType;
-import moe.wolfgirl.probejs.legacy.ProbeDumpingThread;
-import moe.wolfgirl.probejs.legacy.events.CodeGenerationEventJS;
-import moe.wolfgirl.probejs.legacy.events.ProbeEvents;
-import moe.wolfgirl.probejs.next.OtherDump;
-import moe.wolfgirl.probejs.next.PackageDump;
-import moe.wolfgirl.probejs.next.java.ClassRegistry;
-import moe.wolfgirl.probejs.legacy.utils.GameUtils;
+import moe.wolfgirl.probejs.gui.DumpScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
-import net.minecraft.world.item.HoeItem;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.LogicalSide;
-import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
 import net.neoforged.neoforge.common.util.FakePlayer;
 import net.neoforged.neoforge.event.entity.EntityTravelToDimensionEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
-
-
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.function.Consumer;
 
 @EventBusSubscriber(value = Dist.CLIENT)
 public class GameEvents {
@@ -42,32 +26,7 @@ public class GameEvents {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void playerJoined(ClientPlayerNetworkEvent.LoggingIn event) {
         var player = event.getPlayer();
-        ProbeConfig config = ProbeConfig.INSTANCE;
-
-        if (config.enabled.get() && Minecraft.getInstance().isLocalServer()) {
-            if (config.modHash.get() == -1) {
-                player.sendSystemMessage(Component.translatable("probejs.hello").kjs$gold());
-                if (ModList.get().size() >= MOD_LIMIT) {
-                    player.sendSystemMessage(
-                            Component.translatable("probejs.performance", ModList.get().size())
-                    );
-                    config.classScanning.set(false);
-                    config.complete.set(false);
-                }
-            }
-            if (config.modHash.get() != GameUtils.modHash()) {
-                if (!ProbeDumpingThread.exists()) { // Not very possible but anyway
-                    // TODO: Make the dumping pipeline for Probe-Next
-                }
-            } else {
-                player.sendSystemMessage(
-                        Component.translatable("probejs.enabled_warning")
-                                .append(Component.literal("/probejs disable")
-                                        .kjs$clickSuggestCommand("/probejs disable")
-                                        .kjs$aqua()
-                                ));
-
-            }
+        if (Minecraft.getInstance().isLocalServer()) {
             player.sendSystemMessage(
                     Component.translatable("probejs.wiki")
                             .append(Component.literal("Wiki Page")
@@ -100,110 +59,12 @@ public class GameEvents {
     @SubscribeEvent
     public static void registerCommand(RegisterClientCommandsEvent event) {
         var dispatcher = event.getDispatcher();
-        dispatcher.register(
-                Commands.literal("probejs")
-                        .then(Commands.literal("dump")
-                                .requires(source -> ProbeConfig.INSTANCE.enabled.get() && source.hasPermission(2))
-                                .executes(context -> {
-                                    Consumer<Component> messageSender = component -> context.getSource().sendSystemMessage(component);
-                                    if (ProbeDumpingThread.exists()) {
-                                        messageSender.accept(Component.translatable("probejs.already_running"));
-                                        return Command.SINGLE_SUCCESS;
-                                    }
-                                    KubeJSClient.reloadClientScripts();
-                                    ProbeDumpingThread.create(messageSender).start();
-                                    return Command.SINGLE_SUCCESS;
-                                })
-                        )
-                        .then(Commands.literal("disable")
-                                .requires(source -> ProbeConfig.INSTANCE.enabled.get() && source.hasPermission(2))
-                                .executes(context -> {
-                                    ProbeConfig.INSTANCE.enabled.set(false);
-                                    context.getSource().sendSystemMessage(Component.translatable("probejs.bye_bye").kjs$gold());
-                                    return Command.SINGLE_SUCCESS;
-                                })
-                        )
-                        .then(Commands.literal("enable")
-                                .requires(source -> !ProbeConfig.INSTANCE.enabled.get() && source.hasPermission(2))
-                                .executes(context -> {
-                                    ProbeConfig.INSTANCE.enabled.set(true);
-                                    context.getSource().sendSystemMessage(Component.translatable("probejs.hello_again").kjs$aqua());
-                                    return Command.SINGLE_SUCCESS;
-                                })
-                        )
-                        .then(Commands.literal("complete_dump")
-                                .requires(source -> ProbeConfig.INSTANCE.enabled.get() && source.hasPermission(2))
-                                .executes(context -> {
-                                    boolean flag = !ProbeConfig.INSTANCE.complete.get();
-                                    ProbeConfig.INSTANCE.complete.set(flag);
-                                    context.getSource().sendSystemMessage(flag ?
-                                            Component.translatable("probejs.complete") :
-                                            Component.translatable("probejs.no_complete"));
-                                    return Command.SINGLE_SUCCESS;
-                                })
-                        )
-                        .then(Commands.literal("toggle_beans")
-                                .requires(source -> ProbeConfig.INSTANCE.enabled.get() && source.hasPermission(2))
-                                .executes(context -> {
-                                    boolean flag = !ProbeConfig.INSTANCE.beans.get();
-                                    ProbeConfig.INSTANCE.beans.set(flag);
-                                    context.getSource().sendSystemMessage(flag ?
-                                            Component.translatable("probejs.generate_beans") :
-                                            Component.translatable("probejs.no_generate_beans"));
-                                    return Command.SINGLE_SUCCESS;
-                                })
-                        )
-                        .then(Commands.literal("decompile")
-                                .requires(source -> ProbeConfig.INSTANCE.enabled.get() && source.hasPermission(2))
-                                .executes(context -> {
-                                    boolean flag = !ProbeConfig.INSTANCE.enableDecompiler.get();
-                                    ProbeConfig.INSTANCE.enableDecompiler.set(flag);
-                                    context.getSource().sendSystemMessage(flag ?
-                                            Component.translatable("probejs.decompile") :
-                                            Component.translatable("probejs.no_decompile"));
-                                    if (flag) ProbeConfig.INSTANCE.modHash.set(-2L);
-                                    return Command.SINGLE_SUCCESS;
-                                })
-                        )
-                        .then(Commands.literal("generate")
-                                // I found it might be not that useful, maybe later
-                                .requires(source -> false && ProbeConfig.INSTANCE.enabled.get() && source.hasPermission(2))
-                                .then(Commands.argument("script", new CodeGenerationEventJS.ScriptArgument())
-                                        .executes(context -> {
-                                            var scriptTarget = context.getArgument("script", String.class);
-                                            var codegenEvent = new CodeGenerationEventJS();
-                                            ProbeEvents.CODEGEN.post(ScriptType.CLIENT, scriptTarget, codegenEvent);
-                                            try (BufferedWriter bufferedWriter = Files.newBufferedWriter(ProbePaths.GENERATED_CODE.resolve("%s.js".formatted(scriptTarget)))) {
-                                                bufferedWriter.write(String.join("\n", codegenEvent.getContent()));
-                                            } catch (IOException e) {
-                                                context.getSource().sendFailure(Component.literal("Unable to open file..."));
-                                            }
-                                            return Command.SINGLE_SUCCESS;
-                                        }))
-                        )
-                        .then(Commands.literal("test")
-                                .requires(source -> true)
-                                .executes(context -> {
-                                    new Thread(() -> {
-                                        ClassRegistry.INSTANCE.fetchInitialClasses();
-                                        ClassRegistry.INSTANCE.discover();
-                                        var tree = ClassRegistry.INSTANCE.resolveTree();
-                                        for (var node : tree.traverse()) {
-                                            ProbeJS.LOGGER.info("%s -> %s".formatted(
-                                                    node.getClassPath(),
-                                                    node.getSubPackages()
-                                            ));
-                                        }
-                                        PackageDump dump = new PackageDump(ProbePaths.PROBE);
-                                        dump.dump();
-                                        OtherDump otherDump = new OtherDump(ProbePaths.PROBE);
-                                        otherDump.dump();
-
-                                        context.getSource().sendSystemMessage(Component.literal("Done!").kjs$green());
-                                    }).start();
-                                    return Command.SINGLE_SUCCESS;
-                                })
-                        )
+        dispatcher.register(Commands.literal("probejs")
+                .requires(source -> source.hasPermission(2))
+                .executes(context -> {
+                    DumpScreen.open();
+                    return Command.SINGLE_SUCCESS;
+                })
         );
     }
 

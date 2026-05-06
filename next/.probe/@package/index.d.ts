@@ -1,19 +1,9 @@
 export * as java from "@package/java";
 export * as moe from "@package/moe";
 
-type ResolveJavaClass<Tree, Name extends string> = Name extends `${infer Head}.${infer Tail}`
-    ? Head extends keyof Tree
-    ? ResolveJavaClass<Tree[Head], Tail>
-    : never
-    : Name extends keyof Tree
-    ? Tree[Name]
-    : never;
-
-
-type JavaClassForName<Name extends string> = ResolveJavaClass<typeof import("@package"), Name>;
-
+type ResolveJavaClass<E, N extends string> = N extends `${infer H}.${infer T}` ? H extends keyof E ? ResolveJavaClass<E[H], T> : never : N extends keyof E ? E[N] : never;
 declare global {
     class Java {
-        static loadClass<Name extends string>(name: Name): JavaClassForName<Name>;
+        static loadClass<N extends string>(name: N): ResolveJavaClass<typeof import("@package"), N>;
     }
 }

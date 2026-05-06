@@ -2,14 +2,16 @@ package moe.wolfgirl.probejs;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import moe.wolfgirl.probejs.legacy.utils.JsonUtils;
+import moe.wolfgirl.probejs.utils.JsonUtils;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.nio.file.Path;
 
-@Mod(ProbeJS.MOD_ID)
+@Mod(value = ProbeJS.MOD_ID, dist = Dist.CLIENT)
 public class ProbeJS {
     public static final String MOD_ID = "probejs";
     public static final Logger LOGGER = LogManager.getLogger("probejs");
@@ -23,8 +25,9 @@ public class ProbeJS {
             .setPrettyPrinting()
             .disableHtmlEscaping()
             .create();
+    public static ModContainer MOD_CONTAINER;
 
-    public ProbeJS() {
-
+    public ProbeJS(ModContainer mod) {
+        MOD_CONTAINER = mod;
     }
 }
