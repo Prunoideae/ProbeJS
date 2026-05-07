@@ -2,6 +2,7 @@ package moe.wolfgirl.probejs.java.members;
 
 import dev.latvian.mods.rhino.CachedMethodInfo;
 import dev.latvian.mods.rhino.type.TypeInfo;
+import moe.wolfgirl.probejs.typescript.ClassPath;
 import moe.wolfgirl.probejs.java.members.other.ClassProvider;
 import moe.wolfgirl.probejs.java.members.other.HasAnnotation;
 import moe.wolfgirl.probejs.java.members.other.HasTypeVariable;
@@ -17,7 +18,8 @@ public record MethodInfo(String name,
                          TypeInfo returnType,
                          boolean isStatic, boolean isAbstract, boolean isSynthetic,
                          Annotation[] annotations,
-                         TypeVariable<?>[] typeVariables
+                         TypeVariable<?>[] typeVariables,
+                         ClassPath declaringClass
 ) implements HasAnnotation, HasTypeVariable, ClassProvider {
     public static MethodInfo resolve(CachedMethodInfo methodInfo, Map<String, TypeInfo> typeRemap) {
         return new MethodInfo(methodInfo.getName(),
@@ -27,7 +29,9 @@ public record MethodInfo(String name,
                 Modifier.isAbstract(methodInfo.modifiers),
                 methodInfo.getCached().isSynthetic(),
                 methodInfo.getCached().getAnnotations(),
-                methodInfo.getCached().getTypeParameters());
+                methodInfo.getCached().getTypeParameters(),
+                new ClassPath(methodInfo.getDeclaringClass().type)
+        );
     }
 
     @Override

@@ -4,7 +4,7 @@ import com.mojang.datafixers.util.Pair;
 import dev.latvian.mods.kubejs.server.tag.TagKubeEvent;
 import dev.latvian.mods.kubejs.server.tag.TagWrapper;
 import moe.wolfgirl.probejs.utils.GameUtils;
-import moe.wolfgirl.probejs.ClassPath;
+import moe.wolfgirl.probejs.typescript.ClassPath;
 import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
 import moe.wolfgirl.probejs.plugin.builtins.alias.RegistryTypes;
 import moe.wolfgirl.probejs.typescript.Documents;

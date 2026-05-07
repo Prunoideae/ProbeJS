@@ -4,7 +4,7 @@ import com.mojang.datafixers.util.Pair;
 import dev.latvian.mods.kubejs.registry.*;
 import moe.wolfgirl.probejs.utils.GameUtils;
 import moe.wolfgirl.probejs.utils.NameUtils;
-import moe.wolfgirl.probejs.ClassPath;
+import moe.wolfgirl.probejs.typescript.ClassPath;
 import moe.wolfgirl.probejs.typescript.Documents;
 import moe.wolfgirl.probejs.typescript.base.DocumentRegistrar;
 import moe.wolfgirl.probejs.typescript.document.ClassDecl;

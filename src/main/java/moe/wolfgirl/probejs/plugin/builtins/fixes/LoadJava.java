@@ -1,7 +1,7 @@
 package moe.wolfgirl.probejs.plugin.builtins.fixes;
 
 import dev.latvian.mods.kubejs.plugin.builtin.wrapper.JavaWrapper;
-import moe.wolfgirl.probejs.ClassPath;
+import moe.wolfgirl.probejs.typescript.ClassPath;
 import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
 import moe.wolfgirl.probejs.plugin.builtins.alias.SpecialTypes;
 import moe.wolfgirl.probejs.typescript.Documents;
@@ -48,7 +48,7 @@ public class LoadJava extends ProbeJSPlugin {
         @Override
         // type ResolveJavaClass<E, N extends string> = N extends `${infer H}.${infer T}` ? H extends keyof E ? ResolveJavaClass<E[H], T> : never : N extends keyof E ? E[N] : never;
         public List<String> format(int indent) {
-            return List.of("%stype ResolveJavaClass<E, N extends string> = N extends `${infer H}.${infer T}` ? H extends keyof E ? ResolveJavaClass<E[H], T> : never : N extends keyof E ? E[N] : never;".formatted(" ".repeat(indent)));
+            return List.of("%stype ResolveJavaClass<E, N extends string> = N extends `${infer H}.${infer T}` ? H extends keyof E ? ResolveJavaClass<E[H], T> : never : `$${N}` extends keyof E ? E[`$${N}`] : never;".formatted(" ".repeat(indent)));
         }
     }
 }

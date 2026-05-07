@@ -1,4 +1,4 @@
-package moe.wolfgirl.probejs.utils;
+package moe.wolfgirl.probejs.typescript;
 
 import java.nio.file.Path;
 import java.util.ArrayList;

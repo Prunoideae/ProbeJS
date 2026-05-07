@@ -1,6 +1,6 @@
 package moe.wolfgirl.probejs.typescript.document.base;
 
-import moe.wolfgirl.probejs.ClassPath;
+import moe.wolfgirl.probejs.typescript.ClassPath;
 
 import java.util.Set;
 import java.util.stream.Collectors;

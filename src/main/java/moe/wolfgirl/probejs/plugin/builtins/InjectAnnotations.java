@@ -1,12 +1,13 @@
 package moe.wolfgirl.probejs.plugin.builtins;
 
 import com.mojang.datafixers.util.Pair;
+import dev.latvian.mods.kubejs.plugin.ClassFilter;
 import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.kubejs.typings.Param;
 import dev.latvian.mods.kubejs.typings.ThisIs;
 import dev.latvian.mods.rhino.util.HideFromJS;
 import dev.latvian.mods.rhino.util.ReturnsSelf;
-import moe.wolfgirl.probejs.ClassPath;
+import moe.wolfgirl.probejs.typescript.ClassPath;
 import moe.wolfgirl.probejs.java.members.ConstructorInfo;
 import moe.wolfgirl.probejs.java.members.FieldInfo;
 import moe.wolfgirl.probejs.java.members.MethodInfo;
@@ -23,14 +24,14 @@ import moe.wolfgirl.probejs.typescript.document.members.MethodDecl;
 import moe.wolfgirl.probejs.typescript.document.types.ClassType;
 import moe.wolfgirl.probejs.typescript.document.types.ParamType;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class InjectAnnotations extends ProbeJSPlugin {
     @Override
     public void transformClass(Documents.ClassDocument document) {
         var classDocument = document.document();
         var classInfo = document.classInfo();
+
         if (markedHidden(classInfo)) {
             classDocument.members.clear();
             return;
@@ -92,7 +93,7 @@ public class InjectAnnotations extends ProbeJSPlugin {
         }
     }
 
-    private void applyThisIs(HasAnnotation hasAnnotation, MethodDecl methodDecl) {
+    private void applyThisIs(MethodInfo hasAnnotation, MethodDecl methodDecl) {
         if (hasAnnotation.hasAnnotation(ThisIs.class)) {
             ThisIs annotation = hasAnnotation.getAnnotation(ThisIs.class);
             if (annotation == null) return;
@@ -133,5 +134,11 @@ public class InjectAnnotations extends ProbeJSPlugin {
 
     private boolean markedHidden(HasAnnotation hasAnnotation) {
         return hasAnnotation.hasAnnotation(HideFromJS.class);
+    }
+
+    public record ThisIsInfo(ClassPath classPath, String methodName, ClassPath isType) {
+        public static ThisIsInfo create(Class<?> clazz, String methodName, Class<?> isType) {
+            return new ThisIsInfo(new ClassPath(clazz), methodName, new ClassPath(isType));
+        }
     }
 }

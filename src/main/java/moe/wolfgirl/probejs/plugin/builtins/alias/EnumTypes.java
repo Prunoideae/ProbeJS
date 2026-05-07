@@ -2,7 +2,7 @@ package moe.wolfgirl.probejs.plugin.builtins.alias;
 
 import dev.latvian.mods.rhino.type.EnumTypeInfo;
 import dev.latvian.mods.rhino.type.TypeInfo;
-import moe.wolfgirl.probejs.ClassPath;
+import moe.wolfgirl.probejs.typescript.ClassPath;
 import moe.wolfgirl.probejs.java.ClassRegistry;
 import moe.wolfgirl.probejs.java.members.ClassInfo;
 import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;

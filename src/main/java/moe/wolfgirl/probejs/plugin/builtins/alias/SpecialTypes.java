@@ -1,10 +1,9 @@
 package moe.wolfgirl.probejs.plugin.builtins.alias;
 
 import moe.wolfgirl.probejs.GameStates;
-import moe.wolfgirl.probejs.ClassPath;
+import moe.wolfgirl.probejs.typescript.ClassPath;
 import moe.wolfgirl.probejs.java.ClassRegistry;
 import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
-import moe.wolfgirl.probejs.typescript.Documents;
 import moe.wolfgirl.probejs.typescript.base.DocumentRegistrar;
 import moe.wolfgirl.probejs.typescript.document.Members;
 import moe.wolfgirl.probejs.typescript.document.TypeDecl;
@@ -35,7 +34,6 @@ public class SpecialTypes extends ProbeJSPlugin {
         builder.member(makeSpecial("TranslationKey", GameStates.LANG_KEYS.get()));
         builder.member(makeSpecial("LootTable", GameStates.LOOT_TABLES));
         builder.member(makeSpecial("ClassPath", ClassRegistry.INSTANCE.getAllClasses().keySet().stream().map(ClassPath::asJavaPath).toList()));
-
         registrar.addDocument(SPECIAL_TYPES, builder.build());
     }
 

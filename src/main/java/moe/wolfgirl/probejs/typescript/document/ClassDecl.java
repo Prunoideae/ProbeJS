@@ -1,7 +1,6 @@
 package moe.wolfgirl.probejs.typescript.document;
 
-import moe.wolfgirl.probejs.ClassPath;
-import moe.wolfgirl.probejs.java.members.other.HasAnnotation;
+import moe.wolfgirl.probejs.typescript.ClassPath;
 import moe.wolfgirl.probejs.typescript.document.base.Code;
 import moe.wolfgirl.probejs.typescript.document.base.CommentableCode;
 import moe.wolfgirl.probejs.typescript.document.base.KindAware;

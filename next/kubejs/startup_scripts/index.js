@@ -1,5 +1,7 @@
 // @ts-check
 
+const { Wolfgirl } = require("@package/moe");
+
 const Integer = Java.loadClass("java.lang.Integer");
 const ArrayList = Java.loadClass("java.util.ArrayList");
 
@@ -19,6 +21,10 @@ if (other instanceof Woofable) {
 StartupEvent.networkReady((manager) => {
     manager.woof();
 });
+
+for (let i of new Wolfgirl()) {
+
+}
 
 //@ts-expect-error
 ServerEvent.init(() => {

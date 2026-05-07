@@ -4,7 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import moe.wolfgirl.probejs.GameStates;
 import moe.wolfgirl.probejs.ProbeConfig;
 import moe.wolfgirl.probejs.ProbeJS;
-import moe.wolfgirl.probejs.ClassPath;
+import moe.wolfgirl.probejs.typescript.ClassPath;
 import moe.wolfgirl.probejs.java.members.ClassInfo;
 import moe.wolfgirl.probejs.utils.GameUtils;
 import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;

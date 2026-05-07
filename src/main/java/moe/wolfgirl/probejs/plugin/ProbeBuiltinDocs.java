@@ -40,6 +40,7 @@ public class ProbeBuiltinDocs extends ProbeJSPlugin {
             InjectInputs::new,
             InjectAnnotations::new,
             InjectBeans::new,
+            InjectIndex::new,
 
             // events
             Events::new,

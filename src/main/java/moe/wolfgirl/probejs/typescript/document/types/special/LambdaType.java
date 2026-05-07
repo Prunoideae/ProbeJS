@@ -1,9 +1,8 @@
 package moe.wolfgirl.probejs.typescript.document.types.special;
 
-import moe.wolfgirl.probejs.ClassPath;
+import moe.wolfgirl.probejs.typescript.ClassPath;
 import moe.wolfgirl.probejs.typescript.document.Types;
 import moe.wolfgirl.probejs.typescript.document.base.Code;
-import moe.wolfgirl.probejs.typescript.document.base.InputAliased;
 import moe.wolfgirl.probejs.typescript.document.base.Type;
 
 import java.util.*;

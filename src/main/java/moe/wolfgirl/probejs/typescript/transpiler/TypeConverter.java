@@ -3,7 +3,7 @@ package moe.wolfgirl.probejs.typescript.transpiler;
 import dev.latvian.mods.kubejs.util.ClassWrapper;
 import dev.latvian.mods.kubejs.util.KubeResourceLocation;
 import dev.latvian.mods.rhino.type.*;
-import moe.wolfgirl.probejs.ClassPath;
+import moe.wolfgirl.probejs.typescript.ClassPath;
 import moe.wolfgirl.probejs.typescript.document.Types;
 import moe.wolfgirl.probejs.typescript.document.base.Type;
 import moe.wolfgirl.probejs.typescript.document.types.ClassType;

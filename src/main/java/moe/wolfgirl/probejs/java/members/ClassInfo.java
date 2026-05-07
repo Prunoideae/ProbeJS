@@ -9,7 +9,7 @@ import dev.latvian.mods.rhino.type.ParameterizedTypeInfo;
 import dev.latvian.mods.rhino.type.TypeInfo;
 import dev.latvian.mods.rhino.type.VariableTypeInfo;
 import dev.latvian.mods.rhino.util.HideFromJS;
-import moe.wolfgirl.probejs.ClassPath;
+import moe.wolfgirl.probejs.typescript.ClassPath;
 import moe.wolfgirl.probejs.java.members.other.ClassProvider;
 import moe.wolfgirl.probejs.java.members.other.HasAnnotation;
 import moe.wolfgirl.probejs.java.members.other.HasTypeVariable;
@@ -32,7 +32,8 @@ public record ClassInfo(
         List<MethodInfo> methods,
         TypeInfo superClass,
         List<TypeInfo> interfaces,
-        ClassAttributes attributes
+        ClassAttributes attributes,
+        Map<String, TypeInfo> variableRemaps
 ) implements HasAnnotation, HasTypeVariable, ClassProvider {
 
     public static ClassInfo resolve(Class<?> clazz) {
@@ -51,7 +52,8 @@ public record ClassInfo(
                 findMethods(clazz, variableRemaps),
                 superClass,
                 Arrays.stream(clazz.getGenericInterfaces()).map(TypeInfo::of).toList(),
-                new ClassAttributes(clazz)
+                new ClassAttributes(clazz),
+                variableRemaps
         );
     }
 

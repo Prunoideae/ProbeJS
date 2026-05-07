@@ -1,7 +1,7 @@
 package moe.wolfgirl.probejs.typescript.document.types.special;
 
 import moe.wolfgirl.probejs.ProbeJS;
-import moe.wolfgirl.probejs.ClassPath;
+import moe.wolfgirl.probejs.typescript.ClassPath;
 import moe.wolfgirl.probejs.typescript.document.base.Code;
 import moe.wolfgirl.probejs.typescript.document.base.Type;
 

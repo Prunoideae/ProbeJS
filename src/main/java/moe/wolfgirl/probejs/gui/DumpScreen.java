@@ -10,6 +10,8 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
+import moe.wolfgirl.probejs.misc.RequireToLoadClass;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -21,6 +23,7 @@ public class DumpScreen extends Screen {
     private static final int PANEL_HEIGHT = 180;
     private static final int CONTENT_MARGIN = 18;
     private static final int DUMP_BUTTON_WIDTH = 60;
+    private static final int CONVERT_BUTTON_WIDTH = 50;
     private static final int CONTROL_HEIGHT = 20;
     private static final int PANEL_OUTER_COLOR = 0xFF000000;
     private static final int PANEL_INNER_COLOR = 0xFF303030;
@@ -31,6 +34,7 @@ public class DumpScreen extends Screen {
     private TexturedCheckbox beansCheckbox;
     private TexturedProgressBar progressBar;
     private Button dumpButton;
+    private Button convertButton;
     private List<String> modListFilter = ProbeConfig.INSTANCE.fullScanMods.get();
     private boolean fullDumpEnabled = ProbeConfig.INSTANCE.complete.get();
     private boolean beansEnabled = ProbeConfig.INSTANCE.beans.get();
@@ -74,7 +78,7 @@ public class DumpScreen extends Screen {
                 new TexturedCheckbox(
                         left + CONTENT_MARGIN,
                         top + 24,
-                        contentWidth,
+                        contentWidth - CONVERT_BUTTON_WIDTH - 4,
                         Component.literal("Full Dump"),
                         this.fullDumpEnabled,
                         selected -> {
@@ -85,11 +89,21 @@ public class DumpScreen extends Screen {
                 )
         );
 
+        this.convertButton = this.addRenderableWidget(
+                DumpGuiComponents.createButton(
+                        left + PANEL_WIDTH - CONTENT_MARGIN - CONVERT_BUTTON_WIDTH,
+                        top + 24,
+                        CONVERT_BUTTON_WIDTH,
+                        Component.literal("Convert"),
+                        button -> RequireToLoadClass.convertScripts()
+                )
+        );
+
         this.beansCheckbox = this.addRenderableWidget(
                 new TexturedCheckbox(
                         left + CONTENT_MARGIN,
                         top + 50,
-                        contentWidth,
+                        70,
                         Component.literal("Beans"),
                         this.beansEnabled,
                         selected -> {
@@ -140,7 +154,7 @@ public class DumpScreen extends Screen {
     @Override
     protected void repositionElements() {
         if (this.textBox == null || this.fullDumpCheckbox == null || this.beansCheckbox == null
-                || this.progressBar == null || this.dumpButton == null) {
+                || this.progressBar == null || this.dumpButton == null || this.convertButton == null) {
             return;
         }
 
@@ -150,8 +164,13 @@ public class DumpScreen extends Screen {
 
         this.fullDumpCheckbox.setX(left + CONTENT_MARGIN);
         this.fullDumpCheckbox.setY(top + 24);
-        this.fullDumpCheckbox.setWidth(contentWidth);
+        this.fullDumpCheckbox.setWidth(contentWidth - CONVERT_BUTTON_WIDTH - 4);
         this.fullDumpCheckbox.setHeight(CONTROL_HEIGHT);
+
+        this.convertButton.setX(left + PANEL_WIDTH - CONTENT_MARGIN - CONVERT_BUTTON_WIDTH);
+        this.convertButton.setY(top + 24);
+        this.convertButton.setWidth(CONVERT_BUTTON_WIDTH);
+        this.convertButton.setHeight(CONTROL_HEIGHT);
 
         this.beansCheckbox.setX(left + CONTENT_MARGIN);
         this.beansCheckbox.setY(top + 50);

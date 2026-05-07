@@ -1,9 +1,8 @@
 package moe.wolfgirl.probejs.typescript.document;
 
-import moe.wolfgirl.probejs.ClassPath;
+import moe.wolfgirl.probejs.typescript.ClassPath;
 import moe.wolfgirl.probejs.plugin.builtins.alias.RegistryTypes;
 import moe.wolfgirl.probejs.typescript.Documents;
-import moe.wolfgirl.probejs.typescript.document.base.Code;
 import moe.wolfgirl.probejs.typescript.document.base.Type;
 import moe.wolfgirl.probejs.typescript.document.types.ArrayType;
 import moe.wolfgirl.probejs.typescript.document.types.ClassType;

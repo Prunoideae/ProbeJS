@@ -11,7 +11,7 @@ import dev.latvian.mods.kubejs.recipe.schema.function.RecipeFunctionInstance;
 import dev.latvian.mods.kubejs.server.ServerScriptManager;
 import moe.wolfgirl.probejs.utils.GameUtils;
 import moe.wolfgirl.probejs.utils.NameUtils;
-import moe.wolfgirl.probejs.ClassPath;
+import moe.wolfgirl.probejs.typescript.ClassPath;
 import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
 import moe.wolfgirl.probejs.typescript.Documents;
 import moe.wolfgirl.probejs.typescript.base.DocumentRegistrar;

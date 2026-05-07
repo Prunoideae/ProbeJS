@@ -1,8 +1,7 @@
-package moe.wolfgirl.probejs;
+package moe.wolfgirl.probejs.typescript;
 
 import dev.latvian.mods.kubejs.script.ScriptType;
 import dev.latvian.mods.rhino.util.HideFromJS;
-import moe.wolfgirl.probejs.utils.TSPathProvider;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -15,6 +14,14 @@ public class ClassPath implements TSPathProvider<ClassPath> {
     private final String baseName;
     private final List<String> segments;
     private static final Map<ClassPath, Class<?>> CLASS_CACHE = new ConcurrentHashMap<>();
+
+    private static String nameFromClass(Class<?> clazz) {
+        var segments = new ArrayList<>(List.of(clazz.getName().split("\\.")));
+        // prepend $ to the last segment to avoid naming clashes with JS stuff
+        int lastIndex = segments.size() - 1;
+        segments.set(lastIndex, "$" + segments.get(lastIndex));
+        return String.join(".", segments);
+    }
 
     public static ClassPath special(String className) {
         return new ClassPath("@special", List.of(className.split("\\.")));
@@ -47,10 +54,17 @@ public class ClassPath implements TSPathProvider<ClassPath> {
     }
 
     public ClassPath(Class<?> clazz) {
-        this(clazz.getName());
+        this(nameFromClass(clazz));
     }
 
     public String asJavaPath() {
+        var segments = new ArrayList<>(this.segments);
+        // remove the $ prefix if present to get the original class name
+        int lastIndex = segments.size() - 1;
+        String lastSegment = segments.get(lastIndex);
+        if (lastSegment.startsWith("$")) {
+            segments.set(lastIndex, lastSegment.substring(1));
+        }
         return String.join(".", segments);
     }
 

@@ -2,7 +2,7 @@ package moe.wolfgirl.probejs.plugin.builtins.events;
 
 import com.mojang.datafixers.util.Pair;
 import dev.latvian.mods.kubejs.recipe.viewer.*;
-import moe.wolfgirl.probejs.ClassPath;
+import moe.wolfgirl.probejs.typescript.ClassPath;
 import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
 import moe.wolfgirl.probejs.plugin.builtins.alias.SpecialTypes;
 import moe.wolfgirl.probejs.typescript.Documents;

@@ -3,7 +3,7 @@ package moe.wolfgirl.probejs.plugin.builtins.alias;
 import dev.latvian.mods.kubejs.registry.RegistryType;
 import moe.wolfgirl.probejs.utils.GameUtils;
 import moe.wolfgirl.probejs.utils.NameUtils;
-import moe.wolfgirl.probejs.ClassPath;
+import moe.wolfgirl.probejs.typescript.ClassPath;
 import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
 import moe.wolfgirl.probejs.typescript.Documents;
 import moe.wolfgirl.probejs.typescript.base.AliasRegistrar;

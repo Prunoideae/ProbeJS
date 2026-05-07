@@ -3,12 +3,10 @@ package moe.wolfgirl.probejs.typescript;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import moe.wolfgirl.probejs.ProbeJS;
-import moe.wolfgirl.probejs.ClassPath;
 import moe.wolfgirl.probejs.java.PackageTree;
 import moe.wolfgirl.probejs.typescript.base.DocumentRegistry;
 import moe.wolfgirl.probejs.typescript.document.base.Code;
 import moe.wolfgirl.probejs.typescript.document.base.CommentableCode;
-import moe.wolfgirl.probejs.utils.ProbeFileUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -72,7 +70,11 @@ public class IndexFile {
 
     public void dumpTo(Path baseDir) {
         var dirPath = classPath == null ? baseDir : classPath.asDirPath(baseDir);
-        ProbeFileUtils.createDirectories(dirPath);
+        try {
+            Files.createDirectories(dirPath);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         var indexPath = dirPath.resolve("index.d.ts");
         try (var indexWriter = Files.newBufferedWriter(indexPath)) {

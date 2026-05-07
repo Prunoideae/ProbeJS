@@ -1,7 +1,7 @@
 package moe.wolfgirl.probejs.plugin.builtins;
 
 import moe.wolfgirl.probejs.ProbeConfig;
-import moe.wolfgirl.probejs.ClassPath;
+import moe.wolfgirl.probejs.typescript.ClassPath;
 import moe.wolfgirl.probejs.plugin.Priority;
 import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
 import moe.wolfgirl.probejs.typescript.Documents;

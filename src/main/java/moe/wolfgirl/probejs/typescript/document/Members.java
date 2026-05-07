@@ -1,6 +1,6 @@
 package moe.wolfgirl.probejs.typescript.document;
 
-import moe.wolfgirl.probejs.ClassPath;
+import moe.wolfgirl.probejs.typescript.ClassPath;
 import moe.wolfgirl.probejs.typescript.document.base.Type;
 import moe.wolfgirl.probejs.typescript.document.builders.ClassBuilder;
 import moe.wolfgirl.probejs.typescript.document.builders.ConstructorBuilder;

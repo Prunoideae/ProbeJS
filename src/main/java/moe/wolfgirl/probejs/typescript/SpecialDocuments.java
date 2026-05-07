@@ -1,6 +1,5 @@
 package moe.wolfgirl.probejs.typescript;
 
-import moe.wolfgirl.probejs.ClassPath;
 import moe.wolfgirl.probejs.java.PackageTree;
 import moe.wolfgirl.probejs.typescript.base.DocumentRegistry;
 import moe.wolfgirl.probejs.typescript.base.DocumentRegistrar;

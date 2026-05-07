@@ -1,6 +1,6 @@
 package moe.wolfgirl.probejs.java;
 
-import moe.wolfgirl.probejs.ClassPath;
+import moe.wolfgirl.probejs.typescript.ClassPath;
 
 import java.util.*;
 

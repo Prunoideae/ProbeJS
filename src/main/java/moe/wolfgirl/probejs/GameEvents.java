@@ -2,12 +2,11 @@ package moe.wolfgirl.probejs;
 
 import com.mojang.brigadier.Command;
 import moe.wolfgirl.probejs.gui.DumpScreen;
+import moe.wolfgirl.probejs.misc.Require;
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.CreativeModeTabs;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -18,42 +17,42 @@ import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
 import net.neoforged.neoforge.common.util.FakePlayer;
 import net.neoforged.neoforge.event.entity.EntityTravelToDimensionEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
 @EventBusSubscriber(value = Dist.CLIENT)
 public class GameEvents {
-    private static final int MOD_LIMIT = 200;
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void playerJoined(ClientPlayerNetworkEvent.LoggingIn event) {
         var player = event.getPlayer();
         if (Minecraft.getInstance().isLocalServer()) {
-            player.sendSystemMessage(
-                    Component.translatable("probejs.wiki")
-                            .append(Component.literal("Wiki Page")
-                                    .kjs$aqua()
-                                    .kjs$underlined()
-                                    .kjs$clickOpenUrl("https://kubejs.com/wiki/addons/third-party/probejs")
-                                    .kjs$hover(Component.literal("https://kubejs.com/wiki/addons/third-party/probejs")))
+            player.sendSystemMessage(Component.literal("Welcome to ProbeJS! To open the dump screen, use the command ").kjs$gold()
+                    .append(Component.literal("/probejs")
+                            .kjs$blue()
+                            .kjs$underlined()
+                            .kjs$hover(Component.literal("Click to run /probejs"))
+                            .kjs$clickRunCommand("/probejs"))
             );
 
-            // Reload creative mode tabs
-            var params = new CreativeModeTab.ItemDisplayParameters(
-                    player.connection.enabledFeatures(),
-                    player.canUseGameMasterBlocks() && Minecraft.getInstance().options.operatorItemsTab().get(),
-                    player.level().registryAccess()
-            );
-
-            CreativeModeTabs.tabs().stream()
-                    .filter(t -> t.getType() != CreativeModeTab.Type.CATEGORY && t.getType() != CreativeModeTab.Type.SEARCH)
-                    .forEach(t -> t.buildContents(params));
+            if (Require.usedRequire && !Require.usageReported) {
+                player.sendSystemMessage(Component.literal("require() is used in the script, remember to change to Java.loadClass() before releasing!").kjs$darkRed());
+                player.sendSystemMessage(Component.literal("You can use the Convert button in the dump screen to automatically convert require() to Java.loadClass()").kjs$gold());
+                Require.usageReported = true;
+            }
         }
+    }
 
-        // CreativeModeTabs.CACHED_PARAMETERS = null;
-        // CreativeModeTabs.tryRebuildTabContents(
-        //     player.connection.enabledFeatures(),
-        //     player.canUseGameMasterBlocks() && Minecraft.getInstance().options.operatorItemsTab().get(),
-        //     player.level().registryAccess()
-        //);
+    @SubscribeEvent
+    public static void playerTicking(PlayerTickEvent.Post event) {
+        // injecting require would cause too many checks (and we don't get player instance easily)
+        var player = event.getEntity();
+        if (!Minecraft.getInstance().isLocalServer() || player.tickCount < 40) return;
+        if (Require.usedRequire && !Require.usageReported) {
+
+            player.sendSystemMessage(Component.literal("require() is used in the script, remember to change to Java.loadClass() before releasing!").kjs$darkRed());
+            player.sendSystemMessage(Component.literal("You can use the Convert button in the dump screen to automatically convert require() to Java.loadClass()").kjs$gold());
+            Require.usageReported = true;
+        }
     }
 
     @SubscribeEvent
