@@ -1,7 +1,6 @@
 package moe.wolfgirl.probejs.plugin.builtins;
 
 import com.mojang.datafixers.util.Pair;
-import dev.latvian.mods.kubejs.plugin.ClassFilter;
 import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.kubejs.typings.Param;
 import dev.latvian.mods.kubejs.typings.ThisIs;
@@ -127,7 +126,7 @@ public class InjectAnnotations extends ProbeJSPlugin {
         if (!params.isEmpty()) {
             if (code.hasComments()) code.addComments("");
             for (Param param : params) {
-                code.addComments("@param %s - %s".formatted(param.name(), param.value()));
+                code.addComments("@param %s %s".formatted(param.name(), param.value()));
             }
         }
     }
@@ -136,9 +135,4 @@ public class InjectAnnotations extends ProbeJSPlugin {
         return hasAnnotation.hasAnnotation(HideFromJS.class);
     }
 
-    public record ThisIsInfo(ClassPath classPath, String methodName, ClassPath isType) {
-        public static ThisIsInfo create(Class<?> clazz, String methodName, Class<?> isType) {
-            return new ThisIsInfo(new ClassPath(clazz), methodName, new ClassPath(isType));
-        }
-    }
 }

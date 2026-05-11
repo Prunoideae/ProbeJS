@@ -34,6 +34,9 @@ public class ProjectDump {
         writeJsConfig(ScriptType.CLIENT);
         writeJsConfig(ScriptType.SERVER);
         writeJsConfig(ScriptType.STARTUP);
+        writeAgents("kubejs-planner");
+        writeAgents("kubejs-explore");
+        writeAgents("kubejs-survey");
         GameStates.DUMP_STATE.incrementProgress(1);
     }
 
@@ -50,6 +53,18 @@ public class ProjectDump {
             var outputPath = baseDir.resolve("kubejs/%s_scripts/jsconfig.json".formatted(sideString));
             Files.createDirectories(outputPath.getParent());
             Files.write(outputPath, lines);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void writeAgents(String agentName) {
+        try {
+            var fileName = readDumpFile("assets/probejs/dumps/%s.agent.md".formatted(agentName), Map.of());
+            var outputPath = baseDir.resolve(".github/agents/%s.agent.md".formatted(agentName));
+
+            Files.createDirectories(outputPath.getParent());
+            Files.write(outputPath, fileName);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

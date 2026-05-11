@@ -1,6 +1,8 @@
 package moe.wolfgirl.probejs;
 
 import dev.latvian.mods.kubejs.KubeJSPaths;
+import moe.wolfgirl.probejs.misc.llm.NotesToLLM;
+import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
 import moe.wolfgirl.probejs.utils.GameUtils;
 import moe.wolfgirl.probejs.dumps.OtherDump;
 import moe.wolfgirl.probejs.dumps.PackageDump;
@@ -28,6 +30,7 @@ public class DumpState {
     public static void startDump() {
         try {
             if (GameStates.DUMP_STATE != null) throw new IllegalStateException("Dump already in progress");
+            ProbeJSPlugin.forEachWithPriority("addUsageHintsForAgents", registry -> registry.addUsageHintsForAgents(new NotesToLLM.Registry()));
             GameStates.DUMP_STATE = new DumpState();
             GameStates.DUMP_STATE.setProgress(0);
             if (GameStates.DUMP_SCREEN != null) GameStates.DUMP_SCREEN.initFromState();

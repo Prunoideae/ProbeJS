@@ -1,7 +1,7 @@
 package moe.wolfgirl.probejs;
 
 import com.mojang.brigadier.Command;
-import moe.wolfgirl.probejs.gui.DumpScreen;
+import moe.wolfgirl.probejs.misc.gui.DumpScreen;
 import moe.wolfgirl.probejs.misc.Require;
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.Commands;

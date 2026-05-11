@@ -4,7 +4,7 @@
         "checkJs": false,
         // Fully TS-compatible typing generation is not possible,
         // but turning off skipLibCheck can help debugging
-        "skipLibCheck": false,
+        "skipLibCheck": true,
         "target": "ES2022",
         "lib": [
             "ES2022"

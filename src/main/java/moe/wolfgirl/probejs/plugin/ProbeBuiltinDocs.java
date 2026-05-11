@@ -1,12 +1,14 @@
 package moe.wolfgirl.probejs.plugin;
 
 
+import moe.wolfgirl.probejs.misc.llm.NotesToLLM;
 import moe.wolfgirl.probejs.plugin.builtins.*;
 import moe.wolfgirl.probejs.plugin.builtins.alias.*;
 import moe.wolfgirl.probejs.plugin.builtins.discovery.ByMod;
 import moe.wolfgirl.probejs.plugin.builtins.discovery.JavaLoaded;
 import moe.wolfgirl.probejs.plugin.builtins.events.*;
 import moe.wolfgirl.probejs.plugin.builtins.fixes.ForgeEvents;
+import moe.wolfgirl.probejs.plugin.builtins.fixes.LLMHints;
 import moe.wolfgirl.probejs.plugin.builtins.fixes.LoadJava;
 
 import java.util.ArrayList;
@@ -41,6 +43,7 @@ public class ProbeBuiltinDocs extends ProbeJSPlugin {
             InjectAnnotations::new,
             InjectBeans::new,
             InjectIndex::new,
+            InjectDocsForAgents::new,
 
             // events
             Events::new,
@@ -55,6 +58,7 @@ public class ProbeBuiltinDocs extends ProbeJSPlugin {
             // tweaks
             LoadJava::new,
             ForgeEvents::new,
+            LLMHints::new,
 
             // snippets
             Snippets::new

@@ -18,7 +18,7 @@ public class RequireToLoadClass {
     // Matches: const { $ClassName } = require("path")
     // Or:      const { $ClassName: Alias } = require("path")
     private static final Pattern REQUIRE_PATTERN = Pattern.compile(
-            "const\\s*\\{\\s*(\\$\\w+)(?:\\s*:\\s*(\\w+))?\\s*}\\s*=\\s*require\\(\"([^\"]+)\"\\)\\s*;?"
+            "const\\s*\\{\\s*(\\$[\\w$]+)(?:\\s*:\\s*(\\w+))?\\s*}\\s*=\\s*require\\(\"([^\"]+)\"\\)\\s*;?"
     );
 
     /**

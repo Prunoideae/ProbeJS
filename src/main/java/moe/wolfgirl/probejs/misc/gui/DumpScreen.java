@@ -1,4 +1,4 @@
-package moe.wolfgirl.probejs.gui;
+package moe.wolfgirl.probejs.misc.gui;
 
 import moe.wolfgirl.probejs.DumpState;
 import moe.wolfgirl.probejs.GameStates;
@@ -12,10 +12,8 @@ import net.minecraft.network.chat.Component;
 
 import moe.wolfgirl.probejs.misc.RequireToLoadClass;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class DumpScreen extends Screen {
@@ -32,12 +30,14 @@ public class DumpScreen extends Screen {
     private EditBox textBox;
     private TexturedCheckbox fullDumpCheckbox;
     private TexturedCheckbox beansCheckbox;
+    private TexturedCheckbox hintsForLLMCheckbox;
     private TexturedProgressBar progressBar;
     private Button dumpButton;
     private Button convertButton;
     private List<String> modListFilter = ProbeConfig.INSTANCE.fullScanMods.get();
     private boolean fullDumpEnabled = ProbeConfig.INSTANCE.complete.get();
     private boolean beansEnabled = ProbeConfig.INSTANCE.beans.get();
+    private boolean hintsForLLMEnabled = ProbeConfig.INSTANCE.hintsForLLM.get();
     private int progress = 0;
     private float maxProgress = 100F;
     private Component statusMessage = Component.literal("Ready");
@@ -103,7 +103,7 @@ public class DumpScreen extends Screen {
                 new TexturedCheckbox(
                         left + CONTENT_MARGIN,
                         top + 50,
-                        70,
+                        65,
                         Component.literal("Beans"),
                         this.beansEnabled,
                         selected -> {
@@ -111,6 +111,21 @@ public class DumpScreen extends Screen {
                             ProbeConfig.INSTANCE.beans.set(selected);
                         },
                         Component.literal("Generate beans for classes for easier access.")
+                )
+        );
+
+        this.hintsForLLMCheckbox = this.addRenderableWidget(
+                new TexturedCheckbox(
+                        left + CONTENT_MARGIN + 65 + 4,
+                        top + 50,
+                        contentWidth - 65 - 4,
+                        Component.literal("LLM support"),
+                        this.hintsForLLMEnabled,
+                        selected -> {
+                            this.hintsForLLMEnabled = selected;
+                            ProbeConfig.INSTANCE.hintsForLLM.set(selected);
+                        },
+                        Component.literal("Generate hints and agents related files.")
                 )
         );
 
@@ -154,6 +169,7 @@ public class DumpScreen extends Screen {
     @Override
     protected void repositionElements() {
         if (this.textBox == null || this.fullDumpCheckbox == null || this.beansCheckbox == null
+                || this.hintsForLLMCheckbox == null
                 || this.progressBar == null || this.dumpButton == null || this.convertButton == null) {
             return;
         }
@@ -174,8 +190,13 @@ public class DumpScreen extends Screen {
 
         this.beansCheckbox.setX(left + CONTENT_MARGIN);
         this.beansCheckbox.setY(top + 50);
-        this.beansCheckbox.setWidth(contentWidth);
+        this.beansCheckbox.setWidth(65);
         this.beansCheckbox.setHeight(CONTROL_HEIGHT);
+
+        this.hintsForLLMCheckbox.setX(left + CONTENT_MARGIN + 65 + 4);
+        this.hintsForLLMCheckbox.setY(top + 50);
+        this.hintsForLLMCheckbox.setWidth(contentWidth - 65 - 4);
+        this.hintsForLLMCheckbox.setHeight(CONTROL_HEIGHT);
 
         this.textBox.setX(left + CONTENT_MARGIN);
         this.textBox.setY(top + 90);

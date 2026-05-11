@@ -1,5 +1,6 @@
 package moe.wolfgirl.probejs.typescript.document;
 
+import moe.wolfgirl.probejs.plugin.builtins.alias.RecordTypes;
 import moe.wolfgirl.probejs.typescript.ClassPath;
 import moe.wolfgirl.probejs.plugin.builtins.alias.RegistryTypes;
 import moe.wolfgirl.probejs.typescript.Documents;
@@ -127,6 +128,13 @@ public interface Types {
                 // If we have alias, alias will refer to the original type as input, so we don't need to check
                 // for functional interface
                 if (Documents.INSTANCE.hasAlias(classPath)) classType.asInput();
+                else {
+                    try {
+                        Class<?> clazz = classPath.loadClass();
+                        if (!RecordTypes.SKIP_RECORDS.contains(clazz) && clazz.isRecord()) classType.asInput();
+                    } catch (Throwable ignore) {
+                    }
+                }
             }
             case ArrayType arrayType -> markAsInput(arrayType.componentType);
             case OptionalType optionalType -> markAsInput(optionalType.componentType);

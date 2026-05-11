@@ -20,15 +20,13 @@ public class ProbeConfig {
     public static ProbeConfig INSTANCE = new ProbeConfig();
 
     public ConfigEntry<Boolean> enabled = new ConfigEntry<>("enabled", true);
-    public ConfigEntry<Boolean> enableDecompiler = new ConfigEntry<>("enableDecompiler", false);
     public ConfigEntry<Integer> recursionDepth = new ConfigEntry<>("recursionDepth", 5);
-    public ConfigEntry<Boolean> classScanning = new ConfigEntry<>("classScanning", false);
-    public ConfigEntry<Long> modHash = new ConfigEntry<>("modHash", -1L);
     // if the dump is complete (including all mods), or some are stripped out
     public ConfigEntry<Boolean> complete = new ConfigEntry<>("complete", true);
     // what mods are force-included from an incomplete dump, other mods/registry objects are stripped off
     public ConfigEntry<String> mods = new ConfigEntry<>("forceIncluded", "kubejs,minecraft,neoforge");
     public ConfigEntry<Boolean> beans = new ConfigEntry<>("generateBeans", true);
+    public ConfigEntry<Boolean> hintsForLLM = new ConfigEntry<>("hintsForLLM", false);
     public ConfigEntry<List<String>> excludedPaths = new ConfigEntry<>("excludedClassPaths", List.of());
     public ConfigEntry<List<String>> fullScanMods = new ConfigEntry<>("fullScanMods", List.of("minecraft", "kubejs", "neoforge"));
 

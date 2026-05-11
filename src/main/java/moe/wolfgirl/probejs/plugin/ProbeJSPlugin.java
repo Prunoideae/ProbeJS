@@ -4,6 +4,7 @@ import dev.latvian.mods.kubejs.plugin.KubeJSPlugin;
 import dev.latvian.mods.kubejs.plugin.KubeJSPlugins;
 import dev.latvian.mods.rhino.util.HideFromJS;
 import moe.wolfgirl.probejs.ProbeJS;
+import moe.wolfgirl.probejs.misc.llm.NotesToLLM;
 import moe.wolfgirl.probejs.utils.GameUtils;
 import moe.wolfgirl.probejs.snippet.SnippetRegisterer;
 import moe.wolfgirl.probejs.typescript.base.AliasRegistrar;
@@ -65,13 +66,24 @@ public class ProbeJSPlugin implements KubeJSPlugin {
      * This is useful when the class is not directly referenced by any other classes, but you still want to generate declaration for it.
      * For example, Neoforge event classes.
      *
-     * @return
+     * @return true if the class should be added to the discovery list, false otherwise.
      */
     public boolean allowClassInDiscovery(Class<?> clazz) {
         return false;
     }
 
     public void addSnippets(SnippetRegisterer registerer) {
+
+    }
+
+    /**
+     * Allows the plugins to add usage hints for some classes. This is used to clarify some usages that are not clear from the type declaration alone.
+     * <br>
+     * For example, `get recipes()` actually is used for adding recipes.
+     * <br>
+     * Things are dumped after the classes definition but before any other members, so that the hints have most probability to be noticed by agents.
+     */
+    public void addUsageHintsForAgents(NotesToLLM.Registry registry) {
 
     }
 

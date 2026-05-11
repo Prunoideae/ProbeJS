@@ -2,7 +2,7 @@ package moe.wolfgirl.probejs;
 
 import com.google.gson.JsonObject;
 import dev.latvian.mods.kubejs.util.Lazy;
-import moe.wolfgirl.probejs.gui.DumpScreen;
+import moe.wolfgirl.probejs.misc.gui.DumpScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.ClientLanguage;
 import net.minecraft.core.BlockPos;

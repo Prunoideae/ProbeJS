@@ -1,4 +1,4 @@
-package moe.wolfgirl.probejs.gui;
+package moe.wolfgirl.probejs.misc.gui;
 
 import moe.wolfgirl.probejs.ProbeJS;
 import net.minecraft.resources.ResourceLocation;

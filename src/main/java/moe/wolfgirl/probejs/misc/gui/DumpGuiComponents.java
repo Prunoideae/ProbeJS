@@ -1,4 +1,4 @@
-package moe.wolfgirl.probejs.gui;
+package moe.wolfgirl.probejs.misc.gui;
 
 import java.util.function.Consumer;
 import net.minecraft.client.gui.Font;
