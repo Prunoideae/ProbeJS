@@ -88,6 +88,10 @@ public interface Types {
         return b.build();
     }
 
+    static ObjectType.Builder newObject() {
+        return new ObjectType.Builder();
+    }
+
     static FixedArrayType fixedArray(Consumer<ObjectType.Builder> builder) {
         ObjectType.Builder b = new ObjectType.Builder();
         builder.accept(b);

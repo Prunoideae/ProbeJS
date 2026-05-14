@@ -149,6 +149,7 @@ public class ClassRegistry {
             allowedClasses.addAll(plugin.provideClassForDiscovery());
         });
 
+        allowedClasses.removeIf(c -> c.getName().equals("package-info")); // No one needs this
         for (Class<?> allowedClass : allowedClasses) {
             putClass(allowedClass, 0);
             reportClassesFound(classMap.size());
@@ -211,6 +212,7 @@ public class ClassRegistry {
                 break;
             }
         }
+        if (paths[paths.length - 1].equals("package-info")) return true; // No one needs this
         if (mixinPackage) return true;
         for (String prefix : ProbeConfig.INSTANCE.excludedPaths.get()) {
             if (className.startsWith(prefix)) return true;

@@ -1,6 +1,6 @@
 package moe.wolfgirl.probejs.java.members;
 
-import dev.latvian.mods.rhino.CachedConstructorInfo;
+import dev.latvian.mods.rhino.CachedExecutableInfo;
 import dev.latvian.mods.rhino.type.TypeInfo;
 import moe.wolfgirl.probejs.java.members.other.ClassProvider;
 import moe.wolfgirl.probejs.java.members.other.HasAnnotation;
@@ -15,8 +15,13 @@ public record ConstructorInfo(List<ParamInfo> params,
                               Annotation[] annotations,
                               TypeVariable<?>[] typeVariables
 ) implements HasAnnotation, HasTypeVariable, ClassProvider {
-    public ConstructorInfo(CachedConstructorInfo constructorInfo, Map<String, TypeInfo> typeRemap) {
-        this(ParamInfo.resolve(constructorInfo, typeRemap),
+    public static ConstructorInfo resolve(CachedExecutableInfo constructorInfo, Map<String, TypeInfo> typeRemap) {
+        var typeRemapNoLocal = new HashMap<>(typeRemap);
+        for (TypeVariable<?> typeVariable : constructorInfo.getCached().getTypeParameters()) {
+            typeRemapNoLocal.remove(typeVariable.getName());
+        }
+
+        return new ConstructorInfo(ParamInfo.resolve(constructorInfo, typeRemapNoLocal),
                 constructorInfo.getCached().getAnnotations(),
                 constructorInfo.getCached().getTypeParameters()
         );

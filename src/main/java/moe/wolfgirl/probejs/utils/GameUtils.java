@@ -1,5 +1,6 @@
 package moe.wolfgirl.probejs.utils;
 
+import dev.latvian.mods.kubejs.script.KubeJSContext;
 import dev.latvian.mods.kubejs.server.ServerScriptManager;
 import moe.wolfgirl.probejs.ProbeJS;
 import net.minecraft.client.server.IntegratedServer;
@@ -25,6 +26,12 @@ public class GameUtils {
     public static MinecraftServer getCurrentServer() {
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         return server instanceof IntegratedServer ? server : null;
+    }
+
+    public static KubeJSContext getCurrentContext(){
+        ServerScriptManager manager = getServerScriptManager();
+        if (manager == null) return null;
+        return (KubeJSContext) manager.contextFactory.enter();
     }
 
     public static void logException(Throwable t) {

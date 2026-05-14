@@ -37,6 +37,7 @@ public class ProbeBuiltinDocs extends ProbeJSPlugin {
             RegistryTypes::new,
             WorldTypes::new,
             InterfaceTypes::new,
+            DataComponentTypes::new,
 
             // transformations
             InjectInputs::new,

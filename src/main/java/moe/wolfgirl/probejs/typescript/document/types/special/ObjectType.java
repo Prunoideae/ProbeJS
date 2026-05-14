@@ -1,10 +1,12 @@
 package moe.wolfgirl.probejs.typescript.document.types.special;
 
+import moe.wolfgirl.probejs.ProbeJS;
 import moe.wolfgirl.probejs.typescript.ClassPath;
 import moe.wolfgirl.probejs.typescript.document.base.Code;
 import moe.wolfgirl.probejs.typescript.document.base.Type;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 public class ObjectType extends Type {
     // { paramName: type, ... }
@@ -43,7 +45,8 @@ public class ObjectType extends Type {
     }
 
     public static class ParamType extends Type {
-        // paramName: type
+        // paramName: type, not valid name use GSON to dump first
+        private static final Pattern VALID_PARAM_NAME = Pattern.compile("^[a-zA-Z_$][a-zA-Z0-9_$]*$");
 
         final String name;
         final boolean optional;
@@ -60,12 +63,16 @@ public class ObjectType extends Type {
             return type.getImports();
         }
 
+        public boolean isNameValid() {
+            return name == null || VALID_PARAM_NAME.matcher(name).matches();
+        }
+
         @Override
         public List<String> format(int indent) {
             if (name == null) {
                 return List.of(type.first() + (optional ? "?" : ""));
             } else {
-                return List.of(name + (optional ? "?" : "") + ": " + type.first());
+                return List.of((isNameValid() ? name : ProbeJS.GSON.toJson(name)) + (optional ? "?" : "") + ": " + type.first());
             }
         }
 

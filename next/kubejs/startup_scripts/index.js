@@ -30,3 +30,6 @@ for (let i of new Wolfgirl()) {
 ServerEvent.init(() => {
     console.log("Server is initializing...");
 });
+
+let a = new Java().testOutput('entity:');
+Java.testInput('block', 'minecraft:dirt')

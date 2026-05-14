@@ -22,9 +22,14 @@ public record MethodInfo(String name,
                          ClassPath declaringClass
 ) implements HasAnnotation, HasTypeVariable, ClassProvider {
     public static MethodInfo resolve(CachedMethodInfo methodInfo, Map<String, TypeInfo> typeRemap) {
+        var typeRemapNoLocal = new HashMap<>(typeRemap);
+        for (TypeVariable<?> typeVariable : methodInfo.getCached().getTypeParameters()) {
+            typeRemapNoLocal.remove(typeVariable.getName());
+        }
+
         return new MethodInfo(methodInfo.getName(),
-                ParamInfo.resolve(methodInfo, typeRemap),
-                ClassInfo.remapType(methodInfo.getReturnType(), typeRemap),
+                ParamInfo.resolve(methodInfo, typeRemapNoLocal),
+                ClassInfo.remapType(methodInfo.getReturnType(), typeRemapNoLocal),
                 methodInfo.isStatic,
                 Modifier.isAbstract(methodInfo.modifiers),
                 methodInfo.getCached().isSynthetic(),

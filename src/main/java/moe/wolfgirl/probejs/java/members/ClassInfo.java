@@ -62,7 +62,7 @@ public record ClassInfo(
         try {
             return classInfo.getConstructors()
                     .stream()
-                    .map(c -> new ConstructorInfo(c, variableRemaps))
+                    .map(c -> ConstructorInfo.resolve(c, variableRemaps))
                     .toList();
         } catch (Throwable t) {
             return List.of();

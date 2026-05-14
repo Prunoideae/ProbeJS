@@ -34,6 +34,7 @@ public class ProjectDump {
         writeJsConfig(ScriptType.CLIENT);
         writeJsConfig(ScriptType.SERVER);
         writeJsConfig(ScriptType.STARTUP);
+        writePackageJson(); // https://www.typescriptlang.org/docs/handbook/modules/reference.html#module-format-detection
         writeAgents("kubejs-planner");
         writeAgents("kubejs-explore");
         writeAgents("kubejs-survey");
@@ -60,11 +61,22 @@ public class ProjectDump {
 
     private void writeAgents(String agentName) {
         try {
-            var fileName = readDumpFile("assets/probejs/dumps/%s.agent.md".formatted(agentName), Map.of());
+            var lines = readDumpFile("assets/probejs/dumps/%s.agent.md".formatted(agentName), Map.of());
             var outputPath = baseDir.resolve(".github/agents/%s.agent.md".formatted(agentName));
 
             Files.createDirectories(outputPath.getParent());
-            Files.write(outputPath, fileName);
+            Files.write(outputPath, lines);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void writePackageJson() {
+        try {
+            var lines = readDumpFile("assets/probejs/dumps/package.json", Map.of());
+            var outputPath = baseDir.resolve("kubejs/package.json");
+            Files.createDirectories(outputPath.getParent());
+            Files.write(outputPath, lines);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

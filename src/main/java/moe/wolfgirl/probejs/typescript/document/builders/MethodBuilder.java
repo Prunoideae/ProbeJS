@@ -28,7 +28,7 @@ public class MethodBuilder {
         return this;
     }
 
-    public MethodBuilder typeParam(String name, @Nullable VariableType bound) {
+    public MethodBuilder typeParam(String name, @Nullable Type bound) {
         this.typeParams.add(Types.variable(name, bound));
         return this;
     }

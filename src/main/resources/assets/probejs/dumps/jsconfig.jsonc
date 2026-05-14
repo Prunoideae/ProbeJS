@@ -9,8 +9,7 @@
         "lib": [
             "ES2022"
         ],
-        "module": "nodenext",
-        "moduleResolution": "nodenext",
+        "module": "commonjs",
         "paths": {
             "@package": [
                 "../../.probe/@package"

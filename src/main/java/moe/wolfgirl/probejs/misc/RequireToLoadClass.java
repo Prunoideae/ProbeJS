@@ -17,8 +17,9 @@ import java.util.regex.Pattern;
 public class RequireToLoadClass {
     // Matches: const { $ClassName } = require("path")
     // Or:      const { $ClassName: Alias } = require("path")
+    // Also handles single quotes and backticks as path delimiters
     private static final Pattern REQUIRE_PATTERN = Pattern.compile(
-            "const\\s*\\{\\s*(\\$[\\w$]+)(?:\\s*:\\s*(\\w+))?\\s*}\\s*=\\s*require\\(\"([^\"]+)\"\\)\\s*;?"
+            "const\\s*\\{\\s*(\\$[\\w$]+)(?:\\s*:\\s*(\\w+))?\\s*}\\s*=\\s*require\\([\"'`]([^\"'`]+)[\"'`]\\)\\s*;?"
     );
 
     /**

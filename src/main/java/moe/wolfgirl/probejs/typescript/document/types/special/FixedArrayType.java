@@ -13,6 +13,10 @@ public class FixedArrayType extends ObjectType {
         StringBuilder sb = new StringBuilder();
         sb.append("[");
         for (ParamType param : params) {
+            // ["foo": number] is not valid, must be [number, number, ...] or [foo: number, bar: string, ...]
+            if (!param.isNameValid()) {
+                throw new IllegalStateException("FixedArrayType param name must be valid, got: " + param.name);
+            }
             sb.append(param.first()).append(", ");
         }
         sb.append("]");

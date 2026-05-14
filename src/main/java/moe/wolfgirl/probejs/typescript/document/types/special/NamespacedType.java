@@ -14,7 +14,7 @@ public class NamespacedType extends Type {
     public ClassPath classPath;
     public String typeName;
 
-    public  NamespacedType(ClassPath classPath, String typeName) {
+    public NamespacedType(ClassPath classPath, String typeName) {
         this.classPath = classPath;
         this.typeName = typeName;
     }
@@ -32,5 +32,9 @@ public class NamespacedType extends Type {
     @Override
     public Collection<Code> getContainedTypes() {
         return List.of();
+    }
+
+    public ClassPath asClassPath() {
+        return classPath.append(typeName);
     }
 }
