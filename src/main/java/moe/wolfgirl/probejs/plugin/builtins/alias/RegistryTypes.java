@@ -1,6 +1,7 @@
 package moe.wolfgirl.probejs.plugin.builtins.alias;
 
 import dev.latvian.mods.kubejs.registry.RegistryType;
+import moe.wolfgirl.probejs.java.ClassRegistry;
 import moe.wolfgirl.probejs.utils.GameUtils;
 import moe.wolfgirl.probejs.utils.NameUtils;
 import moe.wolfgirl.probejs.typescript.ClassPath;
@@ -28,7 +29,9 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.TypeVariable;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class RegistryTypes extends ProbeJSPlugin {
     public static final ClassPath REGISTRY_TYPES = ClassPath.special("types.RegistryTypes");
@@ -224,10 +227,16 @@ public class RegistryTypes extends ProbeJSPlugin {
 
         @Override
         public List<String> format(int indent) {
+            var classInfo = ClassRegistry.INSTANCE.getClassInfo(classPath);
+            var paramStr = classInfo == null || classInfo.getTypeVariables().length == 0 ? "" :
+                    "<%s>".formatted(Arrays.stream(classInfo.getTypeVariables())
+                            .map(TypeVariable::getName)
+                            .collect(Collectors.joining(", ")));
             var extendsType = REGISTRY_MARKED_TYPE.withParams(tagType, objectType);
-            return List.of("%sexport interface %s extends %s {}".formatted(
+            return List.of("%sexport interface %s%s extends %s {}".formatted(
                     " ".repeat(indent),
                     classPath.getClassName(),
+                    paramStr,
                     extendsType.first()
             ));
         }

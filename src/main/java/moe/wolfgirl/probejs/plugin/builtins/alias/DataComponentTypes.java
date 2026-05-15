@@ -2,11 +2,11 @@ package moe.wolfgirl.probejs.plugin.builtins.alias;
 
 import dev.latvian.mods.kubejs.component.ComponentFunctions;
 import dev.latvian.mods.kubejs.component.DataComponentWrapper;
-import dev.latvian.mods.kubejs.component.ItemComponentFunctions;
 import dev.latvian.mods.rhino.type.TypeInfo;
 import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
 import moe.wolfgirl.probejs.typescript.ClassPath;
 import moe.wolfgirl.probejs.typescript.Documents;
+import moe.wolfgirl.probejs.typescript.base.AliasRegistrar;
 import moe.wolfgirl.probejs.typescript.base.DocumentRegistrar;
 import moe.wolfgirl.probejs.typescript.document.Members;
 import moe.wolfgirl.probejs.typescript.document.TypeDecl;
@@ -18,10 +18,11 @@ import moe.wolfgirl.probejs.typescript.document.types.special.NamespacedType;
 import moe.wolfgirl.probejs.typescript.transpiler.TypeConverter;
 import moe.wolfgirl.probejs.utils.GameUtils;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.server.MinecraftServer;
-import net.neoforged.neoforge.common.MutableDataComponentHolder;
 
 import java.util.*;
 
@@ -36,28 +37,39 @@ public class DataComponentTypes extends ProbeJSPlugin {
         var classInfo = document.classInfo();
         var classDocument = document.document();
         // ItemStack or FluidStack, but we make it compatible with mixins
-        if (!ComponentFunctions.class.isAssignableFrom(classInfo.clazz())) return;
-        // get<T extends keyof OutputMap>(type: T): OutputMap[T]
-        // set<T extends keyof InputMap>(type: T, data: InputMap[T]): void
-        classDocument.members.removeIf(m -> m instanceof MethodDecl md && REMOVED_METHODS.contains(md.name));
-        classDocument.members.add(Members.method("get")
-                .typeParam("T", Types.wrapped("keyof %s", OUTPUT_MAP))
-                .param("type", Types.variable("T"))
-                .returnType(Types.wrapped("%s[T] | null", OUTPUT_MAP))
-                .build());
-        classDocument.members.add(Members.method("getOrDefault")
-                .typeParam("T", Types.wrapped("keyof %s", OUTPUT_MAP))
-                .param("type", Types.variable("T"))
-                .param("default", Types.wrapped("%s[T]", OUTPUT_MAP))
-                .returnType(Types.wrapped("%s[T]", OUTPUT_MAP))
-                .build());
+        if (ComponentFunctions.class.isAssignableFrom(classInfo.clazz())) {
+            // get<T extends keyof OutputMap>(type: T): OutputMap[T]
+            // set<T extends keyof InputMap>(type: T, data: InputMap[T]): void
+            classDocument.members.removeIf(m -> m instanceof MethodDecl md && REMOVED_METHODS.contains(md.name));
+            classDocument.members.add(Members.method("get")
+                    .typeParam("T", Types.wrapped("keyof %s", OUTPUT_MAP))
+                    .param("type", Types.variable("T"))
+                    .returnType(Types.wrapped("%s[T] | null", OUTPUT_MAP))
+                    .build());
+            classDocument.members.add(Members.method("getOrDefault")
+                    .typeParam("T", Types.wrapped("keyof %s", OUTPUT_MAP))
+                    .param("type", Types.variable("T"))
+                    .param("default", Types.wrapped("%s[T]", OUTPUT_MAP))
+                    .returnType(Types.wrapped("%s[T]", OUTPUT_MAP))
+                    .build());
 
-        classDocument.members.add(Members.method("set")
-                .typeParam("T", Types.wrapped("keyof %s", INPUT_MAP))
-                .param("type", Types.variable("T"))
-                .param("data", Types.wrapped("%s[T]", INPUT_MAP))
-                .returnType(Types.THIS)
-                .build());
+            classDocument.members.add(Members.method("set")
+                    .param("components", Types.clazz(DataComponentMap.class))
+                    .returnType(Types.THIS)
+                    .build());
+            classDocument.members.add(Members.method("set")
+                    .typeParam("T", Types.wrapped("keyof %s", INPUT_MAP))
+                    .param("type", Types.variable("T"))
+                    .param("data", Types.wrapped("%s[T]", INPUT_MAP))
+                    .returnType(Types.THIS)
+                    .build());
+        }
+    }
+
+    @Override
+    public void addTypeAlias(AliasRegistrar registrar) {
+        registrar.addInputAlias(DataComponentMap.class, Types.raw("Partial").withParams(INPUT_MAP));
+        registrar.addInputAlias(DataComponentPatch.class, Types.raw("Partial").withParams(INPUT_MAP));
     }
 
     @Override

@@ -33,7 +33,7 @@ public abstract class InputAliased extends Type {
         }
     }
 
-    protected String resolveSymbol(ClassPath classPath) {
+    public String resolveSymbol(ClassPath classPath) {
         if (input) {
             var modified = classPath.withSuffix("_");
             return resolvedSymbols.getOrDefault(modified, modified.getClassName());

@@ -32,4 +32,7 @@ ServerEvent.init(() => {
 });
 
 let a = new Java().testOutput('entity:');
-Java.testInput('block', 'minecraft:dirt')
+new Java().testInput('minecraft:block_state', 'minecraft:dirt').testInput({
+    'minecraft:item_name': 'minecraft:apple',
+    
+})

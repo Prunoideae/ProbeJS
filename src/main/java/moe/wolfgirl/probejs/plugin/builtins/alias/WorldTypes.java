@@ -3,6 +3,7 @@ package moe.wolfgirl.probejs.plugin.builtins.alias;
 import dev.latvian.mods.kubejs.block.BlockTintFunction;
 import dev.latvian.mods.kubejs.block.MapColorHelper;
 import dev.latvian.mods.kubejs.block.state.BlockStatePredicate;
+import dev.latvian.mods.kubejs.client.icon.KubeIcon;
 import dev.latvian.mods.kubejs.color.KubeColor;
 import dev.latvian.mods.kubejs.item.ItemTintFunction;
 import dev.latvian.mods.kubejs.plugin.builtin.wrapper.ColorWrapper;
@@ -18,11 +19,16 @@ import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextColor;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.stats.Stat;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntitySelector;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
@@ -34,6 +40,7 @@ import net.minecraft.world.level.levelgen.placement.BiomeFilter;
 import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.functions.CopyNameFunction;
+import net.neoforged.neoforge.common.ItemAbility;
 
 import java.util.Set;
 
@@ -135,14 +142,28 @@ public class WorldTypes extends ProbeJSPlugin {
         registrar.addInputAlias(TextColor.class, Types.raw("`#${string}`"));
         registrar.addInputAlias(TextColor.class, Types.NUMBER);
 
+        registrar.addInputAlias(DamageSource.class, RegistryTypes.object("DamageType"));
+        registrar.addInputAlias(DamageSource.class, Types.clazz(LivingEntity.class));
 
         registrar.addInputAlias(ClickEvent.class, Types.object(builder -> {
             builder.param("action", Types.clazz(ClickEvent.Action.class).asInput());
             builder.param("value", Types.STRING);
         }));
 
-        registrar.addInputAlias(DataComponentMap.class, Types.STRING);
+        for (ItemAbility action : ItemAbility.getActions()) {
+            registrar.addInputAlias(ItemAbility.class, Types.literal(action.name()));
+        }
+
         registrar.addInputAlias(ItemEnchantments.class, Types.wrapped("{[key in %s]?: number}", RegistryTypes.object("Enchantment")));
+
+        // Icons
+        registrar.addInputAlias(KubeIcon.class, Types.object(ob -> ob.param("type", Types.literal("kubejs:item"))
+                .param("item", Types.object(ib -> ib.param("id", RegistryTypes.object("Item")).param("count", true, Types.NUMBER)))));
+        registrar.addInputAlias(KubeIcon.class, Types.object(ob -> ob.param("type", Types.literal("kubejs:texture"))
+                .param("texture", Types.raw("`${string}:${string}`"))));
+        registrar.addInputAlias(KubeIcon.class, Types.object(ob -> ob.param("type", Types.literal("kubejs:atlas_sprite"))
+                .param("atlas", true, Types.raw("`${string}:${string}`"))
+                .param("sprite", Types.raw("`${string}:${string}`"))));
     }
 
     @Override

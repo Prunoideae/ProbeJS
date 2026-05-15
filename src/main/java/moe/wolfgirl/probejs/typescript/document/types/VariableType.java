@@ -22,15 +22,19 @@ public class VariableType extends InputAliased {
 
     @Override
     public List<String> format(int indent) {
-        return List.of(name);
+        var typeStr = name;
+        if (input && typeInfo instanceof ClassType classType) {
+            if (classType.resolveSymbol(classType.classPath).endsWith("_")) {
+                typeStr = "%s | %s".formatted(name, classType.first());
+            }
+        }
+
+        return List.of(typeStr);
     }
 
     public String formatWithBound() {
-        if (typeInfo == null) {
-            return name;
-        } else {
-            return "%s extends %s".formatted(name, typeInfo.first());
-        }
+        if (typeInfo == null) return name;
+        else return "%s extends %s".formatted(name, typeInfo.first());
     }
 
     @Override
