@@ -165,6 +165,21 @@ public class RecipeEvents extends ProbeJSPlugin {
         return builder.build();
     }
 
+    @Override
+    public Set<Class<?>> provideClassForDiscovery() {
+        var manager = GameUtils.getServerScriptManager();
+        if (manager == null) return Set.of();
+        Set<Class<?>> classes = new HashSet<>();
+
+        manager.recipeSchemaStorage.namespaces.values()
+                .stream()
+                .flatMap(n -> n.values().stream())
+                .flatMap(t -> t.schema.keys.stream())
+                .forEach(recipeKey -> classes.add(recipeKey.typeInfo.asClass()));
+
+        return classes;
+    }
+
     // Represents an "object type" that has several methods inside
     // class DocumentedRecipes {
     //     minecraft: {

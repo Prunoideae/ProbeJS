@@ -67,6 +67,9 @@ public class TypeConverter {
                         .toArray(Type[]::new);
                 yield baseType.withParams(params);
             }
+            case JSOrTypeInfo(List<TypeInfo> types) -> Types.union(types.stream()
+                    .map(t -> convertType(t, true, seenVariables))
+                    .toArray(Type[]::new));
             case null, default -> Types.ANY;
         };
     }

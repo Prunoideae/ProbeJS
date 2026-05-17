@@ -4,6 +4,7 @@ import moe.wolfgirl.probejs.ProbeJS;
 import moe.wolfgirl.probejs.typescript.ClassPath;
 import moe.wolfgirl.probejs.typescript.document.base.Code;
 import moe.wolfgirl.probejs.typescript.document.base.Type;
+import moe.wolfgirl.probejs.utils.NameUtils;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -64,7 +65,7 @@ public class ObjectType extends Type {
         }
 
         public boolean isNameValid() {
-            return name == null || VALID_PARAM_NAME.matcher(name).matches();
+            return name == null || NameUtils.JS_IDENTIFIER_MATCH.matcher(name).matches();
         }
 
         @Override

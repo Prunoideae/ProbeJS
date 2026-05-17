@@ -3,6 +3,9 @@ package moe.wolfgirl.probejs;
 import dev.latvian.mods.kubejs.KubeJSPaths;
 import moe.wolfgirl.probejs.misc.llm.NotesToLLM;
 import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
+import moe.wolfgirl.probejs.typescript.Documents;
+import moe.wolfgirl.probejs.typescript.SidedDocuments;
+import moe.wolfgirl.probejs.typescript.SpecialDocuments;
 import moe.wolfgirl.probejs.utils.GameUtils;
 import moe.wolfgirl.probejs.dumps.OtherDump;
 import moe.wolfgirl.probejs.dumps.PackageDump;
@@ -48,6 +51,12 @@ public class DumpState {
             GameStates.DUMP_STATE.setStatus(Component.literal("Dump complete!"));
             GameStates.DUMP_STATE = null;
             GameStates.DUMP_SCREEN.onDumpFinished();
+
+            // clear the registries to free up memory
+            ClassRegistry.INSTANCE.clear();
+            Documents.INSTANCE.clear();
+            SpecialDocuments.INSTANCE.clear();
+            SidedDocuments.INSTANCE.clear();
         } catch (Exception e) {
             GameStates.DUMP_STATE.setStatus(Component.literal("Dump failed!").withStyle(ChatFormatting.RED));
             GameUtils.logException(e);

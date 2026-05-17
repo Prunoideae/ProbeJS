@@ -2,12 +2,14 @@ package moe.wolfgirl.probejs.plugin.builtins.alias;
 
 import dev.latvian.mods.kubejs.block.BlockTintFunction;
 import dev.latvian.mods.kubejs.block.MapColorHelper;
+import dev.latvian.mods.kubejs.block.SoundTypeWrapper;
 import dev.latvian.mods.kubejs.block.state.BlockStatePredicate;
 import dev.latvian.mods.kubejs.client.icon.KubeIcon;
 import dev.latvian.mods.kubejs.color.KubeColor;
 import dev.latvian.mods.kubejs.item.ItemTintFunction;
 import dev.latvian.mods.kubejs.plugin.builtin.wrapper.ColorWrapper;
 import dev.latvian.mods.kubejs.recipe.match.ReplacementMatch;
+import dev.latvian.mods.kubejs.recipe.match.ReplacementMatchInfo;
 import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
 import moe.wolfgirl.probejs.typescript.base.AliasRegistrar;
 import moe.wolfgirl.probejs.typescript.document.Types;
@@ -19,16 +21,13 @@ import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextColor;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.stats.Stat;
+import net.minecraft.util.Unit;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MobCategory;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorMaterial;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
@@ -78,10 +77,10 @@ public class WorldTypes extends ProbeJSPlugin {
         registrar.addInputAlias(ArmorMaterial.class, Types.STRING);
         registrar.addInputAlias(EntitySelector.class, Types.STRING);
         registrar.addInputAlias(ReplacementMatch.class, Ingredient.class);
+        registrar.addInputAlias(ReplacementMatchInfo.class, ReplacementMatch.class);
         registrar.addInputAlias(Stat.class, Types.STRING);
         registrar.addInputAlias(MapColorHelper.class, Types.STRING);
         registrar.addInputAlias(MapColorHelper.class, Types.NUMBER);
-        registrar.addInputAlias(SoundType.class, Types.STRING);
         registrar.addInputAlias(ParticleOptions.class, Types.STRING);
         registrar.addInputAlias(ItemTintFunction.class, Types.clazz(ItemTintFunction.class).asInput().asArray());
         registrar.addInputAlias(ItemTintFunction.class, Types.STRING);
@@ -144,7 +143,7 @@ public class WorldTypes extends ProbeJSPlugin {
 
         registrar.addInputAlias(DamageSource.class, RegistryTypes.object("DamageType"));
         registrar.addInputAlias(DamageSource.class, Types.clazz(LivingEntity.class));
-
+        registrar.addInputAlias(Unit.class, Types.ANY);
         registrar.addInputAlias(ClickEvent.class, Types.object(builder -> {
             builder.param("action", Types.clazz(ClickEvent.Action.class).asInput());
             builder.param("value", Types.STRING);
@@ -152,6 +151,10 @@ public class WorldTypes extends ProbeJSPlugin {
 
         for (ItemAbility action : ItemAbility.getActions()) {
             registrar.addInputAlias(ItemAbility.class, Types.literal(action.name()));
+        }
+
+        for (String s : SoundTypeWrapper.INSTANCE.getMap().keySet()) {
+            registrar.addInputAlias(SoundType.class, Types.literal(s));
         }
 
         registrar.addInputAlias(ItemEnchantments.class, Types.wrapped("{[key in %s]?: number}", RegistryTypes.object("Enchantment")));

@@ -153,7 +153,7 @@ public interface Types {
                     markAsInput(typeArg);
                 }
             }
-
+            case JoinedType.UnionType unionType -> unionType.types.forEach(Types::markAsInput);
             case null, default -> {
             }
         }

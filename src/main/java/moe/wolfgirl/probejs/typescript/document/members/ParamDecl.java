@@ -3,6 +3,7 @@ package moe.wolfgirl.probejs.typescript.document.members;
 import moe.wolfgirl.probejs.typescript.ClassPath;
 import moe.wolfgirl.probejs.typescript.document.base.Code;
 import moe.wolfgirl.probejs.typescript.document.base.Type;
+import moe.wolfgirl.probejs.utils.NameUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -47,9 +48,7 @@ public class ParamDecl extends Code {
 
     @Override
     public List<String> format(int indent) {
-        if (RESERVED_NAMES.contains(name)) {
-            name = "_" + name;
-        }
+        var name = NameUtils.isNameSafe(this.name) ? this.name : "_" + this.name;
         return List.of("%s%s%s: %s".formatted(isRest ? "..." : "", name, optional ? "?" : "", typeInfo.first()));
     }
 

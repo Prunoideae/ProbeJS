@@ -1,10 +1,12 @@
 package moe.wolfgirl.probejs.typescript.document.members;
 
+import moe.wolfgirl.probejs.ProbeJS;
 import moe.wolfgirl.probejs.typescript.ClassPath;
 import moe.wolfgirl.probejs.typescript.document.base.Code;
 import moe.wolfgirl.probejs.typescript.document.base.CommentableCode;
 import moe.wolfgirl.probejs.typescript.document.base.KindAware;
 import moe.wolfgirl.probejs.typescript.document.types.VariableType;
+import moe.wolfgirl.probejs.utils.NameUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
@@ -64,6 +66,7 @@ public class MethodDecl extends CommentableCode implements KindAware {
         var indentStr = " ".repeat(indent);
         var typeParamsStr = typeParams.isEmpty() ? "" : "<%s>".formatted(String.join(", ", typeParams.stream().map(VariableType::formatWithBound).toList()));
         var paramsStr = String.join(", ", params.stream().map(Code::first).toList());
+        var name = NameUtils.isNameSafe(this.name) ? this.name : ProbeJS.GSON.toJson(this.name);
         return List.of("%s%s%s%s(%s): %s;".formatted(indentStr, getPrefix(), name, typeParamsStr, paramsStr, returnType.first()));
     }
 

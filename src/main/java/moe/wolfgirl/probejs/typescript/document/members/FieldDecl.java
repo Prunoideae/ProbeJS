@@ -1,9 +1,11 @@
 package moe.wolfgirl.probejs.typescript.document.members;
 
+import moe.wolfgirl.probejs.ProbeJS;
 import moe.wolfgirl.probejs.typescript.ClassPath;
 import moe.wolfgirl.probejs.typescript.document.base.CommentableCode;
 import moe.wolfgirl.probejs.typescript.document.base.KindAware;
 import moe.wolfgirl.probejs.typescript.document.base.Type;
+import moe.wolfgirl.probejs.utils.NameUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -39,6 +41,7 @@ public class FieldDecl extends CommentableCode implements KindAware {
 
     @Override
     public List<String> format(int indent) {
+        var name = NameUtils.isNameSafe(this.name) ? this.name : ProbeJS.GSON.toJson(this.name);
         return List.of("%s%s%s: %s;".formatted(" ".repeat(indent), getPrefix(), name, typeInfo.first()));
     }
 
