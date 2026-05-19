@@ -218,5 +218,11 @@ public class RecipeEvents extends ProbeJSPlugin {
             lines.add(" ".repeat(indent) + "}");
             return lines;
         }
+
+        @Override
+        public void setResolvedSymbols(Map<ClassPath, String> resolvedSymbols) {
+            super.setResolvedSymbols(resolvedSymbols);
+            for (MethodDecl method : methods) method.setResolvedSymbols(resolvedSymbols);
+        }
     }
 }

@@ -6,6 +6,7 @@ import moe.wolfgirl.probejs.typescript.document.base.Type;
 import moe.wolfgirl.probejs.typescript.document.types.VariableType;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 // export type Identifier = TypeInfo;
@@ -46,5 +47,11 @@ public class TypeDecl extends CommentableCode {
                 variablesPart,
                 typeInfo.first()
         ));
+    }
+
+    @Override
+    public void setResolvedSymbols(Map<ClassPath, String> resolvedSymbols) {
+        super.setResolvedSymbols(resolvedSymbols);
+        typeInfo.setResolvedSymbols(resolvedSymbols);
     }
 }

@@ -55,7 +55,8 @@ public class Documents implements DocumentRegistry, DocumentRegistrar {
     public void transpile() {
         TypeConverter typeConverter = new TypeConverter();
         Transpiler transpiler = new Transpiler(typeConverter);
-        for (var entry : ClassRegistry.INSTANCE.getAllClasses().entrySet()) {
+        Map<ClassPath, ClassInfo> allClasses = ClassRegistry.INSTANCE.getAllClasses();
+        for (var entry : allClasses.entrySet()) {
             var classPath = entry.getKey();
             var classInfo = entry.getValue();
 
@@ -65,7 +66,12 @@ public class Documents implements DocumentRegistry, DocumentRegistrar {
             reportTranspileStatus(documents.size());
         }
 
-        ProbeJSPlugin.forEachWithPriority("modifyClasses", plugin -> plugin.modifyClasses(new ClassAccessor(documents, ClassRegistry.INSTANCE.getAllClasses(), typeConverter)));
+        ProbeJSPlugin.forEachWithPriority("modifyClasses", plugin -> plugin.modifyClasses(new ClassAccessor(documents, allClasses, typeConverter)));
+
+        // Free ClassInfo data now that transpiling is complete;
+        // PackageDump only reads from Documents, not ClassRegistry.
+        ClassRegistry.INSTANCE.clear();
+        System.gc();
     }
 
     @Nullable

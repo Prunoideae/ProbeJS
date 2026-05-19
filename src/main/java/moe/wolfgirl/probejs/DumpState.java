@@ -57,6 +57,7 @@ public class DumpState {
             Documents.INSTANCE.clear();
             SpecialDocuments.INSTANCE.clear();
             SidedDocuments.INSTANCE.clear();
+            System.gc();
         } catch (Exception e) {
             GameStates.DUMP_STATE.setStatus(Component.literal("Dump failed!").withStyle(ChatFormatting.RED));
             GameUtils.logException(e);

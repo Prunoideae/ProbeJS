@@ -1,5 +1,7 @@
 package moe.wolfgirl.probejs.typescript.document.base;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,5 +52,24 @@ public abstract class CommentableCode extends Code {
         } else {
             return code.format(indent);
         }
+    }
+
+    /**
+     * Streaming version of {@link #format(Code, int)}: writes JSDoc comments (if any)
+     * followed by the formatted code lines directly to the writer.
+     */
+    public static void writeTo(Code code, BufferedWriter writer, int indent) throws IOException {
+        if (code instanceof CommentableCode commentableCode && commentableCode.hasComments()) {
+            String pad = " ".repeat(indent);
+            writer.write(pad + "/**");
+            writer.write("\n");
+            for (String comment : commentableCode.comments) {
+                writer.write(pad + " * " + comment);
+                writer.write("\n");
+            }
+            writer.write(pad + " */");
+            writer.write("\n");
+        }
+        code.writeTo(writer, indent);
     }
 }

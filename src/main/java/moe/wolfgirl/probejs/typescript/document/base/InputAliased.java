@@ -1,5 +1,6 @@
 package moe.wolfgirl.probejs.typescript.document.base;
 
+import moe.wolfgirl.probejs.ProbeJS;
 import moe.wolfgirl.probejs.typescript.ClassPath;
 
 import java.util.Set;
@@ -24,8 +25,7 @@ public abstract class InputAliased extends Type {
 
     public final Set<ClassPath> getImports() {
         if (input) {
-            return getOriginalImports()
-                    .stream()
+            return getOriginalImports().stream()
                     .map(classPath -> classPath.withSuffix("_"))
                     .collect(Collectors.toSet());
         } else {
@@ -34,6 +34,10 @@ public abstract class InputAliased extends Type {
     }
 
     public String resolveSymbol(ClassPath classPath) {
+        if (resolvedSymbols == null) {
+            ProbeJS.LOGGER.warn("Resolved symbols map is ot set when resolving symbol for %s. Override setResolvedSymbols in the caller to provide the map!".formatted(classPath));
+            throw new IllegalStateException("Resolved symbols map is not set");
+        }
         if (input) {
             var modified = classPath.withSuffix("_");
             return resolvedSymbols.getOrDefault(modified, modified.getClassName());

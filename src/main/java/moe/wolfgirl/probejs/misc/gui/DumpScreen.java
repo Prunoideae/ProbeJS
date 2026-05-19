@@ -85,7 +85,7 @@ public class DumpScreen extends Screen {
                             this.fullDumpEnabled = selected;
                             ProbeConfig.INSTANCE.complete.set(selected);
                         },
-                        Component.literal("Dumps more classes, not good for packs like ATM10.")
+                        Component.literal("Dumps more classes, now can handle ATM10!")
                 )
         );
 

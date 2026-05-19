@@ -4,6 +4,7 @@ import dev.latvian.mods.rhino.CachedExecutableInfo;
 import dev.latvian.mods.rhino.CachedParameters;
 import dev.latvian.mods.rhino.type.TypeInfo;
 import moe.wolfgirl.probejs.java.members.ClassInfo;
+import moe.wolfgirl.probejs.utils.NameUtils;
 
 import java.lang.reflect.Executable;
 import java.lang.reflect.Parameter;
@@ -40,7 +41,8 @@ public record ParamInfo(String name, TypeInfo typeInfo, boolean varArgs) impleme
             Parameter parameter = parameters[i];
             TypeInfo typeInfo = cachedParameters.typeInfos().get(i - offset);
             typeInfo = ClassInfo.remapType(typeInfo, typeRemapNoLocal);
-            result.add(new ParamInfo(parameter.getName(), typeInfo, parameter.isVarArgs()));
+            var paramName = NameUtils.isNameSafe(parameter.getName()) ? parameter.getName() : "arg" + (i - offset);
+            result.add(new ParamInfo(paramName, typeInfo, parameter.isVarArgs()));
         }
 
         return result;

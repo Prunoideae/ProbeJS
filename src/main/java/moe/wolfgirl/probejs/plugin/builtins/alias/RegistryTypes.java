@@ -233,6 +233,7 @@ public class RegistryTypes extends ProbeJSPlugin {
                             .map(TypeVariable::getName)
                             .collect(Collectors.joining(", ")));
             var extendsType = REGISTRY_MARKED_TYPE.withParams(tagType, objectType);
+            extendsType.setResolvedSymbols(resolvedSymbols);
             return List.of("%sexport interface %s%s extends %s {}".formatted(
                     " ".repeat(indent),
                     classPath.getClassName(),

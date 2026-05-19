@@ -1,7 +1,5 @@
 package moe.wolfgirl.probejs.typescript;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
 import moe.wolfgirl.probejs.ProbeJS;
 import moe.wolfgirl.probejs.java.PackageTree;
 import moe.wolfgirl.probejs.typescript.base.DocumentRegistry;
@@ -81,19 +79,19 @@ public class IndexFile {
             var resolvedSymbols = loadClasses();
 
             // import { A, B } from "@package/xxx";
-            Multimap<ClassPath, String> packageToClasses = ArrayListMultimap.create();
+            Map<ClassPath, List<String>> packageToClasses = new HashMap<>();
             for (var importPath : imports) {
                 if (importPath.getPackage() != null && importPath.getPackage().equals(classPath))
                     continue; // Don't import from the same package
-                // indexWriter.write("import { %s } from \"%s\";\n".formatted(importPath.getClassName(), importPath.asTypePath()));
                 var symbolName = resolvedSymbols.getOrDefault(importPath, importPath.getClassName());
                 if (symbolName.equals(importPath.getClassName())) {
-                    packageToClasses.put(importPath.getPackage(), symbolName);
+                    packageToClasses.computeIfAbsent(importPath.getPackage(), k -> new ArrayList<>()).add(symbolName);
                 } else {
-                    packageToClasses.put(importPath.getPackage(), "%s as %s".formatted(importPath.getClassName(), resolvedSymbols.get(importPath)));
+                    packageToClasses.computeIfAbsent(importPath.getPackage(), k -> new ArrayList<>())
+                            .add("%s as %s".formatted(importPath.getClassName(), symbolName));
                 }
             }
-            for (var entry : packageToClasses.asMap().entrySet()) {
+            for (var entry : packageToClasses.entrySet()) {
                 ClassPath packagePath = entry.getKey();
                 String classList = String.join(", ", entry.getValue());
                 indexWriter.write("import { %s } from \"%s\";\n".formatted(classList, packagePath.asTypePath()));
@@ -109,10 +107,7 @@ public class IndexFile {
                 indexWriter.write("\n");
                 indexWriter.write("declare module \"%s\" {\n".formatted(classPath.asTypePath()));
                 for (var code : moduleDumps) {
-                    for (String line : CommentableCode.format(code, 4)) {
-                        indexWriter.write(line);
-                        indexWriter.write("\n");
-                    }
+                    CommentableCode.writeTo(code, indexWriter, 4);
                 }
                 indexWriter.write("}\n");
             }
@@ -123,10 +118,7 @@ public class IndexFile {
                 indexWriter.write("\nexport {};\n\n");
                 indexWriter.write("declare global {\n");
                 for (var code : globals) {
-                    for (String line : CommentableCode.format(code, 4)) {
-                        indexWriter.write(line);
-                        indexWriter.write("\n");
-                    }
+                    CommentableCode.writeTo(code, indexWriter, 4);
                 }
                 indexWriter.write("}\n");
             }
@@ -138,20 +130,20 @@ public class IndexFile {
     private Map<ClassPath, String> getResolvedSymbols() {
         // java.lang.String -> String
         // java.lang.String + foo.bar.String -> String, String$1
-        Multimap<String, ClassPath> nameToClassPaths = ArrayListMultimap.create();
+        Map<String, List<ClassPath>> nameToClassPaths = new HashMap<>();
         for (var classPath : classes) {
-            nameToClassPaths.put(classPath.getClassName(), classPath);
+            nameToClassPaths.computeIfAbsent(classPath.getClassName(), k -> new ArrayList<>()).add(classPath);
         }
         for (var importPath : imports) {
-            nameToClassPaths.put(importPath.getClassName(), importPath);
+            nameToClassPaths.computeIfAbsent(importPath.getClassName(), k -> new ArrayList<>()).add(importPath);
         }
         for (var subPackage : subpackages) {
-            nameToClassPaths.put(subPackage.getClassName(), subPackage); // In case if people go mad
+            nameToClassPaths.computeIfAbsent(subPackage.getClassName(), k -> new ArrayList<>()).add(subPackage); // In case if people go mad
         }
 
         // We only keep the first one, and rename the rest with $1, $2, ...
         Map<ClassPath, String> resolvedSymbols = new HashMap<>();
-        for (var entry : nameToClassPaths.asMap().entrySet()) {
+        for (var entry : nameToClassPaths.entrySet()) {
             String name = entry.getKey();
             // deduplicate class paths to avoid unnecessary renaming
             List<ClassPath> classPaths = new ArrayList<>(new HashSet<>(entry.getValue()));
@@ -178,7 +170,7 @@ public class IndexFile {
             }
         }
 
-        return resolvedSymbols;
+        return Map.copyOf(resolvedSymbols);
     }
 
 }

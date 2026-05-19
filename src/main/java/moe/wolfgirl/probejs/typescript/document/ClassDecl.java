@@ -7,6 +7,8 @@ import moe.wolfgirl.probejs.typescript.document.base.KindAware;
 import moe.wolfgirl.probejs.typescript.document.base.Type;
 import moe.wolfgirl.probejs.typescript.document.types.VariableType;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.util.*;
 
 // Represents a class/ declaration in TypeScript.
@@ -56,6 +58,15 @@ public class ClassDecl extends CommentableCode {
         else throw new IllegalStateException("Unknown kind: %s".formatted(kind));
     }
 
+    @Override
+    public void writeTo(BufferedWriter writer, int indent) throws IOException {
+        sanitize();
+        if (kind == KindAware.Kind.CLASS) writeAsClass(writer, indent);
+        else if (kind == KindAware.Kind.INTERFACE) writeAsInterface(writer, indent);
+        else if (kind == KindAware.Kind.NAMESPACE) writeAsNamespace(writer, indent);
+        else throw new IllegalStateException("Unknown kind: %s".formatted(kind));
+    }
+
     private List<String> formatAsClass(int indent) {
         List<String> formatted = new ArrayList<>();
         // (export) (class/interface/namespace) Identifier(<T1, T2>) (extends Base) (implements Interface1, Interface2) {
@@ -71,6 +82,21 @@ public class ClassDecl extends CommentableCode {
         }
         formatted.add("%s}".formatted(" ".repeat(indent)));
         return formatted;
+    }
+
+    private void writeAsClass(BufferedWriter writer, int indent) throws IOException {
+        String indentStr = " ".repeat(indent);
+        String exportStr = export ? "export " : "";
+        String typeParamsStr = typeParams.isEmpty() ? "" : "<%s>".formatted(String.join(", ", typeParams.stream().map(VariableType::formatWithBound).toList()));
+        String extendsStr = extendsType == Types.NEVER ? "" : " extends %s".formatted(extendsType.first());
+        String implementsStr = implementsTypes.isEmpty() ? "" : " implements %s".formatted(String.join(", ", implementsTypes.stream().map(Code::first).toList()));
+        writer.write("%s%sclass %s%s%s%s {".formatted(indentStr, exportStr, identifier, typeParamsStr, extendsStr, implementsStr));
+        writer.write("\n");
+        for (Code member : members) {
+            CommentableCode.writeTo(member, writer, indent + 4);
+        }
+        writer.write("%s}".formatted(indentStr));
+        writer.write("\n");
     }
 
     // Java interface is a real thing, but TS one disappears at runtime
@@ -105,6 +131,33 @@ public class ClassDecl extends CommentableCode {
         return formatted;
     }
 
+    private void writeAsInterface(BufferedWriter writer, int indent) throws IOException {
+        String indentStr = " ".repeat(indent);
+        String exportStr = export ? "export " : "";
+        String typeParamsStr = typeParams.isEmpty() ? "" : "<%s>".formatted(String.join(", ", typeParams.stream().map(VariableType::formatWithBound).toList()));
+
+        // (export) class Identifier {
+        writer.write("%s%sclass %s%s {".formatted(indentStr, exportStr, identifier, typeParamsStr));
+        writer.write("\n");
+        for (Code member : members) {
+            if (member instanceof KindAware kindAware && !kindAware.shouldAppear(KindAware.Kind.CLASS)) continue;
+            CommentableCode.writeTo(member, writer, indent + 4);
+        }
+        writer.write("%s}".formatted(indentStr));
+        writer.write("\n");
+
+        // (export) interface Identifier(<T1, T2>) (extends Interface1, Interface2) {
+        String extendsInterfaceStr = implementsTypes.isEmpty() ? "" : " extends %s".formatted(String.join(", ", implementsTypes.stream().map(Code::first).toList()));
+        writer.write("%s%sinterface %s%s%s {".formatted(indentStr, exportStr, identifier, typeParamsStr, extendsInterfaceStr));
+        writer.write("\n");
+        for (Code member : members) {
+            if (member instanceof KindAware kindAware && !kindAware.shouldAppear(KindAware.Kind.INTERFACE)) continue;
+            CommentableCode.writeTo(member, writer, indent + 4);
+        }
+        writer.write("%s}".formatted(indentStr));
+        writer.write("\n");
+    }
+
     // Why do I need this?
     private List<String> formatAsNamespace(int indent) {
         List<String> formatted = new ArrayList<>();
@@ -121,6 +174,21 @@ public class ClassDecl extends CommentableCode {
         }
         formatted.add("%s}".formatted(" ".repeat(indent)));
         return formatted;
+    }
+
+    private void writeAsNamespace(BufferedWriter writer, int indent) throws IOException {
+        String indentStr = " ".repeat(indent);
+        String exportStr = export ? "export " : "";
+        String typeParamsStr = typeParams.isEmpty() ? "" : "<%s>".formatted(String.join(", ", typeParams.stream().map(VariableType::formatWithBound).toList()));
+        String extendsStr = extendsType == Types.NEVER ? "" : " extends %s".formatted(extendsType.first());
+        String implementsStr = implementsTypes.isEmpty() ? "" : " implements %s".formatted(String.join(", ", implementsTypes.stream().map(Code::first).toList()));
+        writer.write("%s%snamespace %s%s%s%s {".formatted(indentStr, exportStr, identifier, typeParamsStr, extendsStr, implementsStr));
+        writer.write("\n");
+        for (Code member : members) {
+            CommentableCode.writeTo(member, writer, indent + 4);
+        }
+        writer.write("%s}".formatted(indentStr));
+        writer.write("\n");
     }
 
     private void sanitize() {

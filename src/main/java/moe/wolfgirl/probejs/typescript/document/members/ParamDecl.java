@@ -13,11 +13,6 @@ import java.util.Set;
 // param1: Type1
 // ...args: Type2[]
 public class ParamDecl extends Code {
-    private static final Set<String> RESERVED_NAMES = Set.of(
-            "in", "with", "as", "async", "await", "break", "case", "catch", "class", "const", "continue", "debugger",
-            "default", "delete", "do", "else", "enum", "export", "extends", "finally", "for", "function", "if", "import",
-            "instanceof", "new", "return", "super", "switch", "this", "throw", "try", "typeof", "var", "void", "while"
-    );
 
     public String name;
     public Type typeInfo;
