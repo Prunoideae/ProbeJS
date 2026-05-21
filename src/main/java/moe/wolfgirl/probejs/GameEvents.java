@@ -26,14 +26,16 @@ public class GameEvents {
     public static void playerJoined(ClientPlayerNetworkEvent.LoggingIn event) {
         var player = event.getPlayer();
         if (Minecraft.getInstance().isLocalServer()) {
-            player.sendSystemMessage(Component.literal("Welcome to ProbeJS! To open the dump screen, use the command ").kjs$gold()
-                    .append(Component.literal("/probejs")
-                            .kjs$blue()
-                            .kjs$underlined()
-                            .kjs$hover(Component.literal("Click to run /probejs"))
-                            .kjs$clickRunCommand("/probejs"))
-            );
-
+            if (ProbeConfig.INSTANCE.newGame.get()) {
+                player.sendSystemMessage(Component.literal("Welcome to ProbeJS! To open the dump screen, use the command ").kjs$gold()
+                        .append(Component.literal("/probejs")
+                                .kjs$blue()
+                                .kjs$underlined()
+                                .kjs$hover(Component.literal("Click to run /probejs"))
+                                .kjs$clickRunCommand("/probejs"))
+                );
+                ProbeConfig.INSTANCE.newGame.set(false);
+            }
             if (Require.usedRequire && !Require.usageReported) {
                 player.sendSystemMessage(Component.literal("require() is used in the script, remember to change to Java.loadClass() before releasing!").kjs$darkRed());
                 player.sendSystemMessage(Component.literal("You can use the Convert button in the dump screen to automatically convert require() to Java.loadClass()").kjs$gold());
