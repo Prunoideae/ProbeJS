@@ -21,6 +21,7 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.ZipFile;
 
 public class ClassRegistry {
@@ -162,8 +163,49 @@ public class ClassRegistry {
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
 
         for (File modFile : findModFiles()) {
-            try (var jarFile = new ZipFile(modFile)) {
+            for (String entry : findEntries(modFile)) {
+                try {
+                    // Skipping due to mojang is weird or other problems
+                    if (shouldSkipClass(entry)) continue;
+                    var clazz = Class.forName(entry, false, loader);
+                    // You won't refer to anonymous classes anywhere, and they are hard to dump
+                    if (clazz.isAnonymousClass()) continue;
+                    boolean allowed = allowedClasses.contains(clazz);
+                    if (!allowed) {
+                        for (ProbeJSPlugin plugin : pluginCache) {
+                            if (plugin.allowClassInDiscovery(clazz)) {
+                                allowed = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (allowed) {
+                        putClass(clazz, 0);
+                        reportClassesFound(classMap.size());
+                    }
+                } catch (Throwable ignore) {
+                    ProbeJS.LOGGER.error("Error while loading class %s, don't worry, it's just one class.".formatted(entry));
+                }
+            }
+        }
+    }
+
+    public Iterable<String> findEntries(File file) {
+        if (file.isDirectory()) {
+            try (Stream<Path> paths = Files.walk(file.toPath())) {
+                return paths.filter(Files::isRegularFile)
+                        .filter(path -> path.toString().endsWith(".class"))
+                        .map(path -> file.toPath().relativize(path).toString())
+                        .map(name -> name.substring(0, name.length() - 6))
+                        .map(name -> name.replace("/", "."))
+                        .toList();
+            } catch (IOException ignore) {
+                return Collections.emptyList();
+            }
+        } else {
+            try (var jarFile = new ZipFile(file)) {
                 var entries = jarFile.entries();
+                List<String> names = new ArrayList<>();
                 while (entries.hasMoreElements()) {
                     var entry = entries.nextElement();
                     if (entry.isDirectory()) continue;
@@ -171,30 +213,11 @@ public class ClassRegistry {
                     if (!name.endsWith(".class")) continue;
                     name = name.substring(0, name.length() - 6);
                     name = name.replace("/", ".");
-                    try {
-                        // Skipping due to mojang is weird or other problems
-                        if (shouldSkipClass(name)) continue;
-                        var clazz = Class.forName(name, false, loader);
-                        // You won't refer to anonymous classes anywhere, and they are hard to dump
-                        if (clazz.isAnonymousClass()) continue;
-                        boolean allowed = allowedClasses.contains(clazz);
-                        if (!allowed) {
-                            for (ProbeJSPlugin plugin : pluginCache) {
-                                if (plugin.allowClassInDiscovery(clazz)) {
-                                    allowed = true;
-                                    break;
-                                }
-                            }
-                        }
-                        if (allowed) {
-                            putClass(clazz, 0);
-                            reportClassesFound(classMap.size());
-                        }
-                    } catch (Throwable ignore) {
-                        ProbeJS.LOGGER.error("Error while loading class %s, don't worry, it's just one class.".formatted(name));
-                    }
+                    names.add(name);
                 }
+                return names;
             } catch (IOException ignore) {
+                return Collections.emptyList();
             }
         }
     }

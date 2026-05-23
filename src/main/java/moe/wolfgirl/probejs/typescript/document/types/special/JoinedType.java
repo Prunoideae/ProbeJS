@@ -20,6 +20,7 @@ public abstract class JoinedType extends Type {
 
     @Override
     public List<String> format(int indent) {
+        if (types.isEmpty()) return List.of("never");
         return List.of(String.join(operator(), types.stream().map(Code::first).toList()));
     }
 

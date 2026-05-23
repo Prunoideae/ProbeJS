@@ -1,4 +1,4 @@
-package moe.wolfgirl.probejs.plugin.builtins.fixes;
+package moe.wolfgirl.probejs.plugin.builtins.extras;
 
 import dev.latvian.mods.kubejs.plugin.builtin.wrapper.NativeEventWrapper;
 import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;

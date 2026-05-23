@@ -30,7 +30,7 @@ public class ProbeJSWeb {
         try {
             var command = ProbeJS.GSON.fromJson(req.mainBody().text(), JsonObject.class).get("command").getAsString();
             var server = GameUtils.getCurrentServer();
-            if (server == null) HTTPStatus.BAD_REQUEST.json("\"Server not started\"");
+            if (server == null) return HTTPStatus.BAD_REQUEST.json("\"Server not started\"");
             var player = server.getPlayerList().getPlayers().getFirst();
             var css = new DelegatedSourceStack(player.createCommandSourceStack(), player.position(), player);
             server.getCommands().performPrefixedCommand(css, command);

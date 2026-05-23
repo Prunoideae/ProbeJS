@@ -11,6 +11,10 @@ const names = new ArrayList();
 const Woofable = Java.loadClass("moe.wolfgirl.Woofable");
 const NetworkManager = Java.loadClass("moe.wolfgirl.networking.NetworkManager");
 
+/**
+ * @type {Internal.Object}
+ */
+// @ts-expect-error
 let manager = new NetworkManager();
 
 let other = JSON.parse("{}");
@@ -34,5 +38,4 @@ ServerEvent.init(() => {
 let a = new Java().testOutput('entity:');
 new Java().testInput('minecraft:block_state', 'minecraft:dirt').testInput({
     'minecraft:item_name': 'minecraft:apple',
-    
 })

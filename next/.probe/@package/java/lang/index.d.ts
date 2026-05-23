@@ -1,11 +1,18 @@
 export { };
-
+declare global {
+    export namespace Internal {
+        type Object = import("@package/java/lang").Object;
+    }
+}
 declare module "@package/java/lang" {
+
     export class Object {
         equals(other: unknown): boolean;
         hashCode(): number;
         toString(): string;
     }
+    type Object_ = Object | { [key: string]: unknown };
+
 
     export class String extends Object {
         constructor(value?: string | number | boolean);

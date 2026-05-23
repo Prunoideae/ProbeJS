@@ -50,4 +50,12 @@ public interface TSPathProvider<T extends TSPathProvider<T>> {
         newSegments.addAll(segments());
         return create(getBaseName(), newSegments);
     }
+
+    default T subpath(int start, int end) {
+        return create(getBaseName(), segments().subList(start, end));
+    }
+
+    default T subpath(int end) {
+        return subpath(0, end);
+    }
 }

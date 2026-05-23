@@ -67,16 +67,23 @@ public class Documents implements DocumentRegistry, DocumentRegistrar {
         }
 
         ProbeJSPlugin.forEachWithPriority("modifyClasses", plugin -> plugin.modifyClasses(new ClassAccessor(documents, allClasses, typeConverter)));
-
-        // Free ClassInfo data now that transpiling is complete;
-        // PackageDump only reads from Documents, not ClassRegistry.
-        ClassRegistry.INSTANCE.clear();
-        System.gc();
     }
 
     @Nullable
     public Code getDocument(ClassPath classPath) {
         return documents.get(classPath);
+    }
+
+    public Map<ClassPath, Code> getAllDocuments() {
+        return Collections.unmodifiableMap(documents);
+    }
+
+    public Map<ClassPath, List<Type>> getAllAlias() {
+        Map<ClassPath, List<Type>> result = new HashMap<>();
+        for (var entry : inputAlias.asMap().entrySet()) {
+            result.put(entry.getKey(), List.copyOf(entry.getValue()));
+        }
+        return Collections.unmodifiableMap(result);
     }
 
     @Nullable

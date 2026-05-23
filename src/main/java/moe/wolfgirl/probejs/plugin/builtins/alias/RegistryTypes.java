@@ -174,15 +174,11 @@ public class RegistryTypes extends ProbeJSPlugin {
         List<String> entries = registry.keySet().stream()
                 .map(ResourceLocation::toString)
                 .toList();
-        if (entries.isEmpty()) {
-            return new TypeDecl(REGISTRY_TYPES.append(typeName), Types.NEVER, false);
-        } else {
-            return new TypeDecl(
-                    REGISTRY_TYPES.append(typeName),
-                    Types.union(entries.stream().map(Types::literal).map(t -> (Type) t).toList()),
-                    false
-            );
-        }
+        return new TypeDecl(
+                REGISTRY_TYPES.append(typeName),
+                Types.union(entries.stream().map(Types::literal).map(t -> (Type) t).toList()),
+                false
+        );
     }
 
     private TypeDecl makeTagType(ResourceKey<? extends Registry<?>> key, Registry<?> registry) {
