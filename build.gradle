@@ -94,6 +94,8 @@ dependencies {
 
     jarJar implementation('com.github.javaparser:javaparser-symbol-solver-core:3.24.8')
     jarJar implementation('com.github.javaparser:javaparser-core:3.24.8')
+    additionalRuntimeClasspath('com.github.javaparser:javaparser-symbol-solver-core:3.24.8')
+    additionalRuntimeClasspath('com.github.javaparser:javaparser-core:3.24.8')
 }
 
 compileJava {

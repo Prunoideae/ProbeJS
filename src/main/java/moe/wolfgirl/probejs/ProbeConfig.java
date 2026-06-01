@@ -10,7 +10,6 @@ import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -21,8 +20,8 @@ public class ProbeConfig {
 
     public ConfigEntry<Boolean> enabled = new ConfigEntry<>("enabled", true);
     public ConfigEntry<Integer> recursionDepth = new ConfigEntry<>("recursionDepth", 5);
-    // if the dump is complete (including all mods), or some are stripped out
-    public ConfigEntry<Boolean> complete = new ConfigEntry<>("complete", true);
+    // remove .probe, .vscode, .github, jsconfig.json, and package.json before dumping
+    public ConfigEntry<Boolean> reset = new ConfigEntry<>("reset", true);
     // what mods are force-included from an incomplete dump, other mods/registry objects are stripped off
     public ConfigEntry<String> mods = new ConfigEntry<>("forceIncluded", "kubejs,minecraft,neoforge");
     public ConfigEntry<Boolean> beans = new ConfigEntry<>("generateBeans", true);
@@ -31,7 +30,8 @@ public class ProbeConfig {
     public ConfigEntry<List<String>> fullScanMods = new ConfigEntry<>("fullScanMods", List.of("minecraft", "kubejs", "neoforge"));
     public ConfigEntry<Boolean> explicitNames = new ConfigEntry<>("explicitNames", false);
     public ConfigEntry<Boolean> newGame = new ConfigEntry<>("newGame", true);
-    
+    public ConfigEntry<List<String>> modSources = new ConfigEntry<>("modSources", List.of("https://maven.neoforged.net/releases/net/neoforged/neoforge/21.1.199/neoforge-21.1.199-sources.jar"));
+
     public static class ConfigEntry<T> {
         public final String name;
         public final T defaultValue;
@@ -126,7 +126,4 @@ public class ProbeConfig {
         return null;
     }
 
-    public Set<String> getIncludedMods() {
-        return Set.of(mods.get().split(","));
-    }
 }

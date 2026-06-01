@@ -12,6 +12,7 @@ import moe.wolfgirl.probejs.dumps.PackageDump;
 import moe.wolfgirl.probejs.dumps.ProjectDump;
 import moe.wolfgirl.probejs.java.ClassRegistry;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 
 public class DumpState {
@@ -33,6 +34,7 @@ public class DumpState {
     public static void startDump() {
         try {
             if (GameStates.DUMP_STATE != null) throw new IllegalStateException("Dump already in progress");
+            ProbeJSPlugin.forEachWithPriority("initialize", ProbeJSPlugin::initialize);
             ProbeJSPlugin.forEachWithPriority("addUsageHintsForAgents", registry -> registry.addUsageHintsForAgents(new NotesToLLM.Registry()));
             GameStates.DUMP_STATE = new DumpState();
             GameStates.DUMP_STATE.setProgress(0);
@@ -50,7 +52,10 @@ public class DumpState {
 
             GameStates.DUMP_STATE.setStatus(Component.literal("Dump complete!"));
             GameStates.DUMP_STATE = null;
-            GameStates.DUMP_SCREEN.onDumpFinished();
+            if (GameStates.DUMP_SCREEN != null) GameStates.DUMP_SCREEN.onDumpFinished();
+            else if (Minecraft.getInstance().player != null) {
+                Minecraft.getInstance().player.sendSystemMessage(Component.literal("Dump complete!").withStyle(ChatFormatting.GREEN));
+            }
 
             // clear the registries to free up memory
             ClassRegistry.INSTANCE.clear();
@@ -59,7 +64,11 @@ public class DumpState {
             SidedDocuments.INSTANCE.clear();
             System.gc();
         } catch (Exception e) {
-            GameStates.DUMP_STATE.setStatus(Component.literal("Dump failed!").withStyle(ChatFormatting.RED));
+            if (GameStates.DUMP_SCREEN != null) {
+                GameStates.DUMP_STATE.setStatus(Component.literal("Dump failed!").withStyle(ChatFormatting.RED));
+            } else if (Minecraft.getInstance().player != null) {
+                Minecraft.getInstance().player.sendSystemMessage(Component.literal("Dump failed!").withStyle(ChatFormatting.RED));
+            }
             GameUtils.logException(e);
             GameStates.DUMP_STATE = null;
             if (GameStates.DUMP_SCREEN != null) GameStates.DUMP_SCREEN.onDumpFinished();

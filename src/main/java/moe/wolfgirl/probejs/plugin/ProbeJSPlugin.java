@@ -16,6 +16,13 @@ import java.util.function.Consumer;
 
 public class ProbeJSPlugin implements KubeJSPlugin {
     /**
+     * Called to initialize the plugin before dump.
+     */
+    public void initialize() {
+
+    }
+
+    /**
      * Called right after a class is transpiled into TypeScript declaration, but before
      * all the classes are transpiled. This is used to apply a general transformation to
      * the class. E.g. setting input/output types, beans, etc.

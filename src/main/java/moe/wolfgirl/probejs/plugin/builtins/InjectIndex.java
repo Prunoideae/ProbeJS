@@ -35,18 +35,7 @@ public class InjectIndex extends ProbeJSPlugin {
                 var elementType = paramType.typeArgs.getFirst();
                 classDocument.members.add(new IterableIndex(elementType));
             }
-        }/* else if (Map.class.isAssignableFrom(classInfo.clazz())) {
-            // the same goes to map, we find remove to get the value
-            // we don't use key because TS can only use string to index the object
-            var remove = classDocument.members.stream()
-                    .filter(m -> m instanceof MethodDecl method && method.name.equals("remove") && method.params.size() == 1)
-                    .map(m -> (MethodDecl) m)
-                    .findFirst()
-                    .orElse(null);
-            if (remove == null) return;
-            // Remove returns the value
-            if (remove.returnType instanceof Type t) classDocument.members.add(new MapIndex(t));
-        }*/
+        }
     }
 
     private static class IterableIndex extends Code {

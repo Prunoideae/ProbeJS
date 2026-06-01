@@ -14,6 +14,12 @@ public abstract class CommentableCode extends Code {
         }
     }
 
+    public void addComments(List<String> comments) {
+        for (String comment : comments) {
+            this.comments.addAll(List.of(comment.strip().split("\\n")));
+        }
+    }
+
     public boolean hasComments() {
         return !comments.isEmpty();
     }

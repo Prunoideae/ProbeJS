@@ -23,6 +23,7 @@ public interface Types {
     RawType NEVER = raw("never");
     RawType OBJECT = raw("object");
     RawType UNKNOWN = raw("unknown");
+    RawType NULL = raw("null");
     RawType VOID = raw("void");
     RawType BOOLEAN = raw("boolean");
     RawType NUMBER = raw("number");

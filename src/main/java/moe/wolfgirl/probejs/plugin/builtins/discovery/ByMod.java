@@ -39,6 +39,7 @@ public class ByMod extends ProbeJSPlugin {
                 if (!name.endsWith(".class")) continue;
                 name = name.substring(0, name.length() - 6);
                 name = name.replace("/", ".");
+                name = name.replace("\\", ".");
 
                 try {
                     if (ClassRegistry.shouldSkipClass(name)) continue;

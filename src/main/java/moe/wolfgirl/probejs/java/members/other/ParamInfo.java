@@ -6,12 +6,14 @@ import dev.latvian.mods.rhino.type.TypeInfo;
 import moe.wolfgirl.probejs.java.members.ClassInfo;
 import moe.wolfgirl.probejs.utils.NameUtils;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.TypeVariable;
 import java.util.*;
 
-public record ParamInfo(String name, TypeInfo typeInfo, boolean varArgs) implements ClassProvider {
+public record ParamInfo(String name, TypeInfo typeInfo, boolean varArgs,
+                        Annotation[] annotations) implements ClassProvider, HasAnnotation {
 
     public static List<ParamInfo> resolve(CachedExecutableInfo executableInfo, Map<String, TypeInfo> typeRemap) {
         Executable original = executableInfo.getCached();
@@ -42,7 +44,7 @@ public record ParamInfo(String name, TypeInfo typeInfo, boolean varArgs) impleme
             TypeInfo typeInfo = cachedParameters.typeInfos().get(i - offset);
             typeInfo = ClassInfo.remapType(typeInfo, typeRemapNoLocal);
             var paramName = NameUtils.isNameSafe(parameter.getName()) ? parameter.getName() : "arg" + (i - offset);
-            result.add(new ParamInfo(paramName, typeInfo, parameter.isVarArgs()));
+            result.add(new ParamInfo(paramName, typeInfo, parameter.isVarArgs(), parameter.getAnnotations()));
         }
 
         return result;
@@ -51,5 +53,10 @@ public record ParamInfo(String name, TypeInfo typeInfo, boolean varArgs) impleme
     @Override
     public Collection<Class<?>> getReferredClasses() {
         return typeInfo.getContainedComponentClasses();
+    }
+
+    @Override
+    public Annotation[] getAnnotations() {
+        return annotations;
     }
 }

@@ -2,6 +2,7 @@ package moe.wolfgirl.probejs.typescript;
 
 import dev.latvian.mods.kubejs.script.ScriptType;
 import dev.latvian.mods.rhino.util.HideFromJS;
+import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -94,6 +95,34 @@ public class ClassPath implements TSPathProvider<ClassPath> {
         var clazz = Class.forName(asJavaPath(), false, Thread.currentThread().getContextClassLoader());
         CLASS_CACHE.put(this, clazz);
         return clazz;
+    }
+
+    @HideFromJS
+    @Nullable
+    public ClassPath superclass() {
+        try {
+            var clazz = loadClass();
+            var superClass = clazz.getSuperclass();
+            if (superClass == null) return null;
+            return new ClassPath(superClass);
+        } catch (ClassNotFoundException e) {
+            return null;
+        }
+    }
+
+    @HideFromJS
+    public List<ClassPath> interfaces() {
+        try {
+            var clazz = loadClass();
+            var interfaces = clazz.getInterfaces();
+            List<ClassPath> result = new ArrayList<>();
+            for (var iface : interfaces) {
+                result.add(new ClassPath(iface));
+            }
+            return result;
+        } catch (ClassNotFoundException e) {
+            return List.of();
+        }
     }
 
     @Override

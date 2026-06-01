@@ -35,7 +35,7 @@ public class DumpScreen extends Screen {
     private Button dumpButton;
     private Button convertButton;
     private List<String> modListFilter = ProbeConfig.INSTANCE.fullScanMods.get();
-    private boolean fullDumpEnabled = ProbeConfig.INSTANCE.complete.get();
+    private boolean fullDumpEnabled = ProbeConfig.INSTANCE.reset.get();
     private boolean beansEnabled = ProbeConfig.INSTANCE.beans.get();
     private boolean hintsForLLMEnabled = ProbeConfig.INSTANCE.hintsForLLM.get();
     private int progress = 0;
@@ -79,13 +79,13 @@ public class DumpScreen extends Screen {
                         left + CONTENT_MARGIN,
                         top + 24,
                         contentWidth - CONVERT_BUTTON_WIDTH - 4,
-                        Component.literal("Full Dump"),
+                        Component.literal("Re-dump"),
                         this.fullDumpEnabled,
                         selected -> {
                             this.fullDumpEnabled = selected;
-                            ProbeConfig.INSTANCE.complete.set(selected);
+                            ProbeConfig.INSTANCE.reset.set(selected);
                         },
-                        Component.literal("Dumps more classes, now can handle ATM10!")
+                        Component.literal("Clean up before dumping files. Used to reset jsconfig, vscode json, etc.")
                 )
         );
 

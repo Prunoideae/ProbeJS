@@ -1,4 +1,4 @@
-package moe.wolfgirl.probejs.plugin.builtins;
+package moe.wolfgirl.probejs.plugin.builtins.extras;
 
 import moe.wolfgirl.probejs.GameStates;
 import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;

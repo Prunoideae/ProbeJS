@@ -2,13 +2,12 @@ package moe.wolfgirl.probejs.dumps;
 
 import dev.latvian.mods.kubejs.script.ScriptType;
 import moe.wolfgirl.probejs.GameStates;
-import moe.wolfgirl.probejs.ProbeJS;
 import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
 import moe.wolfgirl.probejs.snippet.SnippetRegistry;
+import moe.wolfgirl.probejs.utils.GameUtils;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -50,7 +49,7 @@ public class ProjectDump {
         };
 
         try {
-            List<String> lines = readDumpFile("assets/probejs/dumps/jsconfig.jsonc", Map.of("side", sideString));
+            List<String> lines = GameUtils.readData("assets/probejs/dumps/jsconfig.jsonc", Map.of("side", sideString));
             var outputPath = baseDir.resolve("kubejs/%s_scripts/jsconfig.json".formatted(sideString));
             Files.createDirectories(outputPath.getParent());
             Files.write(outputPath, lines);
@@ -61,7 +60,7 @@ public class ProjectDump {
 
     private void writeAgents(String agentName) {
         try {
-            var lines = readDumpFile("assets/probejs/dumps/%s.agent.md".formatted(agentName), Map.of());
+            var lines = GameUtils.readData("assets/probejs/dumps/%s.agent.md".formatted(agentName), Map.of());
             var outputPath = baseDir.resolve(".github/agents/%s.agent.md".formatted(agentName));
 
             Files.createDirectories(outputPath.getParent());
@@ -73,7 +72,7 @@ public class ProjectDump {
 
     private void writePackageJson() {
         try {
-            var lines = readDumpFile("assets/probejs/dumps/package.json", Map.of());
+            var lines = GameUtils.readData("assets/probejs/dumps/package.json", Map.of());
             var outputPath = baseDir.resolve("kubejs/package.json");
             Files.createDirectories(outputPath.getParent());
             Files.write(outputPath, lines);
@@ -82,16 +81,4 @@ public class ProjectDump {
         }
     }
 
-    private static List<String> readDumpFile(String resourcePath, Map<String, String> formatter) throws IOException {
-        var modFile = ProbeJS.MOD_CONTAINER.getModInfo().getOwningFile().getFile();
-        var resourceFile = modFile.findResource(resourcePath);
-        if (!Files.exists(resourceFile)) throw new FileNotFoundException("Resource not found: " + resourcePath);
-
-        return Files.readAllLines(resourceFile).stream().map(line -> {
-            for (var entry : formatter.entrySet()) {
-                line = line.replace("$%s$".formatted(entry.getKey()), entry.getValue());
-            }
-            return line;
-        }).toList();
-    }
 }

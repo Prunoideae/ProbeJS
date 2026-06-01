@@ -26,5 +26,6 @@
     "probejs.decompile": "ProbeJS will decompile mod sources at next dump, decompilation will also trigger when mod list changed.",
     "probejs.no_decompile": "ProbeJS will not decompile mod sources now.",
     "probejs.generate_beans": "ProbeJS will generate beans for getXX, isXX and setXX methods now.",
-    "probejs.no_generate_beans": "ProbeJS will not generate beans now."
+    "probejs.no_generate_beans": "ProbeJS will not generate beans now.",
+    "probejs.modified_give_command": "[ProbeJS] This is not vanilla behavior, use only in development!"
 }

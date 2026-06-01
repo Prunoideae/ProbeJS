@@ -7,6 +7,7 @@ import moe.wolfgirl.probejs.java.members.other.ClassProvider;
 import moe.wolfgirl.probejs.java.members.other.HasAnnotation;
 import moe.wolfgirl.probejs.java.members.other.HasTypeVariable;
 import moe.wolfgirl.probejs.java.members.other.ParamInfo;
+import org.objectweb.asm.Type;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Modifier;
@@ -19,7 +20,8 @@ public record MethodInfo(String name,
                          boolean isStatic, boolean isAbstract, boolean isSynthetic,
                          Annotation[] annotations,
                          TypeVariable<?>[] typeVariables,
-                         ClassPath declaringClass
+                         ClassPath declaringClass,
+                         String descriptor
 ) implements HasAnnotation, HasTypeVariable, ClassProvider {
     public static MethodInfo resolve(CachedMethodInfo methodInfo, Map<String, TypeInfo> typeRemap) {
         var typeRemapNoLocal = new HashMap<>(typeRemap);
@@ -35,7 +37,8 @@ public record MethodInfo(String name,
                 methodInfo.getCached().isSynthetic(),
                 methodInfo.getCached().getAnnotations(),
                 methodInfo.getCached().getTypeParameters(),
-                new ClassPath(methodInfo.getDeclaringClass().type)
+                new ClassPath(methodInfo.getDeclaringClass().type),
+                Type.getMethodDescriptor(methodInfo.getCached())
         );
     }
 

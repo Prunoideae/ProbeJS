@@ -6,10 +6,7 @@ import moe.wolfgirl.probejs.plugin.builtins.alias.*;
 import moe.wolfgirl.probejs.plugin.builtins.discovery.ByMod;
 import moe.wolfgirl.probejs.plugin.builtins.discovery.JavaLoaded;
 import moe.wolfgirl.probejs.plugin.builtins.events.*;
-import moe.wolfgirl.probejs.plugin.builtins.extras.ForgeEvents;
-import moe.wolfgirl.probejs.plugin.builtins.extras.Internals;
-import moe.wolfgirl.probejs.plugin.builtins.extras.LLMHints;
-import moe.wolfgirl.probejs.plugin.builtins.extras.LoadJava;
+import moe.wolfgirl.probejs.plugin.builtins.extras.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,8 +18,6 @@ import java.util.function.Supplier;
  * to be correct.
  */
 public class ProbeBuiltinDocs extends ProbeJSPlugin {
-    public static final ProbeBuiltinDocs INSTANCE = new ProbeBuiltinDocs();
-
     private static final List<Supplier<ProbeJSPlugin>> BUILTIN_DOCS = new ArrayList<>(List.of(
             // discovery
             JavaLoaded::new,
@@ -45,6 +40,7 @@ public class ProbeBuiltinDocs extends ProbeJSPlugin {
             InjectBeans::new,
             InjectIndex::new,
             InjectDocsForAgents::new,
+            InjectParchment::new,
 
             // events
             Events::new,
@@ -63,14 +59,24 @@ public class ProbeBuiltinDocs extends ProbeJSPlugin {
             Internals::new,
 
             // snippets
-            Snippets::new
+            Snippets::new,
+            RegistrySnippets::new
     ));
 
+    private static List<ProbeJSPlugin> cachedDocs = null;
+
     public static List<ProbeJSPlugin> getAll() {
-        List<ProbeJSPlugin> result = new ArrayList<>();
-        for (Supplier<ProbeJSPlugin> builtinDoc : BUILTIN_DOCS) {
-            result.add(builtinDoc.get());
+        if (cachedDocs == null) {
+            cachedDocs = new ArrayList<>();
+            for (Supplier<ProbeJSPlugin> builtinDoc : BUILTIN_DOCS) {
+                cachedDocs.add(builtinDoc.get());
+            }
         }
-        return result;
+
+        return cachedDocs;
+    }
+
+    public static void clearCache() {
+        cachedDocs = null;
     }
 }

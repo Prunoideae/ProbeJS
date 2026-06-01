@@ -198,6 +198,7 @@ public class ClassRegistry {
                         .map(path -> file.toPath().relativize(path).toString())
                         .map(name -> name.substring(0, name.length() - 6))
                         .map(name -> name.replace("/", "."))
+                        .map(name -> name.replace("\\", "."))
                         .toList();
             } catch (IOException ignore) {
                 return Collections.emptyList();

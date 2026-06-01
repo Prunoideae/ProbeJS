@@ -11,7 +11,12 @@ import net.minecraft.server.MinecraftServer;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import javax.annotation.Nullable;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class GameUtils {
@@ -50,5 +55,18 @@ public class GameUtils {
     @SuppressWarnings("unchecked")
     public static <T> ResourceKey<Registry<T>> castKey(ResourceKey<?> key) {
         return (ResourceKey<Registry<T>>) key;
+    }
+
+    public static List<String> readData(String resourcePath, Map<String, String> formatter) throws IOException {
+        var modFile = ProbeJS.MOD_CONTAINER.getModInfo().getOwningFile().getFile();
+        var resourceFile = modFile.findResource(resourcePath);
+        if (!Files.exists(resourceFile)) throw new FileNotFoundException("Resource not found: " + resourcePath);
+
+        return Files.readAllLines(resourceFile).stream().map(line -> {
+            for (var entry : formatter.entrySet()) {
+                line = line.replace("$%s$".formatted(entry.getKey()), entry.getValue());
+            }
+            return line;
+        }).toList();
     }
 }
