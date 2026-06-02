@@ -23,6 +23,8 @@ public class GameStates {
     public static final Map<String, JsonObject> RECIPE_IDS = new HashMap<>();
     public static final Set<String> LOOT_TABLES = new HashSet<>();
     public static DumpScreen DUMP_SCREEN = null;
+    // It is better to call DUMP_STATE directly rather than checking if dump screen is null, because dump state ensures
+    // null-check when inside the dumping lifecycle. If used outside of dumping, use DUMP_SCREEN with null-check instead.
     public static DumpState DUMP_STATE = null;
 
     public static final Supplier<Set<String>> LANG_KEYS = () ->

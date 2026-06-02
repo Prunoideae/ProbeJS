@@ -16,6 +16,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 
 public class DumpState {
+    // Initialization
     // Fetching initial classes
     // Discovering more classes
     // Transpiling to TypeScript
@@ -34,9 +35,9 @@ public class DumpState {
     public static void startDump() {
         try {
             if (GameStates.DUMP_STATE != null) throw new IllegalStateException("Dump already in progress");
+            GameStates.DUMP_STATE = new DumpState();
             ProbeJSPlugin.forEachWithPriority("initialize", ProbeJSPlugin::initialize);
             ProbeJSPlugin.forEachWithPriority("addUsageHintsForAgents", registry -> registry.addUsageHintsForAgents(new NotesToLLM.Registry()));
-            GameStates.DUMP_STATE = new DumpState();
             GameStates.DUMP_STATE.setProgress(0);
             if (GameStates.DUMP_SCREEN != null) GameStates.DUMP_SCREEN.initFromState();
             ClassRegistry.INSTANCE.fetchInitialClasses();

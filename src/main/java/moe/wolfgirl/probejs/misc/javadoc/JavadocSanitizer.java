@@ -1,4 +1,4 @@
-package moe.wolfgirl.probejs.misc;
+package moe.wolfgirl.probejs.misc.javadoc;
 
 import java.util.ArrayList;
 import java.util.List;

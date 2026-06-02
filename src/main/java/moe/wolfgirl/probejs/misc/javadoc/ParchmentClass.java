@@ -1,4 +1,4 @@
-package moe.wolfgirl.probejs.misc;
+package moe.wolfgirl.probejs.misc.javadoc;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -17,6 +17,13 @@ public record ParchmentClass(String name, List<String> javaDoc, List<Method> met
         String[] parts = name.split("/");
         parts[parts.length - 1] = "$" + parts[parts.length - 1];
         return new ClassPath(List.of(parts));
+    }
+
+    public Method getConstructor(String descriptor) {
+        for (Method method : methods) {
+            if (method.name().equals("<init>") && method.descriptor().equals(descriptor)) return method;
+        }
+        return null;
     }
 
     public Method getMethod(String descriptor) {

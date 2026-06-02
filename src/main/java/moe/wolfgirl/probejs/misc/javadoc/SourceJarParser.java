@@ -1,4 +1,4 @@
-package moe.wolfgirl.probejs.misc;
+package moe.wolfgirl.probejs.misc.javadoc;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
@@ -67,6 +67,10 @@ public class SourceJarParser {
             List<String> javaDoc = classDecl.getJavadoc()
                     .map(javadoc -> javadoc.getDescription().toText().lines().toList())
                     .orElse(List.of());
+            List<ParchmentClass.Method> constructors = classDecl.getConstructors().stream()
+                    .filter(ConstructorDeclaration::isPublic)
+                    .map(c -> parseMethod(c, compilationUnit))
+                    .toList();
             List<ParchmentClass.Method> methods = classDecl.getMethods().stream()
                     .filter(m -> m.isPublic() || classDecl.isInterface()) // interface methods are implicitly public
                     .map(m -> parseMethod(m, compilationUnit))
@@ -75,8 +79,12 @@ public class SourceJarParser {
                     .filter(FieldDeclaration::isPublic)
                     .flatMap(f -> parseFields(f, compilationUnit).stream())
                     .toList();
+
+            List<ParchmentClass.Method> allMethods = new ArrayList<>();
+            allMethods.addAll(constructors);
+            allMethods.addAll(methods);
             // methods and fields must be mutable since we will perform merging later
-            result.add(new ParchmentClass(className, javaDoc, new ArrayList<>(methods), new ArrayList<>(fields)));
+            result.add(new ParchmentClass(className, javaDoc, allMethods, new ArrayList<>(fields)));
         }
         return result;
     }
@@ -164,8 +172,8 @@ public class SourceJarParser {
 
     // --- Public parsing methods ---
 
-    public static ParchmentClass.Method parseMethod(MethodDeclaration method, CompilationUnit cu) {
-        String name = method.getNameAsString();
+    public static ParchmentClass.Method parseMethod(CallableDeclaration<?> method, CompilationUnit cu) {
+        String name = method instanceof ConstructorDeclaration ? "<init>" : method.getNameAsString();
 
         // Javadoc (description only, before @param / @return tags)
         List<String> javaDoc = method.getJavadoc()
@@ -173,7 +181,10 @@ public class SourceJarParser {
                 .orElse(List.of());
 
         // JVM method descriptor:  (paramTypes)returnType
-        String returnDescriptor = toJvmDescriptor(method.getType(), cu);
+
+        String returnDescriptor = method instanceof MethodDeclaration md
+                ? toJvmDescriptor(md.getType(), cu)
+                : "V"; // constructors have void return type
         String paramsDescriptor = method.getParameters().stream()
                 .map(p -> toJvmDescriptor(p.getType(), cu))
                 .collect(Collectors.joining());
@@ -219,7 +230,7 @@ public class SourceJarParser {
      * Reads {@code @param} block tags from a method's javadoc and returns a map
      * from parameter name to its documented description lines.
      */
-    private static Map<String, List<String>> extractParamDocs(MethodDeclaration method) {
+    private static Map<String, List<String>> extractParamDocs(CallableDeclaration<?> method) {
         Map<String, List<String>> result = new HashMap<>();
         method.getJavadoc().ifPresent(javadoc -> {
             for (var blockTag : javadoc.getBlockTags()) {
