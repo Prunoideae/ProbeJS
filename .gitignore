@@ -20,4 +20,4 @@ gradle-app.setting
 /.idea/
 ProbeJS_server.launch
 ProbeJS_client.launch
-src/main/resources/assets/probejs/dumps/parchment.json
+**/parchment.json

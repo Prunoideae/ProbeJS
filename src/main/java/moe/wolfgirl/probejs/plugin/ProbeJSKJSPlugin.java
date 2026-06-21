@@ -1,5 +1,6 @@
 package moe.wolfgirl.probejs.plugin;
 
+import dev.latvian.mods.kubejs.event.EventGroupRegistry;
 import dev.latvian.mods.kubejs.plugin.KubeJSPlugin;
 import dev.latvian.mods.kubejs.script.BindingRegistry;
 import dev.latvian.mods.kubejs.web.LocalWebServerRegistry;
@@ -20,5 +21,10 @@ public class ProbeJSKJSPlugin implements KubeJSPlugin {
     @Override
     public void registerLocalWebServerWithAuth(LocalWebServerRegistry registry) {
         ProbeJSWeb.registerWithAuth(registry);
+    }
+
+    @Override
+    public void registerEvents(EventGroupRegistry registry) {
+        // TODO
     }
 }
