@@ -2,14 +2,16 @@ package moe.wolfgirl.probejs;
 
 import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonWriter;
+import dev.latvian.mods.kubejs.plugin.KubeJSPlugins;
 import moe.wolfgirl.probejs.utils.JsonUtils;
+import net.neoforged.fml.ModList;
+import net.neoforged.neoforgespi.language.IModFileInfo;
+import net.neoforged.neoforgespi.language.IModInfo;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -27,10 +29,28 @@ public class ProbeConfig {
     public ConfigEntry<Boolean> beans = new ConfigEntry<>("generateBeans", true);
     public ConfigEntry<Boolean> hintsForLLM = new ConfigEntry<>("hintsForLLM", false);
     public ConfigEntry<List<String>> excludedPaths = new ConfigEntry<>("excludedClassPaths", List.of());
-    public ConfigEntry<List<String>> fullScanMods = new ConfigEntry<>("fullScanMods", List.of("minecraft", "kubejs", "neoforge"));
+    public ConfigEntry<List<String>> fullScanMods = new ConfigEntry<>("fullScanMods", findFullScanMods());
     public ConfigEntry<Boolean> explicitNames = new ConfigEntry<>("explicitNames", false);
     public ConfigEntry<Boolean> newGame = new ConfigEntry<>("newGame", true);
     public ConfigEntry<List<String>> modSources = new ConfigEntry<>("modSources", List.of("https://maven.neoforged.net/releases/net/neoforged/neoforge/21.1.199/neoforge-21.1.199-sources.jar"));
+
+
+    private static List<String> findFullScanMods() {
+        Set<String> mods = new HashSet<>(List.of("minecraft", "kubejs", "neoforge"));
+        // Fully load addon mods
+        for (IModFileInfo modFileInfo : ModList.get().getModFiles()) {
+            var modFile = modFileInfo.getFile();
+            if (!modFile.getModInfos().isEmpty()) {
+                var path = modFile.findResource("kubejs.plugins.txt");
+                if (Files.exists(path)) {
+                    for (IModInfo modInfo : modFile.getModInfos()) {
+                        mods.add(modInfo.getModId());
+                    }
+                }
+            }
+        }
+        return new ArrayList<>(mods);
+    }
 
     public static class ConfigEntry<T> {
         public final String name;

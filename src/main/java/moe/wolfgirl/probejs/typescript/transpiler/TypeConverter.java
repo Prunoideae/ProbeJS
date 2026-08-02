@@ -70,6 +70,8 @@ public class TypeConverter {
             case JSOrTypeInfo(List<TypeInfo> types) -> Types.union(types.stream()
                     .map(t -> convertType(t, true, seenVariables))
                     .toArray(Type[]::new));
+            case JSNumberConstantTypeInfo(Number number) -> Types.raw(number.toString());
+            case JSStringConstantTypeInfo(String constant) -> Types.literal(constant);
             case null, default -> Types.ANY;
         };
     }

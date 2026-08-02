@@ -2,6 +2,7 @@ package moe.wolfgirl.probejs.dumps;
 
 import dev.latvian.mods.kubejs.script.ScriptType;
 import moe.wolfgirl.probejs.GameStates;
+import moe.wolfgirl.probejs.ProbeConfig;
 import moe.wolfgirl.probejs.plugin.ProbeJSPlugin;
 import moe.wolfgirl.probejs.snippet.SnippetRegistry;
 import moe.wolfgirl.probejs.utils.GameUtils;
@@ -34,9 +35,11 @@ public class ProjectDump {
         writeJsConfig(ScriptType.SERVER);
         writeJsConfig(ScriptType.STARTUP);
         writePackageJson(); // https://www.typescriptlang.org/docs/handbook/modules/reference.html#module-format-detection
-        writeAgents("kubejs-planner");
-        writeAgents("kubejs-explore");
-        writeAgents("kubejs-survey");
+        if (ProbeConfig.INSTANCE.hintsForLLM.get()) {
+            writeAgents("kubejs-planner");
+            writeAgents("kubejs-explore");
+            writeAgents("kubejs-survey");
+        }
         GameStates.DUMP_STATE.incrementProgress(1);
     }
 

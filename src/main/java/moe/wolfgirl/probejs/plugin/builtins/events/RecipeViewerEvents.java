@@ -65,8 +65,10 @@ public class RecipeViewerEvents extends ProbeJSPlugin {
             events.add(generateEvent("registerSubtypes", entry.id, RegisterSubtypesKubeEvent.class, predicateType));
             events.add(generateEvent("removeEntries", entry.id, RemoveEntriesKubeEvent.class, predicateType));
             events.add(generateEvent("removeEntriesCompletely", entry.id, RemoveEntriesKubeEvent.class, predicateType));
-            events.add(generateEvent("removeRecipes", entry.id, RemoveRecipesKubeEvent.class));
+
         }
+        events.add(generateEventNoEntry("removeCategories", RemoveCategoriesKubeEvent.class));
+        events.add(generateEventNoEntry("removeRecipes", RemoveRecipesKubeEvent.class));
 
         return events;
     }
@@ -76,6 +78,13 @@ public class RecipeViewerEvents extends ProbeJSPlugin {
 
         return Members.method(eventName)
                 .param("extra", Types.literal(entryType))
+                .param("handler", Types.lambda(builder -> builder.param("event", e)))
+                .build(KindAware.Kind.NAMESPACE);
+    }
+
+    public MethodDecl generateEventNoEntry(String eventName, Class<?> eventType, Type... params) {
+        var e = params.length == 0 ? Types.clazz(eventType) : Types.clazz(eventType).withParams(params);
+        return Members.method(eventName)
                 .param("handler", Types.lambda(builder -> builder.param("event", e)))
                 .build(KindAware.Kind.NAMESPACE);
     }

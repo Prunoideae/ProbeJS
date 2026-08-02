@@ -24,6 +24,10 @@ public abstract class CommentableCode extends Code {
         return !comments.isEmpty();
     }
 
+    public List<String> getComments() {
+        return comments;
+    }
+
     // //...
     // //...
     public List<String> formatDoubleDash(int indent) {
