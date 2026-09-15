@@ -32,13 +32,17 @@ public class InjectBeans extends ProbeJSPlugin {
         }
 
         List<Bean> beans = new ArrayList<>();
-        Set<String> allBeanNames = new HashSet<>();
+        Set<String> allBeanNamesRead = new HashSet<>();
+        Set<String> allBeanNamesWrite = new HashSet<>();
         Set<String> duplicatedNames = new HashSet<>(classInfo.getMethodNames());
         for (Code member : classDocument.members) {
             if (member instanceof MethodDecl methodDecl) {
+                var beanType = getBeanType(methodDecl.name);
+                if (beanType == null || methodDecl.params.size() != beanType.argCount) continue;
                 var beanName = getBeanName(methodDecl.name);
                 if (beanName == null) continue;
-                if (!allBeanNames.add(beanName)) duplicatedNames.add(beanName);
+                var seenSet = beanType == BeanType.SETTER ? allBeanNamesWrite : allBeanNamesRead;
+                if (!seenSet.add(beanName)) duplicatedNames.add(beanName);
             }
         }
 
@@ -154,6 +158,11 @@ public class InjectBeans extends ProbeJSPlugin {
     }
 
     private enum BeanType {
-        GETTER, SETTER, IS
+        GETTER(0), SETTER(1), IS(0);
+
+        BeanType(int argc) {
+            argCount = argc;
+        }
+        public final int argCount;
     }
 }
